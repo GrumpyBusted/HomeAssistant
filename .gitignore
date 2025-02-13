@@ -1,4 +1,4 @@
-# .gitingore file for Home Assistant
+# .gitingore file for Home Assistant configuration
 *
 !*/
 !**/*.yaml
