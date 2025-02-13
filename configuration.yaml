@@ -44,4 +44,4 @@ mqtt:
       unit_of_measurement: "°C"
 
 shell_command:
-  pushupdates_to_github: /bin/bash /config/pushupdates.sh
+  pushupdates_to_github: /bin/bash pushupdates.sh
