@@ -1,0 +1,4316 @@
+- id: '1735603602121'
+  alias: Stue - Lys
+  description: Automatik for lys på Stuen
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_1_philips_hue
+    attribute: event_type
+    to: short_release
+    id: button_1_short
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_1_philips_hue
+    attribute: event_type
+    to: long_release
+    id: button_1_long
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_2_philips_hue
+    attribute: event_type
+    to: short_release
+    id: button_2_short
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_2_philips_hue
+    attribute: event_type
+    to: long_release
+    id: button_2_long
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_3_philips_hue
+    attribute: event_type
+    to: short_release
+    id: button_3_short
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_3_philips_hue
+    attribute: event_type
+    to: long_release
+    id: button_3_long
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_4_philips_hue
+    attribute: event_type
+    to: short_release
+    id: button_4_short
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_4_philips_hue
+    attribute: event_type
+    to: long_release
+    id: button_4_long
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_rotary_philips_hue
+    id: rotary
+  - trigger: state
+    entity_id:
+    - binary_sensor.family_home
+    to: 'off'
+  - trigger: state
+    entity_id:
+    - binary_sensor.living_room_light
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1_short
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2700
+          brightness_pct: 80
+        target:
+          entity_id: light.living_room_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_2_short
+      sequence:
+      - action: script.living_room_light_dinning
+        metadata: {}
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - button_3_short
+      sequence:
+      - action: script.living_room_light_tv
+        metadata: {}
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1_long
+        - button_2_long
+        - button_3_long
+        - button_4_long
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.living_room_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - rotary
+      sequence:
+      - choose:
+        - conditions:
+          - condition: state
+            entity_id: event.living_room_switch_rotary_philips_hue
+            attribute: event_type
+            state: clock_wise
+          - condition: state
+            entity_id: binary_sensor.living_room_light
+            state: 'off'
+          sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              brightness_pct: '{{ (state_attr(''event.living_room_switch_rotary_philips_hue'',
+                ''steps'')|float / 3.60)|round(0) }}'
+            target:
+              entity_id: light.living_room_light_philips_hue
+        - conditions:
+          - condition: state
+            entity_id: event.living_room_switch_rotary_philips_hue
+            attribute: event_type
+            state: clock_wise
+          sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              brightness_step_pct: '{{ (state_attr(''event.living_room_switch_rotary_philips_hue'',
+                ''steps'')|float / 3.60)|round(0) }}'
+            target:
+              entity_id: "{% set lights = state_attr('light.living_room_light_philips_hue',
+                'entity_id') | expand() | selectattr('state', 'eq', 'on') | map(attribute='entity_id')
+                | list %} {% if lights | length > 0 -%}\n  {{ lights }}      \n{%-
+                else -%}\n  {{ 'light.living_room_light_philips_hue' }}      \n{%-
+                endif %}"
+        default:
+        - action: light.turn_on
+          metadata: {}
+          data:
+            brightness_step_pct: '{{ (state_attr(''event.living_room_switch_rotary_philips_hue'',
+              ''steps'')|float / -3.60)|round(0) }}'
+          target:
+            entity_id: '{{ state_attr(''light.living_room_light_philips_hue'', ''entity_id'')
+              | expand() | selectattr(''state'', ''eq'', ''on'') | map(attribute=''entity_id'')
+              | list }}      '
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.family_home
+        state: 'off'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 0
+        target:
+          entity_id:
+          - light.living_room_light_philips_hue
+  mode: queued
+- id: '1735658670560'
+  alias: Indkørsel - Billader lås op
+  description: Hvis en af bilerne er hjemme og tilsluttet, lås billaderen op
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.driveway_ev_charger_status_description_wallbox
+    to: Locked, car connected
+  - trigger: state
+    entity_id:
+    - device_tracker.volvo_ex30_location
+    to: home
+  - trigger: state
+    entity_id:
+    - device_tracker.volvo_xc40_location
+    to: home
+  - trigger: state
+    entity_id:
+    - sensor.volvo_ex30_charging_connection_status
+    from: Disconnected
+  - trigger: state
+    entity_id:
+    - sensor.volvo_xc40_charging_connection_status
+    to: Connected AC
+  - trigger: state
+    entity_id:
+    - binary_sensor.family_home
+    to: 'on'
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.family_home
+    state: 'on'
+  - condition: state
+    entity_id: lock.driveway_ev_charger_lock_wallbox
+    state: locked
+  - condition: state
+    entity_id: sensor.driveway_ev_charger_status_description_wallbox
+    state: Locked, car connected
+  - condition: or
+    conditions:
+    - condition: and
+      conditions:
+      - condition: state
+        entity_id: device_tracker.volvo_ex30_location
+        state: home
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: sensor.volvo_ex30_charging_connection_status
+          state: Disconnected
+    - condition: and
+      conditions:
+      - condition: state
+        entity_id: device_tracker.volvo_xc40_location
+        state: home
+      - condition: state
+        entity_id: sensor.volvo_xc40_charging_connection_status
+        state: Connected AC
+  actions:
+  - action: lock.unlock
+    metadata: {}
+    data: {}
+    target:
+      entity_id: lock.driveway_ev_charger_lock_wallbox
+  trace:
+    stored_traces: 100
+  mode: queued
+- id: '1735725983183'
+  alias: Garage - Lys
+  description: Automatik for lys i garage
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.garage_switch_button_1_philips_hue
+    id: button_1
+  - trigger: state
+    entity_id:
+    - event.garage_switch_button_2_philips_hue
+    id: button_2
+  - trigger: state
+    entity_id:
+    - event.garage_switch_button_3_philips_hue
+    id: button_3
+  - trigger: state
+    entity_id:
+    - event.garage_switch_button_4_philips_hue
+    id: button_4
+  - trigger: state
+    entity_id:
+    - binary_sensor.family_home
+    to: 'off'
+  - trigger: state
+    entity_id:
+    - lock.garage_door_lock_yale
+    to: locked
+  - trigger: state
+    entity_id:
+    - binary_sensor.garage_door_sensor_opening_philips_hue
+    to: 'on'
+  - trigger: state
+    entity_id:
+    - binary_sensor.garage_door_sensor_opening_philips_hue
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+  - trigger: state
+    entity_id:
+    - binary_sensor.garage_light
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - light.garage_light_main_philips_hue
+          - light.garage_light_spots_philips_hue
+          - light.garage_light_projector_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_2
+      sequence:
+      - action: light.toggle
+        metadata: {}
+        data: {}
+        target:
+          entity_id: light.garage_light_main_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_3
+      sequence:
+      - action: light.toggle
+        metadata: {}
+        data: {}
+        target:
+          entity_id: light.garage_light_spots_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_4
+      sequence:
+      - action: light.toggle
+        metadata: {}
+        data: {}
+        target:
+          entity_id: light.garage_light_projector_philips_hue
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.garage_door_sensor_opening_philips_hue
+        state: 'on'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: light.garage_light_main_philips_hue
+    - conditions:
+      - condition: state
+        entity_id: lock.garage_door_lock_yale
+        state: locked
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - light.garage_light_main_philips_hue
+          - light.garage_light_spots_philips_hue
+          - light.garage_light_projector_philips_hue
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.family_home
+        state: 'off'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - light.garage_light_main_philips_hue
+          - light.garage_light_spots_philips_hue
+          - light.garage_light_projector_philips_hue
+  mode: queued
+- id: '1735733828705'
+  alias: Hjem - Ingen hjemme
+  description: Når alle har forladt hjemme
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.family_home
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+  conditions:
+  - condition: state
+    entity_id: input_boolean.home_house_sitter
+    state: 'off'
+  actions:
+  - action: climate.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: climate.living_room_heat_pump_panasonic
+  - action: automation.turn_off
+    metadata: {}
+    data:
+      stop_actions: false
+    target:
+      entity_id: automation.living_room_heat_pump_booster_turn_off
+  - if:
+    - condition: state
+      entity_id: climate.home_heat_pump_panasonic
+      state: heat
+    then:
+    - action: climate.set_temperature
+      metadata: {}
+      data:
+        temperature: '{{ state_attr(''climate.home_heat_pump_panasonic'', ''min_temp'')
+          }}'
+      target:
+        entity_id: climate.home_heat_pump_panasonic
+    - action: climate.set_preset_mode
+      metadata: {}
+      data:
+        preset_mode: eco
+      target:
+        entity_id: climate.home_heat_pump_panasonic
+    - action: select.select_option
+      metadata: {}
+      data:
+        option: 'off'
+      target:
+        entity_id: select.home_heat_pump_powerful_panasonic
+  - action: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: '{{ states.light |  selectattr(''state'', ''eq'', ''off'') | selectattr(''attributes.lights'',
+        ''=='', undefined) | map(attribute=''entity_id'') | reject(''in'', label_entities(''Tændt
+        når ingen hjemme'')) |  list |  sort }}'
+  - action: climate.set_temperature
+    metadata: {}
+    data:
+      temperature: 17
+    target:
+      entity_id: '{{ states.climate | map(attribute=''entity_id'') | reject(''in'',
+        label_entities(''Tændt når ingen hjemme'')) | list | sort }}'
+  - action: switch.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - switch.entrance_door_lock_autolock_yale
+      - switch.garage_door_lock_autolock_yale
+      - switch.utility_room_door_lock_autolock_yale
+  mode: queued
+- id: '1735738251165'
+  alias: Stue varmepumpe varme tænd
+  description: Tænder for varmepumpe i stuen, for at varme hurtigere op hvis den ønskede
+    temperatur er væsentligt koldere end den aktuelle.
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.family_home
+    to: 'on'
+  - trigger: state
+    entity_id:
+    - sensor.living_room_target_temperature
+  conditions:
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.family_home
+      state: 'on'
+    - condition: state
+      entity_id: input_boolean.home_house_sitter
+      state: 'on'
+  - condition: state
+    entity_id: climate.living_room_heat_pump_panasonic
+    state: 'off'
+  - condition: template
+    value_template: '{{ states("sensor.living_room_current_temperature")|float < states("sensor.living_room_target_temperature")|float
+      - 1 }}'
+  actions:
+  - action: climate.turn_on
+    target:
+      entity_id: climate.living_room_heat_pump_panasonic
+    data: {}
+  - action: climate.set_preset_mode
+    metadata: {}
+    data:
+      preset_mode: boost
+    target:
+      entity_id: climate.living_room_heat_pump_panasonic
+  - action: climate.set_temperature
+    target:
+      entity_id: climate.living_room_heat_pump_panasonic
+    data:
+      temperature: '{{ states(''sensor.living_room_target_temperature'')|float(0)
+        }}'
+  - action: climate.set_hvac_mode
+    target:
+      entity_id: climate.living_room_heat_pump_panasonic
+    data:
+      hvac_mode: heat
+  - action: climate.set_fan_mode
+    target:
+      entity_id: climate.living_room_heat_pump_panasonic
+    data:
+      fan_mode: Auto
+  - action: climate.set_swing_mode
+    target:
+      entity_id: climate.living_room_heat_pump_panasonic
+    data:
+      swing_mode: Auto
+  - action: automation.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: automation.living_room_heat_pump_heating_turn_off
+  - action: timer.start
+    metadata: {}
+    data:
+      duration: 00:10:00
+    target:
+      entity_id: timer.living_room_heat_pump_heating_timer
+  mode: queued
+- id: '1735742496976'
+  alias: Stue varmpepumpe varme sluk
+  description: 'Slukker for varmepumpen i stuen efter den er brugt til at hjemme med
+    at varme stuen op. Denne automatik er blever aktiveret af Stue varmepumpe varme
+    tænd.
+
+    '
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.living_room_current_temperature
+    - sensor.living_room_target_temperature
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: climate.living_room_heat_pump_panasonic
+        attribute: hvac_action
+        state: 'off'
+      sequence:
+      - action: automation.turn_off
+        metadata: {}
+        data:
+          stop_actions: false
+        target:
+          entity_id: automation.living_room_heat_pump_heating_turn_off
+    - conditions:
+      - condition: state
+        entity_id: climate.living_room_heat_pump_panasonic
+        state: heat
+      - condition: template
+        value_template: '{{ states("sensor.living_room_current_temperature")|float
+          > states("sensor.living_room_target_temperature")|float - 1 }}    '
+      - condition: state
+        entity_id: timer.living_room_heat_pump_heating_timer
+        state: idle
+      sequence:
+      - action: climate.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: climate.living_room_heat_pump_panasonic
+      - action: automation.turn_off
+        metadata: {}
+        data:
+          stop_actions: false
+        target:
+          entity_id: automation.living_room_heat_pump_heating_turn_off
+  mode: queued
+- id: '1735743298155'
+  alias: Hjem varmepumpe
+  description: Automatik til styring af central luft-til-vand varmepumpe
+  triggers:
+  - trigger: time_pattern
+    minutes: /15
+  - trigger: state
+    entity_id:
+    - sensor.living_room_target_temperature
+    - sensor.emils_room_target_temperature
+    - sensor.charlies_room_target_temperature
+    - sensor.bedroom_target_temperature
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: climate.home_heat_pump_panasonic
+        state: 'off'
+      - condition: numeric_state
+        entity_id: sensor.home_minimum_temperature_24h
+        below: 20
+      - condition: numeric_state
+        entity_id: sensor.home_outside_minimum_temperature_24h
+        below: 10
+      - condition: numeric_state
+        entity_id: sensor.home_outside_maximum_temperature_24_timer
+        below: 15
+      sequence:
+      - action: climate.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: climate.home_heat_pump_panasonic
+      - action: climate.set_hvac_mode
+        metadata: {}
+        data:
+          hvac_mode: heat
+        target:
+          entity_id: climate.home_heat_pump_panasonic
+      - action: climate.set_preset_mode
+        metadata: {}
+        data:
+          preset_mode: none
+        target:
+          entity_id: climate.home_heat_pump_panasonic
+      - action: select.select_option
+        metadata: {}
+        data:
+          option: 'off'
+        target:
+          entity_id: select.home_heat_pump_powerful_panasonic
+      - action: select.select_option
+        metadata: {}
+        data:
+          option: 'off'
+        target:
+          entity_id: select.home_heat_pump_quiet_mode_panasonic
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 0
+        target:
+          entity_id: climate.home_heat_pump_panasonic
+    - conditions:
+      - condition: state
+        entity_id: climate.home_heat_pump_panasonic
+        state: heat
+      - condition: numeric_state
+        entity_id: sensor.home_minimum_temperature_24h
+        above: 20
+      - condition: numeric_state
+        entity_id: sensor.home_outside_minimum_temperature_24h
+        above: 11
+      - condition: numeric_state
+        entity_id: sensor.home_outside_average_temperature_24h
+        above: 16
+      sequence:
+      - action: climate.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: climate.home_heat_pump_panasonic
+    - conditions:
+      - condition: template
+        value_template: '{{ states("sensor.living_room_current_temperature")|float
+          < states("sensor.living_room_target_temperature")|float - 3 or states("sensor.emils_room_current_temperature")|float
+          < states("sensor.emils_room_target_temperature")|float - 3 or states("sensor.charlies_room_current_temperature")|float
+          < states("sensor.charlies_room_target_temperature")|float - 3 or states("sensor.bedroom_current_temperature")|float
+          < states("sensor.bedroom_target_temperature")|float - 3 }}'
+      sequence:
+      - action: select.select_option
+        metadata: {}
+        data:
+          option: on-30m
+        target:
+          entity_id: select.home_heat_pump_powerful_panasonic
+      - action: climate.set_preset_mode
+        metadata: {}
+        data:
+          preset_mode: comfort
+        target:
+          entity_id: climate.home_heat_pump_panasonic
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: '{{ state_attr(''climate.home_heat_pump_panasonic'', ''max_temp'')
+            }}'
+        target:
+          entity_id: climate.home_heat_pump_panasonic
+    - conditions:
+      - condition: template
+        value_template: '{{ states("sensor.living_room_current_temperature")|float
+          < states("sensor.living_room_target_temperature")|float - 1 or states("sensor.emils_room_current_temperature")|float
+          < states("sensor.emils_room_target_temperature")|float - 1 or states("sensor.charlies_room_current_temperature")|float
+          < states("sensor.charlies_room_target_temperature")|float - 1 or states("sensor.bedroom_current_temperature")|float
+          < states("sensor.bedroom_target_temperature")|float - 1 }}'
+      - condition: template
+        value_template: '{{ state_attr(''climate.home_heat_pump_panasonic'', ''max_temp'')|float
+          > state_attr(''climate.home_heat_pump_panasonic'', ''temperature'')|float
+          }}'
+      sequence:
+      - action: select.select_option
+        metadata: {}
+        data:
+          option: 'off'
+        target:
+          entity_id: select.home_heat_pump_powerful_panasonic
+      - action: climate.set_preset_mode
+        metadata: {}
+        data:
+          preset_mode: comfort
+        target:
+          entity_id: climate.home_heat_pump_panasonic
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: '{{ state_attr(''climate.home_heat_pump_panasonic'', ''temperature'')|float
+            + 1 }}'
+        target:
+          entity_id: climate.home_heat_pump_panasonic
+    - conditions:
+      - condition: template
+        value_template: '{{ states("sensor.living_room_current_temperature")|float
+          < states("sensor.living_room_target_temperature")|float - 0.5 or states("sensor.emils_room_current_temperature")|float
+          < states("sensor.emils_room_target_temperature")|float - 0.5 or states("sensor.charlies_room_current_temperature")|float
+          < states("sensor.charlies_room_target_temperature")|float - 0.5 or states("sensor.bedroom_current_temperature")|float
+          < states("sensor.bedroom_target_temperature")|float - 0.5 }}'
+      sequence:
+      - action: select.select_option
+        metadata: {}
+        data:
+          option: 'off'
+        target:
+          entity_id: select.home_heat_pump_powerful_panasonic
+      - action: climate.set_preset_mode
+        metadata: {}
+        data:
+          preset_mode: none
+        target:
+          entity_id: climate.home_heat_pump_panasonic
+    - conditions:
+      - condition: template
+        value_template: '{{ states("sensor.living_room_current_temperature")|float
+          > states("sensor.living_room_target_temperature")|float - 0.5 and states("sensor.emils_room_current_temperature")|float
+          > states("sensor.emils_room_target_temperature")|float - 0.5 and states("sensor.charlies_room_current_temperature")|float
+          > states("sensor.charlies_room_target_temperature")|float - 0.5 and states("sensor.bedroom_current_temperature")|float
+          > states("sensor.bedroom_target_temperature")|float - 0.5 }}'
+      - condition: template
+        value_template: '{{ state_attr(''climate.home_heat_pump_panasonic'', ''min_temp'')|float
+          < state_attr(''climate.home_heat_pump_panasonic'', ''temperature'')|float
+          }}'
+      sequence:
+      - action: select.select_option
+        metadata: {}
+        data:
+          option: 'off'
+        target:
+          entity_id: select.home_heat_pump_powerful_panasonic
+      - action: climate.set_preset_mode
+        metadata: {}
+        data:
+          preset_mode: none
+        target:
+          entity_id: climate.home_heat_pump_panasonic
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: '{{ state_attr(''climate.home_heat_pump_panasonic'', ''temperature'')|float
+            - 1 }}'
+        target:
+          entity_id: climate.home_heat_pump_panasonic
+    - conditions:
+      - condition: template
+        value_template: '{{ states("sensor.living_room_current_temperature")|float
+          > states("sensor.living_room_target_temperature")|float and states("sensor.emils_room_current_temperature")|float
+          > states("sensor.emils_room_target_temperature")|float and states("sensor.charlies_room_current_temperature")|float
+          > states("sensor.charlies_room_target_temperature")|float and states("sensor.bedroom_current_temperature")|float
+          > states("sensor.bedroom_target_temperature")|float }}'
+      sequence:
+      - action: select.select_option
+        metadata: {}
+        data:
+          option: 'off'
+        target:
+          entity_id: select.home_heat_pump_powerful_panasonic
+      - action: climate.set_preset_mode
+        metadata: {}
+        data:
+          preset_mode: eco
+        target:
+          entity_id: climate.home_heat_pump_panasonic
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: '{{ state_attr(''climate.home_heat_pump_panasonic'', ''min_temp'')
+            }}'
+        target:
+          entity_id: climate.home_heat_pump_panasonic
+  mode: queued
+  max: 10
+- id: '1735842629315'
+  alias: Entre - Dørlås
+  description: Når en af os kommer hjem, lås dør op
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.anders_home
+    - binary_sensor.monique_home
+    - binary_sensor.emil_home
+    - binary_sensor.charlie_home
+    to: 'on'
+    id: someone_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.family_home
+    to: 'off'
+  - trigger: state
+    entity_id:
+    - switch.entrance_door_lock_autolock_yale
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 3
+      seconds: 0
+    enabled: true
+  - trigger: state
+    entity_id:
+    - select.entrance_door_lock_volume_yale
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+    from: high
+  - trigger: state
+    entity_id:
+    - timer.entrance_door_active_autolock_timer
+    to: idle
+  conditions: []
+  actions:
+  - parallel:
+    - sequence:
+      - delay: 00:00:30
+      - if:
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: select.entrance_door_lock_autolock_yale
+            state: 'off'
+          - condition: not
+            conditions:
+            - condition: state
+              entity_id: select.entrance_door_lock_volume_yale
+              state: high
+        then:
+        - action: timer.start
+          metadata: {}
+          data:
+            duration: 00:05:00
+          target:
+            entity_id: timer.entrance_door_active_autolock_timer
+    - choose:
+      - conditions:
+        - condition: trigger
+          id:
+          - someone_home
+        sequence:
+        - if:
+          - condition: not
+            conditions:
+            - condition: state
+              entity_id: select.entrance_door_lock_volume_yale
+              state: 'off'
+          then:
+          - action: select.select_option
+            target:
+              entity_id: select.entrance_door_lock_volume_yale
+            data:
+              option: 'off'
+        - if:
+          - condition: state
+            entity_id: switch.entrance_door_lock_autolock_yale
+            state: 'on'
+          then:
+          - action: switch.turn_off
+            target:
+              entity_id: switch.entrance_door_lock_autolock_yale
+            data: {}
+        - if:
+          - condition: state
+            entity_id: lock.entrance_door_lock_yale
+            state: locked
+          then:
+          - action: lock.unlock
+            metadata: {}
+            data:
+              code: '137900'
+            target:
+              entity_id: lock.entrance_door_lock_yale
+            enabled: true
+      default:
+      - parallel:
+        - sequence:
+          - if:
+            - condition: state
+              entity_id: lock.entrance_door_lock_yale
+              state: unlocked
+            then:
+            - action: lock.lock
+              metadata: {}
+              data: {}
+              target:
+                entity_id: lock.entrance_door_lock_yale
+        - sequence:
+          - delay: 00:00:05
+          - if:
+            - condition: state
+              entity_id: switch.entrance_door_lock_autolock_yale
+              state: 'off'
+            then:
+            - action: switch.turn_on
+              metadata: {}
+              data: {}
+              target:
+                entity_id: switch.entrance_door_lock_autolock_yale
+        - sequence:
+          - delay: 00:00:10
+          - if:
+            - condition: not
+              conditions:
+              - condition: state
+                entity_id: select.entrance_door_lock_volume_yale
+                state: high
+            then:
+            - action: select.select_option
+              target:
+                entity_id: select.entrance_door_lock_volume_yale
+              data:
+                option: high
+  mode: queued
+- id: '1735847242174'
+  alias: Terrasse - Lys
+  description: Automatik for lys på terrassen
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.patio_switch_button_1_philips_hue
+    id: button_1_short
+    attribute: event_type
+    to: short_release
+  - trigger: state
+    entity_id:
+    - event.patio_switch_button_1_philips_hue
+    id: button_1_long
+    attribute: event_type
+    to: long_release
+  - trigger: state
+    entity_id:
+    - event.patio_switch_button_2_philips_hue
+    id: button_2
+  - trigger: state
+    entity_id:
+    - event.patio_switch_button_3_philips_hue
+    id: button_3
+  - trigger: state
+    entity_id:
+    - event.patio_switch_button_4_philips_hue
+    id: button_4
+    attribute: event_type
+    to: initial_press
+  - trigger: state
+    entity_id:
+    - binary_sensor.family_home
+    to: 'off'
+  - trigger: state
+    entity_id:
+    - binary_sensor.patio_light
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1_short
+      sequence:
+      - action: light.toggle
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2700
+          brightness_pct: 60
+        target:
+          entity_id: light.patio_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1_long
+      sequence:
+      - action: light.toggle
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 3000
+          brightness_pct: 100
+        target:
+          entity_id: light.patio_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_2
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 0.5
+          brightness_step_pct: 10
+        target:
+          entity_id: light.patio_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_3
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 0.5
+          brightness_step_pct: -10
+        target:
+          entity_id: light.patio_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_4
+      sequence:
+      - action: script.patio_light_sunset
+        metadata: {}
+        data: {}
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.family_home
+        state: 'off'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 0
+        target:
+          entity_id: light.patio_light_philips_hue
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.home_outside_temperature
+        below: 10
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 0
+        target:
+          entity_id: light.patio_light_philips_hue
+  mode: queued
+- id: '1735851968042'
+  alias: Gang - Lys
+  description: Automatik for lys i gangen
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.hallway_switch_button_1_philips_hue
+    id: button_1_short
+    attribute: event_type
+    to: short_release
+  - trigger: state
+    entity_id:
+    - event.hallway_switch_button_1_philips_hue
+    id: button_1_long
+    attribute: event_type
+    to: long_release
+  - trigger: state
+    entity_id:
+    - event.hallway_switch_button_2_philips_hue
+    id: button_2
+  - trigger: state
+    entity_id:
+    - event.hallway_switch_button_3_philips_hue
+    id: button_3
+  - trigger: state
+    entity_id:
+    - event.hallway_switch_button_4_philips_hue
+    id: button_4
+    attribute: event_type
+    to: initial_press
+  - trigger: state
+    entity_id:
+    - binary_sensor.family_home
+    to: 'off'
+  - trigger: state
+    entity_id:
+    - binary_sensor.anders_home
+    - binary_sensor.monique_home
+    - binary_sensor.emil_home
+    - binary_sensor.charlie_home
+    to: 'on'
+    id: someone_home
+  - trigger: state
+    entity_id: binary_sensor.bedroom_blind
+    to: 'off'
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_door
+    to: 'on'
+  - trigger: state
+    entity_id:
+    - light.bedroom_light_philips_hue
+    attribute: brightness
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_light
+    to: 'off'
+  - trigger: state
+    entity_id:
+    - binary_sensor.hallway_light
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1_short
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2700
+          brightness_pct: 75
+        target:
+          entity_id: light.hallway_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1_long
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 3000
+          brightness_pct: 100
+        target:
+          entity_id: light.hallway_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_2
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 0.5
+          brightness_step_pct: 10
+        target:
+          entity_id: light.hallway_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_3
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 0.5
+          brightness_step_pct: -10
+        target:
+          entity_id: light.hallway_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_4
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.hallway_light_philips_hue
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.family_home
+        state: 'off'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.hallway_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - someone_home
+      - condition: state
+        entity_id: binary_sensor.bedroom_blind
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.bedroom_light
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          kelvin: 2700
+          brightness_pct: 20
+          transition: 3
+        target:
+          entity_id:
+          - light.hallway_light_bathroom_philips_hue
+          - light.hallway_light_toilet_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - someone_home
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2700
+          brightness_pct: 75
+        target:
+          entity_id: light.hallway_light_philips_hue
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.bedroom_blind
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.bedroom_light
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'on'
+      - condition: state
+        entity_id: input_select.monique_nap_time_state
+        state: 'off'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.hallway_light_philips_hue
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.bedroom_blind
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'on'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          brightness: '{{ state_attr(''light.bedroom_light_philips_hue'', ''brightness'')
+            }}'
+        target:
+          entity_id: light.hallway_light_philips_hue
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'on'
+      - condition: numeric_state
+        entity_id: light.bedroom_light_philips_hue
+        attribute: brightness
+        above: 153
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2700
+          brightness_pct: 75
+        target:
+          entity_id: light.hallway_light_philips_hue
+  mode: queued
+  trace:
+    stored_traces: 10
+- id: '1735852365839'
+  alias: Emils værelse - Lys
+  description: Automatik for lys på Emils værelse
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.emils_room_switch_button_1_philips_hue
+    id: button_1_short
+    attribute: event_type
+    to: short_release
+  - trigger: state
+    entity_id:
+    - event.emils_room_switch_button_1_philips_hue
+    id: button_1_long
+    attribute: event_type
+    to: long_release
+  - trigger: state
+    entity_id:
+    - event.emils_room_switch_button_2_philips_hue
+    id: button_2
+  - trigger: state
+    entity_id:
+    - event.emils_room_switch_button_3_philips_hue
+    id: button_3
+  - trigger: state
+    entity_id:
+    - event.emils_room_switch_button_4_philips_hue
+    id: button_4
+    attribute: event_type
+    to: initial_press
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_home
+    to: 'off'
+  - trigger: state
+    entity_id:
+    - binary_sensor.emils_room_light
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1_short
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2700
+          brightness_pct: 80
+        target:
+          entity_id: light.emils_room_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1_long
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 3000
+          brightness_pct: 100
+        target:
+          entity_id: light.emils_room_light_philips_hue
+    - conditions:
+      - condition: state
+        entity_id: light.emils_room_light_philips_hue
+        state: 'off'
+      - condition: trigger
+        id:
+        - button_2
+        - button_3
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 60
+          kelvin: 2300
+          brightness: 10
+        target:
+          entity_id: light.emils_room_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_2
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 0.5
+          brightness_step_pct: 10
+        target:
+          entity_id: light.emils_room_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_3
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 0.5
+          brightness_step_pct: -10
+        target:
+          entity_id: light.emils_room_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_4
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.emils_room_light_philips_hue
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.emil_home
+        state: 'off'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.emils_room_light_philips_hue
+  mode: queued
+- id: '1736082177257'
+  alias: Charlies værelse - Lys
+  description: Automatik for lys på Charlies værelse
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.charlies_room_switch_button_1_philips_hue
+    id: button_1
+    attribute: event_type
+    to: initial_press
+  - trigger: state
+    entity_id:
+    - event.charlies_room_switch_button_2_philips_hue
+    id: button_2_short
+    attribute: event_type
+    to: short_release
+  - trigger: state
+    entity_id:
+    - event.charlies_room_switch_button_2_philips_hue
+    id: button_2
+  - trigger: state
+    entity_id:
+    - event.charlies_room_switch_button_3_philips_hue
+    id: button_3
+    attribute: event_type
+    to: initial_press
+  - trigger: state
+    entity_id:
+    - event.charlies_room_switch_button_4_philips_hue
+    id: button_4
+    attribute: event_type
+    to: initial_press
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlie_home
+    to: 'off'
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlie_home
+    to: 'on'
+    id: charlie_home
+  - trigger: time
+    at: input_datetime.charlie_wake_up_alarm
+    id: wake_up
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlies_room_light
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1
+      sequence:
+      - parallel:
+        - action: light.turn_on
+          metadata: {}
+          data: {}
+          target:
+            entity_id: light.charlies_room_light_bed_philips_hue
+        - action: light.turn_on
+          metadata: {}
+          data:
+            transition: 1
+            brightness_pct: 80
+          target:
+            entity_id:
+            - light.charlies_room_light_desk_right_philips_hue
+            - light.charlies_room_light_desk_mid_philips_hue
+            - light.charlies_room_light_desk_left_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_2_short
+      sequence:
+      - action: light.toggle
+        metadata: {}
+        data:
+          transition: 1
+          brightness_pct: 80
+        target:
+          entity_id:
+          - light.charlies_room_light_desk_right_philips_hue
+          - light.charlies_room_light_desk_mid_philips_hue
+          - light.charlies_room_light_desk_left_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_2
+      - condition: state
+        entity_id: event.charlies_room_switch_button_2_philips_hue
+        attribute: event_type
+        state: repeat
+      sequence:
+      - action: script.charlies_room_light_desk_adjust
+        metadata: {}
+        data:
+          brightness_step: 25
+    - conditions:
+      - condition: trigger
+        id:
+        - button_3
+      sequence:
+      - action: light.toggle
+        metadata: {}
+        data: {}
+        target:
+          entity_id: light.charlies_room_light_bed_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_4
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.charlies_room_light_philips_hue
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.charlies_room_light
+        state: 'off'
+      - condition: trigger
+        id:
+        - charlie_home
+        - wake_up
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id: light.charlies_room_light_bed_philips_hue
+        data: {}
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.charlie_home
+        state: 'off'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.charlies_room_light_philips_hue
+  mode: queued
+- id: '1736083584615'
+  alias: Soveværelse - Lys
+  description: Automatik for lys på soveværelset
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.bedroom_switch_button_1_philips_hue
+    id: button_1
+    attribute: event_type
+    to: initial_press
+  - trigger: state
+    entity_id:
+    - event.bedroom_switch_button_2_philips_hue
+    id: button_2
+    attribute: event_type
+    to: initial_press
+  - trigger: state
+    entity_id:
+    - event.bedroom_switch_button_3_philips_hue
+    id: button_3
+    attribute: event_type
+    to: initial_press
+  - trigger: state
+    entity_id:
+    - event.bedroom_switch_button_4_philips_hue
+    id: button_4
+    attribute: event_type
+    to: initial_press
+  - trigger: state
+    entity_id:
+    - binary_sensor.parent_home
+    to: 'off'
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_blind
+    from: 'off'
+    to: 'on'
+    id: blind_open
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_blind
+  - trigger: state
+    entity_id:
+    - sensor.anders_iphone_battery_state
+    - sensor.monique_iphone_battery_state
+    to: Charging
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_light
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+  - trigger: time
+    at: input_datetime.monique_wake_up_alarm
+    id: wake_up
+  - trigger: state
+    entity_id:
+    - timer.bedroom_light_sunrise_delay_timer
+    to: idle
+    from: active
+    id: sunrise_script
+  - trigger: state
+    entity_id:
+    - input_select.monique_nap_time_state
+    to: 'off'
+    id: nap_time_over
+  - trigger: state
+    entity_id:
+    - input_select.monique_nap_time_state
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_door
+    from: 'on'
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+    id: door_closes
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2700
+          brightness_pct: 80
+        target:
+          entity_id: light.bedroom_light_philips_hue
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - button_2
+      sequence:
+      - action: script.bedroom_light_sunrise
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - button_3
+      sequence:
+      - action: script.bedroom_light_sunset
+        data:
+          transition: 180
+          brightness_from: 200
+          brightness_to: 50
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - button_4
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.bedroom_light_philips_hue
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.parent_home
+        state: 'off'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.bedroom_light_philips_hue
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.bedroom_light
+        state: 'off'
+      - condition: trigger
+        id:
+        - wake_up
+      sequence:
+      - action: script.bedroom_light_sunrise
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - sunrise_script
+      sequence:
+      - action: script.bedroom_light_sunrise
+        data: {}
+    - conditions:
+      - condition: state
+        entity_id: input_select.monique_nap_time_state
+        state: prepare
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          brightness_pct: 50
+          transition: 1
+        target:
+          entity_id:
+          - light.bedroom_light_philips_hue
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+    - conditions:
+      - condition: state
+        entity_id: input_select.monique_nap_time_state
+        state: sleeping
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 60
+        target:
+          entity_id:
+          - light.bedroom_light_philips_hue
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - nap_time_over
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.bedroom_light_philips_hue
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.anders_home
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
+      - condition: state
+        entity_id: sensor.anders_iphone_battery_state
+        state: Charging
+      - condition: state
+        entity_id: sensor.monique_iphone_battery_state
+        state: Charging
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 10
+        target:
+          entity_id:
+          - light.bedroom_light_philips_hue
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.anders_home
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
+      - condition: state
+        entity_id: sensor.monique_iphone_battery_state
+        state: Charging
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 10
+        target:
+          entity_id:
+          - light.bedroom_light_philips_hue
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.anders_home
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'off'
+      - condition: state
+        entity_id: sensor.anders_iphone_battery_state
+        state: Charging
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 10
+        target:
+          entity_id:
+          - light.bedroom_light_philips_hue
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.bedroom_blind
+        state: 'off'
+      - condition: numeric_state
+        entity_id: light.bedroom_light_philips_hue
+        attribute: brightness
+        above: 200
+      sequence:
+      - action: script.bedroom_light_sunset
+        data:
+          transition: 300
+          brightness_from: 200
+          brightness_to: 50
+    - conditions:
+      - condition: trigger
+        id:
+        - blind_open
+      - condition: state
+        entity_id: binary_sensor.bedroom_light
+        state: 'off'
+      sequence:
+      - action: script.bedroom_light_sunrise
+        data: {}
+  trace:
+    stored_traces: 100
+- id: '1736103151599'
+  alias: Emils værelse - Rullegardin
+  description: Automatik for rullegardin på Emils værelse
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_home
+  - trigger: time
+    at:
+    - '12:00:00'
+  - trigger: numeric_state
+    entity_id:
+    - sensor.driveway_motion_sensor_street_illuminance_signify
+    below: 1
+  - trigger: numeric_state
+    entity_id:
+    - sensor.driveway_motion_sensor_street_illuminance_signify
+    above: 1
+  - trigger: state
+    entity_id:
+    - binary_sensor.emils_room_window_sensor_door
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.driveway_motion_sensor_street_illuminance_signify
+        below: 1
+      - condition: state
+        entity_id: binary_sensor.emils_room_window_sensor_door
+        state: 'on'
+      sequence:
+      - action: cover.set_cover_position
+        metadata: {}
+        data:
+          position: 50
+        target:
+          entity_id: cover.emils_room_blind_ikea
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.driveway_motion_sensor_street_illuminance_signify
+        below: 1
+      sequence:
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.emils_room_blind_ikea
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.emil_home
+        state: 'off'
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.emils_room_blind_ikea
+    - conditions:
+      - condition: numeric_state
+        entity_id: cover.emils_room_blind_ikea
+        attribute: current_position
+        above: 40
+      sequence:
+      - action: cover.set_cover_position
+        metadata: {}
+        data:
+          position: 40
+        target:
+          entity_id: cover.emils_room_blind_ikea
+  mode: queued
+- id: '1736106304486'
+  alias: Charlies værelse - Rullegardin
+  description: Automatik for rullegardin på Charlies værelse
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlie_home
+  - trigger: numeric_state
+    entity_id:
+    - sensor.driveway_motion_sensor_street_illuminance_signify
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.driveway_motion_sensor_street_illuminance_signify
+    above: 5
+  - trigger: time
+    at:
+    - '12:00:00'
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.driveway_motion_sensor_street_illuminance_signify
+        below: 1
+      sequence:
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.charlies_room_blind_ikea
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.charlie_home
+        state: 'off'
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.charlies_room_blind_ikea
+    - conditions:
+      - condition: numeric_state
+        entity_id: cover.charlies_room_blind_ikea
+        attribute: current_position
+        below: 100
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.charlies_room_blind_ikea
+  mode: queued
+- id: '1736106591926'
+  alias: Soveværelse - Rullegardin
+  description: Automatik for rullegardin på soveværelse
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.parent_home
+    from: 'off'
+    to: 'on'
+    id: parent_home
+  - trigger: numeric_state
+    entity_id:
+    - sensor.driveway_motion_sensor_entrance_illuminance_signify
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.driveway_motion_sensor_entrance_illuminance_signify
+    above: 5
+  - trigger: event
+    event_type: bedroom_light_sunrise_script
+    id: sunrise_scene
+  - trigger: event
+    event_type: bedroom_light_sunset_script
+    id: sunset_scene
+  - trigger: state
+    entity_id:
+    - input_select.monique_nap_time_state
+    to: sleeping
+  - trigger: state
+    entity_id:
+    - input_select.monique_nap_time_state
+    to: 'off'
+    id: nap_time_over
+  - trigger: state
+    entity_id:
+    - weather.home_forecast
+    to: sunny
+  - trigger: numeric_state
+    entity_id:
+    - sun.sun
+    attribute: azimuth
+    above: 240
+    below: 360
+  - trigger: time
+    at: '16:00:00'
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: trigger
+        id:
+        - sunrise_scene
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind_ikea
+        attribute: current_position
+        below: 100
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind_ikea
+    - conditions:
+      - condition: trigger
+        id:
+        - sunset_scene
+      sequence:
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind_ikea
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.driveway_motion_sensor_entrance_illuminance_signify
+        below: 5
+      - condition: state
+        entity_id: binary_sensor.parent_home
+        state: 'off'
+      sequence:
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind_ikea
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.driveway_motion_sensor_entrance_illuminance_signify
+        above: 5
+      - condition: state
+        entity_id: binary_sensor.parent_home
+        state: 'off'
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind_ikea
+    - conditions:
+      - condition: state
+        entity_id: input_select.monique_nap_time_state
+        state: sleeping
+      sequence:
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind_ikea
+    - conditions:
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind_ikea
+        attribute: current_position
+        above: 50
+      - condition: template
+        value_template: "{{ states('sensor.bedroom_current_temperature')|float > \n
+          \  states('sensor.bedroom_target_temperature')|float and\n   state_attr('sun.sun',
+          'elevation') > 20 and\n   state_attr('sun.sun', 'azimuth') > 240 and \n
+          \  state_attr('sun.sun', 'azimuth') < 360 and \n   states('weather.home_forecast')
+          == 'sunny' }}"
+      sequence:
+      - action: cover.set_cover_position
+        metadata: {}
+        data:
+          position: 50
+        target:
+          entity_id: cover.bedroom_blind_ikea
+    - conditions:
+      - condition: trigger
+        id:
+        - parent_home
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind_ikea
+    - conditions:
+      - condition: trigger
+        id:
+        - nap_time_over
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind_ikea
+  trace:
+    stored_traces: 20
+  mode: queued
+- id: '1737201831964'
+  alias: Indkørsel - Billader sæt pris
+  description: Sæt elektricitets prisen på billader
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.energy_data_service
+    attribute: current_price
+  - trigger: time_pattern
+    minutes: '0'
+    seconds: '0'
+    hours: '*'
+  conditions: []
+  actions:
+  - action: number.set_value
+    metadata: {}
+    data:
+      value: '{{ state_attr(''sensor.energy_data_service'', ''current_price'') }}'
+    target:
+      entity_id: number.driveway_ev_charger_energy_price_wallbox
+  mode: single
+- id: '1737240652738'
+  alias: Teknik solcelle batteri - Sæt operating mode
+  description: Sæt operation mode på solcelle batteri for at lade om natten hvis billigere
+  triggers:
+  - trigger: time
+    at: 00:01:00
+  conditions: []
+  actions:
+  - variables:
+      capacity: "{%- set g = namespace(capacity = 10) %} {%- set forecast = state_attr('sensor.solar_forecast_energy_today_solcast_pv_forecast',
+        'detailedHourly') %} {%- for hour in forecast %}\n  {%- if hour.period_start.hour
+        >= 0 and hour.period_start.hour <= 17 %}\n    {%- set g.capacity = g.capacity
+        - min(0, hour.pv_estimate - 0.5) %}\n  {%- endif %}\n{%- endfor %} {{ (g.capacity
+        * 1000)|round(0) }}"
+      schedule: '{{ "[{\"start\": \"00:00\", \"stop\": \"06:00\", \"threshold_p_max\":
+        " ~ capacity ~ "}, {\"start\": \"06:01\", \"stop\": \"17:00\", \"threshold_p_max\":
+        0}]" }}'
+      charge_cost: '{% set g = namespace(charge_cost = 0) %} {% set prices = state_attr(''sensor.energy_data_service'',
+        ''today'') %} {%- for i in range(0, 6) %} {%- set g.charge_cost = g.charge_cost
+        + prices[i] * capacity / 6  %} {%- endfor %} {{ (g.charge_cost / 1000)|round(0)
+        }}'
+      use_cost: '{% set g = namespace(use_cost=0) %} {% set prices = state_attr(''sensor.energy_data_service'',
+        ''today'') %} {%- for i in range(17, 21) %} {%- set g.use_cost = g.use_cost
+        + prices[i] * capacity / 4  %} {%- endfor %} {{ (g.use_cost / 1000)|round(0)
+        }}'
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ capasity > 0 and charge_cost - use_cost > 5 }}'
+      sequence:
+      - action: sonnenbatterie.set_operating_mode
+        data:
+          device_id: 8c7dc86f86da84b01a301ef8044852c6
+          mode: timeofuse
+        response_variable: conversation_response
+      - action: sonnenbatterie.set_tou_schedule
+        data:
+          device_id: 8c7dc86f86da84b01a301ef8044852c6
+          schedule: '{{ schedule }}'
+        response_variable: conversation_response
+    default:
+    - action: sonnenbatterie.set_operating_mode
+      data:
+        device_id: 8c7dc86f86da84b01a301ef8044852c6
+        mode: automatic
+      response_variable: conversation_response
+  mode: single
+- id: '1737244947943'
+  alias: Volvo XC40 - Lås
+  description: Lås døren op bilen hvis den ikke er låst
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.volvo_xc40_door_front_right
+    - binary_sensor.volvo_xc40_door_front_left
+    - binary_sensor.volvo_xc40_door_rear_right
+    - binary_sensor.volvo_xc40_door_rear_left
+    - binary_sensor.volvo_xc40_tailgate
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+  - trigger: state
+    entity_id:
+    - binary_sensor.volvo_xc40_engine_state
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.volvo_xc40_door_front_right
+    state: 'off'
+  - condition: state
+    entity_id: binary_sensor.volvo_xc40_door_front_left
+    state: 'off'
+  - condition: state
+    entity_id: binary_sensor.volvo_xc40_door_rear_right
+    state: 'off'
+  - condition: state
+    entity_id: binary_sensor.volvo_xc40_door_rear_left
+    state: 'off'
+  - condition: state
+    entity_id: binary_sensor.volvo_xc40_tailgate
+    state: 'off'
+  - condition: state
+    entity_id: sensor.volvo_xc40_charging_connection_status
+    state: Disconnected
+  - condition: state
+    entity_id: binary_sensor.volvo_xc40_engine_state
+    state: 'off'
+  actions:
+  - action: lock.lock
+    metadata: {}
+    data: {}
+    target:
+      entity_id: lock.volvo_xc40_lock_status
+  mode: restart
+- id: '1737245308947'
+  alias: Volvo EX30 - Lås
+  description: Lås døren op bilen hvis den ikke er låst
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.volvo_ex30_door_front_right
+    - binary_sensor.volvo_ex30_door_front_left
+    - binary_sensor.volvo_ex30_door_rear_right
+    - binary_sensor.volvo_ex30_door_rear_left
+    - binary_sensor.volvo_ex30_tailgate
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+  - trigger: state
+    entity_id:
+    - binary_sensor.volvo_ex30_engine_state
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.volvo_ex30_door_front_right
+    state: 'off'
+  - condition: state
+    entity_id: binary_sensor.volvo_ex30_door_front_left
+    state: 'off'
+  - condition: state
+    entity_id: binary_sensor.volvo_ex30_door_rear_right
+    state: 'off'
+  - condition: state
+    entity_id: binary_sensor.volvo_ex30_door_rear_left
+    state: 'off'
+  - condition: state
+    entity_id: binary_sensor.volvo_ex30_tailgate
+    state: 'off'
+  - condition: state
+    entity_id: sensor.volvo_ex30_charging_connection_status
+    state: Disconnected
+  - condition: state
+    entity_id: binary_sensor.volvo_ex30_engine_state
+    state: 'off'
+  actions:
+  - action: lock.lock
+    metadata: {}
+    data: {}
+    target:
+      entity_id: lock.volvo_ex30_lock_status
+  mode: restart
+- id: '1737299093662'
+  alias: Emils værelse - Varme
+  description: Automatik til at styre varmen på Emils værelse
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_sleeping
+  - trigger: state
+    entity_id:
+    - binary_sensor.emils_room_window_sensor_door
+  - trigger: state
+    entity_id:
+    - automation.emils_room_heating
+    to: 'on'
+  conditions: []
+  actions:
+  - action: timer.cancel
+    metadata: {}
+    data: {}
+    target:
+      entity_id: timer.emils_room_heating_manual_timer
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: climate.home_heat_pump_panasonic
+        state: 'off'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 21
+        target:
+          entity_id: climate.emils_room_radiator_thermostat_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.emil_home
+        state: 'off'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 17
+        target:
+          entity_id: climate.emils_room_radiator_thermostat_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.emils_room_window_sensor_door
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 5
+        target:
+          entity_id: climate.emils_room_radiator_thermostat_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.emil_sleeping
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 19
+        target:
+          entity_id: climate.emils_room_radiator_thermostat_tado
+    default:
+    - action: climate.set_temperature
+      metadata: {}
+      data:
+        temperature: 21
+      target:
+        entity_id: climate.emils_room_radiator_thermostat_tado
+  mode: restart
+- id: '1737309773463'
+  alias: Charlies værelse - Varme
+  description: Automatik til at styre varmen på Charlies værelse
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlie_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlie_sleeping
+  - trigger: state
+    entity_id:
+    - automation.charlies_room_heating
+    to: 'on'
+  conditions: []
+  actions:
+  - action: timer.cancel
+    metadata: {}
+    data: {}
+    target:
+      entity_id: timer.charlies_room_heating_manual_timer
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: climate.home_heat_pump_panasonic
+        state: 'off'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 21
+        target:
+          entity_id: climate.charlies_room_radiator_thermostat_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.charlie_home
+        state: 'off'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 17
+        target:
+          entity_id: climate.charlies_room_radiator_thermostat_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.charlie_sleeping
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 19
+        target:
+          entity_id: climate.charlies_room_radiator_thermostat_tado
+    default:
+    - action: climate.set_temperature
+      metadata: {}
+      data:
+        temperature: 21
+      target:
+        entity_id: climate.charlies_room_radiator_thermostat_tado
+  mode: restart
+- id: '1737310160740'
+  alias: Soveværelse varme
+  description: Automatik til at styre varmen på soveværelse
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.parent_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.parent_sleeping
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_light
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_door
+  - trigger: state
+    entity_id:
+    - sensor.hallway_target_temperature
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_blind
+  - trigger: state
+    entity_id:
+    - input_select.monique_nap_time_state
+  - trigger: state
+    entity_id:
+    - automation.bedroom_heating
+    to: 'on'
+  conditions: []
+  actions:
+  - action: timer.cancel
+    metadata: {}
+    data: {}
+    target:
+      entity_id: timer.bedroom_heating_manual_timer
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: climate.home_heat_pump_panasonic
+        state: 'off'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 21
+        target:
+          entity_id: climate.bedroom_radiator_thermostat_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.parent_home
+        state: 'off'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 17
+        target:
+          entity_id: climate.bedroom_radiator_thermostat_tado
+    - conditions:
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: input_select.monique_nap_time_state
+          state: 'off'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 22
+        target:
+          entity_id: climate.bedroom_radiator_thermostat_tado
+    - conditions:
+      - condition: time
+        after: '11:00:00'
+        before: '14:00:00'
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 20
+        target:
+          entity_id: climate.bedroom_radiator_thermostat_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.parent_sleeping
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 19
+        target:
+          entity_id: climate.bedroom_radiator_thermostat_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'off'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 19
+        target:
+          entity_id: climate.bedroom_radiator_thermostat_tado
+    default:
+    - action: climate.set_temperature
+      metadata: {}
+      data:
+        temperature: '{{ states(''sensor.hallway_target_temperature'') }}'
+      target:
+        entity_id: climate.bedroom_radiator_thermostat_tado
+  mode: restart
+- id: '1737310628140'
+  alias: Toilet - Varme
+  description: Automatik til at styre varmen på toilettet
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.family_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.parent_sleeping
+  - trigger: state
+    entity_id:
+    - sensor.toilet_target_temperature
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: climate.home_heat_pump_panasonic
+        state: 'off'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 20
+        target:
+          entity_id: climate.toilet_radiator_thermostat_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.family_home
+        state: 'off'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 17
+        target:
+          entity_id: climate.toilet_radiator_thermostat_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.parent_sleeping
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 19.5
+        target:
+          entity_id: climate.toilet_radiator_thermostat_tado
+    default:
+    - action: climate.set_temperature
+      metadata: {}
+      data:
+        temperature: 20.5
+      target:
+        entity_id: climate.toilet_radiator_thermostat_tado
+  mode: restart
+- id: '1737311363654'
+  alias: Badeværelse - Varme
+  description: Automatik til at styre varmen på badeværelset
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.family_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.parent_sleeping
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_sleeping
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlie_sleeping
+  - trigger: state
+    entity_id:
+    - sensor.bathroom_target_temperature
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: climate.home_heat_pump_panasonic
+        state: 'off'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 20
+        target:
+          entity_id:
+          - climate.bathroom_radiator_thermostat_floor_tado
+          - climate.bathroom_radiator_thermostat_wall_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.family_home
+        state: 'off'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 17
+        target:
+          entity_id:
+          - climate.bathroom_radiator_thermostat_floor_tado
+          - climate.bathroom_radiator_thermostat_wall_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.parent_sleeping
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.emil_sleeping
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.charlie_sleeping
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 19.5
+        target:
+          entity_id:
+          - climate.bathroom_radiator_thermostat_wall_tado
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 20
+        target:
+          entity_id:
+          - climate.bathroom_radiator_thermostat_floor_tado
+    default:
+    - action: climate.set_temperature
+      metadata: {}
+      data:
+        temperature: 20.5
+      target:
+        entity_id:
+        - climate.bathroom_radiator_thermostat_wall_tado
+    - action: climate.set_temperature
+      metadata: {}
+      data:
+        temperature: 21
+      target:
+        entity_id:
+        - climate.bathroom_radiator_thermostat_floor_tado
+  mode: restart
+- id: '1737311656075'
+  alias: Bryggers - Varme
+  description: Automatik til at styre varmen på bryggers
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.family_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.parent_sleeping
+  - trigger: state
+    entity_id:
+    - sensor.utility_room_target_temperature
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: climate.home_heat_pump_panasonic
+        state: 'off'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 20
+        target:
+          entity_id:
+          - climate.utility_room_radiator_thermostat_floor_tado
+          - climate.utility_room_radiator_thermostat_wall_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.family_home
+        state: 'off'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 17
+        target:
+          entity_id:
+          - climate.utility_room_radiator_thermostat_floor_tado
+          - climate.utility_room_radiator_thermostat_wall_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.parent_sleeping
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 19
+        target:
+          entity_id:
+          - climate.utility_room_radiator_thermostat_floor_tado
+          - climate.utility_room_radiator_thermostat_wall_tado
+    default:
+    - action: climate.set_temperature
+      metadata: {}
+      data:
+        temperature: 20
+      target:
+        entity_id:
+        - climate.utility_room_radiator_thermostat_floor_tado
+        - climate.utility_room_radiator_thermostat_wall_tado
+  mode: restart
+- id: '1737312016227'
+  alias: Stue - Varme
+  description: Automatik til at styre varmen i stuen
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.family_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.parent_sleeping
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_sleeping
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlie_sleeping
+  - trigger: state
+    entity_id:
+    - binary_sensor.living_room_light
+  - trigger: state
+    entity_id:
+    - media_player.living_room_receiver_denon
+  - trigger: state
+    entity_id:
+    - automation.living_room_heating
+    to: 'on'
+  conditions: []
+  actions:
+  - action: timer.cancel
+    metadata: {}
+    data: {}
+    target:
+      entity_id: timer.living_room_heating_manual_timer
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: climate.home_heat_pump_panasonic
+        state: 'off'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 22
+        target:
+          entity_id:
+          - climate.living_room_radiator_thermostat_bookcase_tado
+          - climate.living_room_radiator_thermostat_dinning_table_tado
+          - climate.living_room_radiator_thermostat_sofa_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.family_home
+        state: 'off'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 17
+        target:
+          entity_id:
+          - climate.living_room_radiator_thermostat_bookcase_tado
+          - climate.living_room_radiator_thermostat_dinning_table_tado
+          - climate.living_room_radiator_thermostat_sofa_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.living_room_light
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 22
+        target:
+          entity_id:
+          - climate.living_room_radiator_thermostat_bookcase_tado
+          - climate.living_room_radiator_thermostat_dinning_table_tado
+          - climate.living_room_radiator_thermostat_sofa_tado
+    - conditions:
+      - condition: state
+        entity_id: media_player.living_room_receiver_denon
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 22
+        target:
+          entity_id:
+          - climate.living_room_radiator_thermostat_bookcase_tado
+          - climate.living_room_radiator_thermostat_dinning_table_tado
+          - climate.living_room_radiator_thermostat_sofa_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.parent_sleeping
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.emil_sleeping
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.charlie_sleeping
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 17
+        target:
+          entity_id:
+          - climate.living_room_radiator_thermostat_bookcase_tado
+          - climate.living_room_radiator_thermostat_dinning_table_tado
+          - climate.living_room_radiator_thermostat_sofa_tado
+    default:
+    - action: climate.set_temperature
+      metadata: {}
+      data:
+        temperature: 19
+      target:
+        entity_id:
+        - climate.living_room_radiator_thermostat_bookcase_tado
+        - climate.living_room_radiator_thermostat_dinning_table_tado
+        - climate.living_room_radiator_thermostat_sofa_tado
+  trace:
+    stored_traces: 100
+  mode: restart
+- id: '1737313921011'
+  alias: Gang - Varme
+  description: Automatik til at styre varmen i gangen
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.family_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.parent_sleeping
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_sleeping
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlie_sleeping
+  - trigger: state
+    entity_id:
+    - sensor.hallway_target_temperature
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: climate.home_heat_pump_panasonic
+        state: 'off'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 22
+        target:
+          entity_id:
+          - climate.hallway_radiator_thermostat_tado
+          - climate.kitchen_radiator_thermostat_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.family_home
+        state: 'off'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 17
+        target:
+          entity_id:
+          - climate.hallway_radiator_thermostat_tado
+          - climate.kitchen_radiator_thermostat_tado
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.parent_sleeping
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.charlie_sleeping
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.emil_sleeping
+        state: 'on'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 18
+        target:
+          entity_id:
+          - climate.hallway_radiator_thermostat_tado
+          - climate.kitchen_radiator_thermostat_tado
+    default:
+    - action: climate.set_temperature
+      metadata: {}
+      data:
+        temperature: 20
+      target:
+        entity_id:
+        - climate.hallway_radiator_thermostat_tado
+        - climate.kitchen_radiator_thermostat_tado
+  mode: restart
+- id: '1737405624054'
+  alias: Stue varme manuelt
+  description: Start timer for manuelt kontrol af varme
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.living_room_target_temperature
+    id: target_change
+  - trigger: state
+    entity_id:
+    - timer.living_room_heating_manual_timer
+    to: idle
+  - trigger: state
+    entity_id:
+    - binary_sensor.family_home
+    to: 'off'
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.family_home
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'off'
+      sequence:
+      - action: timer.finish
+        metadata: {}
+        target:
+          entity_id: timer.living_room_heating_manual_timer
+        data: {}
+      - action: automation.turn_on
+        metadata: {}
+        target:
+          entity_id: automation.living_room_heating
+        data: {}
+      - action: automation.trigger
+        metadata: {}
+        data:
+          skip_condition: false
+        target:
+          entity_id: automation.living_room_heating
+    - conditions:
+      - condition: trigger
+        id:
+        - target_change
+      - condition: template
+        value_template: '{{ is_state_attr(''automation.living_room_heating'', ''current'',
+          0) }}'
+      - condition: template
+        value_template: '{{ (now().timestamp() - state_attr(''automation.living_room_heating'',
+          ''last_triggered'')|as_datetime|as_timestamp) > 5 }} '
+      sequence:
+      - action: automation.turn_off
+        metadata: {}
+        data:
+          stop_actions: true
+        target:
+          entity_id: automation.living_room_heating
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 02:00:00
+        target:
+          entity_id: timer.living_room_heating_manual_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - target_change
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: timer.living_room_heating_manual_timer
+        state: idle
+      sequence:
+      - action: automation.turn_on
+        metadata: {}
+        target:
+          entity_id: automation.living_room_heating
+        data: {}
+      - action: automation.trigger
+        metadata: {}
+        data:
+          skip_condition: false
+        target:
+          entity_id: automation.living_room_heating
+  mode: restart
+- id: '1737748537241'
+  alias: Soveværelse varme manuelt
+  description: Start timer for manuelt kontrol af varme
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.bedroom_target_temperature
+    id: target_change
+  - trigger: state
+    entity_id:
+    - timer.bedroom_heating_manual_timer
+    to: idle
+  - trigger: state
+    entity_id:
+    - binary_sensor.parent_home
+    to: 'off'
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.parent_home
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'off'
+      sequence:
+      - action: timer.finish
+        metadata: {}
+        target:
+          entity_id: timer.bedroom_heating_manual_timer
+        data: {}
+      - action: automation.turn_on
+        metadata: {}
+        target:
+          entity_id: automation.bedroom_heating
+        data: {}
+      - action: automation.trigger
+        metadata: {}
+        data:
+          skip_condition: false
+        target:
+          entity_id: automation.bedroom_heating
+    - conditions:
+      - condition: trigger
+        id:
+        - target_change
+      - condition: template
+        value_template: '{{ is_state_attr(''automation.bedroom_heating'', ''current'',
+          0) }}'
+      - condition: template
+        value_template: '{{ (now().timestamp() - state_attr(''automation.bedroom_heating'',
+          ''last_triggered'')|as_datetime|as_timestamp) > 5 }} '
+      sequence:
+      - action: automation.turn_off
+        metadata: {}
+        data:
+          stop_actions: true
+        target:
+          entity_id: automation.bedroom_heating
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 01:00:00
+        target:
+          entity_id: timer.bedroom_heating_manual_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - target_change
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: timer.bedroom_heating_manual_timer
+        state: idle
+      sequence:
+      - action: automation.turn_on
+        metadata: {}
+        target:
+          entity_id: automation.bedroom_heating
+        data: {}
+      - action: automation.trigger
+        metadata: {}
+        data:
+          skip_condition: false
+        target:
+          entity_id: automation.bedroom_heating
+  mode: restart
+- id: '1737748573372'
+  alias: Emils værelse varme manuelt
+  description: Start timer for manuelt kontrol af varme
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.emils_room_target_temperature
+    id: target_change
+  - trigger: state
+    entity_id:
+    - timer.emils_room_heating_manual_timer
+    to: idle
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_home
+    to: 'off'
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.emil_home
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'off'
+      sequence:
+      - action: timer.finish
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.emils_room_heating_manual_timer
+      - action: automation.turn_on
+        metadata: {}
+        target:
+          entity_id: automation.emils_room_heating
+        data: {}
+      - action: automation.trigger
+        metadata: {}
+        data:
+          skip_condition: false
+        target:
+          entity_id: automation.emils_room_heating
+    - conditions:
+      - condition: trigger
+        id:
+        - target_change
+      - condition: template
+        value_template: '{{ is_state_attr(''automation.emils_room_heating'', ''current'',
+          0) }}'
+      - condition: template
+        value_template: '{{ (now().timestamp() - state_attr(''automation.emils_room_heating'',
+          ''last_triggered'')|as_datetime|as_timestamp) > 5 }} '
+      sequence:
+      - action: automation.turn_off
+        metadata: {}
+        data:
+          stop_actions: true
+        target:
+          entity_id: automation.emils_room_heating
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 01:00:00
+        target:
+          entity_id: timer.emils_room_heating_manual_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - target_change
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: timer.emils_room_heating_manual_timer
+        state: idle
+      sequence:
+      - action: automation.turn_on
+        metadata: {}
+        target:
+          entity_id: automation.emils_room_heating
+        data: {}
+      - action: automation.trigger
+        metadata: {}
+        data:
+          skip_condition: false
+        target:
+          entity_id: automation.emils_room_heating
+  trace:
+    stored_traces: 20
+  mode: restart
+- id: '1737748610394'
+  alias: Charlies værelse varme manuelt
+  description: Start timer for manuelt kontrol af varme
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.charlies_room_target_temperature
+    id: target_change
+  - trigger: state
+    entity_id:
+    - timer.charlies_room_heating_manual_timer
+    to: idle
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlie_home
+    to: 'off'
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.charlie_home
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.home_house_sitter
+        state: 'off'
+      sequence:
+      - action: timer.finish
+        metadata: {}
+        target:
+          entity_id: timer.charlies_room_heating_manual_timer
+        data: {}
+      - action: automation.turn_on
+        metadata: {}
+        target:
+          entity_id: automation.charlies_room_heating
+        data: {}
+      - action: automation.trigger
+        metadata: {}
+        data:
+          skip_condition: false
+        target:
+          entity_id: automation.charlies_room_heating
+    - conditions:
+      - condition: trigger
+        id:
+        - target_change
+      - condition: template
+        value_template: '{{ is_state_attr(''automation.charlies_room_heating'', ''current'',
+          0) }}'
+      - condition: template
+        value_template: '{{ (now().timestamp() - state_attr(''automation.charlies_room_heating'',
+          ''last_triggered'')|as_datetime|as_timestamp) > 5 }} '
+      sequence:
+      - action: automation.turn_off
+        metadata: {}
+        data:
+          stop_actions: true
+        target:
+          entity_id: automation.charlies_room_heating
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 01:00:00
+        target:
+          entity_id: timer.charlies_room_heating_manual_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - target_change
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: timer.charlies_room_heating_manual_timer
+        state: idle
+      sequence:
+      - action: automation.turn_on
+        metadata: {}
+        target:
+          entity_id: automation.charlies_room_heating
+        data: {}
+      - action: automation.trigger
+        metadata: {}
+        data:
+          skip_condition: false
+        target:
+          entity_id: automation.charlies_room_heating
+  mode: restart
+- id: '1737757884659'
+  alias: Hjem varme slukket
+  description: 'Automatik til at motionere radiator ventiler når varmepumpe er slukket.
+
+    '
+  triggers:
+  - trigger: state
+    entity_id:
+    - climate.home_heat_pump_panasonic
+    to: 'off'
+  - trigger: time_pattern
+    hours: /1
+  conditions:
+  - condition: state
+    entity_id: climate.home_heat_pump_panasonic
+    state: 'off'
+  actions:
+  - choose:
+    - conditions:
+      - condition: time
+        after: '12:00:00'
+        before: '14:00:00'
+        weekday:
+        - mon
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 30
+        target:
+          entity_id: '{{ states.climate | map(attribute=''entity_id'') | reject(''in'',
+            label_entities(''Tændt når ingen hjemme'')) | list | sort }}'
+    default:
+    - action: climate.set_temperature
+      metadata: {}
+      data:
+        temperature: 7
+      target:
+        entity_id: '{{ states.climate | map(attribute=''entity_id'') | reject(''in'',
+          label_entities(''Tændt når ingen hjemme'')) | list | sort }}'
+  mode: single
+- id: '1737796089950'
+  alias: Solcast PV Forecast opdater
+  description: Opdater sol produktion udsigten i Solcast PV Forecast
+  triggers:
+  - trigger: time
+    at: 00:00:00
+  - trigger: sun
+    event: sunrise
+    offset: 0
+  conditions: []
+  actions:
+  - action: solcast_solar.update_forecasts
+    metadata: {}
+    data: {}
+  mode: single
+- id: '1737835831554'
+  alias: Hjem huspasser slår fra
+  description: Automatik til at slår huspasser fra
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.family_home
+    to: 'on'
+  conditions: []
+  actions:
+  - action: input_boolean.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: input_boolean.home_house_sitter
+  mode: single
+- id: '1737916297775'
+  alias: Indkørsel lys
+  description: Automatik til at styre lys i indkørsel
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_entrance_occupancy_signify
+    - binary_sensor.driveway_motion_sensor_street_occupancy_signify
+    - binary_sensor.driveway_motion_sensor_house_south_occupancy_signify
+    - binary_sensor.driveway_motion_sensor_house_east_occupancy_signify
+    to: 'on'
+  - trigger: state
+    entity_id:
+    - timer.driveway_light_courtyard_timer
+    - timer.driveway_light_entrance_timer
+    - timer.driveway_light_driveway_timer
+    to: idle
+  - trigger: numeric_state
+    entity_id:
+    - sensor.driveway_motion_sensor_street_illuminance_signify
+    below: 2
+  - trigger: time
+    at: '21:30:00'
+  conditions: []
+  actions:
+  - variables:
+      night_light: "{{ now().strftime('%H:%M') > '12:00' and \n   now().strftime('%H:%M')
+        < '21:30' and\n   states('sensor.driveway_motion_sensor_street_illuminance_signify')|float(0)
+        < 2 }}"
+  - if:
+    - condition: numeric_state
+      entity_id: sensor.driveway_motion_sensor_street_illuminance_signify
+      above: 1
+    then:
+    - action: light.turn_off
+      metadata: {}
+      data:
+        transition: 1
+      target:
+        entity_id:
+        - light.driveway_light_entrance_spot_1_signify
+        - light.driveway_light_entrance_spot_2_signify
+        - light.driveway_light_entrance_spot_3_signify
+        - light.driveway_light_right_1_signify
+        - light.driveway_light_right_2_signify
+        - light.driveway_light_right_3_signify
+        - light.driveway_light_left_1_signify
+        - light.driveway_light_left_2_signify
+        - light.driveway_light_left_3_signify
+        - light.driveway_light_left_4_philips
+        - light.driveway_light_left_5_signify
+        - light.driveway_light_left_6_signify
+        - light.driveway_light_left_7_philips
+        - light.driveway_light_left_8_signify
+        - light.driveway_light_left_9_signify
+        - light.driveway_light_house_east_gledopto
+        - light.driveway_light_house_south_gledopto
+    else:
+    - if:
+      - condition: state
+        entity_id: binary_sensor.driveway_motion_sensor_entrance_occupancy_signify
+        state: 'on'
+      then:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:01:00
+        target:
+          entity_id: timer.driveway_light_entrance_timer
+    - if:
+      - condition: state
+        entity_id: binary_sensor.driveway_motion_sensor_street_occupancy_signify
+        state: 'on'
+      then:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.driveway_light_driveway_timer
+    - if:
+      - condition: state
+        entity_id: binary_sensor.driveway_motion_sensor_house_south_occupancy_signify
+        state: 'on'
+      then:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.driveway_light_driveway_timer
+    - if:
+      - condition: state
+        entity_id: binary_sensor.driveway_motion_sensor_house_east_occupancy_signify
+        state: 'on'
+      then:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:02:00
+        target:
+          entity_id: timer.driveway_light_courtyard_timer
+    - if:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: timer.driveway_light_courtyard_timer
+          state: active
+        - condition: state
+          entity_id: timer.driveway_light_entrance_timer
+          state: active
+        - condition: template
+          value_template: '{{ night_light }}'
+      then:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          brightness_pct: 100
+          transition: 1
+        target:
+          entity_id:
+          - light.driveway_light_house_east_gledopto
+      else:
+      - action: light.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - light.driveway_light_house_east_gledopto
+    - if:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: timer.driveway_light_driveway_timer
+          state: active
+        - condition: state
+          entity_id: timer.driveway_light_entrance_timer
+          state: active
+        - condition: template
+          value_template: '{{ night_light }}'
+      then:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          brightness_pct: 100
+          transition: 1
+        target:
+          entity_id:
+          - light.driveway_light_house_south_gledopto
+      else:
+      - action: light.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - light.driveway_light_house_south_gledopto
+    - if:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: timer.driveway_light_entrance_timer
+          state: active
+      then:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          brightness_pct: 100
+          transition: 1
+        target:
+          entity_id:
+          - light.driveway_light_entrance_spot_1_signify
+          - light.driveway_light_entrance_spot_2_signify
+          - light.driveway_light_entrance_spot_3_signify
+      else:
+      - action: light.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - light.driveway_light_entrance_spot_1_signify
+          - light.driveway_light_entrance_spot_2_signify
+          - light.driveway_light_entrance_spot_3_signify
+    - if:
+      - condition: state
+        entity_id: timer.driveway_light_entrance_timer
+        state: active
+      then:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          brightness_pct: 100
+          transition: 1
+        target:
+          entity_id:
+          - light.driveway_light_left_1_signify
+      else:
+      - action: light.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - light.driveway_light_left_1_signify
+    - if:
+      - condition: state
+        entity_id: timer.driveway_light_driveway_timer
+        state: active
+      then:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          brightness_pct: 80
+          kelvin: 2700
+          transition: 1
+        target:
+          entity_id:
+          - light.driveway_light_right_1_signify
+      else:
+      - action: light.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - light.driveway_light_right_1_signify
+    - choose:
+      - conditions:
+        - condition: state
+          entity_id: timer.driveway_light_driveway_timer
+          state: active
+        sequence:
+        - action: light.turn_on
+          metadata: {}
+          data:
+            brightness_pct: 80
+            kelvin: 2700
+            transition: 1
+          target:
+            entity_id:
+            - light.driveway_light_right_2_signify
+            - light.driveway_light_right_3_signify
+        - action: light.turn_on
+          metadata: {}
+          data:
+            brightness_pct: 100
+            transition: 1
+          target:
+            entity_id:
+            - light.driveway_light_left_2_signify
+            - light.driveway_light_left_3_signify
+            - light.driveway_light_left_4_philips
+            - light.driveway_light_left_5_signify
+            - light.driveway_light_left_6_signify
+            - light.driveway_light_left_7_philips
+            - light.driveway_light_left_8_signify
+            - light.driveway_light_left_9_signify
+      - conditions:
+        - condition: template
+          value_template: '{{ night_light }}'
+        sequence:
+        - action: light.turn_on
+          metadata: {}
+          data:
+            brightness_pct: 10
+            transition: 1
+          target:
+            entity_id:
+            - light.driveway_light_right_2_signify
+            - light.driveway_light_right_3_signify
+            - light.driveway_light_left_2_signify
+            - light.driveway_light_left_3_signify
+            - light.driveway_light_left_4_philips
+            - light.driveway_light_left_5_signify
+            - light.driveway_light_left_6_signify
+            - light.driveway_light_left_7_philips
+            - light.driveway_light_left_8_signify
+            - light.driveway_light_left_9_signify
+      default:
+      - action: light.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - light.driveway_light_right_2_signify
+          - light.driveway_light_right_3_signify
+          - light.driveway_light_left_2_signify
+          - light.driveway_light_left_3_signify
+          - light.driveway_light_left_4_philips
+          - light.driveway_light_left_5_signify
+          - light.driveway_light_left_6_signify
+          - light.driveway_light_left_7_philips
+          - light.driveway_light_left_8_signify
+          - light.driveway_light_left_9_signify
+  trace:
+    stored_traces: 20
+  mode: restart
+- id: '1738003454800'
+  alias: Monique middagslur
+  description: Automatik til at styre Moniques middagslur
+  triggers:
+  - trigger: state
+    entity_id:
+    - input_boolean.monique_nap_time_toggle
+  - trigger: state
+    entity_id:
+    - input_select.monique_nap_time_state
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_door
+    from: 'off'
+    to: 'on'
+    id: open_door
+  conditions: []
+  actions:
+  - action: system_log.write
+    metadata: {}
+    data:
+      level: error
+      message: '{{ trigger.entity_id }}'
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id == ''input_boolean.monique_nap_time_toggle''
+          }}'
+      sequence:
+      - if:
+        - condition: state
+          entity_id: input_boolean.monique_nap_time_toggle
+          state: 'off'
+        then:
+        - action: input_select.select_option
+          metadata: {}
+          data:
+            option: 'off'
+          target:
+            entity_id: input_select.monique_nap_time_state
+        else:
+        - action: input_select.select_option
+          metadata: {}
+          data:
+            option: prepare
+          target:
+            entity_id: input_select.monique_nap_time_state
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id == ''input_select.monique_nap_time_state''
+          }}'
+      sequence:
+      - if:
+        - condition: state
+          entity_id: input_select.monique_nap_time_state
+          state: 'off'
+        then:
+        - action: input_boolean.turn_off
+          metadata: {}
+          data: {}
+          target:
+            entity_id: input_boolean.monique_nap_time_toggle
+        else:
+        - action: input_boolean.turn_on
+          metadata: {}
+          data: {}
+          target:
+            entity_id: input_boolean.monique_nap_time_toggle
+    default:
+    - choose:
+      - conditions:
+        - condition: state
+          entity_id: input_select.monique_nap_time_state
+          state: prepare
+        - condition: trigger
+          id:
+          - open_door
+        sequence:
+        - action: input_select.select_option
+          metadata: {}
+          data:
+            option: sleep
+          target:
+            entity_id: input_select.monique_nap_time_state
+      - conditions:
+        - condition: state
+          entity_id: input_select.monique_nap_time_state
+          state: sleep
+        - condition: trigger
+          id:
+          - open_door
+        sequence:
+        - action: input_select.select_option
+          metadata: {}
+          data:
+            option: 'off'
+          target:
+            entity_id: input_select.monique_nap_time_state
+  mode: restart
+- id: '1738962148356'
+  alias: Garage 3D Printer
+  description: Automatik til at slukke for 3D printer
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.garage_3d_printer_prusa
+    to: idle
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+  conditions: []
+  actions:
+  - action: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: light.garage_3d_printer_power_philips_hue
+  mode: single
+- id: '1739016002574'
+  alias: Emils værelse blæser
+  description: Tænder for Dyson Hot+Cool i Emils værelse, for at varme hurtigere op
+    hvis den ønskede temperatur er væsentligt koldere end den aktuelle.
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.emils_room_light
+  - trigger: state
+    entity_id:
+    - sensor.emils_room_target_temperature
+  - trigger: state
+    entity_id:
+    - sensor.emils_room_current_temperature
+  - trigger: state
+    entity_id:
+    - binary_sensor.emils_room_window_sensor_door
+  - trigger: state
+    entity_id:
+    - timer.emils_room_window_open_timer
+  - trigger: state
+    entity_id:
+    - binary_sensor.emils_room_window_sensor_door
+    to: 'on'
+    from: 'off'
+    id: window_open
+  conditions: []
+  actions:
+  - if:
+    - condition: state
+      entity_id: binary_sensor.emils_room_light
+      state: 'on'
+    then:
+    - action: switch.turn_off
+      metadata: {}
+      data: {}
+      target:
+        entity_id: switch.emils_room_pure_hot_cool_night_mode_dyson
+    else:
+    - action: switch.turn_on
+      metadata: {}
+      data: {}
+      target:
+        entity_id: switch.emils_room_pure_hot_cool_night_mode_dyson
+  - if:
+    - condition: trigger
+      id:
+      - window_open
+    then:
+    - action: timer.start
+      metadata: {}
+      data:
+        duration: 00:10:00
+      target:
+        entity_id: timer.emils_room_window_open_timer
+  - if:
+    - condition: state
+      entity_id: binary_sensor.emils_room_window_sensor_door
+      state: 'off'
+    - condition: state
+      entity_id: timer.emils_room_window_open_timer
+      state: active
+    then:
+    - action: timer.finish
+      metadata: {}
+      data: {}
+      target:
+        entity_id: timer.emils_room_window_open_timer
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.emil_home
+        state: 'off'
+      sequence:
+      - action: climate.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: climate.emils_room_pure_hot_cool_dyson
+    - conditions:
+      - condition: state
+        entity_id: timer.emils_room_window_open_timer
+        state: active
+      sequence:
+      - action: fan.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
+      - action: fan.set_percentage
+        metadata: {}
+        data:
+          percentage: 100
+        target:
+          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
+      - action: fan.oscillate
+        metadata: {}
+        data:
+          oscillating: true
+        target:
+          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
+      - action: fan.set_preset_mode
+        metadata: {}
+        data:
+          preset_mode: Normal
+        target:
+          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
+      - action: switch.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.emils_room_pure_hot_cool_focus_mode_dyson
+      - action: climate.set_hvac_mode
+        metadata: {}
+        data:
+          hvac_mode: cool
+        target:
+          entity_id: climate.emils_room_pure_hot_cool_dyson
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.emils_room_window_sensor_door
+        state: 'off'
+      - condition: template
+        value_template: '{{ states("sensor.emils_room_current_temperature")|float
+          < states("sensor.emils_room_target_temperature")|float - 1 }}'
+      sequence:
+      - action: climate.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: climate.emils_room_pure_hot_cool_dyson
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: '{{ states(''sensor.emils_room_target_temperature'')|float(0)
+            }}'
+          hvac_mode: heat
+        target:
+          entity_id: climate.emils_room_pure_hot_cool_dyson
+      - action: fan.oscillate
+        metadata: {}
+        data:
+          oscillating: true
+        target:
+          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
+      - action: fan.set_preset_mode
+        metadata: {}
+        data:
+          preset_mode: Auto
+        target:
+          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
+      - action: switch.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.emils_room_pure_hot_cool_focus_mode_dyson
+    - conditions:
+      - condition: template
+        value_template: '{{ states("sensor.emils_room_current_temperature")|float
+          > states("sensor.emils_room_target_temperature")|float }}'
+      - condition: numeric_state
+        entity_id: sensor.emils_room_current_temperature
+        above: 23
+      sequence:
+      - action: climate.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: climate.emils_room_pure_hot_cool_dyson
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 21
+          hvac_mode: cool
+        target:
+          entity_id: climate.emils_room_pure_hot_cool_dyson
+      - action: fan.oscillate
+        metadata: {}
+        data:
+          oscillating: true
+        target:
+          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
+      - action: fan.set_preset_mode
+        metadata: {}
+        data:
+          preset_mode: Auto
+        target:
+          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
+      - action: switch.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.emils_room_pure_hot_cool_focus_mode_dyson
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.emils_room_pure_hot_cool_air_quality_index_dyson
+        above: 5
+      sequence:
+      - action: fan.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
+      - action: fan.oscillate
+        metadata: {}
+        data:
+          oscillating: true
+        target:
+          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
+      - action: fan.set_preset_mode
+        metadata: {}
+        data:
+          preset_mode: Auto
+        target:
+          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
+      - action: switch.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.emils_room_pure_hot_cool_focus_mode_dyson
+      - action: climate.set_hvac_mode
+        metadata: {}
+        data:
+          hvac_mode: cool
+        target:
+          entity_id: climate.emils_room_pure_hot_cool_dyson
+    default:
+    - action: climate.turn_off
+      metadata: {}
+      data: {}
+      target:
+        entity_id: climate.emils_room_pure_hot_cool_dyson
+  mode: queued
+- id: '1739206213123'
+  alias: Stue robotstøvsuger
+  description: Automatic til at styre robotstøvsuger
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_sleeping
+    - binary_sensor.charlie_sleeping
+    - binary_sensor.parent_sleeping
+    to: 'off'
+  - trigger: state
+    entity_id:
+    - vacuum.living_room_robot_vacuum_roborock
+    to: docked
+  - trigger: state
+    entity_id:
+    - media_player.living_room_receiver_denon
+    to: 'off'
+  - trigger: state
+    entity_id:
+    - binary_sensor.living_room_light
+    to: 'off'
+  conditions: []
+  actions:
+  - action: time.set_value
+    metadata: {}
+    data:
+      time: 00:00:00
+    target:
+      entity_id: time.living_room_robot_vacuum_do_not_disturb_begin_roborock
+  - action: time.set_value
+    metadata: {}
+    data:
+      time: '23:59:59'
+    target:
+      entity_id: time.living_room_robot_vacuum_do_not_disturb_end_roborock
+  - if:
+    - condition: state
+      entity_id: vacuum.living_room_robot_vacuum_roborock
+      state: docked
+    - condition: state
+      entity_id: binary_sensor.parent_sleeping
+      state: 'off'
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: '{{ states(''input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin'')|int
+          + 4800 < states(''sensor.living_room_robot_vacuum_total_cleaning_time_roborock'')|int
+          }}'
+      - condition: and
+        conditions:
+        - condition: template
+          value_template: '{{ states(''input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin'')|int
+            + 600 < states(''sensor.living_room_robot_vacuum_total_cleaning_time_roborock'')|int
+            }}'
+        - condition: state
+          entity_id: binary_sensor.emil_sleeping
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.charlie_sleeping
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.living_room_light
+          state: 'off'
+        - condition: state
+          entity_id: media_player.living_room_receiver_denon
+          state: 'off'
+    then:
+    - action: input_number.set_value
+      metadata: {}
+      data:
+        value: '{{ states(''sensor.living_room_robot_vacuum_total_cleaning_time_roborock'')|int
+          }}
+
+          '
+      target:
+        entity_id: input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin
+    - action: vacuum.send_command
+      data:
+        command: app_start_collect_dust
+      target:
+        entity_id: vacuum.living_room_robot_vacuum_roborock
+  - if:
+    - condition: state
+      entity_id: vacuum.living_room_robot_vacuum_roborock
+      state: docked
+    - condition: state
+      entity_id: binary_sensor.parent_sleeping
+      state: 'off'
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: '{{ states(''input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin'')|int
+          + 4800 > states(''sensor.living_room_robot_vacuum_total_cleaning_time_roborock'')|int
+          }}'
+      - condition: and
+        conditions:
+        - condition: template
+          value_template: '{{ states(''input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin'')|int
+            + 600 > states(''sensor.living_room_robot_vacuum_total_cleaning_time_roborock'')|int
+            }}'
+        - condition: state
+          entity_id: binary_sensor.emil_sleeping
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.charlie_sleeping
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.living_room_light
+          state: 'off'
+        - condition: state
+          entity_id: media_player.living_room_receiver_denon
+          state: 'off'
+    then: []
+  mode: single

@@ -1,0 +1,95 @@
+- binary_sensor:
+    - name: patio_light
+      unique_id: AD9B1A73-B6D7-46D6-A039-C8B614204624
+      device_class: light
+      state: >-
+        {{ not is_state('light.patio_light_philips_hue', 'off') }}
+      icon: >
+        {% if is_state('binary_sensor.patio_light', 'off') %}
+        mdi:lightbulb-group
+        {% else %}
+        mdi:lightbulb-group-outline
+        {% endif %}
+- binary_sensor:
+    - name: living_room_light
+      unique_id: 76558701-3EA0-4094-955F-C9D4F603A5DD
+      device_class: light
+      state: >-
+        {{ not(is_state('light.living_room_light_china_cabinet_philips_hue', 'off') and 
+               is_state('light.living_room_light_dinning_table_philips_hue', 'off') and 
+               is_state('light.living_room_light_escher_philips_hue', 'off') and 
+               is_state('light.living_room_light_glass_cabinet_philips_hue', 'off') and 
+               is_state('light.living_room_light_joakim_philips_hue', 'off') and 
+               is_state('light.living_room_light_lamp_philips_hue', 'off') and 
+               is_state('light.living_room_light_sofa_receiver_philips_hue', 'off') and 
+               is_state('light.living_room_light_sofa_spot_philips_hue', 'off') and 
+               is_state('light.living_room_light_sofa_window_philips_hue', 'off') and 
+               is_state('light.living_room_tv_light_strip_philips_hue', 'off')) }}
+      icon: >
+        {% if is_state('binary_sensor.living_room_light', 'on') %}
+        mdi:lightbulb-group
+        {% else %}
+        mdi:lightbulb-group-outline
+        {% endif %}
+- binary_sensor:
+    - name: hallway_light
+      unique_id: 8B69225C-21E5-48EB-9F23-C84489CAC680
+      device_class: light
+      state: >-
+        {{ not is_state('light.hallway_light_philips_hue', 'off') }}
+      icon: >
+        {% if is_state('binary_sensor.hallway_light', 'on') %}
+        mdi:lightbulb-group
+        {% else %}
+        mdi:lightbulb-group-outline
+        {% endif %}
+- binary_sensor:
+    - name: garage_light
+      unique_id: 105579B3-F827-4B88-BC14-8CBC2054E865
+      device_class: light
+      state: >-
+        {{ not(is_state('light.garage_light_main_philips_hue', 'off') and 
+               is_state('light.garage_light_spots_philips_hue', 'off') and 
+               is_state('light.garage_light_projector_philips_hue', 'off')) }}
+      icon: >
+        {% if is_state('binary_sensor.garage_light', 'on') %}
+        mdi:lightbulb-group
+        {% else %}
+        mdi:lightbulb-group-outline
+        {% endif %}
+- binary_sensor:
+    - name: emils_room_light
+      unique_id: 0F211B6B-1262-49E1-B490-4B8A4FD9E6D4
+      device_class: light
+      state: >-
+        {{ not is_state('light.emils_room_light_philips_hue', 'off') }}
+      icon: >
+        {% if is_state('binary_sensor.emils_room_light', 'on') %}
+        mdi:lightbulb-group
+        {% else %}
+        mdi:lightbulb-group-outline
+        {% endif %}
+- binary_sensor:
+    - name: charlies_room_light
+      unique_id: BA83115F-F80D-4CAF-BFD3-46A2D6A27BBB
+      device_class: light
+      state: >-
+        {{ not is_state('light.charlies_room_light_philips_hue', 'off') }}
+      icon: >
+        {% if is_state('binary_sensor.charlies_room_light', 'on') %}
+        mdi:lightbulb-group
+        {% else %}
+        mdi:lightbulb-group-outline
+        {% endif %}
+- binary_sensor:
+    - name: bedroom_light
+      unique_id: C368D318-00EE-4AEB-986B-61B7D9D48091
+      device_class: light
+      state: >-
+        {{ not is_state('light.bedroom_light_philips_hue', 'off') }}
+      icon: >
+        {% if is_state('binary_sensor.bedroom_light', 'on') %}
+        mdi:lightbulb-group
+        {% else %}
+        mdi:lightbulb-group-outline
+        {% endif %}

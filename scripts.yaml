@@ -1,0 +1,443 @@
+charlies_room_light_desk_adjust:
+  alias: Charlies værelse lys skrivebord tilpas
+  description: Regulær lysstyrke på lys ved skrivebord på Charlies værelse
+  sequence:
+  - variables:
+      light_entity: light.charlies_room_light_desk_mid_philips_hue
+      step: '{{ brightness_step | int }}'
+  - target:
+      entity_id:
+      - light.charlies_room_light_desk_left_philips_hue
+      - light.charlies_room_light_desk_mid_philips_hue
+      - light.charlies_room_light_desk_right_philips_hue
+    data:
+      transition: 0.5
+      brightness: "{% set current_brightness = state_attr(light_entity, 'brightness')
+        | int(0) %} {% if is_state('input_boolean.charlies_room_light_desk_brightness_up',
+        'on') %}\n  {% set new_brightness = current_brightness + step %}\n  {% if
+        new_brightness > 255 %}\n    {{ 255 }}\n  {% else %}\n    {{ new_brightness
+        }}\n  {% endif %}\n{% else %}\n  {% set new_brightness = current_brightness
+        - step %}\n  {% if new_brightness < 0 %}\n    {{ 0 }}\n  {% else %}\n    {{
+        new_brightness }}\n  {% endif %}\n{% endif %}\n"
+    action: light.turn_on
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.charlies_room_light_desk_brightness_up'',
+          ''on'') and state_attr(light_entity, ''brightness'') | int(0) >= 255 }}
+
+          '
+      sequence:
+      - target:
+          entity_id: input_boolean.charlies_room_light_desk_brightness_up
+        action: input_boolean.turn_off
+        data: {}
+    - conditions:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.charlies_room_light_desk_brightness_up'',
+          ''off'') and state_attr(light_entity, ''brightness'') | int(0) <= 0 }}
+
+          '
+      sequence:
+      - target:
+          entity_id: input_boolean.charlies_room_light_desk_brightness_up
+        action: input_boolean.turn_on
+        data: {}
+  mode: queued
+  max: 10
+patio_light_sunset:
+  alias: Terrasse lys solnedgang scene
+  description: Lys scene på terrasse til hygge lys med sol nedgangs farver
+  sequence:
+  - parallel:
+    - action: light.turn_on
+      metadata: {}
+      data:
+        transition: 1
+        brightness_pct: 40
+        rgb_color:
+        - 253
+        - 160
+        - 83
+      target:
+        entity_id:
+        - light.patio_light_table_philips_hue
+    - action: light.turn_on
+      metadata: {}
+      data:
+        transition: 1
+        brightness_pct: 40
+        rgb_color:
+        - 240
+        - 106
+        - 92
+      target:
+        entity_id:
+        - light.patio_light_main_philips_hue
+    - action: light.turn_on
+      metadata: {}
+      data:
+        transition: 1
+        brightness_pct: 40
+        rgb_color:
+        - 199
+        - 83
+        - 253
+      target:
+        entity_id:
+        - light.patio_light_bar_ledvance_philips_hue
+living_room_light_dinning:
+  alias: Stue lys spise scene
+  description: Lys scene til stuen til spise situation
+  sequence:
+  - parallel:
+    - action: light.turn_on
+      metadata: {}
+      data:
+        transition: 1
+        kelvin: 2700
+        brightness_pct: 100
+      target:
+        entity_id:
+        - light.living_room_light_dinning_table_philips_hue
+        - light.living_room_light_extra_philips_hue
+    - action: light.turn_on
+      metadata: {}
+      data:
+        transition: 1
+        kelvin: 2700
+        brightness_pct: 75
+      target:
+        entity_id:
+        - light.living_room_light_china_cabinet_philips_hue
+    - action: light.turn_on
+      metadata: {}
+      data:
+        transition: 1
+        kelvin: 2300
+        brightness_pct: 50
+      target:
+        entity_id:
+        - light.living_room_light_escher_philips_hue
+        - light.living_room_light_joakim_philips_hue
+        - light.living_room_light_sofa_spot_philips_hue
+    - action: light.turn_off
+      metadata: {}
+      data:
+        transition: 1
+      target:
+        entity_id:
+        - light.living_room_light_sofa_receiver_philips_hue
+        - light.living_room_light_sofa_window_philips_hue
+        - light.living_room_tv_light_strip_philips_hue
+    - action: light.turn_on
+      metadata: {}
+      data: {}
+      target:
+        entity_id:
+        - light.living_room_light_glass_cabinet_philips_hue
+    - action: light.turn_off
+      metadata: {}
+      data: {}
+      target:
+        entity_id:
+        - light.living_room_light_bookcase_philips_hue
+        - light.living_room_light_lamp_philips_hue
+living_room_light_tv:
+  alias: Stue lys TV scene
+  description: Lys scene til stuen til TV situation
+  sequence:
+  - parallel:
+    - action: light.turn_on
+      metadata: {}
+      data:
+        transition: 1
+        kelvin: 2700
+        brightness_pct: 75
+      target:
+        entity_id:
+        - light.living_room_tv_light_strip_philips_hue
+        - light.living_room_light_escher_philips_hue
+        - light.living_room_light_joakim_philips_hue
+        - light.living_room_light_sofa_spot_philips_hue
+    - action: light.turn_on
+      metadata: {}
+      data:
+        transition: 1
+        kelvin: 2300
+        brightness_pct: 50
+      target:
+        entity_id:
+        - light.living_room_light_sofa_receiver_philips_hue
+        - light.living_room_light_sofa_window_philips_hue
+        - light.living_room_light_china_cabinet_philips_hue
+    - action: light.turn_off
+      metadata: {}
+      data:
+        transition: 1
+      target:
+        entity_id:
+        - light.living_room_light_dinning_table_philips_hue
+        - light.living_room_light_extra_philips_hue
+    - action: light.turn_on
+      metadata: {}
+      data: {}
+      target:
+        entity_id:
+        - light.living_room_light_lamp_philips_hue
+    - action: light.turn_off
+      metadata: {}
+      data: {}
+      target:
+        entity_id:
+        - light.living_room_light_bookcase_philips_hue
+        - light.living_room_light_glass_cabinet_philips_hue
+bedroom_light_sunrise:
+  alias: Soveværelse lys solopgang scene
+  description: Lys scene til soveværelse til vågn op
+  mode: restart
+  sequence:
+  - event: bedroom_light_sunrise_script
+    event_data: {}
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: light.bedroom_light_philips_hue
+        state: 'off'
+      sequence:
+      - action: light.turn_on
+        data:
+          transition: 240
+          brightness: 100
+          rgb_color:
+          - 102
+          - 102
+          - 255
+        target:
+          entity_id:
+          - light.bedroom_light_anders_philips_hue
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 60
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+    - conditions:
+      - condition: state
+        entity_id: light.bedroom_light_monique_philips_hue
+        state: 'off'
+      - condition: numeric_state
+        entity_id: light.bedroom_light_anders_philips_hue
+        attribute: brightness
+        above: 1
+        below: 170
+      sequence:
+      - action: light.turn_on
+        data:
+          transition: 180
+          brightness: 100
+          rgb_color:
+          - 204
+          - 153
+          - 255
+        target:
+          entity_id:
+          - light.bedroom_light_monique_philips_hue
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 60
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+    - conditions:
+      - condition: state
+        entity_id: light.bedroom_light_window_philips_hue
+        state: 'off'
+      - condition: numeric_state
+        entity_id:
+        - light.bedroom_light_anders_philips_hue
+        - light.bedroom_light_monique_philips_hue
+        attribute: brightness
+        above: 1
+        below: 170
+      sequence:
+      - action: light.turn_on
+        data:
+          transition: 120
+          brightness: 100
+          rgb_color:
+          - 255
+          - 183
+          - 94
+        target:
+          entity_id:
+          - light.bedroom_light_window_philips_hue
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 60
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+    - conditions:
+      - condition: state
+        entity_id: light.bedroom_light_closet_philips_hue
+        state: 'off'
+      - condition: numeric_state
+        entity_id:
+        - light.bedroom_light_anders_philips_hue
+        - light.bedroom_light_monique_philips_hue
+        - light.bedroom_light_window_philips_hue
+        attribute: brightness
+        above: 1
+        below: 170
+      sequence:
+      - action: light.turn_on
+        data:
+          transition: 60
+          brightness: 100
+          rgb_color:
+          - 255
+          - 128
+          - 128
+        target:
+          entity_id:
+          - light.bedroom_light_closet_philips_hue
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 60
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+    default:
+    - action: light.turn_on
+      metadata: {}
+      data:
+        transition: 60
+        kelvin: 2700
+        brightness_pct: 80
+      target:
+        entity_id: light.bedroom_light_philips_hue
+bedroom_light_sunset:
+  alias: Soveværelse lys solnedgang scene
+  description: Lys scene til soveværelse til gå i seng
+  mode: restart
+  sequence:
+  - event: bedroom_light_sunset_script
+    event_data: {}
+  - if:
+    - condition: state
+      entity_id: binary_sensor.bedroom_light
+      state: 'off'
+    then:
+    - action: light.turn_on
+      metadata: {}
+      data:
+        transition: 1
+        kelvin: 2700
+      target:
+        entity_id: light.bedroom_light_philips_hue
+  - parallel:
+    - action: light.turn_on
+      data:
+        transition: 5
+        brightness: '{{ brightness_from }}'
+        rgb_color:
+        - 204
+        - 51
+        - 63
+      target:
+        entity_id:
+        - light.bedroom_light_anders_philips_hue
+    - action: light.turn_on
+      data:
+        transition: 5
+        brightness: '{{ brightness_from }}'
+        rgb_color:
+        - 153
+        - 102
+        - 204
+      target:
+        entity_id:
+        - light.bedroom_light_monique_philips_hue
+    - action: light.turn_on
+      data:
+        transition: 5
+        brightness: '{{ brightness_from }}'
+        rgb_color:
+        - 255
+        - 94
+        - 77
+      target:
+        entity_id:
+        - light.bedroom_light_closet_philips_hue
+    - action: light.turn_on
+      data:
+        transition: 5
+        brightness: '{{ brightness_from }}'
+        rgb_color:
+        - 255
+        - 140
+        - 148
+      target:
+        entity_id:
+        - light.bedroom_light_window_philips_hue
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+  - parallel:
+    - action: light.turn_on
+      data:
+        transition: '{{ transition }}'
+        brightness: '{{ brightness_to }}'
+        rgb_color:
+        - 204
+        - 51
+        - 63
+      target:
+        entity_id:
+        - light.bedroom_light_anders_philips_hue
+    - action: light.turn_on
+      data:
+        transition: '{{ transition }}'
+        brightness: '{{ brightness_to }}'
+        rgb_color:
+        - 153
+        - 102
+        - 204
+      target:
+        entity_id:
+        - light.bedroom_light_monique_philips_hue
+    - action: light.turn_on
+      data:
+        transition: '{{ transition }}'
+        brightness: '{{ brightness_to }}'
+        rgb_color:
+        - 255
+        - 94
+        - 77
+      target:
+        entity_id:
+        - light.bedroom_light_closet_philips_hue
+    - action: light.turn_on
+      data:
+        transition: '{{ transition }}'
+        brightness: '{{ brightness_to }}'
+        rgb_color:
+        - 255
+        - 140
+        - 148
+      target:
+        entity_id:
+        - light.bedroom_light_window_philips_hue
+vacuum_empty_dust_bin:
+  alias: Vacuum empty dust bin
+  sequence:
+  - data:
+      command: app_start_collect_dust
+    target:
+      entity_id: vacuum.living_room_robot_vacuum_roborock
+    action: vacuum.send_command
+  mode: single
+  icon: mdi:robot-vacuum
+  description: ''
