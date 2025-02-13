@@ -4314,3 +4314,16 @@
           state: 'off'
     then: []
   mode: single
+- id: '1739480121158'
+  alias: Push configuration files to GitHub
+  description: Automation to must configuration files etc to GitHub repository
+  triggers:
+  - trigger: time
+    at: 02:00:00
+  - trigger: event
+    event_type: event_homeassistant_restarted
+  conditions: []
+  actions:
+  - action: shell_command.pushupdates_to_github
+    data: {}
+  mode: single
