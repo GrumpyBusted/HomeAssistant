@@ -42,3 +42,6 @@ mqtt:
       state_topic: "watermeter/0/sensor/mydatajson"
       value_template: "{{ value_json.WaterTemp }}"
       unit_of_measurement: "°C"
+
+shell_command:
+  pushupdates_to_github: /bin/bash pushupdates.sh
