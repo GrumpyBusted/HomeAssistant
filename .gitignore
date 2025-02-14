@@ -19,10 +19,12 @@ esphome/
 image/
 tts/
 www/
+zigbee2mqtt/
 *.log
 *.log.txt
 *.db
 id_rsa*
 ip_bans.yaml
-secrets.yaml
 known_devices.yaml
+secrets.yaml
+solcast*.json
