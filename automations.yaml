@@ -89,7 +89,7 @@
         id:
         - button_2_short
       sequence:
-      - action: script.living_room_light_dinning
+      - action: script.living_room_light_dining
         metadata: {}
         data: {}
     - conditions:
@@ -2979,7 +2979,7 @@
     - binary_sensor.living_room_light
   - trigger: state
     entity_id:
-    - media_player.living_room_receiver_denon
+    - binary_sensor.living_room_media
   - trigger: state
     entity_id:
     - automation.living_room_heating
@@ -3011,7 +3011,7 @@
         target:
           entity_id:
           - climate.living_room_radiator_thermostat_bookcase_tado
-          - climate.living_room_radiator_thermostat_dinning_table_tado
+          - climate.living_room_radiator_thermostat_dining_table_tado
           - climate.living_room_radiator_thermostat_sofa_tado
     - conditions:
       - condition: state
@@ -3025,7 +3025,7 @@
         target:
           entity_id:
           - climate.living_room_radiator_thermostat_bookcase_tado
-          - climate.living_room_radiator_thermostat_dinning_table_tado
+          - climate.living_room_radiator_thermostat_dining_table_tado
           - climate.living_room_radiator_thermostat_sofa_tado
     - conditions:
       - condition: state
@@ -3039,11 +3039,11 @@
         target:
           entity_id:
           - climate.living_room_radiator_thermostat_bookcase_tado
-          - climate.living_room_radiator_thermostat_dinning_table_tado
+          - climate.living_room_radiator_thermostat_dining_table_tado
           - climate.living_room_radiator_thermostat_sofa_tado
     - conditions:
       - condition: state
-        entity_id: media_player.living_room_receiver_denon
+        entity_id: binary_sensor.living_room_media
         state: 'on'
       sequence:
       - action: climate.set_temperature
@@ -3053,7 +3053,7 @@
         target:
           entity_id:
           - climate.living_room_radiator_thermostat_bookcase_tado
-          - climate.living_room_radiator_thermostat_dinning_table_tado
+          - climate.living_room_radiator_thermostat_dining_table_tado
           - climate.living_room_radiator_thermostat_sofa_tado
     - conditions:
       - condition: state
@@ -3073,7 +3073,7 @@
         target:
           entity_id:
           - climate.living_room_radiator_thermostat_bookcase_tado
-          - climate.living_room_radiator_thermostat_dinning_table_tado
+          - climate.living_room_radiator_thermostat_dining_table_tado
           - climate.living_room_radiator_thermostat_sofa_tado
     default:
     - action: climate.set_temperature
@@ -3083,7 +3083,7 @@
       target:
         entity_id:
         - climate.living_room_radiator_thermostat_bookcase_tado
-        - climate.living_room_radiator_thermostat_dinning_table_tado
+        - climate.living_room_radiator_thermostat_dining_table_tado
         - climate.living_room_radiator_thermostat_sofa_tado
   trace:
     stored_traces: 100
@@ -4286,7 +4286,7 @@
     to: docked
   - trigger: state
     entity_id:
-    - media_player.living_room_receiver_denon
+    - binary_sensor.living_room_media
     to: 'off'
   - trigger: state
     entity_id:
@@ -4335,7 +4335,7 @@
           entity_id: binary_sensor.living_room_light
           state: 'off'
         - condition: state
-          entity_id: media_player.living_room_receiver_denon
+          entity_id: binary_sensor.living_room_media
           state: 'off'
     then:
     - action: input_number.set_value
@@ -4381,7 +4381,7 @@
           entity_id: binary_sensor.living_room_light
           state: 'off'
         - condition: state
-          entity_id: media_player.living_room_receiver_denon
+          entity_id: binary_sensor.living_room_media
           state: 'off'
     then: []
   mode: single
@@ -4402,3 +4402,26 @@
   - action: shell_command.pushupdates_to_github
     data: {}
   mode: single
+- id: '1739615474729'
+  alias: Stue medieafspiller
+  description: Automatik til at styrer TV og receiver i stuen
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_3_philips_hue
+    attribute: event_type
+    to: short_release
+    id: button_3_short
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_3_philips_hue
+    attribute: event_type
+    to: short_release
+    id: button_4_short
+  - trigger: state
+    entity_id:
+    - binary_sensor.living_room_light
+    id: light_out
+  conditions: []
+  actions: []
+  mode: restart

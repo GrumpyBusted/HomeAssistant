@@ -16,7 +16,7 @@
       device_class: light
       state: >-
         {{ not(is_state('light.living_room_light_china_cabinet_philips_hue', 'off') and 
-               is_state('light.living_room_light_dinning_table_philips_hue', 'off') and 
+               is_state('light.living_room_light_dining_table_philips_hue', 'off') and 
                is_state('light.living_room_light_escher_philips_hue', 'off') and 
                is_state('light.living_room_light_glass_cabinet_philips_hue', 'off') and 
                is_state('light.living_room_light_joakim_philips_hue', 'off') and 

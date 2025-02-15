@@ -142,7 +142,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {{ state_attr('climate.living_room_radiator_thermostat_dinning_table_tado', 'temperature')|round(1) }}
+        {{ state_attr('climate.living_room_radiator_thermostat_dining_table_tado', 'temperature')|round(1) }}
 - sensor:
     - name: home_outside_current_temperature
       unique_id: 1402D3CA-3107-4277-BF51-AA664A255ADD

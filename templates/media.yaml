@@ -1,7 +1,6 @@
 - binary_sensor:
     - name: living_room_media
       unique_id: 2FE44509-E6C8-46FB-BC5A-1929BD70FD1E
-      device_class: none
       state: >-
         {{ is_state('media_player.living_room_receiver_denon', 'on') or
            is_state('media_player.living_room_tv_media_player_sony_bravia', 'on') or

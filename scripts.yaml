@@ -86,7 +86,7 @@ patio_light_sunset:
       target:
         entity_id:
         - light.patio_light_bar_ledvance_philips_hue
-living_room_light_dinning:
+living_room_light_dining:
   alias: Stue lys spise scene
   description: Lys scene til stuen til spise situation
   sequence:
@@ -99,7 +99,7 @@ living_room_light_dinning:
         brightness_pct: 100
       target:
         entity_id:
-        - light.living_room_light_dinning_table_philips_hue
+        - light.living_room_light_dining_table_philips_hue
         - light.living_room_light_extra_philips_hue
     - action: light.turn_on
       metadata: {}
@@ -143,6 +143,9 @@ living_room_light_dinning:
         entity_id:
         - light.living_room_light_bookcase_philips_hue
         - light.living_room_light_lamp_philips_hue
+  - event: living_room_light_scene
+    event_data:
+      scene: dining
 living_room_light_tv:
   alias: Stue lys TV scene
   description: Lys scene til stuen til TV situation
@@ -177,7 +180,7 @@ living_room_light_tv:
         transition: 1
       target:
         entity_id:
-        - light.living_room_light_dinning_table_philips_hue
+        - light.living_room_light_dining_table_philips_hue
         - light.living_room_light_extra_philips_hue
     - action: light.turn_on
       metadata: {}
@@ -192,6 +195,9 @@ living_room_light_tv:
         entity_id:
         - light.living_room_light_bookcase_philips_hue
         - light.living_room_light_glass_cabinet_philips_hue
+  - event: living_room_light_scene
+    event_data:
+      scene: tv
 bedroom_light_sunrise:
   alias: Soveværelse lys solopgang scene
   description: Lys scene til soveværelse til vågn op
