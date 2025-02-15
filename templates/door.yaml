@@ -1,0 +1,12 @@
+- binary_sensor:
+    - name: bedroom_door
+      unique_id: 466E5DA4-792E-4237-A9A8-E05BBB5C92EF
+      device_class: door
+      state: >-
+        {{ not is_state('binary_sensor.bedroom_door_sensor_opening_philips_hue', 'off') }}
+      icon: >
+        {% if is_state('binary_sensor.bedroom_door', 'on') %}
+        mdi:door-open
+        {% else %}
+        mdi:door-closed
+        {% endif %}

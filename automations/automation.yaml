@@ -1,0 +1,11 @@
+###############################################################################
+# Custom automation, all yaml files are concatenated
+#
+# Start in column 1 of the file with a hyphen, like:
+# - alias: My custom automation
+#   id: 7350a36f-40fb-4f8f-931f-a4a080bfac41
+#   trigger:
+#     -
+#   action:
+#     -
+###############################################################################
