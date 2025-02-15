@@ -441,3 +441,73 @@ vacuum_empty_dust_bin:
   mode: single
   icon: mdi:robot-vacuum
   description: ''
+stue_tand_tv:
+  alias: Stue TV tænd
+  description: Automatik til at tænde TV i stuen
+  icon: mdi:television
+  sequence:
+  - action: media_player.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: media_player.living_room_receiver_denon
+  - action: media_player.select_source
+    metadata: {}
+    data:
+      source: Apple TV
+    target:
+      entity_id: media_player.living_room_receiver_denon
+  - action: media_player.select_sound_mode
+    metadata: {}
+    data:
+      sound_mode: DOLBY DIGITAL
+    target:
+      entity_id: media_player.living_room_receiver_denon
+  - action: media_player.volume_set
+    metadata: {}
+    data:
+      volume_level: 0.25
+    target:
+      entity_id: media_player.living_room_receiver_denon
+  - action: media_player.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: media_player.living_room_tv_media_player_sony_bravia
+  - action: media_player.volume_mute
+    metadata: {}
+    data:
+      is_volume_muted: true
+    target:
+      entity_id: media_player.living_room_tv_media_player_sony_bravia
+  - action: media_player.select_source
+    metadata: {}
+    data:
+      source: HDMI 3 (eARC/ARC)
+    target:
+      entity_id: media_player.living_room_tv_media_player_sony_bravia
+  - action: media_player.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: media_player.living_room_apple_tv_media_player
+stue_tv_sluk:
+  alias: Stue TV sluk
+  description: Automatik til at slukke TV i stuen
+  icon: mdi:television-off
+  sequence:
+  - action: media_player.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: media_player.living_room_receiver_denon
+  - action: media_player.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: media_player.living_room_tv_media_player_sony_bravia
+  - action: media_player.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: media_player.living_room_apple_tv_media_player
