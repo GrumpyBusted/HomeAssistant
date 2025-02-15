@@ -1,11 +1,12 @@
 # .gitingore file for Home Assistant configuration
 *
-!**/*.yaml
-!**/*.yml
 !.gitignore
+!*.yaml
 !*.md
 !*.sh
-ip_bans.yaml
-known_devices.yaml
+!automations/*.yaml
+!packages/*.yaml
+!scripts/*.yaml
+!templates/*.yaml
+!themes/*.yaml
 secrets.yaml
-zigbee2mqtt/configuration.yaml
