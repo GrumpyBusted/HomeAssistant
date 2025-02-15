@@ -517,3 +517,55 @@ stue_tv_sluk:
     data: {}
     target:
       entity_id: media_player.living_room_apple_tv_media_player
+hjem_motionering_af_radiatorventiler:
+  alias: Hjem motionering af radiatorventiler
+  description: Skru op og ned op thermostater på alle radiator for at motionere radiatorventiler
+  sequence:
+  - variables:
+      tado_entities:
+      - climate.bathroom_radiator_thermostat_floor_tado
+      - climate.bathroom_radiator_thermostat_wall_tado
+  - action: automation.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - automation.bathroom_heating
+      - automation.bedroom_heating
+      - automation.charlies_room_heating
+      - automation.emils_room_heating
+      - automation.hallway_heating
+      - automation.living_room_heating
+      - automation.utility_room_heating
+      - automation.toilet_heating
+  - repeat:
+      count: '{{ tado_entities | length }}'
+      sequence:
+      - variables:
+          tado_index: '{{ repeat.index - 1 }}'
+      - repeat:
+          count: 3
+          sequence:
+          - action: climate.set_temperature
+            data:
+              entity_id: '{{ tado_entities[tado_index] }}'
+              temperature: 30
+          - delay: 00:00:05
+          - action: climate.set_temperature
+            data:
+              entity_id: '{{ tado_entities[tado_index] }}'
+              temperature: 5
+          - delay: 00:00:05
+  - action: automation.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - automation.bathroom_heating
+      - automation.bedroom_heating
+      - automation.charlies_room_heating
+      - automation.emils_room_heating
+      - automation.hallway_heating
+      - automation.living_room_heating
+      - automation.utility_room_heating
+      - automation.toilet_heating
