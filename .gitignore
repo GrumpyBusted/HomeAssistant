@@ -8,3 +8,4 @@
 ip_bans.yaml
 known_devices.yaml
 secrets.yaml
+zigbee2mqtt/
