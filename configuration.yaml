@@ -45,28 +45,24 @@ mqtt:
 
 shell_command:
   pushupdates_to_github: /bin/bash pushupdates.sh
-  tado_get_token: curl -s -X GET https://auth.tado.com/oauth/token -d client_id=tado-web-app -d grant_type=password -d scope=home.user -d username={{ username }} -d password={{ password }} -d client_secret={{ client_secret }}
-  tado_get_token1: curl -s -X GET https://auth.tado.com/oauth/token -d client_id=tado-web-app -d grant_type=password -d scope=home.user -d username=anders@busted-janum.dk -d password=kumDud-zersam-4tapme -d client_secret=wZaRN7rpjn3FoNyF5IFuxg9uMzYJcvOoQ8QWiIqS3hfk6gLhVlG57j5YNoZL2Rtc
 
 rest_command:
-  tado_get_auth:
-    url: "https://auth.tado.com/oauth/token"
-    method: "POST"
-    headers:
-      Content-Type: "application/x-www-form-urlencoded"
-    payload: "client_id=tado-web-app&grant_type=password&scope=home.user&username=anders@busted-janum.dk&password=kumDud-zersam-4tapme&client_secret=wZaRN7rpjn3FoNyF5IFuxg9uMzYJcvOoQ8QWiIqS3hfk6gLhVlG57j5YNoZL2Rtc"
-
-
-rest_command:
-  tado_get_auth:
-    url: "https://auth.tado.com/oauth/token"
-    method: "POST"
-    headers:
-      Content-Type: "application/x-www-form-urlencoded"
-    payload: "client_id=tado-web-app&grant_type=password&scope=home.user&username=anders@busted-janum.dk&password=kumDud-zersam-4tapme&client_secret=wZaRN7rpjn3FoNyF5IFuxg9uMzYJcvOoQ8QWiIqS3hfk6gLhVlG57j5YNoZL2Rtc"
   tado_get_auth_token:
     url: "https://auth.tado.com/oauth/token"
     method: "POST"
     headers:
       Content-Type: "application/x-www-form-urlencoded"
     payload: "client_id=tado-web-app&grant_type=password&scope=home.user&username={{ secrets.tado_username }}&password={{ secrets.tado_password }}&client_secret={{ secrets.tado_client_secret }}"
+  tado_get_profile:
+    url: "https://my.tado.com/api/v2/me"
+    method: "GET"
+    headers:
+      Authorization: "Bearer {{ bearer_token }}"
+  tado_get_rooms_and_devices:
+    url: "https://hops.tado.com/homes/{{ home_id }}/roomsAndDevices?ngsw-bypass=true"
+    method: "GET"
+    headers:
+      Authorization: "Bearer {{ bearer_token }}"
+
+
+
