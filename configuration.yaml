@@ -46,5 +46,6 @@ mqtt:
 shell_command:
   pushupdates_to_github: /bin/bash pushupdates.sh
   tado_get_token: curl -s -X GET https://auth.tado.com/oauth/token -d client_id=tado-web-app -d grant_type=password -d scope=home.user -d username={{ username }} -d password={{ password }} -d client_secret={{ client_secret }}
+  tado_get_token1: curl -s -X GET https://auth.tado.com/oauth/token -d client_id=tado-web-app -d grant_type=password -d scope=home.user -d username=anders@busted-janum.dk -d password=kumDud-zersam-4tapme -d client_secret=wZaRN7rpjn3FoNyF5IFuxg9uMzYJcvOoQ8QWiIqS3hfk6gLhVlG57j5YNoZL2Rtc
 
 
