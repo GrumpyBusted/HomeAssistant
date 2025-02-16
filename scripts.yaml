@@ -611,3 +611,59 @@ home_smart_todo_create_task:
         description: '{{ description }}'
         due: '{{ utcnow().strftime(''%Y-%m-%d'') }}'
         reminder: '{{ utcnow() }}'
+test_script:
+  sequence:
+  - action: rest_command.tado_get_auth_token
+    data:
+      secrets:
+        tado_username: '{{ states(''sensor.tado_username'') }}'
+        tado_password: '{{ states(''sensor.tado_password'') }}'
+        tado_client_secret: '{{ states(''sensor.tado_client_secret'') }}'
+    response_variable: response
+  - variables:
+      token: '{{ response.content.access_token }}'
+  - action: system_log.write
+    metadata: {}
+    data:
+      level: debug
+      message: '{{ token }}'
+  - action: rest_command.tado_get_profile
+    data:
+      bearer_token: '{{ token }}'
+    response_variable: response
+  - variables:
+      home_id: '{{ response.content.homes[0].id }}'
+  - action: system_log.write
+    metadata: {}
+    data:
+      level: debug
+      message: '{{ home_id }}'
+  - action: rest_command.tado_get_rooms_and_devices
+    data:
+      home_id: '{{ home_id }}'
+      bearer_token: '{{ token }}'
+    response_variable: response
+  - action: system_log.write
+    metadata: {}
+    data:
+      level: debug
+      message: '{{ response }}'
+  - variables:
+      devices: "[\n  {% for room in response.content.rooms %}\n    {% for device in
+        room.devices %}\n      {\n        \"roomName\": \"{{ room.roomName }}\",\n
+        \       \"deviceSerialNo\": \"{{ device.serialNumber }}\",\n        \"batteryState\":
+        \"{{ device.batteryState }}\",\n      }{% if not loop.last %}, {% endif %}\n
+        \   {% endfor %}\n  {% if not loop.last %}, {% endif %}\n  {% endfor %}\n]"
+  - action: system_log.write
+    metadata: {}
+    data:
+      level: debug
+      message: '{{ devices }}'
+  - repeat:
+      count: '{{ devices | length }}'
+      sequence:
+      - action: system_log.write
+        metadata: {}
+        data:
+          level: debug
+          message: '{{ devices[repeat.index - 1] }}'

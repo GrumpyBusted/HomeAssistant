@@ -1,0 +1,43 @@
+- sensor:
+    - name: "Tado Username"
+      state: !secret tado_username
+    - name: "Tado Password"
+      state: !secret tado_password
+    - name: "Tado Client Secret"
+      state: !secret tado_client_secret
+- sensor:
+    - name: "Device Types"
+      unique_id: 05D4CDF1-9E4B-481A-8F0F-13684D95B8FF
+      state: "OK"
+      attributes:
+        types: >-
+          {{ {
+            "VA04": "Smart Radiator Thermostat X",
+            "RU04": "Smart Thermostat X",
+            "SU04": "Wireless Temperature Sensor X"
+          } }}
+    - name: "Device Locations"
+      unique_id: B90FDCCE-2C4D-4F76-B2EF-00D3FFEBEE97
+      state: "OK"
+      attributes:
+        locations: >-
+          {{ {
+            "VA3283445504": "Bad gulv",
+            "VA1355245056": "Bad radiator",
+            "VA3778176768": "Bryggers gulv",
+            "VA1924491008": "Bryggers væg",
+            "VA0261842688": "Charlie",
+            "VA2644207360": "Emil",
+            "VA0969303552": "Gang",
+            "VA3388958208": "Køkken",
+            "VA0380921600": "Sove",
+            "VA3214501632": "Stue reol",
+            "VA2912511744": "Stue sofa",
+            "VA4237190656": "Stue spisebord",
+            "VA1929864960": "Toilet",
+            "RU1998022400": "Bryggers",
+            "SU3237438976": "Emil",
+            "SU3723912704": "Gang (Køkken)",
+            "SU2008052224": "Stue",
+            "SU3709368576": "Charlie"
+          } }}
