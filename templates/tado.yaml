@@ -25,22 +25,22 @@
       attributes:
         locations: >-
           {{ {
-            "VA3283445504": "Gulv",          # Bathroom
-            "VA1355245056": "Radiator",      # Bathroom
-            "VA3778176768": "Gulv",          # Utility room
-            "VA1924491008": "Radiator",      # Utility room
-            "VA0261842688": "Radiator",      # Charlies room
-            "VA2644207360": "Radiator",      # Emils room
-            "VA0969303552": "Gulv",          # Hallway
-            "VA3388958208": "Gulv",          # Kitchen
-            "VA0380921600": "Radiator",      # Bedroom 
-            "VA3214501632": "Ved reol",      # Living room
-            "VA2912511744": "Ved sofa",      # Living room
-            "VA4237190656": "Ved spisebord", # Living room
-            "VA1929864960": "Gulv",          # Toilet
-            "RU1998022400": "",              # Utility room
-            "SU3237438976": "",              # Emils room
-            "SU3723912704": "Køkken",        # Hallway
-            "SU2008052224": "",              # Living room
-            "SU3709368576": ""               # Charlies room
+            "VA3283445504": "Gulv",          
+            "VA1355245056": "Radiator",      
+            "VA3778176768": "Gulv",          
+            "VA1924491008": "Radiator",      
+            "VA0261842688": "Radiator",      
+            "VA2644207360": "Radiator",      
+            "VA0969303552": "Gulv",          
+            "VA3388958208": "Gulv",          
+            "VA0380921600": "Radiator",       
+            "VA3214501632": "Ved reol",      
+            "VA2912511744": "Ved sofa",      
+            "VA4237190656": "Ved spisebord", 
+            "VA1929864960": "Gulv",          
+            "RU1998022400": "",              
+            "SU3237438976": "",              
+            "SU3723912704": "Køkken",        
+            "SU2008052224": "",              
+            "SU3709368576": ""               
           } }}
