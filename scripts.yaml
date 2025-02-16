@@ -652,8 +652,11 @@ test_script:
       devices: "[\n  {% for room in response.content.rooms %}\n    {% for device in
         room.devices %}\n      {\n        \"roomName\": \"{{ room.roomName }}\",\n
         \       \"deviceSerialNo\": \"{{ device.serialNumber }}\",\n        \"batteryState\":
-        \"{{ device.batteryState }}\",\n      }{% if not loop.last %}, {% endif %}\n
-        \   {% endfor %}\n  {% if not loop.last %}, {% endif %}\n  {% endfor %}\n]"
+        \"{{ device.batteryState }}\",\n        \"type\": \"{{ state_attr('sensor.tado_device_types',
+        'types').get(device.type, device.type) }}\",\n        \"location\": \"{{ state_attr('sensor.tado_device_locations',
+        'locations').get(device.serialNumber, device.serialNumber) }}\",\n      }{%
+        if not loop.last %}, {% endif %}\n    {% endfor %}\n  {% if not loop.last
+        %}, {% endif %}\n  {% endfor %}\n]"
   - action: system_log.write
     metadata: {}
     data:
@@ -667,3 +670,23 @@ test_script:
         data:
           level: debug
           message: '{{ devices[repeat.index - 1] }}'
+      - if:
+        - condition: template
+          value_template: '{{ devices[repeat.index - 1].batteryState == ''NORMAL''
+            }}'
+        then:
+        - action: system_log.write
+          metadata: {}
+          data:
+            level: debug
+            message: '{{ devices[repeat.index - 1] }}'
+        - action: script.home_smart_todo_create_task
+          data:
+            subject: Skift batteri på {{ devices[repeat.index - 1].type }} i {{ devices[repeat.index
+              - 1].roomName }}{{ '' if not devices[repeat.index - 1].location else
+              '(' ~ devices[repeat.index - 1].location ~ ')'}}
+            description: Skift batteri i Tado {{ devices[repeat.index - 1].type }}
+              med serie no {{ devices[repeat.index - 1].serialNumber }}, der er pladseret
+              {{ devices[repeat.index - 1].roomName }}{{ '' if not devices[repeat.index
+              - 1].location else '(' ~ devices[repeat.index - 1].location ~ ')'}},
+              batteri status er {{ devices[repeat.index - 1].batteryState }}

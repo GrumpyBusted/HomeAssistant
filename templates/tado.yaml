@@ -25,22 +25,22 @@
       attributes:
         locations: >-
           {{ {
-            "VA3283445504": "Bad gulv",
-            "VA1355245056": "Bad radiator",
-            "VA3778176768": "Bryggers gulv",
-            "VA1924491008": "Bryggers væg",
-            "VA0261842688": "Charlie",
-            "VA2644207360": "Emil",
-            "VA0969303552": "Gang",
-            "VA3388958208": "Køkken",
-            "VA0380921600": "Sove",
-            "VA3214501632": "Stue reol",
-            "VA2912511744": "Stue sofa",
-            "VA4237190656": "Stue spisebord",
-            "VA1929864960": "Toilet",
-            "RU1998022400": "Bryggers",
-            "SU3237438976": "Emil",
-            "SU3723912704": "Gang (Køkken)",
-            "SU2008052224": "Stue",
-            "SU3709368576": "Charlie"
+            "VA3283445504": "Gulv",          # Bathroom
+            "VA1355245056": "Radiator",      # Bathroom
+            "VA3778176768": "Gulv",          # Utility room
+            "VA1924491008": "Radiator",      # Utility room
+            "VA0261842688": "Radiator",      # Charlies room
+            "VA2644207360": "Radiator",      # Emils room
+            "VA0969303552": "Gulv",          # Hallway
+            "VA3388958208": "Gulv",          # Kitchen
+            "VA0380921600": "Radiator",      # Bedroom 
+            "VA3214501632": "Ved reol",      # Living room
+            "VA2912511744": "Ved sofa",      # Living room
+            "VA4237190656": "Ved spisebord", # Living room
+            "VA1929864960": "Gulv",          # Toilet
+            "RU1998022400": "",              # Utility room
+            "SU3237438976": "",              # Emils room
+            "SU3723912704": "Køkken",        # Hallway
+            "SU2008052224": "",              # Living room
+            "SU3709368576": ""               # Charlies room
           } }}
