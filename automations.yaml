@@ -2048,6 +2048,7 @@
     - conditions:
       - condition: numeric_state
         entity_id: cover.emils_room_blind_ikea
+        attribute: current_position
         below: 40
       - condition: trigger
         id:
@@ -4711,3 +4712,64 @@
       target:
         entity_id: climate.bedroom_purifier_hot_cool_dyson
   mode: queued
+- id: '1739712804347'
+  alias: Hjem smart todo postkasse
+  description: Opret ToDo opgaver vedrørende postkasse
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_vibration_sensor_mailbox_vibration_aqara
+    from: 'off'
+    to: 'on'
+    id: new_post
+  - trigger: numeric_state
+    entity_id:
+    - sensor.driveway_vibration_mailbox_battery_aqara
+    below: 5
+    id: low_battery
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - new_post
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Tøm postkasse
+          description: Der er nye breve i postkassen ved vejen
+    - conditions:
+      - condition: trigger
+        id:
+        - low_battery
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri i postkasse sensor
+          description: Batteri i vibration sensor i postkassen skal skiftes (CR2032)
+  mode: queued
+  max: 100
+- id: '1739714838791'
+  alias: Hjem smart todo slet afsluttede opgaver
+  description: Automatik der sletter afsluttede opgaver
+  triggers:
+  - trigger: time
+    at: 03:00:00
+  conditions: []
+  actions:
+  - variables:
+      todos: "{% set completed_tasks = namespace(tasks=[]) %} {% for todo in state_attr('todo.home_smart_todo',
+        'all_todos') %}\n  {% if todo.status == 'completed' and todo.completed | as_datetime
+        < utcnow() - timedelta(hours=1) %}\n    {% set completed_tasks.tasks = completed_tasks.tasks
+        + [todo.todo_id] %}\n  {% endif %}\n{% endfor %} {{ completed_tasks.tasks
+        }}"
+  - repeat:
+      count: '{{ todos | length }}'
+      sequence:
+      - action: ms365_todo.delete_todo
+        metadata: {}
+        data:
+          todo_id: '{{ todos[repeat.index - 1] }}'
+          entity_id: todo.home_smart_todo
+  mode: restart

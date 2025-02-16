@@ -580,3 +580,34 @@ hjem_motionering_af_radiatorventiler:
       - automation.living_room_heating
       - automation.utility_room_heating
       - automation.toilet_heating
+home_smart_todo_create_task:
+  alias: Hjem smart todo opret opgave
+  description: Kontroller om samme opgave allerede findes hvis ikke opret den i smart
+    todo
+  icon: mdi:clipboard-list
+  fields:
+    subject:
+      description: Emne for opgaven
+      example: Hent post
+      required: true
+    description:
+      description: Beskrivelse af opgaven
+      example: Der er ny post i postkassen ved vejen
+      required: true
+  sequence:
+  - variables:
+      existing_tasks: '{{ state_attr(''todo.home_smart_todo'', ''all_todos'') | selectattr(''subject'',
+        ''equalto'', subject) | rejectattr(''status'', ''equalto'', ''completed'')
+        | list }}'
+  - if:
+    - condition: template
+      value_template: '{{ existing_tasks | length == 0 }}'
+    then:
+    - action: ms365_todo.new_todo
+      metadata: {}
+      data:
+        entity_id: todo.home_smart_todo
+        subject: '{{ subject }}'
+        description: '{{ description }}'
+        due: '{{ utcnow().strftime(''%Y-%m-%d'') }}'
+        reminder: '{{ utcnow() }}'
