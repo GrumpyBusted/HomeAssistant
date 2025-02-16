@@ -45,14 +45,3 @@ mqtt:
 
 shell_command:
   pushupdates_to_github: /bin/bash pushupdates.sh
-
-o365:
-  accounts:
-    - account_name: MicrosoftAccount
-      client_secret: "Fhy8Q~BbCcoYe1OBujQZzlbc~qefn5zQQKu5aaIW"
-      client_id: "20944008-c898-4168-a8bf-c9679236e860"
-      alt_auth_method: False
-      enable_update: True
-      todo_sensors:
-        enabled: False
-        enable_update: True # set this to true if you want to be able to create new todos
