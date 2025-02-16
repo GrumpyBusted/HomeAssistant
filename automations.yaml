@@ -4773,3 +4773,151 @@
           todo_id: '{{ todos[repeat.index - 1] }}'
           entity_id: todo.home_smart_todo
   mode: restart
+- id: '1739742119703'
+  alias: Hjem smart todo Tabo batteri check
+  description: Kontroller batteri status på Tado enheder
+  triggers:
+  - trigger: time
+    at: 03:05:00
+  conditions: []
+  actions:
+  - action: script.home_smart_todo_tado
+    data: {}
+  mode: restart
+- id: '1739743296346'
+  alias: Hjem smart todo Withings
+  description: Kontroller batteri status på Withings enheder
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.bathroom_thermometer_battery_withings
+    to: low
+    id: thermometer_low
+  - trigger: state
+    entity_id:
+    - sensor.bathroom_scale_battery_withings
+    to: low
+    id: scale_low
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - thermometer_low
+      sequence:
+      - action: script.home_smart_todo_tado
+        data:
+          subject: Skift batteri på termometer
+          description: Batteri niveau er lav på Withings termometer, det er pladseret
+            på badeværelset
+    - conditions:
+      - condition: trigger
+        id:
+        - scale_low
+      sequence:
+      - action: script.home_smart_todo_tado
+        data:
+          subject: Skift batteri på badevægt
+          description: Batteri niveau er lav på Withings kropsvægt, det er pladseret
+            på badeværelset
+  mode: restart
+- id: '1739744093398'
+  alias: Hjem smart todo Ikea
+  description: Kontroller batteri status på Ikea enheder
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.bedroom_blind_battery_ikea
+    below: 5
+    id: bedroom_blind_battery_low
+  - trigger: numeric_state
+    entity_id:
+    - sensor.emils_room_blind_battery_ikea
+    below: 5
+    id: emils_room_blind_battery_low
+  - trigger: numeric_state
+    entity_id:
+    - sensor.charlies_room_blind_battery_ikea
+    below: 5
+    id: charlies_room_blind_battery_low
+  - trigger: numeric_state
+    entity_id:
+    - sensor.bedroom_blind_switch_battery_ikea
+    below: 5
+    id: bedroom_switch_battery_low
+  - trigger: numeric_state
+    entity_id:
+    - sensor.emils_room_blind_switch_battery_ikea
+    below: 5
+    id: emils_room_switch_battery_low
+  - trigger: numeric_state
+    entity_id:
+    - sensor.charlies_room_blind_switch_battery_ikea
+    below: 5
+    id: charlies_room_switch_battery_low
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - bedroom_blind_battery_low
+      sequence:
+      - action: script.home_smart_todo_tado
+        data:
+          subject: Skift batteri i gardinet på soveværelset
+          description: Batteri niveau er {{ states('sensor.bedroom_blind_battery_ikea')
+            }}% på IKEA rullegardin i soveværelset
+    - conditions:
+      - condition: trigger
+        id:
+        - bedroom_switch_battery_low
+      sequence:
+      - action: script.bedroom_blind_switch_battery_ikea
+        data:
+          subject: Skift batteri i kontakt til gardinet på soveværelset
+          description: Batteri niveau er {{ states('sensor.bedroom_blind_switch_battery_ikea')
+            }}% på kontaken til IKEA rullegardin i soveværelset
+    - conditions:
+      - condition: trigger
+        id:
+        - charlies_room_blind_battery_low
+      sequence:
+      - action: script.home_smart_todo_tado
+        data:
+          subject: Skift batteri i gardinet på Charlies værelse
+          description: Batteri niveau er {{ states('sensor.charlies_room_blind_battery_ikea')
+            }}% på IKEA rullegardin på Charlies soveværelse
+    - conditions:
+      - condition: trigger
+        id:
+        - charlies_room_switch_battery_low
+      sequence:
+      - action: script.charlies_room_blind_switch_battery_ikea
+        data:
+          subject: Skift batteri i kontakten til gardinet på Charlies værelse
+          description: Batteri niveau er {{ states('sensor.charlies_room_blind_switch_battery_ikea')
+            }}% på kontaken til IKEA rullegardin på Charlies værelse
+    - conditions:
+      - condition: trigger
+        id:
+        - emils_room_blind_battery_low
+      sequence:
+      - action: script.home_smart_todo_tado
+        data:
+          subject: Skift batteri i gardinet på Emils værelse
+          description: Batteri niveau er {{ states('sensor.emils_room_blind_battery_ikea')
+            }}% på IKEA rullegardin på Emils soveværelse
+    - conditions:
+      - condition: trigger
+        id:
+        - emils_room_switch_battery_low
+      sequence:
+      - action: script.emils_room_blind_switch_battery_ikea
+        data:
+          subject: Skift batteri i kontakten til gardinet på Emils værelse
+          description: Batteri niveau er {{ states('sensor.emils_room_blind_switch_battery_ikea')
+            }}% på kontaken til IKEA rullegardin på Emils værelse
+  mode: queued
+  max: 10
