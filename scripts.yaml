@@ -525,6 +525,17 @@ hjem_motionering_af_radiatorventiler:
       tado_entities:
       - climate.bathroom_radiator_thermostat_floor_tado
       - climate.bathroom_radiator_thermostat_wall_tado
+      - climate.bedroom_radiator_thermostat_tado
+      - climate.charlies_room_radiator_thermostat_tado
+      - climate.emils_room_radiator_thermostat_tado
+      - climate.hallway_radiator_thermostat_tado
+      - climate.kitchen_radiator_thermostat_tado
+      - climate.living_room_radiator_thermostat_bookcase_tado
+      - climate.living_room_radiator_thermostat_dining_table_tado
+      - climate.living_room_radiator_thermostat_sofa_tado
+      - climate.utility_room_radiator_thermostat_wall_tado
+      - climate.utility_room_radiator_thermostat_floor_tado
+      - climate.toilet_radiator_thermostat_tado
   - action: automation.turn_off
     metadata: {}
     data: {}
@@ -550,12 +561,12 @@ hjem_motionering_af_radiatorventiler:
             data:
               entity_id: '{{ tado_entities[tado_index] }}'
               temperature: 30
-          - delay: 00:00:05
+          - delay: 00:01:00
           - action: climate.set_temperature
             data:
               entity_id: '{{ tado_entities[tado_index] }}'
               temperature: 5
-          - delay: 00:00:05
+          - delay: 00:01:00
   - action: automation.turn_on
     metadata: {}
     data: {}
