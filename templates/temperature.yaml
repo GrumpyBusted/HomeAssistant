@@ -227,7 +227,7 @@
       state: >-
         {{ state_attr('climate.home_heat_pump_panasonic', 'current_temperature')|float }}
 - sensor:
-    - name: home_heat_pump_offset   _temperature
+    - name: home_heat_pump_offset_temperature
       unique_id: D00A30BF-C412-4A93-908E-2E1F1CDF78CB
       state_class: measurement
       device_class: temperature

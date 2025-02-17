@@ -4735,7 +4735,7 @@
   - variables:
       todos: "{% set completed_tasks = namespace(tasks=[]) %} {% for todo in state_attr('todo.home_smart_todo',
         'all_todos') %}\n  {% if todo.status == 'completed' and todo.completed | as_datetime
-        < utcnow() - timedelta(hours=1) %}\n    {% set completed_tasks.tasks = completed_tasks.tasks
+        < utcnow() - timedelta(days=1) %}\n    {% set completed_tasks.tasks = completed_tasks.tasks
         + [todo.todo_id] %}\n  {% endif %}\n{% endfor %} {{ completed_tasks.tasks
         }}"
   - repeat:
@@ -4766,31 +4766,29 @@
     entity_id:
     - sensor.bathroom_thermometer_battery_withings
     to: low
-    id: thermometer_low
   - trigger: state
     entity_id:
     - sensor.bathroom_scale_battery_withings
     to: low
-    id: scale_low
   conditions: []
   actions:
   - choose:
     - conditions:
-      - condition: trigger
-        id:
-        - thermometer_low
+      - condition: state
+        entity_id: sensor.bathroom_thermometer_battery_withings
+        state: low
       sequence:
-      - action: script.home_smart_todo_tado
+      - action: script.home_smart_todo_create_task
         data:
           subject: Skift batteri på termometer
           description: Batteri niveau er lav på Withings termometer, det er pladseret
             på badeværelset
     - conditions:
-      - condition: trigger
-        id:
-        - scale_low
+      - condition: state
+        entity_id: sensor.bathroom_scale_battery_withings
+        state: low
       sequence:
-      - action: script.home_smart_todo_tado
+      - action: script.home_smart_todo_create_task
         data:
           subject: Skift batteri på badevægt
           description: Batteri niveau er lav på Withings kropsvægt, det er pladseret
@@ -4895,3 +4893,44 @@
             }}% på kontaken til IKEA rullegardin på Emils værelse
   mode: queued
   max: 10
+- id: '1739816800938'
+  alias: Hjem smart todo Roborock
+  description: Kontroller status på Roborock robostøvsuger
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.living_room_robot_vacuum_dock_error_roborock
+    from: ok
+  - trigger: state
+    entity_id:
+    - sensor.living_room_robot_vacuum_error_roborock
+    from: none
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: sensor.living_room_robot_vacuum_dock_error_roborock
+        state: ok
+      sequence: []
+    default:
+    - action: script.home_smart_todo_create_task
+      data:
+        subject: Løs problem med Dobbys hus ({{ states('sensor.living_room_robot_vacuum_dock_error_roborock')
+          }})
+        description: Advarsel på Roborock docking station - Kode {{ states('sensor.living_room_robot_vacuum_dock_error_roborock')
+          }}
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: sensor.living_room_robot_vacuum_error_roborock
+        state: none
+      sequence: []
+    default:
+    - action: script.home_smart_todo_create_task
+      data:
+        subject: Løs problem med Dobby ({{ states('sensor.living_room_robot_vacuum_error_roborock')
+          }})
+        description: Advarsel på Roborock robot støvsuger - Kode {{ states('sensor.living_room_robot_vacuum_error_roborock')
+          }}
+  mode: queued
