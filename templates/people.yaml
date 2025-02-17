@@ -105,7 +105,7 @@
       state: >-
         {{ is_state('binary_sensor.charlie_home', 'on') and 
            is_state('binary_sensor.charlies_room_blind', 'off') and 
-           is_state('binary_sensor.echarlies_room_light', 'off') }}
+           is_state('binary_sensor.charlies_room_light', 'off') }}
       icon: >-
         {% if is_state('binary_sensor.charlie_sleeping', 'on') %}
         mdi:sleep

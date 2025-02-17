@@ -1675,15 +1675,6 @@
     to: 'off'
   - trigger: state
     entity_id:
-    - binary_sensor.bedroom_blind
-    from: 'off'
-    to: 'on'
-    id: blind_open
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_blind
-  - trigger: state
-    entity_id:
     - sensor.anders_iphone_battery_state
     - sensor.monique_iphone_battery_state
     to: Charging
@@ -1947,30 +1938,6 @@
         data: {}
         target:
           entity_id: timer.bedroom_light_sunrise_delay_timer
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.bedroom_blind
-        state: 'off'
-      - condition: numeric_state
-        entity_id: light.bedroom_light_philips_hue
-        attribute: brightness
-        above: 200
-      sequence:
-      - action: script.bedroom_light_sunset
-        data:
-          transition: 300
-          brightness_from: 200
-          brightness_to: 50
-    - conditions:
-      - condition: trigger
-        id:
-        - blind_open
-      - condition: state
-        entity_id: binary_sensor.bedroom_light
-        state: 'off'
-      sequence:
-      - action: script.bedroom_light_sunrise
-        data: {}
   trace:
     stored_traces: 100
 - id: '1736103151599'
@@ -2812,14 +2779,14 @@
       - action: climate.set_temperature
         metadata: {}
         data:
-          temperature: 19.5
+          temperature: 19
         target:
           entity_id: climate.toilet_radiator_thermostat_tado
     default:
     - action: climate.set_temperature
       metadata: {}
       data:
-        temperature: 20.5
+        temperature: 20
       target:
         entity_id: climate.toilet_radiator_thermostat_tado
   mode: restart
@@ -2904,31 +2871,19 @@
       - action: climate.set_temperature
         metadata: {}
         data:
-          temperature: 19.5
-        target:
-          entity_id:
-          - climate.bathroom_radiator_thermostat_wall_tado
-      - action: climate.set_temperature
-        metadata: {}
-        data:
           temperature: 20
         target:
           entity_id:
+          - climate.bathroom_radiator_thermostat_wall_tado
           - climate.bathroom_radiator_thermostat_floor_tado
     default:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: 20.5
-      target:
-        entity_id:
-        - climate.bathroom_radiator_thermostat_wall_tado
     - action: climate.set_temperature
       metadata: {}
       data:
         temperature: 21
       target:
         entity_id:
+        - climate.bathroom_radiator_thermostat_wall_tado
         - climate.bathroom_radiator_thermostat_floor_tado
   mode: restart
 - id: '1737311656075'
@@ -3672,15 +3627,33 @@
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_entrance_occupancy_signify
+    to: 'on'
+  - trigger: state
+    entity_id:
     - binary_sensor.driveway_motion_sensor_house_east_occupancy_signify
+    to: 'on'
+  - trigger: state
+    entity_id:
     - binary_sensor.driveway_motion_sensor_house_south_occupancy_signify
+    to: 'on'
+  - trigger: state
+    entity_id:
     - binary_sensor.driveway_motion_sensor_street_occupancy_signify
     to: 'on'
   - trigger: state
     entity_id:
     - timer.driveway_light_courtyard_timer
+    to: idle
+  - trigger: state
+    entity_id:
     - timer.driveway_light_house_east_timer
+    to: idle
+  - trigger: state
+    entity_id:
     - timer.driveway_light_house_south_timer
+    to: idle
+  - trigger: state
+    entity_id:
     - timer.driveway_light_street_timer
     to: idle
   - trigger: numeric_state
@@ -3700,7 +3673,7 @@
   - if:
     - condition: numeric_state
       entity_id: sensor.driveway_motion_sensor_street_illuminance_signify
-      above: 1
+      above: 2
     then:
     - action: light.turn_off
       metadata: {}
@@ -3972,8 +3945,9 @@
           - light.driveway_light_left_8_signify
           - light.driveway_light_left_9_signify
   trace:
-    stored_traces: 20
-  mode: restart
+    stored_traces: 100
+  mode: queued
+  max: 100
 - id: '1738003454800'
   alias: Monique middagslur
   description: Automatik til at styre Moniques middagslur

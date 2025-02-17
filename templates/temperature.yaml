@@ -217,3 +217,21 @@
            states('sensor.toilet_current_temperature')|float,
            states('sensor.hallway_current_temperature')|float,
            states('sensor.utility_room_current_temperature')|float) }}
+- sensor:
+    - name: home_heat_pump_current_temperature
+      unique_id: 6393DFA9-ABB7-47B4-99CE-7BE0ED98AE12
+      state_class: measurement
+      device_class: temperature
+      unit_of_measurement: "°C"
+      icon: "mdi:home-thermometer"
+      state: >-
+        {{ state_attr('climate.home_heat_pump_panasonic', 'current_temperature')|float }}
+- sensor:
+    - name: home_heat_pump_offset   _temperature
+      unique_id: D00A30BF-C412-4A93-908E-2E1F1CDF78CB
+      state_class: measurement
+      device_class: temperature
+      unit_of_measurement: "°C"
+      icon: "mdi:home-thermometer"
+      state: >-
+        {{ state_attr('climate.home_heat_pump_panasonic', 'temperature')|float }}
