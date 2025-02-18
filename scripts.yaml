@@ -670,56 +670,189 @@ stue_robotstovsuger_tom_stovbeholder:
         command: app_start_collect_dust
       target:
         entity_id: vacuum.living_room_robot_vacuum_roborock
-gang_robotstovsuger_vask_gulv:
-  alias: Gang robotstøvsuger vask gulv
-  description: Start robotstøvsuger og vask gulv i gangen
+home_robot_vacuum_start_cleaning:
+  alias: Stue robotstøvsuger start rengøring
+  description: Start robotstøvsuger med at gøre rum rent i et bestemt rum
+  mode: queued
+  max: 10
+  fields:
+    type:
+      description: Rengøring type
+      required: true
+      selector:
+        select:
+          options:
+          - vac
+          - mop
+          - vac_mop
+      default: vac
+    rooms:
+      description: Rum der skal rengøres
+      required: true
+      selector:
+        object: {}
+      default:
+      - Gang
   sequence:
+  - action: system_log.write
+    data:
+      message: 'Type: {{ type }} - Rooms: {{ rooms }}'
+      level: debug
   - action: roborock.get_maps
     data: {}
     target:
       entity_id: vacuum.living_room_robot_vacuum_roborock
     response_variable: response
   - variables:
-      room_ids: "{% set rooms = response['vacuum.living_room_robot_vacuum_roborock']['maps'][0]['rooms']
-        %} {% set wanted_rooms = ['Bryggers', 'Køkken'] %}  {% set room_ids = namespace(value=[])
-        %} {% for key, value in rooms.items() %}\n    {% if value in wanted_rooms
+      room_ids: "{% set all_rooms = response['vacuum.living_room_robot_vacuum_roborock']['maps'][0]['rooms']
+        %} {% set wanted_rooms = rooms %}  {% set room_ids = namespace(value=[]) %}
+        {% for key, value in all_rooms.items() %}\n    {% if value in wanted_rooms
         %}\n        {% set room_ids.value = room_ids.value + [key] %}\n    {% endif
         %}\n{% endfor %} {{ room_ids.value }}        "
   - action: system_log.write
     data:
-      message: room {{ room_ids }}
+      message: 'Room ids: {{ room_ids }}'
       level: debug
+  - choose:
+    - conditions:
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: vacuum.living_room_robot_vacuum_roborock
+          state: docked
+      sequence: []
+    - conditions:
+      - condition: template
+        value_template: '{{ type == ''vac'' }}'
+      sequence:
+      - action: vacuum.send_command
+        data:
+          command: set_water_box_custom_mode
+          params:
+            water_box_mode: 200
+          entity_id: select.living_room_robot_vacuum_mop_mode_roborock
+      - action: vacuum.set_fan_speed
+        metadata: {}
+        data:
+          fan_speed: max_plus
+        target:
+          entity_id: vacuum.living_room_robot_vacuum_roborock
+      - action: select.select_option
+        target:
+          entity_id: select.living_room_robot_vacuum_mop_intensity_roborock
+        data:
+          option: 'off'
+      - action: select.select_option
+        target:
+          entity_id: select.living_room_robot_vacuum_mop_mode_roborock
+        data:
+          option: standard
+      - action: vacuum.send_command
+        data:
+          command: app_segment_clean
+          params:
+          - segments: '{{ room_ids }}'
+        target:
+          entity_id: vacuum.living_room_robot_vacuum_roborock
+    - conditions:
+      - condition: template
+        value_template: '{{ type == ''mop'' }}'
+      sequence:
+      - action: vacuum.send_command
+        data:
+          command: set_water_box_custom_mode
+          params:
+            water_box_mode: 203
+          entity_id: select.living_room_robot_vacuum_mop_mode_roborock
+      - action: vacuum.send_command
+        target:
+          entity_id: vacuum.living_room_robot_vacuum_roborock
+        data:
+          command: app_start_wash
+      - action: vacuum.set_fan_speed
+        metadata: {}
+        data:
+          fan_speed: 'off'
+        target:
+          entity_id: vacuum.living_room_robot_vacuum_roborock
+      - action: select.select_option
+        target:
+          entity_id: select.living_room_robot_vacuum_mop_intensity_roborock
+        data:
+          option: intense
+      - action: select.select_option
+        target:
+          entity_id: select.living_room_robot_vacuum_mop_mode_roborock
+        data:
+          option: deep_plus
+      - action: vacuum.send_command
+        data:
+          command: app_segment_clean
+          params:
+          - segments: '{{ room_ids }}'
+        target:
+          entity_id: vacuum.living_room_robot_vacuum_roborock
+      - action: vacuum.send_command
+        target:
+          entity_id: vacuum.living_room_robot_vacuum_roborock
+        data:
+          command: app_start_wash
+    - conditions:
+      - condition: template
+        value_template: '{{ type == ''vac_mop'' }}'
+      sequence:
+      - action: vacuum.send_command
+        data:
+          command: set_water_box_custom_mode
+          params:
+            water_box_mode: 201
+          entity_id: select.living_room_robot_vacuum_mop_mode_roborock
+      - action: vacuum.send_command
+        target:
+          entity_id: vacuum.living_room_robot_vacuum_roborock
+        data:
+          command: app_start_wash
+      - action: vacuum.set_fan_speed
+        metadata: {}
+        data:
+          fan_speed: max
+        target:
+          entity_id: vacuum.living_room_robot_vacuum_roborock
+      - action: select.select_option
+        target:
+          entity_id: select.living_room_robot_vacuum_mop_intensity_roborock
+        data:
+          option: moderate
+      - action: select.select_option
+        target:
+          entity_id: select.living_room_robot_vacuum_mop_mode_roborock
+        data:
+          option: standard
+      - action: vacuum.send_command
+        data:
+          command: app_segment_clean
+          params:
+          - segments: '{{ room_ids }}'
+        target:
+          entity_id: vacuum.living_room_robot_vacuum_roborock
+      - action: vacuum.send_command
+        target:
+          entity_id: vacuum.living_room_robot_vacuum_roborock
+        data:
+          command: app_start_wash
+living_room_robot_vacuum_dock:
+  alias: Stue robotstøvsuger dock
+  description: Returner robotstøvsuger til docking station
+  sequence:
   - if:
-    - condition: state
-      entity_id: vacuum.living_room_robot_vacuum_roborock
-      state: docked
-    then:
-    - action: vacuum.set_fan_speed
-      metadata: {}
-      data:
-        fan_speed: max
-      target:
+    - condition: not
+      conditions:
+      - condition: state
         entity_id: vacuum.living_room_robot_vacuum_roborock
-    - action: select.select_option
-      target:
-        entity_id: select.living_room_robot_vacuum_mop_intensity_roborock
-      data:
-        option: intense
-    - action: select.select_option
-      target:
-        entity_id: select.living_room_robot_vacuum_mop_mode_roborock
-      data:
-        option: deep_plus
-    - action: vacuum.send_command
-      data:
-        command: set_water_box_custom_mode
-        params:
-          water_box_mode: 203
-        entity_id: select.living_room_robot_vacuum_mop_mode_roborock
-    - action: vacuum.send_command
-      data:
-        command: app_segment_clean
-        params:
-        - segments: '{{ room_ids }}'
+        state: docked
+    then:
+    - action: vacuum.return_to_base
+      metadata: {}
+      data: {}
       target:
         entity_id: vacuum.living_room_robot_vacuum_roborock

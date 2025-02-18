@@ -1961,7 +1961,10 @@
     above: 2
   - trigger: state
     entity_id:
-    - binary_sensor.emils_room_window_sensor_open
+    - binary_sensor.emils_room_window_sensor_open_aqara
+  - trigger: state
+    entity_id:
+    - binary_sensor.emils_room_light
   - trigger: state
     entity_id: input_boolean.home_house_sitter
   conditions: []
@@ -1974,7 +1977,7 @@
       sequence: []
     - conditions:
       - condition: state
-        entity_id: binary_sensor.emils_room_window_sensor_open
+        entity_id: binary_sensor.emils_room_window_sensor_open_aqara
         state: 'on'
       - condition: numeric_state
         entity_id: cover.emils_room_blind_ikea
@@ -1989,7 +1992,7 @@
           entity_id: cover.emils_room_blind_ikea
     - conditions:
       - condition: state
-        entity_id: binary_sensor.emils_room_window_sensor_open
+        entity_id: binary_sensor.emils_room_window_sensor_open_aqara
         state: 'on'
       sequence: []
     - conditions:
@@ -2020,6 +2023,21 @@
       - condition: trigger
         id:
         - wake_up
+      sequence:
+      - action: cover.set_cover_position
+        metadata: {}
+        data:
+          position: 40
+        target:
+          entity_id: cover.emils_room_blind_ikea
+    - conditions:
+      - condition: numeric_state
+        entity_id: cover.emils_room_blind_ikea
+        attribute: current_position
+        below: 40
+      - condition: state
+        entity_id: binary_sensor.emils_room_light
+        state: 'on'
       sequence:
       - action: cover.set_cover_position
         metadata: {}
@@ -2433,7 +2451,7 @@
     - binary_sensor.emil_sleeping
   - trigger: state
     entity_id:
-    - binary_sensor.emils_room_window_sensor_open
+    - binary_sensor.emils_room_window_sensor_open_aqara
   - trigger: state
     entity_id:
     - automation.emils_room_heating
@@ -2483,7 +2501,7 @@
           entity_id: climate.emils_room_radiator_thermostat_tado
     - conditions:
       - condition: state
-        entity_id: binary_sensor.emils_room_window_sensor_open
+        entity_id: binary_sensor.emils_room_window_sensor_open_aqara
         state: 'on'
       sequence:
       - action: climate.set_temperature
@@ -3707,7 +3725,7 @@
       - action: timer.start
         metadata: {}
         data:
-          duration: 00:01:00
+          duration: 00:02:00
         target:
           entity_id: timer.driveway_light_entrance_timer
     - if:
@@ -3804,11 +3822,9 @@
           entity_id:
           - light.driveway_light_house_south_gledopto
     - if:
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: timer.driveway_light_entrance_timer
-          state: active
+      - condition: state
+        entity_id: timer.driveway_light_entrance_timer
+        state: active
       then:
       - action: light.turn_on
         metadata: {}
@@ -3872,15 +3888,17 @@
           - light.driveway_light_right_1_signify
     - choose:
       - conditions:
-        - condition: state
-          entity_id: timer.driveway_light_entrance_timer
-          state: active
-        - condition: state
-          entity_id: timer.driveway_light_house_south_timer
-          state: active
-        - condition: state
-          entity_id: timer.driveway_light_street_timer
-          state: active
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: timer.driveway_light_entrance_timer
+            state: active
+          - condition: state
+            entity_id: timer.driveway_light_house_south_timer
+            state: active
+          - condition: state
+            entity_id: timer.driveway_light_street_timer
+            state: active
         sequence:
         - action: light.turn_on
           metadata: {}
@@ -4086,13 +4104,13 @@
     - sensor.emils_room_current_temperature
   - trigger: state
     entity_id:
-    - binary_sensor.emils_room_window_sensor_open
+    - binary_sensor.emils_room_window_sensor_open_aqara
   - trigger: state
     entity_id:
     - timer.emils_room_window_open_timer
   - trigger: state
     entity_id:
-    - binary_sensor.emils_room_window_sensor_open
+    - binary_sensor.emils_room_window_sensor_open_aqara
     to: 'on'
     from: 'off'
     id: window_open
@@ -4127,7 +4145,7 @@
         entity_id: timer.emils_room_window_open_timer
   - if:
     - condition: state
-      entity_id: binary_sensor.emils_room_window_sensor_open
+      entity_id: binary_sensor.emils_room_window_sensor_open_aqara
       state: 'off'
     - condition: state
       entity_id: timer.emils_room_window_open_timer
@@ -4190,7 +4208,7 @@
           entity_id: climate.emils_room_pure_hot_cool_dyson
     - conditions:
       - condition: state
-        entity_id: binary_sensor.emils_room_window_sensor_open
+        entity_id: binary_sensor.emils_room_window_sensor_open_aqara
         state: 'off'
       - condition: template
         value_template: '{{ states("sensor.emils_room_current_temperature")|float
@@ -4934,3 +4952,377 @@
         description: Advarsel på Roborock robot støvsuger - Kode {{ states('sensor.living_room_robot_vacuum_error_roborock')
           }}
   mode: queued
+- id: '1739904709484'
+  alias: Hjem smart todo Netatmo
+  description: Kontroller batteri status på Netatmo enheder
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.garage_weather_station_battery_netatmo
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.garden_anemometer_battery_netatmo
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.garden_rain_gauge_battery_netatmo
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.garden_weather_station_battery_netatmo
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.greenhouse_weather_station_battery_netatmo
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.technic_weather_station_battery_netatmo
+    below: 5
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.garage_weather_station_battery_netatmo
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på vejrstation inde i garagen
+          description: Batteri niveau er {{ states('sensor.garage_weather_station_battery_netatmo')
+            }}% på Netatmo vejrstationen der står inde i garagen, udskift med 4 stk.
+            nye AAA batterier
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.garden_anemometer_battery_netatmo
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Problem med strøm til vindmåler
+          description: Vindmåleren er tilsluttet strømforsyning, kontroller strømforsyning
+            der sidder i teknikrummet og vindmåleren der sidder på nord gavlen ved
+            tagryggen
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.garden_rain_gauge_battery_netatmo
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på regnmåler
+          description: Batteri niveau er {{ states('sensor.garden_rain_gauge_battery_netatmo')
+            }}% på Netatmo regnmålet, udskift med 2 stk. nye AAA batterier
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.garden_weather_station_battery_netatmo
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på udendørs vejrstation på garagen
+          description: Batteri niveau er {{ states('sensor.garden_weather_station_battery_netatmo')
+            }}% på Netatmo vejrstationen der sidder udvendigt på garagen, udskift
+            med 2 stk. nye AAA batterier
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.greenhouse_weather_station_battery_netatmo
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på vejrstation i drivhuset
+          description: Batteri niveau er {{ states('sensor.greenhouse_weather_station_battery_netatmo')
+            }}% på Netatmo vejrstationen i drivhuset, udskift med 4 stk. nye AAA batterier
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.technic_weather_station_battery_netatmo
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på vejrstation i teknikrummet
+          description: Batteri niveau er {{ states('sensor.technic_weather_station_battery_netatmo')
+            }}% på Netatmo vejrstationen i teknikrummet, udskift med 4 stk. nye AAA
+            batterier
+  mode: restart
+- id: '1739906369450'
+  alias: Hjem smart todo Philips hue kontakter
+  description: Kontroller batteri status på Philips hue kontakter
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.bedroom_switch_battery_philips_hue
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.hallway_switch_battery_philips_hue
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.living_room_switch_battery_philips_hue
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.patio_switch_battery_philips_hue
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.emils_room_switch_battery_philips_hue
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.charlies_room_switch_battery_philips_hue
+    below: 5
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.bedroom_switch_battery_philips_hue
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på lyskontakten i soveværelset
+          description: Batteri niveau er {{ states('sensor.bedroom_switch_battery_philips_hue')
+            }}% på Philips hue lys kontakten i soveværelset, udskift med et CR2450
+            batteri
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.hallway_switch_battery_philips_hue
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på lyskontakten i gangen
+          description: Batteri niveau er {{ states('sensor.hallway_switch_battery_philips_hue')
+            }}% på Philips hue lys kontakten i gangen, udskift med et CR2450 batteri
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.living_room_switch_battery_philips_hue
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på lyskontakten i stuen
+          description: Batteri niveau er {{ states('sensor.living_room_switch_battery_philips_hue')
+            }}% på Philips hue lys kontakten i stuen, udskift med et CR2032 batteri
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.patio_switch_battery_philips_hue
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på lyskontakten til terrassen
+          description: Batteri niveau er {{ states('sensor.patio_switch_battery_philips_hue')
+            }}% på Philips hue lys kontakten til terrassen, udskift med et CR2450
+            batteri
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.emils_room_switch_battery_philips_hue
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på lyskontakten på Emils værelset
+          description: Batteri niveau er {{ states('sensor.emils_room_switch_battery_philips_hue')
+            }}% på Philips hue lys kontakten på Emils værelse, udskift med et CR2450
+            batteri
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.charlies_room_switch_battery_philips_hue
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på lyskontakten på Charlies værelset
+          description: Batteri niveau er {{ states('sensor.charlies_room_switch_battery_philips_hue')
+            }}% på Philips hue lys kontakten på Charlies værelse, udskift med et CR2450
+            batteri
+  mode: restart
+- id: '1739907378753'
+  alias: Hjem smart todo Philips hue bevægelsessensor
+  description: Kontroller batteri status på Philips hue bevægelsessensor
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.driveway_motion_sensor_entrance_battery_signify
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.driveway_motion_sensor_house_east_battery_signify
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.driveway_motion_sensor_house_south_battery_signify
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.driveway_motion_sensor_street_battery_signify
+    below: 5
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.driveway_motion_sensor_entrance_battery_signify
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på bevægelsessonsor udendørs ved hoveddøren
+          description: Batteri niveau er {{ states('sensor.driveway_motion_sensor_entrance_battery_signify')
+            }}% på Philips hue udendørs bevægelsessensor ved hoveddøren, udskift med
+            to AA batterier
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.driveway_motion_sensor_house_east_battery_signify
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på bevægelsessonsor udendørs over bryggersdøren
+          description: Batteri niveau er {{ states('sensor.driveway_motion_sensor_house_east_battery_signify')
+            }}% på Philips hue udendørs bevægelsessensor i hunde gården på øst siden
+            ved bryggers, udskift med to AA batterier
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.driveway_motion_sensor_house_south_battery_signify
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på bevægelsessonsor udendørs på syd gavlen
+          description: Batteri niveau er {{ states('sensor.driveway_motion_sensor_house_south_battery_signify')
+            }}% på Philips hue udendørs bevægelsessensor på gavlen på syd siden af
+            huset, udskift med to AA batterier
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.driveway_motion_sensor_street_battery_signify
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på bevægelsessonsor udendørs ved vejen
+          description: Batteri niveau er {{ states('sensor.driveway_motion_sensor_street_battery_signify')
+            }}% på Philips hue udendørs bevægelsessensor i indkørslen ved vejen, udskift
+            med to AA batterier
+  mode: restart
+- id: '1739915975801'
+  alias: Hjem smart todo Philips hue dør sensor
+  description: Kontroller batteri status på Philips hue dør og vindue sensor
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.bedroom_switch_battery_philips_hue
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.hallway_switch_battery_philips_hue
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.living_room_switch_battery_philips_hue
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.patio_switch_battery_philips_hue
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.emils_room_switch_battery_philips_hue
+    below: 5
+  - trigger: numeric_state
+    entity_id:
+    - sensor.charlies_room_switch_battery_philips_hue
+    below: 5
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.bedroom_switch_battery_philips_hue
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på lyskontakten i soveværelset
+          description: Batteri niveau er {{ states('sensor.bedroom_switch_battery_philips_hue')
+            }}% på Philips hue lys kontakten i soveværelset, udskift med et CR2450
+            batteri
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.hallway_switch_battery_philips_hue
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på lyskontakten i gangen
+          description: Batteri niveau er {{ states('sensor.hallway_switch_battery_philips_hue')
+            }}% på Philips hue lys kontakten i gangen, udskift med et CR2450 batteri
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.living_room_switch_battery_philips_hue
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på lyskontakten i stuen
+          description: Batteri niveau er {{ states('sensor.living_room_switch_battery_philips_hue')
+            }}% på Philips hue lys kontakten i stuen, udskift med et CR2032 batteri
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.patio_switch_battery_philips_hue
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på lyskontakten til terrassen
+          description: Batteri niveau er {{ states('sensor.patio_switch_battery_philips_hue')
+            }}% på Philips hue lys kontakten til terrassen, udskift med et CR2450
+            batteri
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.emils_room_switch_battery_philips_hue
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på lyskontakten på Emils værelset
+          description: Batteri niveau er {{ states('sensor.emils_room_switch_battery_philips_hue')
+            }}% på Philips hue lys kontakten på Emils værelse, udskift med et CR2450
+            batteri
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.charlies_room_switch_battery_philips_hue
+        below: 5
+      sequence:
+      - action: script.home_smart_todo_create_task
+        data:
+          subject: Skift batteri på lyskontakten på Charlies værelset
+          description: Batteri niveau er {{ states('sensor.charlies_room_switch_battery_philips_hue')
+            }}% på Philips hue lys kontakten på Charlies værelse, udskift med et CR2450
+            batteri
+  mode: restart
