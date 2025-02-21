@@ -856,3 +856,82 @@ living_room_robot_vacuum_dock:
       data: {}
       target:
         entity_id: vacuum.living_room_robot_vacuum_roborock
+home_create_todo_task:
+  alias: Hjem opret todo opgave
+  description: Kontroller om samme opgave allerede findes hvis ikke opret den i smart
+    todo
+  icon: mdi:clipboard-list
+  fields:
+    subject:
+      description: Emne for opgaven
+      example: Hent post
+      required: true
+      selector:
+        text:
+    description:
+      description: Beskrivelse af opgaven
+      example: Der er ny post i postkassen ved vejen
+      required: true
+      selector:
+        text:
+    entity_id:
+      description: Enhed opgaven opstår udfra
+      example: light.home_light_a
+      required: true
+      selector:
+        entity:
+          domain:
+    todo_list:
+      description: ToDo listen
+      example: todo.my_todo_list
+      required: true
+      selector:
+        entity:
+          domain: todo
+    is_active:
+      description: Skal opgaven være aktiv?
+      example: true/false
+      required: true
+      selector:
+        boolean:
+  sequence:
+  - variables:
+      todo_entity_id: '[{{ entity_id }}]'
+  - if:
+    - condition: template
+      value_template: '{{ is_active }}'
+    then:
+    - variables:
+        exists: '{{ state_attr(todo_list, ''all_todos'') |  selectattr(''subject'',
+          ''equalto'', subject) |  rejectattr(''status'', ''equalto'', ''completed'')
+          |  list | length > 0 }}'
+    - if:
+      - condition: template
+        value_template: '{{ exists }}'
+      then:
+      - action: ms365_todo.new_todo
+        metadata: {}
+        data:
+          entity_id: '{{ todo_list }}'
+          subject: '{{ subject }}'
+          description: '{{ description }}
+
+            {{ todo_id }}
+
+            '
+          due: '{{ utcnow().strftime(''%Y-%m-%d'') }}'
+          reminder: '{{ utcnow() + timedelta(minutes=1) }}'
+    else:
+    - variables:
+        todo_ids: '{{ state_attr(todo_list, ''all_todos'') |  selectattr(''description'',
+          ''search'', todo_entity_id) |  rejectattr(''status'', ''equalto'', ''completed'')
+          |  map(attribute=''todo_id'') |  list }}'
+    - repeat:
+        count: '{{ todo_ids | length }}'
+        sequence:
+        - action: ms365_todo.complete_todo
+          metadata: {}
+          data:
+            entity_id: '{{ todo_list }}'
+            todo_id: '{{ todo_ids[repeat.index - 1] }}'
+            completed: true
