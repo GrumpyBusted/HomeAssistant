@@ -19,6 +19,16 @@
             "RU04": "Smart Thermostat X",
             "SU04": "Wireless Temperature Sensor X"
           } }}
+    - name: "Tado Device Batterys"
+      unique_id: 72EC545E-66DC-4E91-A3EE-372E3F7D5C06
+      state: "OK"
+      attributes:
+        batterys: >-
+          {{ {
+            "VA04": "Genopladelig batteripakke",
+            "RU04": "3 * AAA",
+            "SU04": "3 * AAA"
+          } }}
     - name: "Tado Device Locations"
       unique_id: B90FDCCE-2C4D-4F76-B2EF-00D3FFEBEE97
       state: "OK"

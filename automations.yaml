@@ -4813,9 +4813,12 @@
         \       \"deviceSerialNo\": \"{{ device.serialNumber }}\",\n        \"batteryState\":
         \"{{ device.batteryState }}\",\n        \"type\": \"{{ state_attr('sensor.tado_device_types',
         'types').get(device.type, device.type) }}\",\n        \"location\": \"{{ state_attr('sensor.tado_device_locations',
-        'locations').get(device.serialNumber, device.serialNumber) }}\",\n      }{%
-        if not loop.last %}, {% endif %}\n    {% endfor %}\n  {% if not loop.last
-        %}, {% endif %}\n  {% endfor %}\n]"
+        'locations').get(device.serialNumber, device.serialNumber) }}\",\n        \"entity_id\":
+        \"{{ state_attr('sensor.tado_device_ids', 'ids').get(device.serialNumber,
+        device.serialNumber) }}\",\n        \"battery\": \"{{ state_attr('sensor.tado_device_batterys',
+        'batterys').get(device.type, device.type) }}\",\n      }{% if not loop.last
+        %}, {% endif %}\n    {% endfor %}\n  {% if not loop.last %}, {% endif %}\n
+        \ {% endfor %}\n]"
   - repeat:
       count: '{{ devices | length }}'
       sequence:
@@ -4834,9 +4837,8 @@
             {{ devices[repeat.index - 1].roomName }}{{ '''' if not devices[repeat.index
             - 1].location else '' ('' ~ devices[repeat.index - 1].location ~ '')''}},
             batteri status er {{ devices[repeat.index - 1].batteryState }}. Batteri:
-            genopladelig batteripakke'
-          related_entity_id: '{{ state_attr(''sensor.tado_device_ids'', ''ids'').get(device.serialNumber,
-            device.serialNumber) }}'
+            {{ devices[repeat.index - 1].battery }}'
+          related_entity_id: '{{ devices[repeat.index - 1].entity_id }}'
           entity_id: todo.home_smart_todo
           is_active: '{{ devices[repeat.index - 1].batteryState != ''NORMAL'' }}'
   mode: restart
@@ -4911,7 +4913,7 @@
     data:
       subject: Skift batteri i kontakt til gardinet i soveværelset
       description: 'Batteri niveau er {{ states(''sensor.bedroom_blind_switch_battery_ikea'')
-        }}% på kontaken til IKEA rullegardin i soveværelset. Batteri: ?'
+        }}% på kontaken til IKEA rullegardin i soveværelset. Batteri: 1 * CR2032 '
       related_entity_id: sensor.bedroom_blind_switch_battery_ikea
       entity_id: todo.home_smart_todo
       is_active: '{{ states(''sensor.bedroom_blind_switch_battery_ikea'')|int < 5
@@ -4920,7 +4922,7 @@
     data:
       subject: Skift batteri i kontakt til gardinet på Emils værelset
       description: 'Batteri niveau er {{ states(''sensor.emils_room_blind_switch_battery_ikea'')
-        }}% på kontaken til IKEA rullegardin på Emils værelset. Batteri: ?'
+        }}% på kontaken til IKEA rullegardin på Emils værelset. Batteri: 1 * CR2032 '
       related_entity_id: sensor.emils_room_blind_switch_battery_ikea
       entity_id: todo.home_smart_todo
       is_active: '{{ states(''sensor.emils_room_blind_switch_battery_ikea'')|int <
@@ -4929,7 +4931,7 @@
     data:
       subject: Skift batteri i kontakt til gardinet på Charlies værelset
       description: 'Batteri niveau er {{ states(''sensor.charlies_room_blind_switch_battery_ikea'')
-        }}% på kontaken til IKEA rullegardin på Charlies værelset. Batteri: ?'
+        }}% på kontaken til IKEA rullegardin på Charlies værelset. Batteri: 1 * CR2032 '
       related_entity_id: sensor.charlies_room_blind_switch_battery_ikea
       entity_id: todo.home_smart_todo
       is_active: '{{ states(''sensor.charlies_room_blind_switch_battery_ikea'')|int
