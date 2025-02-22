@@ -3,7 +3,7 @@
       unique_id: 853ACC48-200B-4607-B47B-CA9BB9BA0E84
       device_class: presence
       state: >-
-        {{ is_state('person.anders', 'home') }}
+        {{ is_state('person.anders', 'home') or is_state('sensor.anders_iphone_ssid', 'Palantir')  }}
       icon: >-
         {% if is_state('binary_sensor.anders_home', 'on') %}
         mdi:account
@@ -15,7 +15,7 @@
       unique_id: 38C5ECC5-28B8-46B5-BED7-53625445DFCB
       device_class: presence
       state: >-
-        {{ is_state('person.monique', 'home') }}
+        {{ is_state('person.monique', 'home') or is_state('sensor.monique_iphone_ssid', 'Palantir')  }}
       icon: >-
         {% if is_state('binary_sensor.monique_home', 'on') %}
         mdi:account
@@ -27,7 +27,7 @@
       unique_id: C0544736-ACBB-4C1C-8874-8E18558E8CF5
       device_class: presence
       state: >-
-        {{ is_state('person.emil', 'home') }}
+        {{ is_state('person.emil', 'home') or is_state('sensor.emil_iphone_ssid', 'Palantir') }}
       icon: >-
         {% if is_state('binary_sensor.emil_home', 'on') %}
         mdi:account
@@ -39,7 +39,7 @@
       unique_id: 40083A08-3457-4093-89DC-95E41E763766
       device_class: presence
       state: >-
-        {{ is_state('person.charlie', 'home') }}
+        {{ is_state('person.charlie', 'home') or is_state('sensor.charlie_iphone_ssid', 'Palantir')  }}
       icon: >-
         {% if is_state('binary_sensor.charlie_home', 'on') %}
         mdi:account

@@ -44,3 +44,28 @@
             "SU2008052224": "",              
             "SU3709368576": ""               
           } }}
+    - name: "Tado Device Ids"
+      unique_id: B2F0AF02-75FA-4697-AA5E-886F055D5A80
+      state: "OK"
+      attributes:
+        ids: >-
+          {{ {
+            "VA3283445504": "climate.bathroom_radiator_thermostat_floor_tado",          
+            "VA1355245056": "climate.bathroom_radiator_thermostat_wall_tado",      
+            "VA3778176768": "climate.utility_room_radiator_thermostat_floor_tado",          
+            "VA1924491008": "climate.utility_room_radiator_thermostat_wall_tado",      
+            "VA0261842688": "climate.charlies_room_radiator_thermostat_tado",      
+            "VA2644207360": "climate.emils_room_radiator_thermostat_tado",      
+            "VA0969303552": "climate.hallway_radiator_thermostat_tado",          
+            "VA3388958208": "climate.kitchen_radiator_thermostat_tado",          
+            "VA0380921600": "climate.bedroom_radiator_thermostat_tado",       
+            "VA3214501632": "climate.living_room_radiator_thermostat_bookcase_tado",      
+            "VA2912511744": "climate.living_room_radiator_thermostat_sofa_tado",      
+            "VA4237190656": "climate.living_room_radiator_thermostat_dining_table_tado", 
+            "VA1929864960": "climate.toilet_radiator_thermostat_tado",          
+            "RU1998022400": "climate.utility_room_temperature_sensor_tado",              
+            "SU3237438976": "sensor.emils_room_temperature_sensor_temperature_tado",              
+            "SU3723912704": "sensor.hallway_temperature_sensor_temperature_tado",        
+            "SU2008052224": "sensor.living_room_temperature_sensor_temperature_tado",              
+            "SU3709368576": "sensor.charlies_room_temperature_sensor_temperature_tado"               
+          } }}
