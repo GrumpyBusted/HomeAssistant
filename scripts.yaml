@@ -328,8 +328,12 @@ bedroom_light_sunset:
   description: Lys scene til soveværelse til gå i seng
   mode: restart
   sequence:
-  - event: bedroom_light_sunset_script
-    event_data: {}
+  - action: timer.start
+    metadata: {}
+    data:
+      duration: 01:00:00
+    target:
+      entity_id: timer.bedroom_light_sunset_timer
   - if:
     - condition: state
       entity_id: binary_sensor.bedroom_light
@@ -569,93 +573,6 @@ hjem_motionering_af_radiatorventiler:
       - automation.living_room_heating
       - automation.utility_room_heating
       - automation.toilet_heating
-home_smart_todo_create_task:
-  alias: Hjem smart todo opret opgave
-  description: Kontroller om samme opgave allerede findes hvis ikke opret den i smart
-    todo
-  icon: mdi:clipboard-list
-  fields:
-    subject:
-      description: Emne for opgaven
-      example: Hent post
-      required: true
-    description:
-      description: Beskrivelse af opgaven
-      example: Der er ny post i postkassen ved vejen
-      required: true
-  sequence:
-  - variables:
-      existing_tasks: '{{ state_attr(''todo.home_smart_todo'', ''all_todos'') | selectattr(''subject'',
-        ''equalto'', subject) | rejectattr(''status'', ''equalto'', ''completed'')
-        | list }}'
-  - if:
-    - condition: template
-      value_template: '{{ existing_tasks | length == 0 }}'
-    then:
-    - action: ms365_todo.new_todo
-      metadata: {}
-      data:
-        entity_id: todo.home_smart_todo
-        subject: '{{ subject }}'
-        description: '{{ description }}'
-        due: '{{ utcnow().strftime(''%Y-%m-%d'') }}'
-        reminder: '{{ utcnow() + timedelta(minutes=1) }}'
-home_smart_todo_tado:
-  alias: Hjem smart todo Tado
-  description: Script til at kontrollere batteri tilstand af Tado enheder
-  sequence:
-  - action: rest_command.tado_get_auth_token
-    data:
-      secrets:
-        tado_username: '{{ states(''sensor.tado_username'') }}'
-        tado_password: '{{ states(''sensor.tado_password'') }}'
-        tado_client_secret: '{{ states(''sensor.tado_client_secret'') }}'
-    response_variable: response
-  - variables:
-      token: '{{ response.content.access_token }}'
-  - action: rest_command.tado_get_profile
-    data:
-      bearer_token: '{{ token }}'
-    response_variable: response
-  - variables:
-      home_id: '{{ response.content.homes[0].id }}'
-  - action: rest_command.tado_get_rooms_and_devices
-    data:
-      home_id: '{{ home_id }}'
-      bearer_token: '{{ token }}'
-    response_variable: response
-  - variables:
-      devices: "[\n  {% for room in response.content.rooms %}\n    {% for device in
-        room.devices %}\n      {\n        \"roomName\": \"{{ room.roomName }}\",\n
-        \       \"deviceSerialNo\": \"{{ device.serialNumber }}\",\n        \"batteryState\":
-        \"{{ device.batteryState }}\",\n        \"type\": \"{{ state_attr('sensor.tado_device_types',
-        'types').get(device.type, device.type) }}\",\n        \"location\": \"{{ state_attr('sensor.tado_device_locations',
-        'locations').get(device.serialNumber, device.serialNumber) }}\",\n      }{%
-        if not loop.last %}, {% endif %}\n    {% endfor %}\n  {% if not loop.last
-        %}, {% endif %}\n  {% endfor %}\n]"
-  - repeat:
-      count: '{{ devices | length }}'
-      sequence:
-      - if:
-        - condition: template
-          value_template: '{{ devices[repeat.index - 1].batteryState != ''NORMAL''
-            }}'
-        then:
-        - action: system_log.write
-          metadata: {}
-          data:
-            level: debug
-            message: '{{ devices[repeat.index - 1] }}'
-        - action: script.home_smart_todo_create_task
-          data:
-            subject: Skift batteri på {{ devices[repeat.index - 1].type }} i {{ devices[repeat.index
-              - 1].roomName }}{{ '' if not devices[repeat.index - 1].location else
-              ' (' ~ devices[repeat.index - 1].location ~ ')'}}
-            description: Skift batteri på Tado {{ devices[repeat.index - 1].type }}
-              med serie no {{ devices[repeat.index - 1].deviceSerialNo }}, der er
-              pladseret {{ devices[repeat.index - 1].roomName }}{{ '' if not devices[repeat.index
-              - 1].location else ' (' ~ devices[repeat.index - 1].location ~ ')'}},
-              batteri status er {{ devices[repeat.index - 1].batteryState }}
 stue_robotstovsuger_tom_stovbeholder:
   alias: Stue robotstøvsuger tøm støvbeholder
   description: Tøm støv beholder i robotstøvsuger over i docking station

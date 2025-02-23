@@ -75,6 +75,20 @@
       - condition: trigger
         id:
         - button_1_short
+      - condition: state
+        entity_id: binary_sensor.living_room_light
+        state: 'on'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id: light.living_room_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1_short
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -246,8 +260,6 @@
     data: {}
     target:
       entity_id: lock.driveway_ev_charger_lock_wallbox
-  trace:
-    stored_traces: 100
   mode: queued
 - id: '1735725983183'
   alias: Garage lys
@@ -1335,8 +1347,6 @@
         target:
           entity_id: light.hallway_light_philips_hue
   mode: queued
-  trace:
-    stored_traces: 10
 - id: '1735852365839'
   alias: Emils værelse lys
   description: Automatik for lys på Emils værelse
@@ -1880,6 +1890,19 @@
         entity_id: sensor.monique_iphone_battery_state
         state: Charging
       sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+      - action: light.turn_on
+        metadata: {}
+        data:
+          flash: short
+        target:
+          entity_id:
+          - light.bedroom_light_anders_philips_hue
+          - light.bedroom_light_monique_philips_hue
       - action: light.turn_off
         metadata: {}
         data:
@@ -1887,11 +1910,6 @@
         target:
           entity_id:
           - light.bedroom_light_philips_hue
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
     - conditions:
       - condition: state
         entity_id: binary_sensor.anders_home
@@ -1903,6 +1921,19 @@
         entity_id: sensor.monique_iphone_battery_state
         state: Charging
       sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+      - action: light.turn_on
+        metadata: {}
+        data:
+          flash: short
+        target:
+          entity_id:
+          - light.bedroom_light_anders_philips_hue
+          - light.bedroom_light_monique_philips_hue
       - action: light.turn_off
         metadata: {}
         data:
@@ -1910,11 +1941,6 @@
         target:
           entity_id:
           - light.bedroom_light_philips_hue
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
     - conditions:
       - condition: state
         entity_id: binary_sensor.anders_home
@@ -1926,6 +1952,19 @@
         entity_id: sensor.anders_iphone_battery_state
         state: Charging
       sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+      - action: light.turn_on
+        metadata: {}
+        data:
+          flash: short
+        target:
+          entity_id:
+          - light.bedroom_light_anders_philips_hue
+          - light.bedroom_light_monique_philips_hue
       - action: light.turn_off
         metadata: {}
         data:
@@ -1933,13 +1972,6 @@
         target:
           entity_id:
           - light.bedroom_light_philips_hue
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
-  trace:
-    stored_traces: 100
 - id: '1736103151599'
   alias: Emils værelse - Rullegardin
   description: Automatik for rullegardin på Emils værelse
@@ -2145,9 +2177,6 @@
   - trigger: event
     event_type: bedroom_light_sunrise_script
     id: sunrise_scene
-  - trigger: event
-    event_type: bedroom_light_sunset_script
-    id: sunset_scene
   - trigger: state
     entity_id:
     - input_select.monique_nap_time_state
@@ -2171,6 +2200,11 @@
     at: '16:00:00'
   - trigger: state
     entity_id: input_boolean.home_house_sitter
+  - trigger: state
+    entity_id:
+    - sensor.anders_iphone_battery_state
+    - sensor.monique_iphone_battery_state
+    to: Charging
   conditions: []
   actions:
   - choose:
@@ -2194,10 +2228,75 @@
         target:
           entity_id: cover.bedroom_blind_ikea
     - conditions:
-      - condition: trigger
-        id:
-        - sunset_scene
+      - condition: state
+        entity_id: binary_sensor.anders_home
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
+      - condition: state
+        entity_id: sensor.anders_iphone_battery_state
+        state: Charging
+      - condition: state
+        entity_id: sensor.monique_iphone_battery_state
+        state: Charging
+      - condition: state
+        entity_id: timer.bedroom_light_sunset_timer
+        state: active
       sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunset_timer
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind_ikea
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.anders_home
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
+      - condition: state
+        entity_id: sensor.monique_iphone_battery_state
+        state: Charging
+      - condition: state
+        entity_id: timer.bedroom_light_sunset_timer
+        state: active
+      sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunset_timer
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind_ikea
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.anders_home
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'off'
+      - condition: state
+        entity_id: sensor.anders_iphone_battery_state
+        state: Charging
+      - condition: state
+        entity_id: timer.bedroom_light_sunset_timer
+        state: active
+      sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunset_timer
       - action: cover.close_cover
         metadata: {}
         data: {}
@@ -2277,8 +2376,6 @@
         data: {}
         target:
           entity_id: cover.bedroom_blind_ikea
-  trace:
-    stored_traces: 20
   mode: queued
 - id: '1737201831964'
   alias: Indkørsel - Billader sæt pris
@@ -2558,6 +2655,11 @@
     entity_id:
     - automation.charlies_room_heating
     to: 'on'
+  - trigger: time
+    at:
+      entity_id: input_datetime.charlie_wake_up_alarm
+      offset: -00:30:00
+    id: wake_up_soon
   - trigger: state
     entity_id: input_boolean.home_house_sitter
   conditions: []
@@ -2602,6 +2704,17 @@
         target:
           entity_id: climate.charlies_room_radiator_thermostat_tado
     - conditions:
+      - condition: trigger
+        id:
+        - wake_up_soon
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 21
+        target:
+          entity_id: climate.charlies_room_radiator_thermostat_tado
+    - conditions:
       - condition: state
         entity_id: binary_sensor.charlie_sleeping
         state: 'on'
@@ -2632,18 +2745,6 @@
     - binary_sensor.parent_sleeping
   - trigger: state
     entity_id:
-    - binary_sensor.bedroom_light
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_door
-  - trigger: state
-    entity_id:
-    - sensor.hallway_target_temperature
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_blind
-  - trigger: state
-    entity_id:
     - input_select.monique_nap_time_state
   - trigger: state
     entity_id:
@@ -2651,6 +2752,11 @@
     to: 'on'
   - trigger: state
     entity_id: input_boolean.home_house_sitter
+  - trigger: time
+    at:
+      entity_id: input_datetime.monique_wake_up_alarm
+      offset: -00:30:00
+    id: wake_up_soon
   conditions: []
   actions:
   - action: timer.cancel
@@ -2693,6 +2799,17 @@
         target:
           entity_id: climate.bedroom_radiator_thermostat_tado
     - conditions:
+      - condition: trigger
+        id:
+        - wake_up_soon
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 21
+        target:
+          entity_id: climate.bedroom_radiator_thermostat_tado
+    - conditions:
       - condition: not
         conditions:
         - condition: state
@@ -2706,34 +2823,9 @@
         target:
           entity_id: climate.bedroom_radiator_thermostat_tado
     - conditions:
-      - condition: time
-        after: '11:00:00'
-        before: '14:00:00'
-      - condition: state
-        entity_id: binary_sensor.monique_home
-        state: 'on'
-      sequence:
-      - action: climate.set_temperature
-        metadata: {}
-        data:
-          temperature: 20
-        target:
-          entity_id: climate.bedroom_radiator_thermostat_tado
-    - conditions:
       - condition: state
         entity_id: binary_sensor.parent_sleeping
         state: 'on'
-      sequence:
-      - action: climate.set_temperature
-        metadata: {}
-        data:
-          temperature: 19
-        target:
-          entity_id: climate.bedroom_radiator_thermostat_tado
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.bedroom_door
-        state: 'off'
       sequence:
       - action: climate.set_temperature
         metadata: {}
@@ -2745,7 +2837,7 @@
     - action: climate.set_temperature
       metadata: {}
       data:
-        temperature: '{{ states(''sensor.hallway_target_temperature'') }}'
+        temperature: 19
       target:
         entity_id: climate.bedroom_radiator_thermostat_tado
   mode: restart
@@ -3031,6 +3123,10 @@
     to: 'on'
   - trigger: state
     entity_id: input_boolean.home_house_sitter
+  - trigger: time
+    at:
+      entity_id: input_datetime.monique_wake_up_alarm
+      offset: -00:15:00
   conditions: []
   actions:
   - action: timer.cancel
@@ -3110,6 +3206,22 @@
           - climate.living_room_radiator_thermostat_dining_table_tado
           - climate.living_room_radiator_thermostat_sofa_tado
     - conditions:
+      - condition: template
+        value_template: '{% set alarm_time = strptime(states(''input_datetime.monique_wake_up_alarm''),
+          ''%Y-%m-%d %H:%M:%S'').replace(tzinfo=now().tzinfo) %}  {{ now() > (alarm_time
+          - timedelta(minutes=15)) and now() < (alarm_time + timedelta(minutes=15))
+          }}'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 21
+        target:
+          entity_id:
+          - climate.living_room_radiator_thermostat_bookcase_tado
+          - climate.living_room_radiator_thermostat_dining_table_tado
+          - climate.living_room_radiator_thermostat_sofa_tado
+    - conditions:
       - condition: state
         entity_id: binary_sensor.parent_sleeping
         state: 'on'
@@ -3139,8 +3251,6 @@
         - climate.living_room_radiator_thermostat_bookcase_tado
         - climate.living_room_radiator_thermostat_dining_table_tado
         - climate.living_room_radiator_thermostat_sofa_tado
-  trace:
-    stored_traces: 100
   mode: restart
 - id: '1737313921011'
   alias: Gang - Varme
@@ -3507,8 +3617,6 @@
           skip_condition: false
         target:
           entity_id: automation.emils_room_heating
-  trace:
-    stored_traces: 20
   mode: restart
 - id: '1737748610394'
   alias: Charlies værelse varme manuelt
@@ -3977,10 +4085,7 @@
           - light.driveway_light_left_7_philips
           - light.driveway_light_left_8_signify
           - light.driveway_light_left_9_signify
-  trace:
-    stored_traces: 100
-  mode: queued
-  max: 100
+  mode: restart
 - id: '1738003454800'
   alias: Monique middagslur
   description: Automatik til at styre Moniques middagslur
@@ -4336,9 +4441,7 @@
       data: {}
       target:
         entity_id: climate.emils_room_pure_hot_cool_dyson
-  mode: queued
-  trace:
-    stored_traces: 100
+  mode: restart
 - id: '1739206213123'
   alias: Stue robotstøvsuger
   description: Automatic til at styre robotstøvsuger
@@ -4731,9 +4834,6 @@
     from: 'off'
     to: 'on'
     id: new_post
-  - trigger: state
-    entity_id:
-    - sensor.driveway_vibration_mailbox_battery_aqara
   conditions: []
   actions:
   - if:
@@ -4741,21 +4841,14 @@
       id:
       - new_post
     then:
-    - action: script.home_smart_todo_create_task
+    - action: script.home_create_todo_task
       data:
         subject: Tøm postkasse
         description: Der er nye breve i postkassen ved vejen
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på sensoren i postkassen
-      description: 'Batteri niveau er {{ states(''sensor.driveway_vibration_mailbox_battery_aqara'')
-        }}% på Aqara vibrationssensor i postkassen. Batteri: 1 * CR2032'
-      related_entity_id: sensor.driveway_vibration_mailbox_battery_aqara
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.driveway_vibration_mailbox_battery_aqara'')|int
-        < 5 }}'
-  mode: queued
-  max: 100
+        related_entity_id: sensor.driveway_vibration_sensor_mailbox_vibration_aqara
+        entity_id: todo.home_smart_todo
+        is_active: true
+  mode: restart
 - id: '1739714838791'
   alias: Hjem smart todo slet afsluttede opgaver
   description: Automatik der sletter afsluttede opgaver
@@ -4780,7 +4873,7 @@
           entity_id: todo.home_smart_todo
   mode: restart
 - id: '1739742119703'
-  alias: Hjem smart todo Tabo batteri check
+  alias: Hjem smart todo Tabo
   description: Kontroller batteri status på Tado enheder
   triggers:
   - trigger: time
@@ -4850,6 +4943,8 @@
     entity_id:
     - sensor.bathroom_thermometer_battery_withings
     - sensor.bathroom_scale_battery_withings
+  - trigger: time
+    at: 03:16:00
   conditions: []
   actions:
   - action: script.home_create_todo_task
@@ -4883,13 +4978,15 @@
     - sensor.bedroom_blind_switch_battery_ikea
     - sensor.emils_room_blind_switch_battery_ikea
     - sensor.charlies_room_blind_switch_battery_ikea
+  - trigger: time
+    at: 03:12:00
   conditions: []
   actions:
   - action: script.home_create_todo_task
     data:
       subject: Skift batteri i gardinet i soveværelset
       description: 'Batteri niveau er {{ states(''sensor.bedroom_blind_battery_ikea'')
-        }}% på IKEA rullegardin i soveværelset. Batteri: genopladelig batteripakke'
+        }}% på IKEA rullegardin i soveværelset. Batteri: Genopladelig batteripakke'
       related_entity_id: sensor.bedroom_blind_battery_ikea
       entity_id: todo.home_smart_todo
       is_active: '{{ states(''sensor.bedroom_blind_battery_ikea'')|int < 5 }}'
@@ -4897,7 +4994,7 @@
     data:
       subject: Skift batteri i gardinet på Emils værelse
       description: 'Batteri niveau er {{ states(''sensor.emils_room_blind_battery_ikea'')
-        }}% på IKEA rullegardin på Emils værelse. Batteri: genopladelig batteripakke'
+        }}% på IKEA rullegardin på Emils værelse. Batteri: Genopladelig batteripakke'
       related_entity_id: sensor.emils_room_blind_battery_ikea
       entity_id: todo.home_smart_todo
       is_active: '{{ states(''sensor.emils_room_blind_battery_ikea'')|int < 5 }}'
@@ -4905,7 +5002,7 @@
     data:
       subject: Skift batteri i gardinet på Charlies værelse
       description: 'Batteri niveau er {{ states(''sensor.charlies_room_blind_battery_ikea'')
-        }}% på IKEA rullegardin på Charlies værelse. Batteri: genopladelig batteripakke'
+        }}% på IKEA rullegardin på Charlies værelse. Batteri: Genopladelig batteripakke'
       related_entity_id: sensor.charlies_room_blind_battery_ikea
       entity_id: todo.home_smart_todo
       is_active: '{{ states(''sensor.charlies_room_blind_battery_ikea'')|int < 5 }}'
@@ -4913,7 +5010,7 @@
     data:
       subject: Skift batteri i kontakt til gardinet i soveværelset
       description: 'Batteri niveau er {{ states(''sensor.bedroom_blind_switch_battery_ikea'')
-        }}% på kontaken til IKEA rullegardin i soveværelset. Batteri: 1 * CR2032 '
+        }}% på kontaken til IKEA rullegardin i soveværelset. Batteri: 1 * CR2032'
       related_entity_id: sensor.bedroom_blind_switch_battery_ikea
       entity_id: todo.home_smart_todo
       is_active: '{{ states(''sensor.bedroom_blind_switch_battery_ikea'')|int < 5
@@ -4931,7 +5028,7 @@
     data:
       subject: Skift batteri i kontakt til gardinet på Charlies værelset
       description: 'Batteri niveau er {{ states(''sensor.charlies_room_blind_switch_battery_ikea'')
-        }}% på kontaken til IKEA rullegardin på Charlies værelset. Batteri: 1 * CR2032 '
+        }}% på kontaken til IKEA rullegardin på Charlies værelset. Batteri: 1 * CR2032'
       related_entity_id: sensor.charlies_room_blind_switch_battery_ikea
       entity_id: todo.home_smart_todo
       is_active: '{{ states(''sensor.charlies_room_blind_switch_battery_ikea'')|int
@@ -4952,7 +5049,7 @@
     data:
       subject: Løs problem med Dobbys hus ({{ states('sensor.living_room_robot_vacuum_dock_error_roborock')
         }})
-      description: Advarsel på Roborock docking station - Kode {{ states('sensor.living_room_robot_vacuum_dock_error_roborock')
+      description: Advarsel på Roborock docking station. Kode {{ states('sensor.living_room_robot_vacuum_dock_error_roborock')
         }}
       related_entity_id: sensor.living_room_robot_vacuum_dock_error_roborock
       entity_id: todo.home_smart_todo
@@ -4962,7 +5059,7 @@
     data:
       subject: Løs problem med Dobby ({{ states('sensor.living_room_robot_vacuum_error_roborock')
         }})
-      description: Advarsel på Roborock robot støvsuger - Kode {{ states('sensor.living_room_robot_vacuum_error_roborock')
+      description: Advarsel på Roborock robot støvsuger. Kode {{ states('sensor.living_room_robot_vacuum_error_roborock')
         }}
       related_entity_id: sensor.living_room_robot_vacuum_error_roborock
       entity_id: todo.home_smart_todo
@@ -4973,102 +5070,75 @@
   alias: Hjem smart todo Netatmo
   description: Kontroller batteri status på Netatmo enheder
   triggers:
-  - trigger: numeric_state
+  - trigger: state
     entity_id:
     - sensor.garage_weather_station_battery_netatmo
-    below: 5
-  - trigger: numeric_state
-    entity_id:
     - sensor.garden_anemometer_battery_netatmo
-    below: 5
-  - trigger: numeric_state
-    entity_id:
     - sensor.garden_rain_gauge_battery_netatmo
-    below: 5
-  - trigger: numeric_state
-    entity_id:
     - sensor.garden_weather_station_battery_netatmo
-    below: 5
-  - trigger: numeric_state
-    entity_id:
     - sensor.greenhouse_weather_station_battery_netatmo
-    below: 5
-  - trigger: numeric_state
-    entity_id:
     - sensor.technic_weather_station_battery_netatmo
-    below: 5
+  - trigger: time
+    at: 03:13:00
   conditions: []
   actions:
-  - choose:
-    - conditions:
-      - condition: numeric_state
-        entity_id: sensor.garage_weather_station_battery_netatmo
-        below: 5
-      sequence:
-      - action: script.home_smart_todo_create_task
-        data:
-          subject: Skift batteri på vejrstation inde i garagen
-          description: Batteri niveau er {{ states('sensor.garage_weather_station_battery_netatmo')
-            }}% på Netatmo vejrstationen der står inde i garagen, udskift med 4 stk.
-            nye AAA batterier
-  - choose:
-    - conditions:
-      - condition: numeric_state
-        entity_id: sensor.garden_anemometer_battery_netatmo
-        below: 5
-      sequence:
-      - action: script.home_smart_todo_create_task
-        data:
-          subject: Problem med strøm til vindmåler
-          description: Vindmåleren er tilsluttet strømforsyning, kontroller strømforsyning
-            der sidder i teknikrummet og vindmåleren der sidder på nord gavlen ved
-            tagryggen
-  - choose:
-    - conditions:
-      - condition: numeric_state
-        entity_id: sensor.garden_rain_gauge_battery_netatmo
-        below: 5
-      sequence:
-      - action: script.home_smart_todo_create_task
-        data:
-          subject: Skift batteri på regnmåler
-          description: Batteri niveau er {{ states('sensor.garden_rain_gauge_battery_netatmo')
-            }}% på Netatmo regnmålet, udskift med 2 stk. nye AAA batterier
-  - choose:
-    - conditions:
-      - condition: numeric_state
-        entity_id: sensor.garden_weather_station_battery_netatmo
-        below: 5
-      sequence:
-      - action: script.home_smart_todo_create_task
-        data:
-          subject: Skift batteri på udendørs vejrstation på garagen
-          description: Batteri niveau er {{ states('sensor.garden_weather_station_battery_netatmo')
-            }}% på Netatmo vejrstationen der sidder udvendigt på garagen, udskift
-            med 2 stk. nye AAA batterier
-  - choose:
-    - conditions:
-      - condition: numeric_state
-        entity_id: sensor.greenhouse_weather_station_battery_netatmo
-        below: 5
-      sequence:
-      - action: script.home_smart_todo_create_task
-        data:
-          subject: Skift batteri på vejrstation i drivhuset
-          description: Batteri niveau er {{ states('sensor.greenhouse_weather_station_battery_netatmo')
-            }}% på Netatmo vejrstationen i drivhuset, udskift med 4 stk. nye AAA batterier
-  - choose:
-    - conditions:
-      - condition: numeric_state
-        entity_id: sensor.technic_weather_station_battery_netatmo
-        below: 5
-      sequence:
-      - action: script.home_smart_todo_create_task
-        data:
-          subject: Skift batteri på vejrstation i teknikrummet
-          description: Batteri niveau er {{ states('sensor.technic_weather_station_battery_netatmo')
-            }}% på Netatmo vejrstationen i teknikrummet, udskift med 4 stk. nye AAA
-            batterier
+  - action: script.home_create_todo_task
+    data:
+      subject: Skift batteri på vejrstation inde i garagen
+      description: 'Batteri niveau er {{ states(''sensor.garage_weather_station_battery_netatmo'')
+        }}% på Netatmo vejrstationen der står inde i garagen. Batteri: 4 * AAA'
+      related_entity_id: sensor.garage_weather_station_battery_netatmo
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.garage_weather_station_battery_netatmo'')|int
+        < 5 }}'
+  - action: script.home_create_todo_task
+    data:
+      subject: Problem med strøm til vindmåler
+      description: Vindmåleren er tilsluttet strømforsyning, kontroller strømforsyning
+        der sidder i teknikrummet og vindmåleren der sidder på gavlen på nord siden
+        ved tagryggen
+      related_entity_id: sensor.garden_anemometer_battery_netatmo
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.garden_anemometer_battery_netatmo'')|int < 5
+        }}'
+  - action: script.home_create_todo_task
+    data:
+      subject: Skift batteri på regnmåler
+      description: 'Batteri niveau er {{ states(''sensor.garden_rain_gauge_battery_netatmo'')
+        }}% på Netatmo regnmålet, der er pladseret på galven på nord siden, ned den
+        overdækkede terrasse. Batteri: 2 * AAA'
+      related_entity_id: sensor.garden_rain_gauge_battery_netatmo
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.garden_rain_gauge_battery_netatmo'')|int < 5
+        }}'
+  - action: script.home_create_todo_task
+    data:
+      subject: Skift batteri på udendørs vejrstation på garagen
+      description: 'Batteri niveau er {{ states(''sensor.garden_weather_station_battery_netatmo'')
+        }}% på Netatmo vejrstationen der sidder udvendigt på garagen. Batteri: 2 *
+        AAA'
+      related_entity_id: sensor.garden_weather_station_battery_netatmo
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.garden_weather_station_battery_netatmo'')|int
+        < 5 }}'
+  - action: script.home_create_todo_task
+    data:
+      subject: Skift batteri på vejrstation i drivhuset
+      description: 'Batteri niveau er {{ states(''sensor.greenhouse_weather_station_battery_netatmo'')
+        }}% på Netatmo vejrstationen i drivhuset. Batteri: 4 * AAA'
+      related_entity_id: sensor.greenhouse_weather_station_battery_netatmo
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.greenhouse_weather_station_battery_netatmo'')|int
+        < 5 }}'
+  - action: script.home_create_todo_task
+    data:
+      subject: Skift batteri på vejrstation i teknikrummet
+      description: 'Batteri niveau er {{ states(''sensor.technic_weather_station_battery_netatmo'')
+        }}% på Netatmo vejrstationen i teknikrummet. Batteri: 4 * AAA'
+      related_entity_id: sensor.technic_weather_station_battery_netatmo
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.technic_weather_station_battery_netatmo'')|int
+        < 5 }}'
   mode: restart
 - id: '1739906369450'
   alias: Hjem smart todo Philips hue kontakter
@@ -5082,6 +5152,8 @@
     - sensor.patio_switch_battery_philips_hue
     - sensor.emils_room_switch_battery_philips_hue
     - sensor.charlies_room_switch_battery_philips_hue
+  - trigger: time
+    at: 03:15:00
   conditions: []
   actions:
   - action: script.home_create_todo_task
@@ -5148,6 +5220,8 @@
     - sensor.driveway_motion_sensor_house_east_battery_signify
     - sensor.driveway_motion_sensor_house_south_battery_signify
     - sensor.driveway_motion_sensor_street_battery_signify
+  - trigger: time
+    at: 03:13:00
   conditions: []
   actions:
   - action: script.home_create_todo_task
@@ -5198,6 +5272,8 @@
     entity_id:
     - sensor.bedroom_door_sensor_battery_philips_hue
     - sensor.garage_door_sensor_battery_philips_hue
+  - trigger: time
+    at: 03:14:00
   conditions: []
   actions:
   - action: script.home_create_todo_task
@@ -5250,6 +5326,8 @@
   - trigger: state
     entity_id:
     - sensor.emils_room_window_sensor_battery_aqara
+  - trigger: time
+    at: 03:10:00
   conditions: []
   actions:
   - action: script.home_create_todo_task
@@ -5261,5 +5339,26 @@
       related_entity_id: sensor.emils_room_window_sensor_battery_aqara
       entity_id: todo.home_smart_todo
       is_active: '{{ states(''sensor.emils_room_window_sensor_battery_aqara'')|int
+        < 5 }}'
+  mode: restart
+- id: '1740337167224'
+  alias: Hjem smart todo Aqara vibration sensor
+  description: Kontroller batteri status på Aqara enheder
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.driveway_vibration_mailbox_battery_aqara
+  - trigger: time
+    at: 03:11:00
+  conditions: []
+  actions:
+  - action: script.home_create_todo_task
+    data:
+      subject: Skift batteri på sensoren i postkassen
+      description: 'Batteri niveau er {{ states(''sensor.driveway_vibration_mailbox_battery_aqara'')
+        }}% på Aqara vibrationssensor i postkassen. Batteri: 1 * CR2032'
+      related_entity_id: sensor.driveway_vibration_mailbox_battery_aqara
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.driveway_vibration_mailbox_battery_aqara'')|int
         < 5 }}'
   mode: restart
