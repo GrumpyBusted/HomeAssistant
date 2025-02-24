@@ -2426,7 +2426,7 @@
   - choose:
     - conditions:
       - condition: template
-        value_template: '{{ capasity > 0 and charge_cost - use_cost > 5 }}'
+        value_template: '{{ capasity > 0 and use_cost - charge_cost > 5 }}'
       sequence:
       - action: sonnenbatterie.set_operating_mode
         data:
@@ -2755,8 +2755,11 @@
   - trigger: time
     at:
       entity_id: input_datetime.monique_wake_up_alarm
-      offset: -00:30:00
-    id: wake_up_soon
+      offset: -00:15:00
+  - trigger: time
+    at:
+      entity_id: input_datetime.monique_wake_up_alarm
+      offset: 00:15:00
   conditions: []
   actions:
   - action: timer.cancel
@@ -2799,9 +2802,11 @@
         target:
           entity_id: climate.bedroom_radiator_thermostat_tado
     - conditions:
-      - condition: trigger
-        id:
-        - wake_up_soon
+      - condition: template
+        value_template: '{% set alarm_time = strptime(states(''input_datetime.monique_wake_up_alarm''),
+          ''%Y-%m-%d %H:%M:%S'').replace(tzinfo=now().tzinfo) %}  {{ now() >= (alarm_time
+          - timedelta(minutes=15)) and now() < (alarm_time + timedelta(minutes=15))
+          }}'
       sequence:
       - action: climate.set_temperature
         metadata: {}
@@ -3126,7 +3131,10 @@
   - trigger: time
     at:
       entity_id: input_datetime.monique_wake_up_alarm
-      offset: -00:15:00
+  - trigger: time
+    at:
+      entity_id: input_datetime.monique_wake_up_alarm
+      offset: 00:30:00
   conditions: []
   actions:
   - action: timer.cancel
@@ -3208,9 +3216,8 @@
     - conditions:
       - condition: template
         value_template: '{% set alarm_time = strptime(states(''input_datetime.monique_wake_up_alarm''),
-          ''%Y-%m-%d %H:%M:%S'').replace(tzinfo=now().tzinfo) %}  {{ now() > (alarm_time
-          - timedelta(minutes=15)) and now() < (alarm_time + timedelta(minutes=15))
-          }}'
+          ''%Y-%m-%d %H:%M:%S'').replace(tzinfo=now().tzinfo) %}  {{ now() >= alarm_time
+          and now() < (alarm_time + timedelta(minutes=30)) }}'
       sequence:
       - action: climate.set_temperature
         metadata: {}
