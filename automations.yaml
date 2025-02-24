@@ -1140,7 +1140,6 @@
   - trigger: state
     entity_id:
     - binary_sensor.bedroom_door
-    to: 'on'
   - trigger: state
     entity_id:
     - light.bedroom_light_philips_hue
@@ -1159,6 +1158,9 @@
       seconds: 0
   - trigger: state
     entity_id: input_boolean.home_house_sitter
+  - trigger: state
+    entity_id: light.bedroom_light_philips_hue
+    attribute: brightness
   conditions: []
   actions:
   - choose:
@@ -1246,14 +1248,11 @@
         id:
         - someone_home
       - condition: state
-        entity_id: binary_sensor.bedroom_blind
-        state: 'off'
+        entity_id: binary_sensor.parent_sleeping
+        state: 'on'
       - condition: state
         entity_id: binary_sensor.bedroom_door
         state: 'on'
-      - condition: state
-        entity_id: binary_sensor.bedroom_light
-        state: 'off'
       - condition: state
         entity_id: binary_sensor.hallway_light
         state: 'off'
@@ -1289,11 +1288,8 @@
         entity_id: binary_sensor.bedroom_door
         state: 'on'
       - condition: state
-        entity_id: binary_sensor.bedroom_blind
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.bedroom_light
-        state: 'off'
+        entity_id: binary_sensor.parent_sleeping
+        state: 'on'
       - condition: state
         entity_id: binary_sensor.hallway_light
         state: 'on'
@@ -1310,24 +1306,6 @@
           - light.hallway_light_philips_hue
     - conditions:
       - condition: state
-        entity_id: binary_sensor.bedroom_door
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.bedroom_blind
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'on'
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          brightness: '{{ state_attr(''light.bedroom_light_philips_hue'', ''brightness'')
-            }}'
-        target:
-          entity_id: light.hallway_light_philips_hue
-    - conditions:
-      - condition: state
         entity_id: binary_sensor.hallway_light
         state: 'off'
       - condition: state
@@ -1336,7 +1314,10 @@
       - condition: numeric_state
         entity_id: light.bedroom_light_philips_hue
         attribute: brightness
-        above: 153
+        above: 50
+      - condition: state
+        entity_id: input_select.monique_nap_time_state
+        state: 'off'
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -1391,6 +1372,13 @@
       seconds: 0
   - trigger: state
     entity_id: input_boolean.home_house_sitter
+  - trigger: state
+    entity_id:
+    - input_datetime.emil_bedtime_alarm
+    id: bedtime
+  - trigger: time
+    at: input_datetime.emil_wake_up_alarm
+    id: wake_up
   conditions: []
   actions:
   - choose:
@@ -1490,6 +1478,37 @@
         target:
           entity_id:
           - light.emils_room_light_philips_hue
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.emils_room_light
+        state: 'off'
+      - condition: trigger
+        id:
+        - wake_up
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 60
+          brightness: 10
+        target:
+          entity_id: light.emils_room_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - bedtime
+      - condition: numeric_state
+        entity_id: light.emils_room_light_philips_hue
+        attribute: brightness
+        above: 30
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 10
+          brightness: 30
+        target:
+          entity_id: light.emils_room_light_philips_hue
   mode: queued
 - id: '1736082177257'
   alias: Charlies værelse lys
@@ -1545,6 +1564,10 @@
       seconds: 0
   - trigger: state
     entity_id: input_boolean.home_house_sitter
+  - trigger: state
+    entity_id:
+    - input_datetime.charlie_bedtime_alarm
+    id: bedtime
   conditions: []
   actions:
   - choose:
@@ -1650,6 +1673,21 @@
         target:
           entity_id:
           - light.charlies_room_light_philips_hue
+    - conditions:
+      - condition: trigger
+        id:
+        - bedtime
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 10
+        target:
+          entity_id:
+          - light.charlies_room_light_desk_left_philips_hue
+          - light.charlies_room_light_desk_mid_philips_hue
+          - light.charlies_room_light_desk_right_philips_hue
+          - light.charlies_room_light_dresser_philips_hue
   mode: queued
 - id: '1736083584615'
   alias: Soveværelse lys
@@ -1895,14 +1933,6 @@
         data: {}
         target:
           entity_id: timer.bedroom_light_sunrise_delay_timer
-      - action: light.turn_on
-        metadata: {}
-        data:
-          flash: short
-        target:
-          entity_id:
-          - light.bedroom_light_anders_philips_hue
-          - light.bedroom_light_monique_philips_hue
       - action: light.turn_off
         metadata: {}
         data:
@@ -1926,14 +1956,6 @@
         data: {}
         target:
           entity_id: timer.bedroom_light_sunrise_delay_timer
-      - action: light.turn_on
-        metadata: {}
-        data:
-          flash: short
-        target:
-          entity_id:
-          - light.bedroom_light_anders_philips_hue
-          - light.bedroom_light_monique_philips_hue
       - action: light.turn_off
         metadata: {}
         data:
@@ -1957,14 +1979,6 @@
         data: {}
         target:
           entity_id: timer.bedroom_light_sunrise_delay_timer
-      - action: light.turn_on
-        metadata: {}
-        data:
-          flash: short
-        target:
-          entity_id:
-          - light.bedroom_light_anders_philips_hue
-          - light.bedroom_light_monique_philips_hue
       - action: light.turn_off
         metadata: {}
         data:
@@ -2570,6 +2584,14 @@
     to: 'on'
   - trigger: state
     entity_id: input_boolean.home_house_sitter
+  - trigger: time
+    at:
+      entity_id: input_datetime.emil_wake_up_alarm
+      offset: -00:15:00
+  - trigger: time
+    at:
+      entity_id: input_datetime.emil_wake_up_alarm
+      offset: 00:15:00
   conditions: []
   actions:
   - action: timer.cancel
@@ -2623,6 +2645,19 @@
         target:
           entity_id: climate.emils_room_radiator_thermostat_tado
     - conditions:
+      - condition: template
+        value_template: '{% set alarm_time = strptime(states(''input_datetime.emil_wake_up_alarm''),
+          ''%Y-%m-%d %H:%M:%S'').replace(tzinfo=now().tzinfo) %}  {{ now() >= (alarm_time
+          - timedelta(minutes=15)) and now() < (alarm_time + timedelta(minutes=15))
+          }}'
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 21
+        target:
+          entity_id: climate.emils_room_radiator_thermostat_tado
+    - conditions:
       - condition: state
         entity_id: binary_sensor.emil_sleeping
         state: 'on'
@@ -2658,8 +2693,11 @@
   - trigger: time
     at:
       entity_id: input_datetime.charlie_wake_up_alarm
-      offset: -00:30:00
-    id: wake_up_soon
+      offset: -00:15:00
+  - trigger: time
+    at:
+      entity_id: input_datetime.charlie_wake_up_alarm
+      offset: 00:15:00
   - trigger: state
     entity_id: input_boolean.home_house_sitter
   conditions: []
@@ -2704,9 +2742,11 @@
         target:
           entity_id: climate.charlies_room_radiator_thermostat_tado
     - conditions:
-      - condition: trigger
-        id:
-        - wake_up_soon
+      - condition: template
+        value_template: '{% set alarm_time = strptime(states(''input_datetime.charlie_wake_up_alarm''),
+          ''%Y-%m-%d %H:%M:%S'').replace(tzinfo=now().tzinfo) %}  {{ now() >= (alarm_time
+          - timedelta(minutes=15)) and now() < (alarm_time + timedelta(minutes=15))
+          }}'
       sequence:
       - action: climate.set_temperature
         metadata: {}
@@ -4105,10 +4145,7 @@
     - input_select.monique_nap_time_state
   - trigger: state
     entity_id:
-    - binary_sensor.bedroom_door
-    from: 'off'
-    to: 'on'
-    id: open_door
+    - binary_sensor.bedroom_blind
   conditions: []
   actions:
   - action: system_log.write
@@ -4167,9 +4204,9 @@
         - condition: state
           entity_id: input_select.monique_nap_time_state
           state: prepare
-        - condition: trigger
-          id:
-          - open_door
+        - condition: state
+          entity_id: binary_sensor.bedroom_blind
+          state: 'off'
         sequence:
         - action: input_select.select_option
           metadata: {}
@@ -4181,9 +4218,9 @@
         - condition: state
           entity_id: input_select.monique_nap_time_state
           state: sleep
-        - condition: trigger
-          id:
-          - open_door
+        - condition: state
+          entity_id: binary_sensor.bedroom_blind
+          state: 'on'
         sequence:
         - action: input_select.select_option
           metadata: {}
@@ -5368,4 +5405,58 @@
       entity_id: todo.home_smart_todo
       is_active: '{{ states(''sensor.driveway_vibration_mailbox_battery_aqara'')|int
         < 5 }}'
+  mode: restart
+- id: '1740422421448'
+  alias: Monique sæt sengetid
+  description: Sæt sengetid input hjælper for Monique, når webhook er kaldt
+  triggers:
+  - trigger: webhook
+    allowed_methods:
+    - POST
+    local_only: false
+    webhook_id: monique-set-bedtime-CNwYS0I0HIbgeRZ1GmGOxxvS
+  conditions: []
+  actions:
+  - action: input_datetime.set_datetime
+    metadata: {}
+    data:
+      datetime: '{{ now() }}'
+    target:
+      entity_id: input_datetime.monique_bedtime_alarm
+  mode: restart
+- id: '1740423743719'
+  alias: Emil sæt sengetid
+  description: Sæt sengetid input hjælper for Emil, når webhook er kaldt
+  triggers:
+  - trigger: webhook
+    allowed_methods:
+    - POST
+    local_only: false
+    webhook_id: emil-set-bedtime-06NToCv45RaHexKeI8Smp4d-
+  conditions: []
+  actions:
+  - action: input_datetime.set_datetime
+    metadata: {}
+    data:
+      datetime: '{{ now() }}'
+    target:
+      entity_id: input_datetime.emil_bedtime_alarm
+  mode: restart
+- id: '1740423776035'
+  alias: Charlie sæt sengetid
+  description: Sæt sengetid input hjælper for Charlie, når webhook er kaldt
+  triggers:
+  - trigger: webhook
+    allowed_methods:
+    - POST
+    local_only: false
+    webhook_id: charlie-set-bedtime-o80tZ1S3giYimCOs0ZQ4Xloc
+  conditions: []
+  actions:
+  - action: input_datetime.set_datetime
+    metadata: {}
+    data:
+      datetime: '{{ now() }}'
+    target:
+      entity_id: input_datetime.charlie_bedtime_alarm
   mode: restart
