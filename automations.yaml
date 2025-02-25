@@ -1161,6 +1161,9 @@
   - trigger: state
     entity_id: light.bedroom_light_philips_hue
     attribute: brightness
+  - trigger: state
+    entity_id:
+    - binary_sensor.parent_sleeping
   conditions: []
   actions:
   - choose:
@@ -5087,6 +5090,8 @@
     entity_id:
     - sensor.living_room_robot_vacuum_dock_error_roborock
     - sensor.living_room_robot_vacuum_error_roborock
+  - trigger: time
+    at: 04:00:00
   conditions: []
   actions:
   - action: script.home_create_todo_task
