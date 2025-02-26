@@ -1996,10 +1996,15 @@
   - trigger: state
     entity_id:
     - binary_sensor.emil_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_home
+    from: 'off'
+    to: 'on'
+    id: comming_home
   - trigger: time
     at:
     - '12:00:00'
-    id: wake_up
   - trigger: numeric_state
     entity_id:
     - sensor.driveway_motion_sensor_street_illuminance_signify
@@ -2065,13 +2070,9 @@
         target:
           entity_id: cover.emils_room_blind_ikea
     - conditions:
-      - condition: numeric_state
-        entity_id: cover.emils_room_blind_ikea
-        attribute: current_position
-        below: 40
       - condition: trigger
         id:
-        - wake_up
+        - comming_home
       sequence:
       - action: cover.set_cover_position
         metadata: {}
@@ -2443,7 +2444,7 @@
   - choose:
     - conditions:
       - condition: template
-        value_template: '{{ capasity > 0 and use_cost - charge_cost > 5 }}'
+        value_template: '{{ capacity > 0 and use_cost - charge_cost > 5 }}'
       sequence:
       - action: sonnenbatterie.set_operating_mode
         data:
@@ -5091,8 +5092,13 @@
     - sensor.living_room_robot_vacuum_dock_error_roborock
     - sensor.living_room_robot_vacuum_error_roborock
   - trigger: time
-    at: 04:00:00
-  conditions: []
+    at: 04:01:00
+  conditions:
+  - condition: not
+    conditions:
+    - condition: time
+      after: 03:00:00
+      before: 04:00:00
   actions:
   - action: script.home_create_todo_task
     data:
@@ -5396,7 +5402,7 @@
   triggers:
   - trigger: state
     entity_id:
-    - sensor.driveway_vibration_mailbox_battery_aqara
+    - sensor.driveway_vibration_sensor_mailbox_battery_aqara
   - trigger: time
     at: 03:11:00
   conditions: []
@@ -5404,11 +5410,11 @@
   - action: script.home_create_todo_task
     data:
       subject: Skift batteri på sensoren i postkassen
-      description: 'Batteri niveau er {{ states(''sensor.driveway_vibration_mailbox_battery_aqara'')
+      description: 'Batteri niveau er {{ states(''sensor.driveway_vibration_sensor_mailbox_battery_aqara'')
         }}% på Aqara vibrationssensor i postkassen. Batteri: 1 * CR2032'
-      related_entity_id: sensor.driveway_vibration_mailbox_battery_aqara
+      related_entity_id: sensor.driveway_vibration_sensor_mailbox_battery_aqara
       entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.driveway_vibration_mailbox_battery_aqara'')|int
+      is_active: '{{ states(''sensor.driveway_vibration_sensor_mailbox_battery_aqara'')|int
         < 5 }}'
   mode: restart
 - id: '1740422421448'
@@ -5465,3 +5471,49 @@
     target:
       entity_id: input_datetime.charlie_bedtime_alarm
   mode: restart
+- id: '1740595186366'
+  alias: Entre dørklokke
+  description: Trigger når dørklokke er aktiveret
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.entrance_doorbell_ringing_eufy
+    to: 'on'
+  conditions: []
+  actions:
+  - parallel:
+    - action: light.turn_on
+      metadata: {}
+      data:
+        flash: short
+      target:
+        label_id: dorklokke_lamper
+    - if:
+      - condition: state
+        entity_id: light.garage_light_main_philips_hue
+        state: 'on'
+      then:
+      - repeat:
+          count: 2
+          sequence:
+          - action: light.turn_off
+            metadata: {}
+            data: {}
+            target:
+              entity_id: light.garage_light_main_philips_hue
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 0
+              milliseconds: 200
+          - action: light.turn_on
+            metadata: {}
+            data: {}
+            target:
+              entity_id: light.garage_light_main_philips_hue
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 0
+              milliseconds: 200
+  mode: queued
