@@ -2435,16 +2435,17 @@
         0}]" }}'
       charge_cost: '{% set g = namespace(charge_cost = 0) %} {% set prices = state_attr(''sensor.energy_data_service'',
         ''today'') %} {%- for i in range(0, 6) %} {%- set g.charge_cost = g.charge_cost
-        + prices[i] * capacity / 6  %} {%- endfor %} {{ (g.charge_cost / 1000)|round(0)
+        + prices[i] * capacity / 6  %} {%- endfor %} {{ (g.charge_cost / 1000)|round(2)
         }}'
       use_cost: '{% set g = namespace(use_cost=0) %} {% set prices = state_attr(''sensor.energy_data_service'',
         ''today'') %} {%- for i in range(17, 21) %} {%- set g.use_cost = g.use_cost
-        + prices[i] * capacity / 4  %} {%- endfor %} {{ (g.use_cost / 1000)|round(0)
+        + prices[i] * capacity / 4  %} {%- endfor %} {{ (g.use_cost / 1000)|round(2)
         }}'
   - choose:
     - conditions:
       - condition: template
-        value_template: '{{ capacity > 0 and use_cost - charge_cost > 5 }}'
+        value_template: '{{ capacity | int > 0 and (use_cost | float - charge_cost
+          | float) > 5 }}'
       sequence:
       - action: sonnenbatterie.set_operating_mode
         data:
@@ -2456,6 +2457,11 @@
           device_id: 8c7dc86f86da84b01a301ef8044852c6
           schedule: '{{ schedule }}'
         response_variable: conversation_response
+      - action: system_log.write
+        metadata: {}
+        data:
+          level: debug
+          message: '{{ conversation_response }}'
     default:
     - action: sonnenbatterie.set_operating_mode
       data:
