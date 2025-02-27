@@ -183,7 +183,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:home-thermometer-outline"
       state: >-
-        {{ states('sensor.home_outdoor_temperature_tado')|round(1) }}
+        {{ states('sensor.garden_weather_station_temperature_netatmo')|round(1) }}
 - sensor:
     - name: home_current_temperature
       unique_id: C3DB0A8D-9F30-488D-9CD1-3EA2D2AEEB61
