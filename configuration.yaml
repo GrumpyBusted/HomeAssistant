@@ -63,3 +63,9 @@ rest_command:
     method: "GET"
     headers:
       Authorization: "Bearer {{ bearer_token }}"
+  perfect_waste_get_next_address_collection:
+    url: "https://europe-west3-perfect-waste.cloudfunctions.net/getNextAddressCollection"
+    method: "POST"
+    headers:
+      Content-Type: "application/json"
+    payload: "{ \"data\": { \"addressID\": \"{{ addressID }}\", \"municipality\": {{ municipality }} } }"
