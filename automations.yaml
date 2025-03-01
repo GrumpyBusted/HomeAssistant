@@ -5546,8 +5546,8 @@
       containers: "{% set ns = namespace(fractions=[]) %}\n{% for fraction in response.content.result.fractions
         %}\n  {% set ns.fractions = ns.fractions + [fraction.fractionName] %}\n{%
         endfor %}\n{{ ns.fractions }}"
-      description_text: 'Følgende affaldscontainere skal køres op til vejen i dag:
-        {{ containers }}'
+      description_text: "Følgende affaldscontainere skal køres op til vejen i dag:
+        <ul> {% for c in containers %}\n  <li>{{ c }}</li>\n{% endfor %} </ul>"
   - action: system_log.write
     metadata: {}
     data:
@@ -5604,7 +5604,7 @@
         is_active: 'true'
   - if:
     - condition: template
-      value_template: '{{ now().weekday() == 5 }}'
+      value_template: '{{ now().weekday() == 1 }}'
     then:
     - action: script.home_create_todo_task
       data:

@@ -791,10 +791,12 @@ home_create_todo_task:
       required: true
       selector:
         text:
+          multiline: true
+          multiple: false
     related_entity_id:
       description: Enhed opgaven opstår udfra
       example: light.home_light_a
-      required: true
+      required: false
       selector:
         entity:
           domain:
@@ -813,7 +815,7 @@ home_create_todo_task:
         boolean:
   sequence:
   - variables:
-      todo_entity_id: '[{{ related_entity_id }}]'
+      todo_entity_id: '[{{ related_entity_id | default(''none'') }}]'
   - if:
     - condition: template
       value_template: '{{ is_active }}'
@@ -831,24 +833,25 @@ home_create_todo_task:
         data:
           entity_id: '{{ entity_id }}'
           subject: '{{ subject }}'
-          description: '{{ description }}
-
-            {{ todo_entity_id }}
-
-            '
+          description: "{{ description }}\n{% if todo_entity_id != '[none]' %}\n  <br>\n
+            \ <pre>{{ todo_entity_id }}</pre>\n{% endif %}"
           due: '{{ utcnow().strftime(''%Y-%m-%d'') }}'
           reminder: '{{ utcnow() + timedelta(minutes=1) }}'
     else:
-    - variables:
-        todo_ids: '{{ state_attr(entity_id, ''all_todos'') |  selectattr(''description'',
-          ''contains'', todo_entity_id) |  rejectattr(''status'', ''equalto'', ''completed'')
-          |  map(attribute=''todo_id'') |  list }}'
-    - repeat:
-        count: '{{ todo_ids | length }}'
-        sequence:
-        - action: ms365_todo.complete_todo
-          metadata: {}
-          data:
-            entity_id: '{{ entity_id }}'
-            todo_id: '{{ todo_ids[repeat.index - 1] }}'
-            completed: true
+    - if:
+      - condition: template
+        value_template: '{{ todo_entity != ''[none]'' }}'
+      then:
+      - variables:
+          todo_ids: '{{ state_attr(entity_id, ''all_todos'') |  selectattr(''description'',
+            ''contains'', todo_entity_id) |  rejectattr(''status'', ''equalto'', ''completed'')
+            |  map(attribute=''todo_id'') |  list }}'
+      - repeat:
+          count: '{{ todo_ids | length }}'
+          sequence:
+          - action: ms365_todo.complete_todo
+            metadata: {}
+            data:
+              entity_id: '{{ entity_id }}'
+              todo_id: '{{ todo_ids[repeat.index - 1] }}'
+              completed: true
