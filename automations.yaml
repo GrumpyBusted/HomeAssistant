@@ -5366,7 +5366,7 @@
   conditions: []
   actions:
   - variables:
-      todos: "{% set completed_tasks = namespace(tasks=[]) %} {% for todo in\n  state_attr('todo.home_shoppig_list_todo',
+      todos: "{% set completed_tasks = namespace(tasks=[]) %} {% for todo in\n  state_attr('todo.home_shopping_list_todo',
         'all_todos') %}\n  {% if todo.status == 'completed' and todo.completed | as_datetime
         < utcnow() - timedelta(days=1) %}\n    {% set completed_tasks.tasks = completed_tasks.tasks
         + [todo.todo_id] %}\n  {% endif %}\n{% endfor %} {{ completed_tasks.tasks
@@ -5378,7 +5378,7 @@
         metadata: {}
         data:
           todo_id: '{{ todos[repeat.index - 1] }}'
-          entity_id: todo.home_shoppig_list_todo
+          entity_id: todo.home_shopping_list_todo
   mode: restart
 - id: '1740170480608'
   alias: Hjem smart todo Aqara dør sensor
