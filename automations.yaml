@@ -1755,16 +1755,6 @@
     entity_id:
     - input_select.monique_nap_time_state
   - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_door
-    from: 'on'
-    to: 'off'
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 30
-    id: door_closes
-  - trigger: state
     entity_id: input_boolean.home_house_sitter
   conditions: []
   actions:
