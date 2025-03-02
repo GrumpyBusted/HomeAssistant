@@ -5605,3 +5605,197 @@
         entity_id: todo.home_smart_todo
         is_active: 'true'
   mode: queued
+- id: '1740941401019'
+  alias: Hjem smart todo iPhone
+  description: Automatik til at kontroller iPhone status
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.anders_iphone_location_permission
+    - sensor.monique_iphone_location_permission
+    - sensor.emil_iphone_location_permission
+    - sensor.charlie_iphone_location_permission
+  - trigger: state
+    entity_id:
+    - sensor.anders_iphone_connection_type
+    - sensor.monique_iphone_connection_type
+    - sensor.emil_iphone_connection_type
+    - sensor.charlie_iphone_connection_type
+    to: Wi-Fi
+  - trigger: time
+    at: 05:00:00
+  conditions: []
+  actions:
+  - action: script.home_create_todo_task
+    metadata: {}
+    data:
+      subject: Skift lokations tilladelse for Anders iPhone til altid
+      description: I indstilinger under Anonymitet & sikkerhed og Lokalitetstjenester,
+        sæt tilladelse for appen Home Assistant til altid og præcis lokation
+      related_entity_id: sensor.anders_iphone_location_permission
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.anders_iphone_location_permission'') != ''Authorized
+        Always''  }}'
+  - action: script.home_create_todo_task
+    metadata: {}
+    data:
+      subject: Skift lokations tilladelse for Monqiue iPhone til altid
+      description: I indstilinger under Anonymitet & sikkerhed og Lokalitetstjenester,
+        sæt tilladelse for appen Home Assistant til altid og præcis lokation
+      related_entity_id: sensor.monique_iphone_location_permission
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.monique_iphone_location_permission'') != ''Authorized
+        Always''  }}'
+  - action: script.home_create_todo_task
+    metadata: {}
+    data:
+      subject: Skift lokations tilladelse for Emil iPhone til altid
+      description: I indstilinger under Anonymitet & sikkerhed og Lokalitetstjenester,
+        sæt tilladelse for appen Home Assistant til altid og præcis lokation
+      related_entity_id: sensor.emil_iphone_location_permission
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.emil_iphone_location_permission'') != ''Authorized
+        Always''  }}'
+  - action: script.home_create_todo_task
+    metadata: {}
+    data:
+      subject: Skift lokations tilladelse for Charlie iPhone til altid
+      description: I indstilinger under Anonymitet & sikkerhed og Lokalitetstjenester,
+        sæt tilladelse for appen Home Assistant til altid og præcis lokation
+      related_entity_id: sensor.charlie_iphone_location_permission
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.charlie_iphone_location_permission'') != ''Authorized
+        Always''  }}'
+  - if:
+    - condition: state
+      entity_id: sensor.anders_iphone_connection_type
+      state: Wi-Fi
+    then:
+    - action: notify.mobile_app_anders_iphone
+      data:
+        message: request_location_update
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 10
+        milliseconds: 0
+    - action: script.home_create_todo_task
+      metadata: {}
+      data:
+        subject: Problem med lokation opdating fra Anders iPhone
+        description: Lokationen fra Anders iPhone er ikke bleve opdateret som forventet,
+          kontroller indstillinger for Home Assistant app'en
+        related_entity_id: device_tracker.anders_iphone
+        entity_id: todo.home_smart_todo
+        is_active: '{{ (as_timestamp(now()) - as_timestamp(states.device_tracker.anders_iphone.last_updated))
+          > 60 }}'
+  - if:
+    - condition: state
+      entity_id: sensor.monique_iphone_connection_type
+      state: Wi-Fi
+    then:
+    - action: notify.mobile_app_monique_iphone
+      data:
+        message: request_location_update
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 10
+        milliseconds: 0
+    - action: script.home_create_todo_task
+      metadata: {}
+      data:
+        subject: Problem med lokation opdating fra Monique iPhone
+        description: Lokationen fra Monique iPhone er ikke bleve opdateret som forventet,
+          kontroller indstillinger for Home Assistant app'en
+        related_entity_id: device_tracker.monique_iphone
+        entity_id: todo.home_smart_todo
+        is_active: '{{ (as_timestamp(now()) - as_timestamp(states.device_tracker.monique_iphone.last_updated))
+          > 60 }}'
+  - if:
+    - condition: state
+      entity_id: sensor.emil_iphone_connection_type
+      state: Wi-Fi
+    then:
+    - action: notify.mobile_app_emil_iphone
+      data:
+        message: request_location_update
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 10
+        milliseconds: 0
+    - action: script.home_create_todo_task
+      metadata: {}
+      data:
+        subject: Problem med lokation opdating fra Emil iPhone
+        description: Lokationen fra Emil iPhone er ikke bleve opdateret som forventet,
+          kontroller indstillinger for Home Assistant app'en
+        related_entity_id: device_tracker.emil_iphone
+        entity_id: todo.home_smart_todo
+        is_active: '{{ (as_timestamp(now()) - as_timestamp(states.device_tracker.emil_iphone.last_updated))
+          > 60 }}'
+  - if:
+    - condition: state
+      entity_id: sensor.charlie_iphone_connection_type
+      state: Wi-Fi
+    then:
+    - action: notify.mobile_app_charlie_iphone
+      data:
+        message: request_location_update
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 10
+        milliseconds: 0
+    - action: script.home_create_todo_task
+      metadata: {}
+      data:
+        subject: Problem med lokation opdating fra Charlie iPhone
+        description: Lokationen fra Charlie iPhone er ikke bleve opdateret som forventet,
+          kontroller indstillinger for Home Assistant app'en
+        related_entity_id: device_tracker.charlie_iphone
+        entity_id: todo.home_smart_todo
+        is_active: '{{ (as_timestamp(now()) - as_timestamp(states.device_tracker.charlie_iphone.last_updated))
+          > 60 }}'
+  mode: single
+- id: '1740945196728'
+  alias: Hjem kontrol ved sengetid
+  description: Kontroller vigtige state når forældre ligger sig til at sove
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.parent_sleeping
+    to: 'on'
+  - trigger: state
+    entity_id:
+    - timer.bedroom_light_sunset_timer
+    to: active
+  conditions: []
+  actions:
+  - if:
+    - condition: not
+      conditions:
+      - condition: state
+        entity_id: lock.entrance_door_lock_yale
+        state: locked
+    then:
+    - action: notify.mobile_app_anders_iphone
+      data:
+        message: Hoveddøren er ikke låst
+        data:
+          push:
+            sound:
+              name: default
+              critical: 1
+              volume: 1
+    - action: notify.mobile_app_anders_iphone
+      data:
+        message: Hoveddøren er ikke låst2
+        data:
+          push:
+            sound:
+              name: default
+              critical: 1
+              volume: 1
+  mode: restart
