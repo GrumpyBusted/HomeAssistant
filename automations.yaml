@@ -2435,7 +2435,7 @@
     - conditions:
       - condition: template
         value_template: '{{ capacity | int > 0 and (use_cost | float - charge_cost
-          | float) > 1 }}'
+          | float) > 5 }}'
       sequence:
       - action: sonnenbatterie.set_operating_mode
         data:
