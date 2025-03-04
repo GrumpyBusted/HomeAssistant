@@ -2425,17 +2425,17 @@
         0}]" }}'
       charge_cost: '{% set g = namespace(charge_cost = 0) %} {% set prices = state_attr(''sensor.energy_data_service'',
         ''today'') %} {%- for i in range(0, 6) %} {%- set g.charge_cost = g.charge_cost
-        + prices[i] * capacity / 6  %} {%- endfor %} {{ (g.charge_cost / 1000)|round(2)
+        + prices[i] * capacity / 6 %} {%- endfor %} {{ (g.charge_cost / 1000)|round(2)
         }}'
       use_cost: '{% set g = namespace(use_cost=0) %} {% set prices = state_attr(''sensor.energy_data_service'',
         ''today'') %} {%- for i in range(17, 21) %} {%- set g.use_cost = g.use_cost
-        + prices[i] * capacity / 4  %} {%- endfor %} {{ (g.use_cost / 1000)|round(2)
+        + prices[i] * capacity / 4 %} {%- endfor %} {{ (g.use_cost / 1000)|round(2)
         }}'
   - choose:
     - conditions:
       - condition: template
         value_template: '{{ capacity | int > 0 and (use_cost | float - charge_cost
-          | float) > 5 }}'
+          | float) > 1 }}'
       sequence:
       - action: sonnenbatterie.set_operating_mode
         data:
@@ -5760,42 +5760,974 @@
           > 60 }}'
   mode: single
 - id: '1740945196728'
-  alias: Hjem kontrol ved sengetid
+  alias: Hjem kontrol af døre
   description: Kontroller vigtige state når forældre ligger sig til at sove
   triggers:
   - trigger: state
     entity_id:
     - binary_sensor.parent_sleeping
+    from: 'off'
     to: 'on'
+    id: parent_in_bed
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_sleeping
+    from: 'off'
+    to: 'on'
+    id: emil_in_bed
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlie_sleeping
+    from: 'off'
+    to: 'on'
+    id: charlie_in_bed
+  - trigger: state
+    entity_id:
+    - binary_sensor.anders_home
+    from: 'off'
+    to: 'on'
+    id: anders_leaving
+  - trigger: state
+    entity_id:
+    - binary_sensor.monique_home
+    from: 'off'
+    to: 'on'
+    id: monique_leaving
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_home
+    from: 'off'
+    to: 'on'
+    id: emil_leaving
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlie_home
+    from: 'off'
+    to: 'on'
+    id: charlie_leaving
   - trigger: state
     entity_id:
     - timer.bedroom_light_sunset_timer
     to: active
+    id: sunset
+  conditions: []
+  actions:
+  - if:
+    - condition: or
+      conditions:
+      - condition: trigger
+        id:
+        - parent_in_bed
+      - condition: trigger
+        id:
+        - sunset
+    then:
+    - if:
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: lock.entrance_door_lock_yale
+          state: locked
+      then:
+      - if:
+        - condition: state
+          entity_id: binary_sensor.anders_home
+          state: 'on'
+        then:
+        - action: notify.mobile_app_anders_iphone
+          data:
+            message: Hoveddøren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: state
+          entity_id: binary_sensor.monique_home
+          state: 'on'
+        then:
+        - action: notify.mobile_app_monique_iphone
+          data:
+            message: Hoveddøren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+    - if:
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: lock.utility_room_door_lock_yale
+          state: locked
+      then:
+      - if:
+        - condition: state
+          entity_id: binary_sensor.anders_home
+          state: 'on'
+        then:
+        - action: notify.mobile_app_anders_iphone
+          data:
+            message: Bryggers døren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: state
+          entity_id: binary_sensor.monique_home
+          state: 'on'
+        then:
+        - action: notify.mobile_app_monique_iphone
+          data:
+            message: Bryggers døren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+    - if:
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: lock.garage_door_lock_yale
+          state: locked
+      then:
+      - if:
+        - condition: state
+          entity_id: binary_sensor.anders_home
+          state: 'on'
+        then:
+        - action: notify.mobile_app_anders_iphone
+          data:
+            message: Garage døren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: state
+          entity_id: binary_sensor.monique_home
+          state: 'on'
+        then:
+        - action: notify.mobile_app_monique_iphone
+          data:
+            message: Garage døren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+    - action: lock.lock
+      metadata: {}
+      data: {}
+      target:
+        entity_id: lock.volvo_xc40_lock_status
+    - if:
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: lock.volvo_xc40_lock_status
+          state: locked
+      - condition: state
+        entity_id: device_tracker.volvo_xc40_location
+        state: home
+      then:
+      - if:
+        - condition: state
+          entity_id: binary_sensor.anders_home
+          state: 'on'
+        then:
+        - action: notify.mobile_app_anders_iphone
+          data:
+            message: Bilen (Volvo XC40) er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: state
+          entity_id: binary_sensor.monique_home
+          state: 'on'
+        then:
+        - action: notify.mobile_app_monique_iphone
+          data:
+            message: Bilen (Volvo XC40) er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+  - if:
+    - condition: trigger
+      id:
+      - emil_in_bed
+    then:
+    - action: lock.lock
+      metadata: {}
+      data: {}
+      target:
+        entity_id: lock.volvo_ex30_lock_status
+    - if:
+      - condition: state
+        entity_id: device_tracker.volvo_ex30_location
+        state: home
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: lock.volvo_ex30_lock_status
+          state: locked
+      then:
+      - action: notify.mobile_app_emil_iphone
+        data:
+          message: Bilen (Volvo EX30) er ikke låst
+          data:
+            push:
+              sound:
+                name: default
+                critical: 1
+                volume: 1
+    - if:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.parent_sleeping
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.parent_home
+          state: 'off'
+      then:
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.entrance_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_emil_iphone
+          data:
+            message: Hoveddøren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.utility_room_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_emil_iphone
+          data:
+            message: Bryggers døren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.garage_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_emil_iphone
+          data:
+            message: Garage døren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - action: lock.lock
+        metadata: {}
+        data: {}
+        target:
+          entity_id: lock.volvo_xc40_lock_status
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.volvo_xc40_lock_status
+            state: locked
+        - condition: state
+          entity_id: device_tracker.volvo_xc40_location
+          state: home
+        then:
+        - action: notify.mobile_app_emil_iphone
+          data:
+            message: Bilen (Volvo XC40) er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+  - if:
+    - condition: trigger
+      id:
+      - charlie_in_bed
+    then:
+    - if:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.parent_sleeping
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.parent_home
+          state: 'off'
+      then:
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.entrance_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_charlie_iphone
+          data:
+            message: Hoveddøren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.utility_room_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_charlie_iphone
+          data:
+            message: Bryggers døren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.garage_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_charlie_iphone
+          data:
+            message: Garage døren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - action: lock.lock
+        metadata: {}
+        data: {}
+        target:
+          entity_id: lock.volvo_xc40_lock_status
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.volvo_xc40_lock_status
+            state: locked
+        - condition: state
+          entity_id: device_tracker.volvo_xc40_location
+          state: home
+        then:
+        - action: notify.mobile_app_charlie_iphone
+          data:
+            message: Bilen (Volvo XC40) er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+  - if:
+    - condition: trigger
+      id:
+      - anders_leaving
+    then:
+    - if:
+      - condition: and
+        conditions:
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.monique_sleeping
+            state: 'on'
+          - condition: state
+            entity_id: binary_sensor.monique_home
+            state: 'off'
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.emil_sleeping
+            state: 'on'
+          - condition: state
+            entity_id: binary_sensor.emil_home
+            state: 'off'
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.charlie_sleeping
+            state: 'on'
+          - condition: state
+            entity_id: binary_sensor.charlie_home
+            state: 'off'
+      then:
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.entrance_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_anders_iphone
+          data:
+            message: Hoveddøren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.utility_room_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_anders_iphone
+          data:
+            message: Bryggers døren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.garage_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_anders_iphone
+          data:
+            message: Garage døren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - action: lock.lock
+        metadata: {}
+        data: {}
+        target:
+          entity_id: lock.volvo_xc40_lock_status
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.volvo_xc40_lock_status
+            state: locked
+        - condition: state
+          entity_id: device_tracker.volvo_xc40_location
+          state: home
+        then:
+        - action: notify.mobile_app_anders_iphone
+          data:
+            message: Bilen (Volvo XC40) er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+  - if:
+    - condition: trigger
+      id:
+      - monique_leaving
+    then:
+    - if:
+      - condition: and
+        conditions:
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.anders_sleeping
+            state: 'on'
+          - condition: state
+            entity_id: binary_sensor.anders_home
+            state: 'off'
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.emil_sleeping
+            state: 'on'
+          - condition: state
+            entity_id: binary_sensor.emil_home
+            state: 'off'
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.charlie_sleeping
+            state: 'on'
+          - condition: state
+            entity_id: binary_sensor.charlie_home
+            state: 'off'
+      then:
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.entrance_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_monique_iphone
+          data:
+            message: Hoveddøren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.utility_room_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_monique_iphone
+          data:
+            message: Bryggers døren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.garage_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_monique_iphone
+          data:
+            message: Garage døren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - action: lock.lock
+        metadata: {}
+        data: {}
+        target:
+          entity_id: lock.volvo_xc40_lock_status
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.volvo_xc40_lock_status
+            state: locked
+        - condition: state
+          entity_id: device_tracker.volvo_xc40_location
+          state: home
+        then:
+        - action: notify.mobile_app_monique_iphone
+          data:
+            message: Bilen (Volvo XC40) er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+  - if:
+    - condition: trigger
+      id:
+      - emil_leaving
+    then:
+    - if:
+      - condition: state
+        entity_id: device_tracker.volvo_ex30_location
+        state: home
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: lock.volvo_ex30_lock_status
+          state: locked
+      then:
+      - action: notify.mobile_app_emil_iphone
+        data:
+          message: Bilen (Volvo EX30) er ikke låst
+          data:
+            push:
+              sound:
+                name: default
+                critical: 1
+                volume: 1
+    - if:
+      - condition: and
+        conditions:
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.charlie_sleeping
+            state: 'on'
+          - condition: state
+            entity_id: binary_sensor.charlie_home
+            state: 'off'
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.parent_sleeping
+            state: 'on'
+          - condition: state
+            entity_id: binary_sensor.parent_home
+            state: 'off'
+      then:
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.entrance_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_emil_iphone
+          data:
+            message: Hoveddøren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.utility_room_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_emil_iphone
+          data:
+            message: Bryggers døren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.garage_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_emil_iphone
+          data:
+            message: Garage døren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - action: lock.lock
+        metadata: {}
+        data: {}
+        target:
+          entity_id: lock.volvo_xc40_lock_status
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.volvo_xc40_lock_status
+            state: locked
+        - condition: state
+          entity_id: device_tracker.volvo_xc40_location
+          state: home
+        then:
+        - action: notify.mobile_app_emil_iphone
+          data:
+            message: Bilen (Volvo XC40) er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+  - if:
+    - condition: trigger
+      id:
+      - charlie_leaving
+    then:
+    - if:
+      - condition: and
+        conditions:
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.emil_sleeping
+            state: 'on'
+          - condition: state
+            entity_id: binary_sensor.emil_home
+            state: 'off'
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.parent_sleeping
+            state: 'on'
+          - condition: state
+            entity_id: binary_sensor.parent_home
+            state: 'off'
+      then:
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.entrance_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_charlie_iphone
+          data:
+            message: Hoveddøren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.utility_room_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_charlie_iphone
+          data:
+            message: Bryggers døren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.garage_door_lock_yale
+            state: locked
+        then:
+        - action: notify.mobile_app_charlie_iphone
+          data:
+            message: Garage døren er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - action: lock.lock
+        metadata: {}
+        data: {}
+        target:
+          entity_id: lock.volvo_xc40_lock_status
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.volvo_xc40_lock_status
+            state: locked
+        - condition: state
+          entity_id: device_tracker.volvo_xc40_location
+          state: home
+        then:
+        - action: notify.mobile_app_charlie_iphone
+          data:
+            message: Bilen (Volvo XC40) er ikke låst
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+  mode: restart
+- id: '1741115279443'
+  alias: Hjem smart todo Canon printer
+  description: Kontroller blæk status på Canon printer
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.living_room_printer_black_bk_canon
+    - sensor.living_room_printer_black_pgbk_canon
+    - sensor.living_room_printer_cyan_canon
+    - sensor.living_room_printer_magenta_canon
+    - sensor.living_room_printer_photo_blue_canon
+    - sensor.living_room_printer_yellow_canon
+    below: 15
+  - trigger: numeric_state
+    entity_id:
+    - sensor.living_room_printer_black_bk_canon
+    - sensor.living_room_printer_black_pgbk_canon
+    - sensor.living_room_printer_cyan_canon
+    - sensor.living_room_printer_magenta_canon
+    - sensor.living_room_printer_photo_blue_canon
+    - sensor.living_room_printer_yellow_canon
+    above: 20
+  - trigger: state
+    entity_id: sensor.living_room_printer_canon
+  - trigger: time
+    at: 03:17:00
   conditions: []
   actions:
   - if:
     - condition: not
       conditions:
       - condition: state
-        entity_id: lock.entrance_door_lock_yale
-        state: locked
+        entity_id: sensor.living_room_printer_black_pgbk_canon
+        state: unknown
     then:
-    - action: notify.mobile_app_anders_iphone
+    - action: script.home_create_todo_task
       data:
-        message: Hoveddøren er ikke låst
-        data:
-          push:
-            sound:
-              name: default
-              critical: 1
-              volume: 1
-    - action: notify.mobile_app_anders_iphone
+        subject: Skift sort (PGBK) blæk på printer
+        description: 'Blæk niveau for sort (PGBK) er {{ states(''sensor.living_room_printer_black_pgbk_canon'')
+          }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 580 PGBK (Black)'
+        related_entity_id: sensor.living_room_printer_black_pgbk_canon
+        entity_id: todo.home_smart_todo
+        is_active: '{{ states(''sensor.living_room_printer_black_pgbk_canon'')|int
+          < state_attr(''sensor.living_room_printer_black_pgbk_canon'', ''marker_low_level'')
+          }}'
+  - if:
+    - condition: not
+      conditions:
+      - condition: state
+        entity_id: sensor.living_room_printer_black_bk_canon
+        state: unknown
+    then:
+    - action: script.home_create_todo_task
       data:
-        message: Hoveddøren er ikke låst2
-        data:
-          push:
-            sound:
-              name: default
-              critical: 1
-              volume: 1
+        subject: Skift sort (BK) blæk på printer
+        description: 'Blæk niveau for sort (BK) er {{ states(''sensor.living_room_printer_black_bk_canon'')
+          }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 BK (Black)'
+        related_entity_id: sensor.living_room_printer_black_bk_canon
+        entity_id: todo.home_smart_todo
+        is_active: '{{ states(''sensor.living_room_printer_black_bk_canon'')|int <
+          state_attr(''sensor.living_room_printer_black_bk_canon'', ''marker_low_level'')
+          }}'
+  - if:
+    - condition: not
+      conditions:
+      - condition: state
+        entity_id: sensor.living_room_printer_cyan_canon
+        state: unknown
+    then:
+    - action: script.home_create_todo_task
+      data:
+        subject: Skift cyan blæk på printer
+        description: 'Blæk niveau for cyan er {{ states(''sensor.living_room_printer_cyan_canon'')
+          }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 C (Cyan)'
+        related_entity_id: sensor.living_room_printer_cyan_canon
+        entity_id: todo.home_smart_todo
+        is_active: '{{ states(''sensor.living_room_printer_cyan_canon'')|int < state_attr(''sensor.living_room_printer_cyan_canon'',
+          ''marker_low_level'') }}'
+  - if:
+    - condition: not
+      conditions:
+      - condition: state
+        entity_id: sensor.living_room_printer_magenta_canon
+        state: unknown
+    then:
+    - action: script.home_create_todo_task
+      data:
+        subject: Skift magenta blæk på printer
+        description: 'Blæk niveau for magenta er {{ states(''sensor.living_room_printer_magenta_canon'')
+          }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 M (Magenta)'
+        related_entity_id: sensor.living_room_printer_magenta_canon
+        entity_id: todo.home_smart_todo
+        is_active: '{{ states(''sensor.living_room_printer_magenta_canon'')|int <
+          state_attr(''sensor.living_room_printer_magenta_canon'', ''marker_low_level'')
+          }}'
+  - if:
+    - condition: not
+      conditions:
+      - condition: state
+        entity_id: sensor.living_room_printer_photo_blue_canon
+        state: unknown
+    then:
+    - action: script.home_create_todo_task
+      data:
+        subject: Skift foto blå blæk på printer
+        description: 'Blæk niveau for foto blå er {{ states(''sensor.living_room_printer_photo_blue_canon'')
+          }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 PB (Photo blå)'
+        related_entity_id: sensor.living_room_printer_photo_blue_canon
+        entity_id: todo.home_smart_todo
+        is_active: '{{ states(''sensor.living_room_printer_photo_blue_canon'')|int
+          < state_attr(''sensor.living_room_printer_photo_blue_canon'', ''marker_low_level'')
+          }}'
+  - if:
+    - condition: not
+      conditions:
+      - condition: state
+        entity_id: sensor.living_room_printer_yellow_canon
+        state: unknown
+    then:
+    - action: script.home_create_todo_task
+      data:
+        subject: Skift gul blæk på printer
+        description: 'Blæk niveau for gul er {{ states(''sensor.living_room_printer_yellow_canon'')
+          }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 Y (Yellow)'
+        related_entity_id: sensor.living_room_printer_yellow_canon
+        entity_id: todo.home_smart_todo
+        is_active: '{{ states(''sensor.living_room_printer_yellow_canon'')|int < state_attr(''sensor.living_room_printer_yellow_canon'',
+          ''marker_low_level'') }}'
+  - action: script.home_create_todo_task
+    data:
+      subject: Løs problem med printer
+      description: 'Der er registreret et problem med Canon TS8300 printer. <br>Message:
+        {{ state_attr(''sensor.living_room_printer_canon'', ''state_message'') }}  <br>Reason:
+        {{ state_attr(''sensor.living_room_printer_canon'', ''state_reason'') }} '
+      related_entity_id: sensor.living_room_printer_canon
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.living_room_printer_canon'') not in [''printing'',
+        ''idle''] }}'
   mode: restart
