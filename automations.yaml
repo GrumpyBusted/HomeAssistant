@@ -4495,7 +4495,6 @@
     - binary_sensor.emil_sleeping
     - binary_sensor.charlie_sleeping
     - binary_sensor.parent_sleeping
-    to: 'off'
   - trigger: state
     entity_id:
     - vacuum.living_room_robot_vacuum_roborock
@@ -4508,6 +4507,9 @@
     entity_id:
     - binary_sensor.living_room_light
     to: 'off'
+  - trigger: state
+    entity_id:
+    - binary_sensor.living_room_door_sensor_open_aqara
   conditions: []
   actions:
   - action: time.set_value
@@ -4600,6 +4602,42 @@
           entity_id: binary_sensor.living_room_media
           state: 'off'
     then: []
+  - choose:
+    - conditions:
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: vacuum.living_room_robot_vacuum_roborock
+          state: docked
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.parent_sleeping
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.living_room_light
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.living_room_media
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: template
+        value_template: '{{ (now() - states(''input_datetime.living_room_robot_vacuum_living_room_last_wash_time'')
+          | as_datetime | as_local).total_seconds() > 60*60*24*5 }}
+
+          '
+      sequence:
+      - action: input_datetime.set_value
+        metadata: {}
+        data:
+          value: '{{ now() }}'
+        target:
+          entity_id: input_datetime.living_room_robot_vacuum_living_room_last_wash_time
   mode: single
 - id: '1739480121158'
   alias: Push configuration filer til GitHub
@@ -5377,6 +5415,7 @@
   - trigger: state
     entity_id:
     - sensor.emils_room_window_sensor_battery_aqara
+    - sensor.living_room_door_sensor_battery_aqara
   - trigger: time
     at: 03:10:00
   conditions: []
@@ -5390,6 +5429,16 @@
       related_entity_id: sensor.emils_room_window_sensor_battery_aqara
       entity_id: todo.home_smart_todo
       is_active: '{{ states(''sensor.emils_room_window_sensor_battery_aqara'')|int
+        < 5 }}'
+  - action: script.home_create_todo_task
+    data:
+      subject: Skift batteri på dør sensor til stuen
+      description: 'Batteri niveau er {{ states(''sensor.living_room_door_sensor_battery_aqara'')
+        }}% på Aqara dør/vindues sensor på døren mellem gangen og stuen. Batteri:
+        1 * {{ states(''sensor.living_room_door_sensor_battery_type_aqara'') }}'
+      related_entity_id: sensor.living_room_door_sensor_battery_aqara
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.living_room_door_sensor_battery_aqara'')|int
         < 5 }}'
   mode: restart
 - id: '1740337167224'
@@ -5671,6 +5720,10 @@
       entity_id: sensor.anders_iphone_connection_type
       state: Wi-Fi
     then:
+    - data:
+        entity_id:
+        - device_tracker.anders_iphone
+      action: homeassistant.update_entity
     - action: notify.mobile_app_anders_iphone
       data:
         message: request_location_update
@@ -5694,6 +5747,10 @@
       entity_id: sensor.monique_iphone_connection_type
       state: Wi-Fi
     then:
+    - data:
+        entity_id:
+        - device_tracker.monique_iphone
+      action: homeassistant.update_entity
     - action: notify.mobile_app_monique_iphone
       data:
         message: request_location_update
@@ -5717,6 +5774,10 @@
       entity_id: sensor.emil_iphone_connection_type
       state: Wi-Fi
     then:
+    - data:
+        entity_id:
+        - device_tracker.emil_iphone
+      action: homeassistant.update_entity
     - action: notify.mobile_app_emil_iphone
       data:
         message: request_location_update
@@ -5740,6 +5801,10 @@
       entity_id: sensor.charlie_iphone_connection_type
       state: Wi-Fi
     then:
+    - data:
+        entity_id:
+        - device_tracker.charlie_iphone
+      action: homeassistant.update_entity
     - action: notify.mobile_app_charlie_iphone
       data:
         message: request_location_update
