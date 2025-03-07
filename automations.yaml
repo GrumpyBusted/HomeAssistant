@@ -4530,10 +4530,10 @@
           entity_id: input_select.living_room_robot_vacuum_status
       - action: input_datetime.set_datetime
         metadata: {}
-        data:
-          value: '{{ now() }}'
         target:
           entity_id: input_datetime.living_room_robot_vacuum_living_room_last_vacuum_time
+        data:
+          datetime: '{{ now() }}'
     - conditions:
       - condition: state
         entity_id: timer.living_room_robot_vacuum_timer
@@ -4553,10 +4553,16 @@
           entity_id: input_select.living_room_robot_vacuum_status
       - action: input_datetime.set_datetime
         metadata: {}
-        data:
-          value: '{{ now() }}'
         target:
           entity_id: input_datetime.living_room_robot_vacuum_living_room_last_wash_time
+        data:
+          datetime: '{{ now() }}'
+      - action: input_datetime.set_datetime
+        metadata: {}
+        target:
+          entity_id: input_datetime.living_room_robot_vacuum_living_room_last_vacuum_time
+        data:
+          datetime: '{{ now() }}'
     - conditions:
       - condition: state
         entity_id: timer.living_room_robot_vacuum_timer
@@ -4576,10 +4582,10 @@
           entity_id: input_select.living_room_robot_vacuum_status
       - action: input_datetime.set_datetime
         metadata: {}
-        data:
-          value: '{{ now() }}'
         target:
           entity_id: input_datetime.living_room_robot_vacuum_hallway_last_wash_time
+        data:
+          datetime: '{{ now() }}'
     - conditions:
       - condition: state
         entity_id: timer.living_room_robot_vacuum_timer
@@ -4648,8 +4654,9 @@
           duration: 00:05:00
         target:
           entity_id: timer.living_room_robot_vacuum_timer
-      - action: script.home_robot_vacuum_dock
+      - action: script.living_room_robot_vacuum_dock
         metadata: {}
+        data: {}
     - conditions:
       - condition: state
         entity_id: input_select.living_room_robot_vacuum_status
@@ -4658,15 +4665,74 @@
         entity_id: binary_sensor.living_room_door_sensor_open_aqara
         state: 'off'
       sequence:
-      - action: notify.mobile_app_anders_iphone
-        data:
-          message: Åben dør til stuen, Dobby er i gangen
+      - if:
+        - condition: state
+          entity_id: binary_sensor.anders_home
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.parent_sleeping
+          state: 'off'
+        then:
+        - action: notify.mobile_app_anders_iphone
           data:
-            push:
-              sound:
-                name: default
-                critical: 1
-                volume: 1
+            message: Åben dør til stuen, Dobby er i gangen
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: state
+          entity_id: binary_sensor.monique_home
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.parent_sleeping
+          state: 'off'
+        then:
+        - action: notify.mobile_app_monique_iphone
+          data:
+            message: Åben dør til stuen, Dobby er i gangen
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: state
+          entity_id: binary_sensor.emil_home
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.emil_sleeping
+          state: 'off'
+        then:
+        - action: notify.mobile_app_emil_iphone
+          data:
+            message: Åben dør til stuen, Dobby er i gangen
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
+      - if:
+        - condition: state
+          entity_id: binary_sensor.charlie_home
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.charlie_sleeping
+          state: 'off'
+        then:
+        - action: notify.mobile_app_charlie_iphone
+          data:
+            message: Åben dør til stuen, Dobby er i gangen
+            data:
+              push:
+                sound:
+                  name: default
+                  critical: 1
+                  volume: 1
     - conditions:
       - condition: state
         entity_id: input_select.living_room_robot_vacuum_status
@@ -4695,8 +4761,9 @@
           duration: 00:05:00
         target:
           entity_id: timer.living_room_robot_vacuum_timer
-      - action: script.home_robot_vacuum_dock
+      - action: script.living_room_robot_vacuum_dock
         metadata: {}
+        data: {}
     - conditions:
       - condition: or
         conditions:
@@ -4733,8 +4800,9 @@
           duration: 00:02:00
         target:
           entity_id: timer.living_room_robot_vacuum_timer
-      - action: script.home_robot_vacuum_dock
+      - action: script.living_room_robot_vacuum_dock
         metadata: {}
+        data: {}
     - conditions:
       - condition: state
         entity_id: timer.living_room_robot_vacuum_timer
