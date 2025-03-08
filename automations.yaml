@@ -1997,11 +1997,11 @@
     - '12:00:00'
   - trigger: numeric_state
     entity_id:
-    - sensor.driveway_motion_sensor_street_illuminance_signify
+    - sensor.home_avarage_outside_illuminance_15m
     below: 1
   - trigger: numeric_state
     entity_id:
-    - sensor.driveway_motion_sensor_street_illuminance_signify
+    - sensor.home_avarage_outside_illuminance_15m
     above: 2
   - trigger: state
     entity_id:
@@ -2041,7 +2041,7 @@
       sequence: []
     - conditions:
       - condition: numeric_state
-        entity_id: sensor.driveway_motion_sensor_street_illuminance_signify
+        entity_id: sensor.home_avarage_outside_illuminance_15m
         below: 1
       sequence:
       - action: cover.close_cover
@@ -2100,11 +2100,11 @@
     id: wake_up
   - trigger: numeric_state
     entity_id:
-    - sensor.driveway_motion_sensor_street_illuminance_signify
+    - sensor.home_avarage_outside_illuminance_15m
     below: 1
   - trigger: numeric_state
     entity_id:
-    - sensor.driveway_motion_sensor_street_illuminance_signify
+    - sensor.home_avarage_outside_illuminance_15m
     above: 2
   - trigger: state
     entity_id: input_boolean.home_house_sitter
@@ -2118,7 +2118,7 @@
       sequence: []
     - conditions:
       - condition: numeric_state
-        entity_id: sensor.driveway_motion_sensor_street_illuminance_signify
+        entity_id: sensor.home_avarage_outside_illuminance_15m
         below: 1
       sequence:
       - action: cover.close_cover
@@ -2176,11 +2176,11 @@
     id: parent_home
   - trigger: numeric_state
     entity_id:
-    - sensor.driveway_motion_sensor_entrance_illuminance_signify
+    - sensor.home_avarage_outside_illuminance_15m
     below: 5
   - trigger: numeric_state
     entity_id:
-    - sensor.driveway_motion_sensor_entrance_illuminance_signify
+    - sensor.home_avarage_outside_illuminance_15m
     above: 5
   - trigger: event
     event_type: bedroom_light_sunrise_script
@@ -2312,7 +2312,7 @@
           entity_id: cover.bedroom_blind_ikea
     - conditions:
       - condition: numeric_state
-        entity_id: sensor.driveway_motion_sensor_entrance_illuminance_signify
+        entity_id: sensor.home_avarage_outside_illuminance_15m
         below: 5
       - condition: state
         entity_id: binary_sensor.parent_home
@@ -2325,7 +2325,7 @@
           entity_id: cover.bedroom_blind_ikea
     - conditions:
       - condition: numeric_state
-        entity_id: sensor.driveway_motion_sensor_entrance_illuminance_signify
+        entity_id: sensor.home_avarage_outside_illuminance_15m
         above: 5
       - condition: state
         entity_id: binary_sensor.parent_home
@@ -3846,7 +3846,7 @@
     to: idle
   - trigger: numeric_state
     entity_id:
-    - sensor.driveway_motion_sensor_street_illuminance_signify
+    - sensor.home_avarage_outside_illuminance_15m
     below: 2
   - trigger: time
     at: '21:30:00'
@@ -3856,11 +3856,10 @@
   actions:
   - variables:
       night_light: "{{ now().strftime('%H:%M') > '12:00' and \n   now().strftime('%H:%M')
-        < '21:30' and\n   states('sensor.driveway_motion_sensor_street_illuminance_signify')|float(0)
-        < 2 }}"
+        < '21:30' and\n   states('sensor.home_avarage_outside_illuminance_15m')|float(0) < 2 }}"
   - if:
     - condition: numeric_state
-      entity_id: sensor.driveway_motion_sensor_street_illuminance_signify
+      entity_id: sensor.home_avarage_outside_illuminance_15m
       above: 2
     then:
     - action: light.turn_off
@@ -4522,6 +4521,11 @@
         entity_id: input_select.living_room_robot_vacuum_status
         state: vacuuming_living_room
       sequence:
+      - action: switch.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.living_room_robot_vacuum_do_not_disturb_roborock
       - action: input_select.select_option
         metadata: {}
         data:
@@ -4545,6 +4549,11 @@
         entity_id: input_select.living_room_robot_vacuum_status
         state: washing_living_room
       sequence:
+      - action: switch.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.living_room_robot_vacuum_do_not_disturb_roborock
       - action: input_select.select_option
         metadata: {}
         data:
@@ -4574,6 +4583,11 @@
         entity_id: input_select.living_room_robot_vacuum_status
         state: cleaning_hallway
       sequence:
+      - action: switch.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.living_room_robot_vacuum_do_not_disturb_roborock
       - action: input_select.select_option
         metadata: {}
         data:
@@ -4621,6 +4635,11 @@
         entity_id: input_select.living_room_robot_vacuum_status
         state: returning
       sequence:
+      - action: switch.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.living_room_robot_vacuum_do_not_disturb_roborock
       - action: input_select.select_option
         metadata: {}
         data:
@@ -4647,7 +4666,7 @@
         data:
           option: returning
         target:
-          entity_id: input_select.stue_robotstovsuger_status
+          entity_id: input_select.living_room_robot_vacuum_status
       - action: timer.start
         metadata: {}
         data:
@@ -4754,7 +4773,7 @@
         data:
           option: returning
         target:
-          entity_id: input_select.stue_robotstovsuger_status
+          entity_id: input_select.living_room_robot_vacuum_status
       - action: timer.start
         metadata: {}
         data:
@@ -4793,7 +4812,7 @@
         data:
           option: returning
         target:
-          entity_id: input_select.stue_robotstovsuger_status
+          entity_id: input_select.living_room_robot_vacuum_status
       - action: timer.start
         metadata: {}
         data:
@@ -4908,6 +4927,11 @@
         value_template: "{{ (now().timestamp() - \n   states('input_datetime.living_room_robot_vacuum_living_room_last_wash_time')
           | as_timestamp) > \n   60*60*24*5 }}\n"
       sequence:
+      - action: switch.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.living_room_robot_vacuum_do_not_disturb_roborock
       - action: input_select.select_option
         metadata: {}
         data:
@@ -4946,6 +4970,11 @@
         value_template: "{{ (now().timestamp() - \n   states('input_datetime.living_room_robot_vacuum_living_room_last_wash_time')
           | as_timestamp) > \n   60*60*18 }}"
       sequence:
+      - action: switch.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.living_room_robot_vacuum_do_not_disturb_roborock
       - action: input_select.select_option
         metadata: {}
         data:
@@ -4984,6 +5013,11 @@
         value_template: "{{ (now().timestamp() - \n   states('input_datetime.living_room_robot_vacuum_hallway_last_wash_time')
           | as_timestamp) > \n   60*60*18 }}"
       sequence:
+      - action: switch.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.living_room_robot_vacuum_do_not_disturb_roborock
       - action: input_select.select_option
         metadata: {}
         data:
@@ -5014,6 +5048,18 @@
       is_active: '{{ states(''timer.living_room_robot_vacuum_timer'') == ''idle''
         and states(''input_select.living_room_robot_vacuum_status'') != ''docked''
         }}'
+  - action: time.set_value
+    metadata: {}
+    data:
+      time: 00:00:00
+    target:
+      entity_id: time.living_room_robot_vacuum_do_not_disturb_begin_roborock
+  - action: time.set_value
+    metadata: {}
+    data:
+      time: '23:59:59'
+    target:
+      entity_id: time.living_room_robot_vacuum_do_not_disturb_end_roborock
   mode: queued
   trace:
     stored_traces: 100

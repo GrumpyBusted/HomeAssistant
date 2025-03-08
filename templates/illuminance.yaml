@@ -1,0 +1,15 @@
+- sensor:
+    - name: home_outside_illuminance
+      unique_id: B83A907E-14D5-4ECF-AFAE-1E89BA8841BD
+      device_class: illuminance
+      state_class: measurement
+      unit_of_measurement: lx
+      state: >-
+        {% set sensors = [
+          states('sensor.driveway_motion_sensor_street_illuminance_signify'),
+          states('sensor.driveway_motion_sensor_house_east_illuminance_signify'),
+          states('sensor.driveway_motion_sensor_house_south_illuminance_signify')
+        ] %}
+        {% set valid_values = sensors | map('float', default=none) | select('!=', none) | list %}
+        {{ (valid_values | min)|round(0) if valid_values | length > 0 else 'unavailable' }}
+      icon: mdi:brightness-6
