@@ -6,6 +6,7 @@
       unit_of_measurement: lx
       state: >-
         {% set sensors = [
+          states('sensor.driveway_motion_sensor_entrance_illuminance_signify'),
           states('sensor.driveway_motion_sensor_street_illuminance_signify'),
           states('sensor.driveway_motion_sensor_house_east_illuminance_signify'),
           states('sensor.driveway_motion_sensor_house_south_illuminance_signify')
