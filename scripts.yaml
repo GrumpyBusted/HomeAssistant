@@ -855,3 +855,15 @@ home_create_todo_task:
               entity_id: '{{ entity_id }}'
               todo_id: '{{ todo_ids[repeat.index - 1] }}'
               completed: true
+new_script:
+  alias: New Script
+  description: ''
+  sequence:
+  - action: notify.mobile_app_anders_iphone
+    data:
+      title: Volvo EX30 er ikke låst
+      message: t
+      data:
+        actions:
+        - action: volvo_ex30_lock
+          title: Lås

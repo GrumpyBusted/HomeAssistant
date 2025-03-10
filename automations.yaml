@@ -2510,7 +2510,7 @@
     metadata: {}
     data: {}
     target:
-      entity_id: lock.volvo_xc40_lock_status
+      entity_id: lock.volvo_xc40_lock
   mode: restart
 - id: '1737245308947'
   alias: Volvo EX30 - Lås
@@ -2563,7 +2563,7 @@
     metadata: {}
     data: {}
     target:
-      entity_id: lock.volvo_ex30_lock_status
+      entity_id: lock.volvo_ex30_lock
   mode: restart
 - id: '1737299093662'
   alias: Emils værelse varme
@@ -6469,12 +6469,12 @@
       metadata: {}
       data: {}
       target:
-        entity_id: lock.volvo_xc40_lock_status
+        entity_id: lock.volvo_xc40_lock
     - if:
       - condition: not
         conditions:
         - condition: state
-          entity_id: lock.volvo_xc40_lock_status
+          entity_id: lock.volvo_xc40_lock
           state: locked
       - condition: state
         entity_id: device_tracker.volvo_xc40_location
@@ -6517,7 +6517,7 @@
       metadata: {}
       data: {}
       target:
-        entity_id: lock.volvo_ex30_lock_status
+        entity_id: lock.volvo_ex30_lock
     - if:
       - condition: state
         entity_id: device_tracker.volvo_ex30_location
@@ -6525,7 +6525,7 @@
       - condition: not
         conditions:
         - condition: state
-          entity_id: lock.volvo_ex30_lock_status
+          entity_id: lock.volvo_ex30_lock
           state: locked
       then:
       - action: notify.mobile_app_emil_iphone
@@ -6599,12 +6599,12 @@
         metadata: {}
         data: {}
         target:
-          entity_id: lock.volvo_xc40_lock_status
+          entity_id: lock.volvo_xc40_lock
       - if:
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.volvo_xc40_lock_status
+            entity_id: lock.volvo_xc40_lock
             state: locked
         - condition: state
           entity_id: device_tracker.volvo_xc40_location
@@ -6686,12 +6686,12 @@
         metadata: {}
         data: {}
         target:
-          entity_id: lock.volvo_xc40_lock_status
+          entity_id: lock.volvo_xc40_lock
       - if:
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.volvo_xc40_lock_status
+            entity_id: lock.volvo_xc40_lock
             state: locked
         - condition: state
           entity_id: device_tracker.volvo_xc40_location
@@ -6791,12 +6791,12 @@
         metadata: {}
         data: {}
         target:
-          entity_id: lock.volvo_xc40_lock_status
+          entity_id: lock.volvo_xc40_lock
       - if:
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.volvo_xc40_lock_status
+            entity_id: lock.volvo_xc40_lock
             state: locked
         - condition: state
           entity_id: device_tracker.volvo_xc40_location
@@ -6896,12 +6896,12 @@
         metadata: {}
         data: {}
         target:
-          entity_id: lock.volvo_xc40_lock_status
+          entity_id: lock.volvo_xc40_lock
       - if:
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.volvo_xc40_lock_status
+            entity_id: lock.volvo_xc40_lock
             state: locked
         - condition: state
           entity_id: device_tracker.volvo_xc40_location
@@ -6928,7 +6928,7 @@
       - condition: not
         conditions:
         - condition: state
-          entity_id: lock.volvo_ex30_lock_status
+          entity_id: lock.volvo_ex30_lock
           state: locked
       then:
       - action: notify.mobile_app_emil_iphone
@@ -7012,12 +7012,12 @@
         metadata: {}
         data: {}
         target:
-          entity_id: lock.volvo_xc40_lock_status
+          entity_id: lock.volvo_xc40_lock
       - if:
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.volvo_xc40_lock_status
+            entity_id: lock.volvo_xc40_lock
             state: locked
         - condition: state
           entity_id: device_tracker.volvo_xc40_location
@@ -7109,12 +7109,12 @@
         metadata: {}
         data: {}
         target:
-          entity_id: lock.volvo_xc40_lock_status
+          entity_id: lock.volvo_xc40_lock
       - if:
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.volvo_xc40_lock_status
+            entity_id: lock.volvo_xc40_lock
             state: locked
         - condition: state
           entity_id: device_tracker.volvo_xc40_location
@@ -7269,3 +7269,199 @@
       is_active: '{{ states(''sensor.living_room_printer_canon'') not in [''printing'',
         ''idle''] }}'
   mode: restart
+- id: '1741631411396'
+  alias: Volvo EX30 lås
+  description: Automatik til at låse bilen
+  triggers:
+  - trigger: event
+    event_type: mobile_app_notification_action
+    event_data:
+      action: volvo_ex30_lock
+  conditions: []
+  actions:
+  - action: lock.lock
+    metadata: {}
+    data: {}
+    target:
+      entity_id: lock.volvo_ex30_lock
+  mode: queued
+- id: '1741632116231'
+  alias: Volvo XC40 lås
+  description: Automatik til at låse bilen
+  triggers:
+  - trigger: event
+    event_type: mobile_app_notification_action
+    event_data:
+      action: volvo_xc40_lock
+  conditions: []
+  actions:
+  - action: lock.lock
+    metadata: {}
+    data: {}
+    target:
+      entity_id: lock.volvo_xc40_lock
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 2
+      milliseconds: 0
+  - action: button.press
+    metadata: {}
+    data: {}
+    target:
+      entity_id: button.volvo_xc40_update_data
+  mode: queued
+- id: '1741633531272'
+  alias: Volvo XC40 kontrol
+  description: Automatik til at kontroller status på bilen
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.volvo_xc40_engine_state
+    from: 'on'
+    to: 'off'
+    id: stop
+  - trigger: state
+    entity_id:
+    - binary_sensor.volvo_xc40_engine_state
+  - trigger: state
+    entity_id:
+    - timer.volvo_xc40_engine_state_timer
+    to: idle
+  - trigger: state
+    entity_id:
+    - lock.volvo_xc40_lock
+    to: locked
+  conditions: []
+  actions:
+  - if:
+    - condition: template
+      value_template: "{{ now().timestamp() - \n   as_timestamp(strptime(states('sensor.volvo_xc40_last_data_update'),
+        '%d. %b. %Y %H.%M.%S')) >\n   5 }}\n"
+    then:
+    - action: button.press
+      metadata: {}
+      data: {}
+      target:
+        entity_id: button.volvo_xc40_update_data
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 2
+        milliseconds: 0
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.volvo_xc40_engine_state
+        state: 'on'
+      - condition: state
+        entity_id: timer.volvo_xc40_engine_state_timer
+        state: active
+      sequence:
+      - action: timer.finish
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.volvo_xc40_engine_state_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - stop
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:10:00
+        target:
+          entity_id: timer.volvo_xc40_engine_state_timer
+    - conditions:
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: lock.volvo_xc40_lock
+          state: locked
+      - condition: state
+        entity_id: timer.volvo_xc40_engine_state_timer
+        state: idle
+      - condition: state
+        entity_id: binary_sensor.volvo_xc40_engine_state
+        state: 'off'
+      sequence:
+      - action: notify.mobile_app_anders_iphone
+        data:
+          title: Bilen er ulåst!
+          message: Volvo XC40 er ikke låst
+          data:
+            actions:
+            - action: volvo_xc40_lock
+              title: Lås
+            push:
+              sound:
+                name: default
+                critical: 1
+                volume: 1
+    - conditions:
+      - condition: state
+        entity_id: lock.volvo_xc40_lock
+        state: locked
+      - condition: state
+        entity_id: timer.volvo_xc40_engine_state_timer
+        state: idle
+      - condition: state
+        entity_id: binary_sensor.volvo_xc40_engine_state
+        state: 'off'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.volvo_xc40_door_front_left
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.volvo_xc40_door_front_right
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.volvo_xc40_door_rear_left
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.volvo_xc40_door_rear_right
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.volvo_xc40_engine_hood
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.volvo_xc40_sunroof
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.volvo_xc40_tailgate
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.volvo_xc40_window_front_left
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.volvo_xc40_window_front_right
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.volvo_xc40_window_rear_left
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.volvo_xc40_window_rear_right
+          state: 'on'
+        - condition: and
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.volvo_xc40_tank_lid
+            state: 'on'
+          - condition: state
+            entity_id: sensor.volvo_xc40_charging_connection_status
+            state: Disconnected
+      sequence:
+      - action: notify.mobile_app_anders_iphone
+        data:
+          title: Bilen er åben!
+          message: En af dørene eller vinduerne på Volvo XC40 er ikke lukket
+          data:
+            push:
+              sound:
+                name: default
+                critical: 1
+                volume: 1
+  mode: queued
