@@ -4488,7 +4488,7 @@
   mode: restart
 - id: '1739206213123'
   alias: Stue robotstøvsuger
-  description: Automatic til at styre
+  description: Automatic til at kontrollere robotstøvsuger
   triggers:
   - trigger: state
     entity_id:
@@ -4502,6 +4502,10 @@
     entity_id:
     - vacuum.living_room_robot_vacuum_roborock
     to: docked
+  - value_template: "{{ states('sensor.living_room_robot_vacuum_cleaning_progress_roborock')
+      | int == 0 and \n   (trigger.from_state.state | int) > 90 }}\n"
+    id: is_done
+    trigger: template
   - trigger: state
     entity_id:
     - timer.living_room_robot_vacuum_timer
@@ -4512,9 +4516,14 @@
   actions:
   - choose:
     - conditions:
-      - condition: state
-        entity_id: timer.living_room_robot_vacuum_timer
-        state: idle
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: timer.living_room_robot_vacuum_timer
+          state: idle
+        - condition: trigger
+          id:
+          - is_done
       - condition: state
         entity_id: vacuum.living_room_robot_vacuum_roborock
         state: docked
@@ -4540,9 +4549,14 @@
         data:
           datetime: '{{ now() }}'
     - conditions:
-      - condition: state
-        entity_id: timer.living_room_robot_vacuum_timer
-        state: idle
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: timer.living_room_robot_vacuum_timer
+          state: idle
+        - condition: trigger
+          id:
+          - is_done
       - condition: state
         entity_id: vacuum.living_room_robot_vacuum_roborock
         state: docked
@@ -4574,9 +4588,14 @@
         data:
           datetime: '{{ now() }}'
     - conditions:
-      - condition: state
-        entity_id: timer.living_room_robot_vacuum_timer
-        state: idle
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: timer.living_room_robot_vacuum_timer
+          state: idle
+        - condition: trigger
+          id:
+          - is_done
       - condition: state
         entity_id: vacuum.living_room_robot_vacuum_roborock
         state: docked
@@ -4823,26 +4842,6 @@
       - action: script.living_room_robot_vacuum_dock
         metadata: {}
         data: {}
-    - conditions:
-      - condition: state
-        entity_id: timer.living_room_robot_vacuum_timer
-        state: active
-      - condition: state
-        entity_id: input_select.living_room_robot_vacuum_status
-        state: cleaning_hallway
-      - condition: state
-        entity_id: binary_sensor.living_room_door_sensor_open_aqara
-        state: 'off'
-      sequence:
-      - action: notify.mobile_app_anders_iphone
-        data:
-          message: Åben dør til stuen, Dobby er i gangen
-          data:
-            push:
-              sound:
-                name: default
-                critical: 1
-                volume: 1
   - choose:
     - conditions:
       - condition: state
@@ -4874,7 +4873,7 @@
       - action: timer.start
         metadata: {}
         data:
-          duration: 00:03:00
+          duration: 00:01:00
         target:
           entity_id: timer.living_room_robot_vacuum_timer
       - action: vacuum.send_command
@@ -4900,7 +4899,7 @@
       - action: timer.start
         metadata: {}
         data:
-          duration: 00:03:00
+          duration: 00:01:00
         target:
           entity_id: timer.living_room_robot_vacuum_timer
       - action: vacuum.send_command
