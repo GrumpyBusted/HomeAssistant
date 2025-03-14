@@ -4502,10 +4502,12 @@
     entity_id:
     - vacuum.living_room_robot_vacuum_roborock
     to: docked
-  - value_template: "{{ states('sensor.living_room_robot_vacuum_cleaning_progress_roborock')
-      | int == 0 and \n   (trigger.from_state.state | int) > 90 }}\n"
+    id: docked
+  - trigger: numeric_state
+    entity_id:
+    - sensor.living_room_robot_vacuum_cleaning_progress_roborock
+    above: 95
     id: is_done
-    trigger: template
   - trigger: state
     entity_id:
     - timer.living_room_robot_vacuum_timer
@@ -4516,32 +4518,34 @@
   actions:
   - choose:
     - conditions:
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: timer.living_room_robot_vacuum_timer
-          state: idle
-        - condition: trigger
-          id:
-          - is_done
-      - condition: state
-        entity_id: vacuum.living_room_robot_vacuum_roborock
-        state: docked
-      - condition: state
-        entity_id: input_select.living_room_robot_vacuum_status
-        state: vacuuming_living_room
+      - condition: trigger
+        id:
+        - docked
       sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.living_room_robot_vacuum_timer
+      - action: input_select.select_option
+        metadata: {}
+        data:
+          option: none
+        target:
+          entity_id: input_select.living_room_robot_vacuum_current_cleaning
       - action: switch.turn_off
         metadata: {}
         data: {}
         target:
           entity_id: switch.living_room_robot_vacuum_do_not_disturb_roborock
-      - action: input_select.select_option
-        metadata: {}
-        data:
-          option: docked
-        target:
-          entity_id: input_select.living_room_robot_vacuum_status
+    - conditions:
+      - condition: trigger
+        id:
+        - is_done
+      - condition: state
+        entity_id: input_select.living_room_robot_vacuum_current_cleaning
+        state: vacuuming_living_room
+      sequence:
       - action: input_datetime.set_datetime
         metadata: {}
         target:
@@ -4549,32 +4553,13 @@
         data:
           datetime: '{{ now() }}'
     - conditions:
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: timer.living_room_robot_vacuum_timer
-          state: idle
-        - condition: trigger
-          id:
-          - is_done
+      - condition: trigger
+        id:
+        - is_done
       - condition: state
-        entity_id: vacuum.living_room_robot_vacuum_roborock
-        state: docked
-      - condition: state
-        entity_id: input_select.living_room_robot_vacuum_status
+        entity_id: input_select.living_room_robot_vacuum_current_cleaning
         state: washing_living_room
       sequence:
-      - action: switch.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id: switch.living_room_robot_vacuum_do_not_disturb_roborock
-      - action: input_select.select_option
-        metadata: {}
-        data:
-          option: docked
-        target:
-          entity_id: input_select.living_room_robot_vacuum_status
       - action: input_datetime.set_datetime
         metadata: {}
         target:
@@ -4588,32 +4573,13 @@
         data:
           datetime: '{{ now() }}'
     - conditions:
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: timer.living_room_robot_vacuum_timer
-          state: idle
-        - condition: trigger
-          id:
-          - is_done
+      - condition: trigger
+        id:
+        - is_done
       - condition: state
-        entity_id: vacuum.living_room_robot_vacuum_roborock
-        state: docked
-      - condition: state
-        entity_id: input_select.living_room_robot_vacuum_status
+        entity_id: input_select.living_room_robot_vacuum_current_cleaning
         state: cleaning_hallway
       sequence:
-      - action: switch.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id: switch.living_room_robot_vacuum_do_not_disturb_roborock
-      - action: input_select.select_option
-        metadata: {}
-        data:
-          option: docked
-        target:
-          entity_id: input_select.living_room_robot_vacuum_status
       - action: input_datetime.set_datetime
         metadata: {}
         target:
@@ -4622,83 +4588,7 @@
           datetime: '{{ now() }}'
     - conditions:
       - condition: state
-        entity_id: timer.living_room_robot_vacuum_timer
-        state: idle
-      - condition: state
-        entity_id: vacuum.living_room_robot_vacuum_roborock
-        state: docked
-      - condition: state
-        entity_id: input_select.living_room_robot_vacuum_status
-        state: emptying_dust_bin
-      sequence:
-      - action: input_select.select_option
-        metadata: {}
-        data:
-          option: docked
-        target:
-          entity_id: input_select.living_room_robot_vacuum_status
-      - action: input_number.set_value
-        metadata: {}
-        data:
-          value: '{{ states(''sensor.living_room_robot_vacuum_total_cleaning_time_roborock'')|int
-            }}'
-        target:
-          entity_id: input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin
-    - conditions:
-      - condition: state
-        entity_id: timer.living_room_robot_vacuum_timer
-        state: idle
-      - condition: state
-        entity_id: vacuum.living_room_robot_vacuum_roborock
-        state: docked
-      - condition: state
-        entity_id: input_select.living_room_robot_vacuum_status
-        state: returning
-      sequence:
-      - action: switch.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id: switch.living_room_robot_vacuum_do_not_disturb_roborock
-      - action: input_select.select_option
-        metadata: {}
-        data:
-          option: docked
-        target:
-          entity_id: input_select.living_room_robot_vacuum_status
-    - conditions:
-      - condition: state
-        entity_id: timer.living_room_robot_vacuum_timer
-        state: idle
-      - condition: not
-        conditions:
-        - condition: state
-          entity_id: vacuum.living_room_robot_vacuum_roborock
-          state: docked
-      - condition: not
-        conditions:
-        - condition: state
-          entity_id: input_select.living_room_robot_vacuum_status
-          state: returning
-      sequence:
-      - action: input_select.select_option
-        metadata: {}
-        data:
-          option: returning
-        target:
-          entity_id: input_select.living_room_robot_vacuum_status
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:05:00
-        target:
-          entity_id: timer.living_room_robot_vacuum_timer
-      - action: script.living_room_robot_vacuum_dock
-        metadata: {}
-        data: {}
-    - conditions:
-      - condition: state
-        entity_id: input_select.living_room_robot_vacuum_status
+        entity_id: input_select.living_room_robot_vacuum_current_cleaning
         state: cleaning_hallway
       - condition: state
         entity_id: binary_sensor.living_room_door_sensor_open_aqara
@@ -4774,7 +4664,7 @@
                   volume: 1
     - conditions:
       - condition: state
-        entity_id: input_select.living_room_robot_vacuum_status
+        entity_id: input_select.living_room_robot_vacuum_current_cleaning
         state: cleaning_hallway
       - condition: or
         conditions:
@@ -4788,12 +4678,6 @@
           entity_id: binary_sensor.charlie_sleeping
           state: 'on'
       sequence:
-      - action: input_select.select_option
-        metadata: {}
-        data:
-          option: returning
-        target:
-          entity_id: input_select.living_room_robot_vacuum_status
       - action: timer.start
         metadata: {}
         data:
@@ -4807,10 +4691,10 @@
       - condition: or
         conditions:
         - condition: state
-          entity_id: input_select.living_room_robot_vacuum_status
+          entity_id: input_select.living_room_robot_vacuum_current_cleaning
           state: washing_living_room
         - condition: state
-          entity_id: input_select.living_room_robot_vacuum_status
+          entity_id: input_select.living_room_robot_vacuum_current_cleaning
           state: vacuuming_living_room
       - condition: or
         conditions:
@@ -4827,12 +4711,6 @@
           entity_id: binary_sensor.living_room_media
           state: 'on'
       sequence:
-      - action: input_select.select_option
-        metadata: {}
-        data:
-          option: returning
-        target:
-          entity_id: input_select.living_room_robot_vacuum_status
       - action: timer.start
         metadata: {}
         data:
@@ -4842,11 +4720,13 @@
       - action: script.living_room_robot_vacuum_dock
         metadata: {}
         data: {}
-  - choose:
     - conditions:
       - condition: state
-        entity_id: input_select.living_room_robot_vacuum_status
+        entity_id: vacuum.living_room_robot_vacuum_roborock
         state: docked
+      - condition: state
+        entity_id: timer.living_room_robot_vacuum_timer
+        state: idle
       - condition: state
         entity_id: binary_sensor.parent_sleeping
         state: 'off'
@@ -4864,53 +4744,53 @@
           -\n   states('input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin')|int
           >\n   60*10 }}\n"
       sequence:
-      - action: input_select.select_option
-        metadata: {}
-        data:
-          option: emptying_dust_bin
-        target:
-          entity_id: input_select.living_room_robot_vacuum_status
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:01:00
-        target:
-          entity_id: timer.living_room_robot_vacuum_timer
       - action: vacuum.send_command
         data:
           command: app_start_collect_dust
         target:
           entity_id: vacuum.living_room_robot_vacuum_roborock
+      - delay:
+          seconds: 60
+      - action: input_number.set_value
+        metadata: {}
+        data:
+          value: '{{ states(''sensor.living_room_robot_vacuum_total_cleaning_time_roborock'')|int
+            }}'
+        target:
+          entity_id: input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin
     - conditions:
       - condition: state
-        entity_id: input_select.living_room_robot_vacuum_status
+        entity_id: vacuum.living_room_robot_vacuum_roborock
         state: docked
+      - condition: state
+        entity_id: timer.living_room_robot_vacuum_timer
+        state: idle
       - condition: template
         value_template: "{{ states('sensor.living_room_robot_vacuum_total_cleaning_time_roborock')|int
           -\n   states('input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin')|int
           >\n   60*90 }}\n"
       sequence:
-      - action: input_select.select_option
-        metadata: {}
-        data:
-          option: emptying_dust_bin
-        target:
-          entity_id: input_select.living_room_robot_vacuum_status
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:01:00
-        target:
-          entity_id: timer.living_room_robot_vacuum_timer
       - action: vacuum.send_command
         data:
           command: app_start_collect_dust
         target:
           entity_id: vacuum.living_room_robot_vacuum_roborock
+      - delay:
+          seconds: 60
+      - action: input_number.set_value
+        metadata: {}
+        data:
+          value: '{{ states(''sensor.living_room_robot_vacuum_total_cleaning_time_roborock'')|int
+            }}'
+        target:
+          entity_id: input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin
     - conditions:
       - condition: state
-        entity_id: input_select.living_room_robot_vacuum_status
+        entity_id: vacuum.living_room_robot_vacuum_roborock
         state: docked
+      - condition: state
+        entity_id: timer.living_room_robot_vacuum_timer
+        state: idle
       - condition: state
         entity_id: binary_sensor.parent_sleeping
         state: 'off'
@@ -4937,11 +4817,11 @@
         data:
           option: washing_living_room
         target:
-          entity_id: input_select.living_room_robot_vacuum_status
+          entity_id: input_select.living_room_robot_vacuum_current_cleaning
       - action: timer.start
         metadata: {}
         data:
-          duration: 00:40:00
+          duration: 00:60:00
         target:
           entity_id: timer.living_room_robot_vacuum_timer
       - action: script.home_robot_vacuum_start_cleaning
@@ -4952,8 +4832,11 @@
           - Stue
     - conditions:
       - condition: state
-        entity_id: input_select.living_room_robot_vacuum_status
+        entity_id: vacuum.living_room_robot_vacuum_roborock
         state: docked
+      - condition: state
+        entity_id: timer.living_room_robot_vacuum_timer
+        state: idle
       - condition: state
         entity_id: binary_sensor.parent_sleeping
         state: 'off'
@@ -4980,11 +4863,11 @@
         data:
           option: vacuuming_living_room
         target:
-          entity_id: input_select.living_room_robot_vacuum_status
+          entity_id: input_select.living_room_robot_vacuum_current_cleaning
       - action: timer.start
         metadata: {}
         data:
-          duration: 00:35:00
+          duration: 00:60:00
         target:
           entity_id: timer.living_room_robot_vacuum_timer
       - action: script.home_robot_vacuum_start_cleaning
@@ -4995,8 +4878,11 @@
           - Stue
     - conditions:
       - condition: state
-        entity_id: input_select.living_room_robot_vacuum_status
+        entity_id: vacuum.living_room_robot_vacuum_roborock
         state: docked
+      - condition: state
+        entity_id: timer.living_room_robot_vacuum_timer
+        state: idle
       - condition: state
         entity_id: binary_sensor.parent_sleeping
         state: 'off'
@@ -5026,7 +4912,7 @@
         data:
           option: cleaning_hallway
         target:
-          entity_id: input_select.living_room_robot_vacuum_status
+          entity_id: input_select.living_room_robot_vacuum_current_cleaning
       - action: timer.start
         metadata: {}
         data:
@@ -5043,8 +4929,11 @@
           - Bryggers
     - conditions:
       - condition: state
-        entity_id: input_select.living_room_robot_vacuum_status
+        entity_id: vacuum.living_room_robot_vacuum_roborock
         state: docked
+      - condition: state
+        entity_id: timer.living_room_robot_vacuum_timer
+        state: idle
       - condition: state
         entity_id: binary_sensor.parent_sleeping
         state: 'off'
@@ -5071,7 +4960,7 @@
         data:
           option: cleaning_hallway
         target:
-          entity_id: input_select.living_room_robot_vacuum_status
+          entity_id: input_select.living_room_robot_vacuum_current_cleaning
       - action: timer.start
         metadata: {}
         data:
@@ -5091,11 +4980,10 @@
       subject: Hjælp Dobby med at finde hjem
       description: Dobby kan ikke finde hjem, placer robotstøvsugeren tilbage i docking
         stationen
-      related_entity_id: input_select.living_room_robot_vacuum_status
+      related_entity_id: input_select.living_room_robot_vacuum_current_cleaning
       entity_id: todo.home_smart_todo
       is_active: '{{ states(''timer.living_room_robot_vacuum_timer'') == ''idle''
-        and states(''input_select.living_room_robot_vacuum_status'') != ''docked''
-        }}'
+        and states(''vacuum.living_room_robot_vacuum_roborock'') != ''docked'' }}'
   - action: time.set_value
     metadata: {}
     data:
