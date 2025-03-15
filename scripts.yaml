@@ -813,9 +813,18 @@ home_create_todo_task:
       required: true
       selector:
         boolean:
+    must_replace:
+      description: Skal opgaven erstattes, hvis den findes?
+      example: true/false
+      required: false
+      selector:
+        boolean:
+      default: false
   sequence:
   - variables:
       todo_entity_id: '[{{ related_entity_id | default(''none'') }}]'
+      todo_desciption: "<htrml> {{ description }} {% if todo_entity_id != '[none]'
+        %}\n  <br><br>Relateret: {{ todo_entity_id }}\n{% endif %}  </html>"
   - if:
     - condition: template
       value_template: '{{ is_active }}'
@@ -826,15 +835,28 @@ home_create_todo_task:
           | list }}'
     - if:
       - condition: template
-        value_template: '{{ existing | length == 0 }}'
+        value_template: '{{ existing | length > 0 and must_replace }}'
+      then:
+      - variables:
+          todo_ids: '{{ state_attr(entity_id, ''all_todos'') |  rejectattr(''status'',
+            ''equalto'', ''completed'') |  map(attribute=''todo_id'') |  list }}'
+      - repeat:
+          count: '{{ todo_ids | length }}'
+          sequence:
+          - action: ms365_todo.delete_todo
+            data:
+              entity_id: '{{ entity_id }}'
+              todo_id: '{{ todo_ids[repeat.index - 1] }}'
+    - if:
+      - condition: template
+        value_template: '{{ existing | length == 0 or must_replace }}'
       then:
       - action: ms365_todo.new_todo
         metadata: {}
         data:
           entity_id: '{{ entity_id }}'
           subject: '{{ subject }}'
-          description: "{{ description }}\n{% if todo_entity_id != '[none]' %}\n  <br>\n
-            \ <pre>{{ todo_entity_id }}</pre>\n{% endif %}"
+          description: '{{ todo_desciption }}'
           due: '{{ utcnow().strftime(''%Y-%m-%d'') }}'
           reminder: '{{ utcnow() + timedelta(minutes=1) }}'
     else:
@@ -855,15 +877,3 @@ home_create_todo_task:
               entity_id: '{{ entity_id }}'
               todo_id: '{{ todo_ids[repeat.index - 1] }}'
               completed: true
-new_script:
-  alias: New Script
-  description: ''
-  sequence:
-  - action: notify.mobile_app_anders_iphone
-    data:
-      title: Volvo EX30 er ikke låst
-      message: t
-      data:
-        actions:
-        - action: volvo_ex30_lock
-          title: Lås

@@ -7352,3 +7352,126 @@
                 critical: 1
                 volume: 1
   mode: queued
+- id: '1742022528405'
+  alias: Hjem overvåg utilgængelige enheder
+  description: Automatik der kontrollere om nogen sensorer eller enheder er unavailable
+    og opretter en To Do-opgave.
+  triggers:
+  - minutes: /30
+    trigger: time_pattern
+  conditions: []
+  actions:
+  - variables:
+      monitored_entities:
+      - cover.bedroom_blind_ikea
+      - cover.emils_room_blind_ikea
+      - cover.charlies_room_blind_ikea
+      - binary_sensor.bedroom_door_sensor_opening_philips_hue
+      - binary_sensor.garage_door_sensor_opening_philips_hue
+      - binary_sensor.living_room_door_sensor_open_aqara
+      - binary_sensor.emils_room_window_sensor_open_aqara
+      - binary_sensor.driveway_motion_sensor_street_opening_signify
+      - binary_sensor.driveway_motion_sensor_house_east_opening_signify
+      - binary_sensor.driveway_motion_sensor_house_south_opening_signify
+      - binary_sensor.driveway_motion_sensor_entrance_opening_signify
+      - device_tracker.anders_iphone
+      - device_tracker.monique_iphone
+      - device_tracker.emil_iphone
+      - device_tracker.charlie_iphone
+      - sensor.anders_iphone_battery_state
+      - sensor.monique_iphone_battery_state
+      - sensor.emil_iphone_battery_state
+      - sensor.charlie_iphone_battery_state
+      - device_tracker.volvo_ex30_location
+      - device_tracker.volvo_xc40_location
+      - sensor.volvo_ex30_charging_connection_status
+      - sensor.volvo_xc40_charging_connection_status
+      - lock.volvo_xc40_lock
+      - lock.volvo_ex30_lock
+      - sensor.driveway_ev_charger_status_description_wallbox
+      - climate.living_room_heat_pump_panasonic
+      - climate.home_heat_pump_panasonic
+      - climate.bathroom_radiator_thermostat_floor_tado
+      - climate.bathroom_radiator_thermostat_wall_tado
+      - climate.utility_room_radiator_thermostat_floor_tado
+      - climate.utility_room_radiator_thermostat_wall_tado
+      - climate.charlies_room_radiator_thermostat_tado
+      - climate.emils_room_radiator_thermostat_tado
+      - climate.hallway_radiator_thermostat_tado
+      - climate.kitchen_radiator_thermostat_tado
+      - climate.bedroom_radiator_thermostat_tado
+      - climate.living_room_radiator_thermostat_bookcase_tado
+      - climate.living_room_radiator_thermostat_sofa_tado
+      - climate.living_room_radiator_thermostat_dining_table_tado
+      - climate.toilet_radiator_thermostat_tado
+      - climate.utility_room_temperature_sensor_tado
+      - sensor.emils_room_temperature_sensor_temperature_tado
+      - sensor.hallway_temperature_sensor_temperature_tado
+      - sensor.living_room_temperature_sensor_temperature_tado
+      - sensor.charlies_room_temperature_sensor_temperature_tado
+      - media_player.living_room_receiver_denon
+      - media_player.living_room_tv_media_player_sony_bravia
+      - media_player.living_room_apple_tv_media_player
+      - light.bedroom_light_philips_hue
+      - light.charlies_room_light_philips_hue
+      - light.emils_room_light_philips_hue
+      - light.garage_light_main_philips_hue
+      - light.garage_light_spots_philips_hue
+      - light.garage_light_projector_philips_hue
+      - light.hallway_light_philips_hue
+      - light.living_room_light_china_cabinet_philips_hue
+      - light.living_room_light_dining_table_philips_hue
+      - light.living_room_light_escher_philips_hue
+      - light.living_room_light_glass_cabinet_philips_hue
+      - light.living_room_light_joakim_philips_hue
+      - light.living_room_light_lamp_philips_hue
+      - light.living_room_light_sofa_receiver_philips_hue
+      - light.living_room_light_sofa_spot_philips_hue
+      - light.living_room_light_sofa_window_philips_hue
+      - light.living_room_tv_light_strip_philips_hue
+      - light.patio_light_philips_hue
+      - light.driveway_light_entrance_spot_1_signify
+      - light.driveway_light_entrance_spot_2_signify
+      - light.driveway_light_entrance_spot_3_signify
+      - light.driveway_light_house_east_gledopto
+      - light.driveway_light_house_south_gledopto
+      - light.driveway_light_left_1_signify
+      - light.driveway_light_left_2_signify
+      - light.driveway_light_left_3_signify
+      - light.driveway_light_left_4_signify
+      - light.driveway_light_left_5_signify
+      - light.driveway_light_left_6_signify
+      - light.driveway_light_left_7_signify
+      - light.driveway_light_left_8_signify
+      - light.driveway_light_left_9_signify
+      - light.driveway_light_right_1_signify
+      - light.driveway_light_right_2_signify
+      - light.driveway_light_right_3_signify
+      - lock.entrance_door_lock_yale
+      - lock.utility_room_door_lock_yale
+      - lock.garage_door_lock_yale
+      - binary_sensor.driveway_vibration_sensor_mailbox_vibration_aqara
+      unavailable_entities: "{% set ns = namespace(unavailable=[]) %} \n{% for entity
+        in monitored_entities if states(entity) == 'unavailable' %}\n  {% set ns.unavailable
+        = ns.unavailable + [entity] %}\n{% endfor %}\n{{ ns.unavailable }}"
+      description_text: "{{ unavailable_entities | length }} utilgængelige enheder
+        ud af {{ monitored_entities | length }} overvågede.<br>\nFølgende enheder
+        er utilgængelige (unavailable): <ul>  \n{% for entity in unavailable_entities
+        %}\n  <li>{{ state_attr(entity, 'friendly_name') | default(entity) }}</li>\n{%
+        endfor %} </ul>"
+  - action: system_log.write
+    metadata: {}
+    data:
+      level: debug
+      message: '"monitored_entities: {{ monitored_entities | length }}"
+
+        "unavailable_entities: {{ unavailable_entities | length }}"'
+  - action: script.home_create_todo_task
+    data:
+      subject: Tjek utilgængelige enheder
+      description: '{{ description_text }}'
+      related_entity_id: automation.home_check_unavailable_devices
+      entity_id: todo.home_smart_todo
+      is_active: '{{ unavailable_entities | length > 0 }}'
+      must_replace: true
+  mode: restart
