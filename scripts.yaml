@@ -838,8 +838,8 @@ home_create_todo_task:
         value_template: '{{ existing | length > 0 and must_replace }}'
       then:
       - variables:
-          todo_ids: '{{ state_attr(entity_id, ''all_todos'') |  rejectattr(''status'',
-            ''equalto'', ''completed'') |  map(attribute=''todo_id'') |  list }}'
+          todo_ids: '{{ state_attr(entity_id, ''existing'') | map(attribute=''todo_id'')
+            | list }}'
       - repeat:
           count: '{{ todo_ids | length }}'
           sequence:

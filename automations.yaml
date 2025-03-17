@@ -261,6 +261,8 @@
     target:
       entity_id: lock.driveway_ev_charger_lock_wallbox
   mode: queued
+  trace:
+    stored_traces: 100
 - id: '1735725983183'
   alias: Garage lys
   description: Automatik for lys i garage
@@ -7363,9 +7365,6 @@
   actions:
   - variables:
       monitored_entities:
-      - cover.bedroom_blind_ikea
-      - cover.emils_room_blind_ikea
-      - cover.charlies_room_blind_ikea
       - binary_sensor.bedroom_door_sensor_opening_philips_hue
       - binary_sensor.garage_door_sensor_opening_philips_hue
       - binary_sensor.living_room_door_sensor_open_aqara
@@ -7374,21 +7373,7 @@
       - binary_sensor.driveway_motion_sensor_house_east_opening_signify
       - binary_sensor.driveway_motion_sensor_house_south_opening_signify
       - binary_sensor.driveway_motion_sensor_entrance_opening_signify
-      - device_tracker.anders_iphone
-      - device_tracker.monique_iphone
-      - device_tracker.emil_iphone
-      - device_tracker.charlie_iphone
-      - sensor.anders_iphone_battery_state
-      - sensor.monique_iphone_battery_state
-      - sensor.emil_iphone_battery_state
-      - sensor.charlie_iphone_battery_state
-      - device_tracker.volvo_ex30_location
-      - device_tracker.volvo_xc40_location
-      - sensor.volvo_ex30_charging_connection_status
-      - sensor.volvo_xc40_charging_connection_status
-      - lock.volvo_xc40_lock
-      - lock.volvo_ex30_lock
-      - sensor.driveway_ev_charger_status_description_wallbox
+      - binary_sensor.driveway_vibration_sensor_mailbox_vibration_aqara
       - climate.living_room_heat_pump_panasonic
       - climate.home_heat_pump_panasonic
       - climate.bathroom_radiator_thermostat_floor_tado
@@ -7405,13 +7390,15 @@
       - climate.living_room_radiator_thermostat_dining_table_tado
       - climate.toilet_radiator_thermostat_tado
       - climate.utility_room_temperature_sensor_tado
-      - sensor.emils_room_temperature_sensor_temperature_tado
-      - sensor.hallway_temperature_sensor_temperature_tado
-      - sensor.living_room_temperature_sensor_temperature_tado
-      - sensor.charlies_room_temperature_sensor_temperature_tado
-      - media_player.living_room_receiver_denon
-      - media_player.living_room_tv_media_player_sony_bravia
-      - media_player.living_room_apple_tv_media_player
+      - cover.bedroom_blind_ikea
+      - cover.emils_room_blind_ikea
+      - cover.charlies_room_blind_ikea
+      - device_tracker.anders_iphone
+      - device_tracker.monique_iphone
+      - device_tracker.emil_iphone
+      - device_tracker.charlie_iphone
+      - device_tracker.volvo_ex30_location
+      - device_tracker.volvo_xc40_location
       - light.bedroom_light_philips_hue
       - light.charlies_room_light_philips_hue
       - light.emils_room_light_philips_hue
@@ -7447,10 +7434,28 @@
       - light.driveway_light_right_1_signify
       - light.driveway_light_right_2_signify
       - light.driveway_light_right_3_signify
+      - lock.volvo_xc40_lock
+      - lock.volvo_ex30_lock
       - lock.entrance_door_lock_yale
       - lock.utility_room_door_lock_yale
       - lock.garage_door_lock_yale
-      - binary_sensor.driveway_vibration_sensor_mailbox_vibration_aqara
+      - lock.driveway_ev_charger_lock_wallbox
+      - media_player.living_room_receiver_denon
+      - media_player.living_room_tv_media_player_sony_bravia
+      - media_player.living_room_apple_tv_media_player
+      - sensor.anders_iphone_battery_state
+      - sensor.monique_iphone_battery_state
+      - sensor.emil_iphone_battery_state
+      - sensor.charlie_iphone_battery_state
+      - sensor.volvo_ex30_charging_connection_status
+      - sensor.volvo_xc40_charging_connection_status
+      - sensor.driveway_ev_charger_status_description_wallbox
+      - sensor.emils_room_temperature_sensor_temperature_tado
+      - sensor.hallway_temperature_sensor_temperature_tado
+      - sensor.living_room_temperature_sensor_temperature_tado
+      - sensor.charlies_room_temperature_sensor_temperature_tado
+      - sensor.utility_room_smart_plug_washer_power_aqara
+      - sensor.utility_room_smart_plug_dryer_power_aqara
       unavailable_entities: "{% set ns = namespace(unavailable=[]) %} \n{% for entity
         in monitored_entities if states(entity) == 'unavailable' %}\n  {% set ns.unavailable
         = ns.unavailable + [entity] %}\n{% endfor %}\n{{ ns.unavailable }}"
@@ -7474,4 +7479,53 @@
       entity_id: todo.home_smart_todo
       is_active: '{{ unavailable_entities | length > 0 }}'
       must_replace: true
+  mode: restart
+- id: '1742241186159'
+  alias: Hjem smart todo vaskemaskine
+  description: Opret ToDo opgaver vedrørende vaskemaskine og tørretumbler
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_washer_power_aqara
+    for:
+      hours: 0
+      minutes: 3
+      seconds: 0
+    below: '10'
+    id: washer_done
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_dryer_power_aqara
+    for:
+      hours: 0
+      minutes: 3
+      seconds: 0
+    below: '10'
+    id: dryer_done
+  conditions: []
+  actions:
+  - if:
+    - condition: trigger
+      id:
+      - washer_done
+    then:
+    - action: script.home_create_todo_task
+      data:
+        subject: Tøm vaskemaskinen
+        description: Vaskemaskinen er færdig, tøm og tør tøjet
+        related_entity_id: sensor.utility_room_smart_plug_washer_power_aqara
+        entity_id: todo.home_smart_todo
+        is_active: true
+  - if:
+    - condition: trigger
+      id:
+      - dryer_done
+    then:
+    - action: script.home_create_todo_task
+      data:
+        subject: Tøm tørretumbler
+        description: Tørretumbleren er færdig, tøm den og læg tøjet på plads
+        related_entity_id: sensor.utility_room_smart_plug_dryer_power_aqara
+        entity_id: todo.home_smart_todo
+        is_active: true
   mode: restart
