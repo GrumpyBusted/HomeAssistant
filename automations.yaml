@@ -2479,7 +2479,7 @@
       seconds: 0
   - trigger: state
     entity_id:
-    - binary_sensor.volvo_xc40_engine_state
+    - binary_sensor.volvo_xc40_engine_status
     to: 'off'
     for:
       hours: 0
@@ -2505,7 +2505,7 @@
     entity_id: sensor.volvo_xc40_charging_connection_status
     state: Disconnected
   - condition: state
-    entity_id: binary_sensor.volvo_xc40_engine_state
+    entity_id: binary_sensor.volvo_xc40_engine_status
     state: 'off'
   actions:
   - action: lock.lock
@@ -2532,7 +2532,7 @@
       seconds: 0
   - trigger: state
     entity_id:
-    - binary_sensor.volvo_ex30_engine_state
+    - binary_sensor.volvo_ex30_engine_status
     to: 'off'
     for:
       hours: 0
@@ -2558,7 +2558,7 @@
     entity_id: sensor.volvo_ex30_charging_connection_status
     state: Disconnected
   - condition: state
-    entity_id: binary_sensor.volvo_ex30_engine_state
+    entity_id: binary_sensor.volvo_ex30_engine_status
     state: 'off'
   actions:
   - action: lock.lock
@@ -7206,16 +7206,16 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.volvo_xc40_engine_state
+    - binary_sensor.volvo_xc40_engine_status
     from: 'on'
     to: 'off'
     id: stop
   - trigger: state
     entity_id:
-    - binary_sensor.volvo_xc40_engine_state
+    - binary_sensor.volvo_xc40_engine_status
   - trigger: state
     entity_id:
-    - timer.volvo_xc40_engine_state_timer
+    - timer.volvo_xc40_engine_status_timer
     to: idle
   - trigger: state
     entity_id:
@@ -7241,17 +7241,17 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.volvo_xc40_engine_state
+        entity_id: binary_sensor.volvo_xc40_engine_status
         state: 'on'
       - condition: state
-        entity_id: timer.volvo_xc40_engine_state_timer
+        entity_id: timer.volvo_xc40_engine_status_timer
         state: active
       sequence:
       - action: timer.finish
         metadata: {}
         data: {}
         target:
-          entity_id: timer.volvo_xc40_engine_state_timer
+          entity_id: timer.volvo_xc40_engine_status_timer
     - conditions:
       - condition: trigger
         id:
@@ -7262,7 +7262,7 @@
         data:
           duration: 00:10:00
         target:
-          entity_id: timer.volvo_xc40_engine_state_timer
+          entity_id: timer.volvo_xc40_engine_status_timer
     - conditions:
       - condition: not
         conditions:
@@ -7270,10 +7270,10 @@
           entity_id: lock.volvo_xc40_lock
           state: locked
       - condition: state
-        entity_id: timer.volvo_xc40_engine_state_timer
+        entity_id: timer.volvo_xc40_engine_status_timer
         state: idle
       - condition: state
-        entity_id: binary_sensor.volvo_xc40_engine_state
+        entity_id: binary_sensor.volvo_xc40_engine_status
         state: 'off'
       sequence:
       - action: notify.mobile_app_anders_iphone
@@ -7294,10 +7294,10 @@
         entity_id: lock.volvo_xc40_lock
         state: locked
       - condition: state
-        entity_id: timer.volvo_xc40_engine_state_timer
+        entity_id: timer.volvo_xc40_engine_status_timer
         state: idle
       - condition: state
-        entity_id: binary_sensor.volvo_xc40_engine_state
+        entity_id: binary_sensor.volvo_xc40_engine_status
         state: 'off'
       - condition: or
         conditions:
