@@ -832,21 +832,20 @@ home_create_todo_task:
     - variables:
         existing: '{{ state_attr(entity_id, ''all_todos'') | selectattr(''subject'',
           ''equalto'', subject) | rejectattr(''status'', ''equalto'', ''completed'')
-          | list }}'
+          | map(attribute=''todo_id'') | list }}'
     - if:
       - condition: template
         value_template: '{{ existing | length > 0 and must_replace }}'
       then:
-      - variables:
-          todo_ids: '{{ state_attr(entity_id, ''existing'') | map(attribute=''todo_id'')
-            | list }}'
       - repeat:
-          count: '{{ todo_ids | length }}'
+          count: '{{ existing | length }}'
           sequence:
-          - action: ms365_todo.delete_todo
+          - action: ms365_todo.complete_todo
+            metadata: {}
             data:
               entity_id: '{{ entity_id }}'
-              todo_id: '{{ todo_ids[repeat.index - 1] }}'
+              todo_id: '{{ existing[repeat.index - 1] }}'
+              completed: true
     - if:
       - condition: template
         value_template: '{{ existing | length == 0 or must_replace }}'

@@ -5000,7 +5000,7 @@
       entity_id: time.living_room_robot_vacuum_do_not_disturb_end_roborock
   mode: queued
   trace:
-    stored_traces: 100
+    stored_traces: 1000
 - id: '1739480121158'
   alias: Push configuration filer til GitHub
   description: Automatik til at sende configuration filer etc til GitHub repository
