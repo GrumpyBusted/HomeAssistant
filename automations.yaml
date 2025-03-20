@@ -4807,7 +4807,7 @@
         state: 'off'
       - condition: template
         value_template: "{{ (now().timestamp() - \n   states('input_datetime.living_room_robot_vacuum_living_room_last_wash_time')
-          | as_timestamp) > \n   60*60*24*5 }}\n"
+          | as_timestamp) > \n   60*60*(24*5-6) }}\n"
       sequence:
       - action: switch.turn_on
         metadata: {}
