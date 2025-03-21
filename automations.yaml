@@ -7485,6 +7485,8 @@
       - sensor.charlies_room_temperature_sensor_temperature_tado
       - sensor.utility_room_smart_plug_washer_power_aqara
       - sensor.utility_room_smart_plug_dryer_power_aqara
+      - sensor.volvo_xc40_status
+      - sensor.volvo_ex30_status
       unavailable_entities: "{% set ns = namespace(unavailable=[]) %} \n{% for entity
         in monitored_entities if states(entity) == 'unavailable' %}\n  {% set ns.unavailable
         = ns.unavailable + [entity] %}\n{% endfor %}\n{{ ns.unavailable }}"
