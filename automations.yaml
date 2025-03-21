@@ -4276,7 +4276,18 @@
       hours: 0
       minutes: 10
       seconds: 0
-  conditions: []
+  - trigger: state
+    entity_id:
+    - light.garage_light_main_philips_hue
+    to: 'off'
+  conditions:
+  - condition: state
+    entity_id: sensor.garage_3d_printer_prusa
+    state: idle
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
   actions:
   - action: light.turn_off
     metadata: {}
@@ -7522,8 +7533,18 @@
       hours: 0
       minutes: 3
       seconds: 0
-    below: '10'
+    below: '20'
     id: washer_done
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_washer_power_aqara
+    above: '5'
+    id: washer_emptied
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_washer_power_aqara
+    above: '100'
+    id: washer_started
   - trigger: numeric_state
     entity_id:
     - sensor.utility_room_smart_plug_dryer_power_aqara
@@ -7531,32 +7552,34 @@
       hours: 0
       minutes: 3
       seconds: 0
-    below: '10'
+    below: '20'
     id: dryer_done
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_dryer_power_aqara
+    above: '3'
+    id: dryer_emptied
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_dryer_power_aqara
+    above: '100'
+    id: dryer_started
   conditions: []
   actions:
-  - if:
-    - condition: trigger
-      id:
-      - washer_done
-    then:
-    - action: script.home_create_todo_task
-      data:
-        subject: Tøm vaskemaskinen
-        description: Vaskemaskinen er færdig, tøm og tør tøjet
-        related_entity_id: sensor.utility_room_smart_plug_washer_power_aqara
-        entity_id: todo.home_smart_todo
-        is_active: true
-  - if:
-    - condition: trigger
-      id:
-      - dryer_done
-    then:
-    - action: script.home_create_todo_task
-      data:
-        subject: Tøm tørretumbler
-        description: Tørretumbleren er færdig, tøm den og læg tøjet på plads
-        related_entity_id: sensor.utility_room_smart_plug_dryer_power_aqara
-        entity_id: todo.home_smart_todo
-        is_active: true
+  - action: script.home_create_todo_task
+    data:
+      subject: Tøm vaskemaskinen
+      description: Vaskemaskinen er færdig, tøm og tør tøjet
+      related_entity_id: sensor.utility_room_smart_plug_washer_power_aqara
+      entity_id: todo.home_smart_todo
+      is_active: '{{ trigger.id == ''washer_done'' }}'
+  - action: script.home_create_todo_task
+    data:
+      subject: Tøm tørretumbler
+      description: Tørretumbleren er færdig, tøm den og læg tøjet på plads
+      related_entity_id: sensor.utility_room_smart_plug_dryer_power_aqara
+      entity_id: todo.home_smart_todo
+      is_active: '{{ trigger.id == ''dryer_done'' }}'
   mode: restart
+  trace:
+    stored_traces: 100
