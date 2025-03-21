@@ -197,7 +197,7 @@
           - light.living_room_light_philips_hue
   mode: queued
 - id: '1735658670560'
-  alias: Indkørsel - Billader lås op
+  alias: Indkørsel billader lås op
   description: Hvis en af bilerne er hjemme og tilsluttet, lås billaderen op
   triggers:
   - trigger: state
@@ -224,20 +224,41 @@
     entity_id:
     - binary_sensor.family_home
     to: 'on'
-  conditions:
-  - condition: state
-    entity_id: binary_sensor.family_home
-    state: 'on'
-  - condition: state
-    entity_id: lock.driveway_ev_charger_lock_wallbox
-    state: locked
-  - condition: state
-    entity_id: sensor.driveway_ev_charger_status_description_wallbox
-    state: Locked, car connected
-  - condition: or
-    conditions:
-    - condition: and
-      conditions:
+  conditions: []
+  actions:
+  - if:
+    - condition: template
+      value_template: '{{ states(''sensor.volvo_ex30_last_data_update'') | as_datetime
+        + timedelta(seconds=5) < now() }}'
+    then:
+    - action: button.press
+      metadata: {}
+      data: {}
+      target:
+        entity_id: button.volvo_ex30_update_data
+    - delay: 00:00:02
+  - if:
+    - condition: template
+      value_template: '{{ states(''sensor.volvo_xc40_last_data_update'') | as_datetime
+        + timedelta(seconds=5) < now() }}'
+    then:
+    - action: button.press
+      metadata: {}
+      data: {}
+      target:
+        entity_id: button.volvo_xc40_update_data
+    - delay: 00:00:02
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.family_home
+        state: 'on'
+      - condition: state
+        entity_id: lock.driveway_ev_charger_lock_wallbox
+        state: locked
+      - condition: state
+        entity_id: sensor.driveway_ev_charger_status_description_wallbox
+        state: Locked, car connected
       - condition: state
         entity_id: device_tracker.volvo_ex30_location
         state: home
@@ -246,23 +267,35 @@
         - condition: state
           entity_id: sensor.volvo_ex30_charging_connection_status
           state: Disconnected
-    - condition: and
-      conditions:
+      sequence:
+      - action: lock.unlock
+        metadata: {}
+        data: {}
+        target:
+          entity_id: lock.driveway_ev_charger_lock_wallbox
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.family_home
+        state: 'on'
+      - condition: state
+        entity_id: lock.driveway_ev_charger_lock_wallbox
+        state: locked
+      - condition: state
+        entity_id: sensor.driveway_ev_charger_status_description_wallbox
+        state: Locked, car connected
       - condition: state
         entity_id: device_tracker.volvo_xc40_location
         state: home
       - condition: state
         entity_id: sensor.volvo_xc40_charging_connection_status
         state: Connected AC
-  actions:
-  - action: lock.unlock
-    metadata: {}
-    data: {}
-    target:
-      entity_id: lock.driveway_ev_charger_lock_wallbox
+      sequence:
+      - action: lock.unlock
+        metadata: {}
+        data: {}
+        target:
+          entity_id: lock.driveway_ev_charger_lock_wallbox
   mode: queued
-  trace:
-    stored_traces: 100
 - id: '1735725983183'
   alias: Garage lys
   description: Automatik for lys i garage
@@ -7225,19 +7258,15 @@
   actions:
   - if:
     - condition: template
-      value_template: "{{ now().timestamp() - \n   as_timestamp(strptime(states('sensor.volvo_xc40_last_data_update'),
-        '%d. %b. %Y %H.%M.%S')) >\n   5 }}\n"
+      value_template: '{{ states(''sensor.volvo_xc40_last_data_update'') | as_datetime
+        + timedelta(seconds=5) < now() }}'
     then:
     - action: button.press
       metadata: {}
       data: {}
       target:
         entity_id: button.volvo_xc40_update_data
-    - delay:
-        hours: 0
-        minutes: 0
-        seconds: 2
-        milliseconds: 0
+    - delay: 00:00:02
   - choose:
     - conditions:
       - condition: state
