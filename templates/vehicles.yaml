@@ -2,7 +2,7 @@
     - name: volvo_xc40_last_data_update
       unique_id: BDF4FC26-6851-45B8-BE7A-0E764DC77805
       device_class: timestamp
-      iicon: "mdi:update"
+      icon: "mdi:update"
       state: >-
         {% if states('sensor.volvo_ex30_api_status') == 'OK' %}
           {{ state_attr('sensor.volvo_ex30_api_status', 'last_refresh') }}
@@ -13,7 +13,7 @@
     - name: volvo_ex30_last_data_update
       unique_id: E0DB55B9-0E3F-4E79-877E-DF9BDB1F0D55
       device_class: timestamp
-      iicon: "mdi:update"
+      icon: "mdi:update"
       state: >-
         {% if states('sensor.volvo_xc40_api_status') == 'OK' %}
           {{ state_attr('sensor.volvo_xc40_api_status', 'last_refresh') }}
