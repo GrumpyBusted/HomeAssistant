@@ -23,7 +23,6 @@
 - sensor:
     - name: volvo_xc40_status
       unique_id: 47C6E31A-970F-42C5-B73E-ABF27C439AA9
-      device_class: connectivity
       state: >-
         {% if states('sensor.volvo_xc40_last_data_update') != 'unavailable' and
               states('sensor.volvo_xc40_last_data_update') | as_datetime +
@@ -42,7 +41,6 @@
 - sensor:
     - name: volvo_ex30_status
       unique_id: 039553C2-9CD7-41F6-9FD8-1246CBF26864
-      device_class: connectivity
       state: >-
         {% if states('sensor.volvo_ex30_last_data_update') != 'unavailable' and
               states('sensor.volvo_ex30_last_data_update') | as_datetime +
