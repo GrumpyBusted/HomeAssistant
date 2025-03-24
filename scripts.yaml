@@ -876,3 +876,52 @@ home_create_todo_task:
               entity_id: '{{ entity_id }}'
               todo_id: '{{ todo_ids[repeat.index - 1] }}'
               completed: true
+home_set_radiator_temperature:
+  alias: Hjem sæt radiator temperatur
+  description: Sæt temperaturen på flere radiator termostater, men kontroller nuværende
+    temperatur først for at undgå unødige kald
+  fields:
+    entities:
+      description: Liste over climate entities der skal opdateres
+      example: '"- climate.living_room_thermostat" "- climate.living_room_thermostat"'
+      required: true
+      selector:
+        entity:
+          domain: climate
+          multiple: true
+    temperature:
+      description: Ønsket temperatur
+      example: 21
+      required: true
+      selector:
+        number:
+          min: -10
+          max: 30
+          unit_of_measurement: °C
+  sequence:
+  - action: system_log.write
+    metadata: {}
+    data:
+      level: debug
+      message: '{{ entities }}'
+  - action: system_log.write
+    metadata: {}
+    data:
+      level: debug
+      message: '{{ temperature }}'
+  - variables:
+      entities_to_update: "{% set result = [] %}\n{% for entity in entities %}\n  {%
+        if state_attr(entity, 'temperature')|float(default=-100) != temperature %}\n
+        \   {% set result = result + [entity] %}\n  {% endif %}\n{% endfor %}\n{{
+        result }}"
+  - action: system_log.write
+    metadata: {}
+    data:
+      level: debug
+      message: '{{ entities_to_update }}'
+  - data:
+      temperature: '{{ temperature }}'
+    target:
+      entity_id: '{{ entities_to_update }}'
+    action: climate.set_temperature
+  mode: parallel
