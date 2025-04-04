@@ -7471,9 +7471,6 @@
       - light.driveway_light_left_7_signify
       - light.driveway_light_left_8_signify
       - light.driveway_light_left_9_signify
-      - light.driveway_light_right_1_signify
-      - light.driveway_light_right_2_signify
-      - light.driveway_light_right_3_signify
       - lock.volvo_xc40_lock
       - lock.volvo_ex30_lock
       - lock.entrance_door_lock_yale
