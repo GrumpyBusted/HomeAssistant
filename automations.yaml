@@ -5715,6 +5715,7 @@
     - sensor.driveway_motion_sensor_house_east_battery_signify
     - sensor.driveway_motion_sensor_house_south_battery_signify
     - sensor.driveway_motion_sensor_street_battery_signify
+    - sensor.entrance_motion_sensor_battery_hue
   - trigger: time
     at: 03:13:00
   conditions: []
@@ -5758,6 +5759,15 @@
       entity_id: todo.home_smart_todo
       is_active: '{{ states(''sensor.driveway_motion_sensor_street_battery_signify'')|int
         < 5 }}'
+  - action: script.home_create_todo_task
+    data:
+      subject: Skift batteri på entre bevægelsessonsor
+      description: 'Batteri niveau er {{ states(''sensor.entrance_motion_sensor_battery_hue'')
+        }}% på Philips hue entre bevægelsessensor. Batteri: 2 * AAA'
+      related_entity_id: sensor.entrance_motion_sensor_battery_hue
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.entrance_motion_sensor_battery_hue'')|int < 5
+        }}'
   mode: restart
 - id: '1739915975801'
   alias: Hjem smart todo Philips hue dør sensor
