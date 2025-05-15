@@ -2482,17 +2482,17 @@
           device_id: 8c7dc86f86da84b01a301ef8044852c6
           schedule: '{{ schedule }}'
         response_variable: conversation_response
-      - action: system_log.write
-        metadata: {}
-        data:
-          level: debug
-          message: '{{ conversation_response }}'
     default:
     - action: sonnenbatterie.set_operating_mode
       data:
         device_id: 8c7dc86f86da84b01a301ef8044852c6
         mode: automatic
       response_variable: conversation_response
+  - action: system_log.write
+    metadata: {}
+    data:
+      level: debug
+      message: '{{ conversation_response }}'
   mode: single
 - id: '1737244947943'
   alias: Volvo XC40 - Lås
@@ -5716,6 +5716,8 @@
     - sensor.driveway_motion_sensor_house_south_battery_signify
     - sensor.driveway_motion_sensor_street_battery_signify
     - sensor.entrance_motion_sensor_battery_hue
+    - sensor.toilet_motion_sensor_battery
+    - sensor.garden_motion_sensor_house_north_battery
   - trigger: time
     at: 03:13:00
   conditions: []
@@ -5761,6 +5763,16 @@
         < 5 }}'
   - action: script.home_create_todo_task
     data:
+      subject: Skift batteri på udendørs bevægelsessonsor på nord gavlen
+      description: 'Batteri niveau er {{ states(''sensor.garden_motion_sensor_house_north_battery'')
+        }}% på Philips hue udendørs bevægelsessensor på nord gavlen. Batteri: 2 *
+        AA'
+      related_entity_id: sensor.garden_motion_sensor_house_north_battery
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.garden_motion_sensor_house_north_battery'')|int
+        < 5 }}'
+  - action: script.home_create_todo_task
+    data:
       subject: Skift batteri på entre bevægelsessonsor
       description: 'Batteri niveau er {{ states(''sensor.entrance_motion_sensor_battery_hue'')
         }}% på Philips hue entre bevægelsessensor. Batteri: 2 * AAA'
@@ -5768,6 +5780,14 @@
       entity_id: todo.home_smart_todo
       is_active: '{{ states(''sensor.entrance_motion_sensor_battery_hue'')|int < 5
         }}'
+  - action: script.home_create_todo_task
+    data:
+      subject: Skift batteri på toilet bevægelsessonsor
+      description: 'Batteri niveau er {{ states(''sensor.toilet_motion_sensor_battery'')
+        }}% på Philips hue toilet bevægelsessensor. Batteri: 2 * AAA'
+      related_entity_id: sensor.toilet_motion_sensor_battery
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.toilet_motion_sensor_battery'')|int < 5 }}'
   mode: restart
 - id: '1739915975801'
   alias: Hjem smart todo Philips hue dør sensor
