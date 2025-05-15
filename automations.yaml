@@ -7610,3 +7610,124 @@
   mode: restart
   trace:
     stored_traces: 100
+- id: '1747337340117'
+  alias: Entre lys
+  description: Automatik til at styre lys i entre
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.entrance_motion_sensor_motion_hue
+    to: 'on'
+  - trigger: state
+    entity_id:
+    - timer.driveway_light_entrance_timer
+    to: active
+  - trigger: state
+    entity_id:
+    - timer.entrance_light_timer
+    - timer.driveway_light_entrance_timer
+    to: idle
+  conditions: []
+  actions:
+  - if:
+    - condition: numeric_state
+      entity_id: sensor.entrance_motion_sensor_illuminance_hue
+      above: 100
+    then:
+    - action: light.turn_off
+      metadata: {}
+      data:
+        transition: 1
+      target:
+        entity_id:
+        - light.entrance_light_mirror_hue
+        - light.entrance_light_door_hue
+    else:
+    - if:
+      - condition: state
+        entity_id: binary_sensor.entrance_motion_sensor_motion_hue
+        state: 'on'
+      then:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:01:00
+        target:
+          entity_id: timer.entrance_light_timer
+    - if:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: timer.entrance_light_timer
+          state: active
+        - condition: state
+          entity_id: timer.driveway_light_entrance_timer
+          state: active
+      then:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          kelvin: 2700
+          brightness_pct: 80
+          transition: 1
+        target:
+          entity_id:
+          - light.entrance_light_mirror_hue
+          - light.entrance_light_door_hue
+      else:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.entrance_light_mirror_hue
+          - light.entrance_light_door_hue
+  mode: restart
+- id: '1747340588102'
+  alias: Toilet lys
+  description: Automatik til at styre lys i toilet
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.toilet_motion_sensor_motion
+    to: 'on'
+  - trigger: state
+    entity_id:
+    - timer.toilet_light_timer
+    to: idle
+  conditions: []
+  actions:
+  - if:
+    - condition: state
+      entity_id: binary_sensor.toilet_motion_sensor_motion
+      state: 'on'
+    then:
+    - action: timer.start
+      metadata: {}
+      data:
+        duration: 00:03:00
+      target:
+        entity_id: timer.toilet_light_timer
+  - if:
+    - condition: state
+      entity_id: timer.toilet_light_timer
+      state: active
+    then:
+    - action: light.turn_on
+      metadata: {}
+      data:
+        brightness_pct: 100
+        transition: 1
+      target:
+        entity_id:
+        - light.toilet_light
+    else:
+    - action: light.turn_off
+      metadata: {}
+      data:
+        transition: 1
+      target:
+        entity_id:
+        - light.toilet_light
+  mode: restart
