@@ -5716,6 +5716,7 @@
     - sensor.driveway_motion_sensor_house_south_battery_signify
     - sensor.driveway_motion_sensor_street_battery_signify
     - sensor.entrance_motion_sensor_battery_hue
+    - sensor.utility_room_motion_sensor_battery_hue
     - sensor.toilet_motion_sensor_battery
     - sensor.garden_motion_sensor_house_north_battery
   - trigger: time
@@ -5775,8 +5776,18 @@
     data:
       subject: Skift batteri på entre bevægelsessonsor
       description: 'Batteri niveau er {{ states(''sensor.entrance_motion_sensor_battery_hue'')
-        }}% på Philips hue entre bevægelsessensor. Batteri: 2 * AAA'
+        }}% på Philips hue indendørs bevægelsessensor i entreen. Batteri: 2 * AAA'
       related_entity_id: sensor.entrance_motion_sensor_battery_hue
+      entity_id: todo.home_smart_todo
+      is_active: '{{ states(''sensor.entrance_motion_sensor_battery_hue'')|int < 5
+        }}'
+  - action: script.home_create_todo_task
+    data:
+      subject: Skift batteri på bryggers bevægelsessonsor
+      description: 'Batteri niveau er {{ states(''sensor.utility_room_motion_sensor_battery'')
+        }}% på Philips hue utility_room_motion_sensor_battery bevægelsessensor i bryggerset.
+        Batteri: 2 * AAA'
+      related_entity_id: sensor.utility_room_motion_sensor_battery
       entity_id: todo.home_smart_todo
       is_active: '{{ states(''sensor.entrance_motion_sensor_battery_hue'')|int < 5
         }}'
@@ -5784,7 +5795,8 @@
     data:
       subject: Skift batteri på toilet bevægelsessonsor
       description: 'Batteri niveau er {{ states(''sensor.toilet_motion_sensor_battery'')
-        }}% på Philips hue toilet bevægelsessensor. Batteri: 2 * AAA'
+        }}% på Philips hue utility_room_motion_sensor_battery bevægelsessensor på
+        toilettet. Batteri: 2 * AAA'
       related_entity_id: sensor.toilet_motion_sensor_battery
       entity_id: todo.home_smart_todo
       is_active: '{{ states(''sensor.toilet_motion_sensor_battery'')|int < 5 }}'
@@ -7686,7 +7698,7 @@
   mode: restart
 - id: '1747340588102'
   alias: Toilet lys
-  description: Automatik til at styre lys i toilet
+  description: Automatik til at styre lys på toilettet
   triggers:
   - trigger: state
     entity_id:
@@ -7706,7 +7718,7 @@
     - action: timer.start
       metadata: {}
       data:
-        duration: 00:03:00
+        duration: 00:04:00
       target:
         entity_id: timer.toilet_light_timer
   - if:
@@ -7730,4 +7742,74 @@
       target:
         entity_id:
         - light.toilet_light
+  mode: restart
+- id: '1748709891445'
+  alias: Bryggers lys
+  description: Automatik til at styre lys i bryggerset
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.utility_room_motion_sensor_motion
+    to: 'on'
+  - trigger: state
+    entity_id:
+    - timer.utility_room_light_timer
+    to: idle
+  conditions: []
+  actions:
+  - if:
+    - condition: numeric_state
+      entity_id: sensor.utility_room_motion_sensor_illuminance
+      above: 100
+    then:
+    - action: light.turn_off
+      metadata: {}
+      data:
+        transition: 1
+      target:
+        entity_id:
+        - light.utility_room_light_spot_1
+        - light.utility_room_light_spot_2
+        - light.utility_room_light_spot_3
+        - light.utility_room_light_spot_4
+    else:
+    - if:
+      - condition: state
+        entity_id: binary_sensor.utility_room_motion_sensor_motion
+        state: 'on'
+      then:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:05:00
+        target:
+          entity_id: timer.utility_room_light_timer
+    - if:
+      - condition: state
+        entity_id: timer.utility_room_light_timer
+        state: active
+      then:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          kelvin: 2700
+          brightness_pct: 80
+          transition: 1
+        target:
+          entity_id:
+          - light.utility_room_light_spot_1
+          - light.utility_room_light_spot_2
+          - light.utility_room_light_spot_3
+          - light.utility_room_light_spot_4
+      else:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.utility_room_light_spot_1
+          - light.utility_room_light_spot_2
+          - light.utility_room_light_spot_3
+          - light.utility_room_light_spot_4
   mode: restart
