@@ -7781,7 +7781,7 @@
       - action: timer.start
         metadata: {}
         data:
-          duration: 00:05:00
+          duration: 00:02:00
         target:
           entity_id: timer.utility_room_light_timer
     - if:
