@@ -74,10 +74,24 @@
         mdi:account-group-outline
         {% endif %}
 - binary_sensor:
+    - name: "bedroom_occupancy"
+      unique_id: 0A2C2AAA-7F34-484D-9BA5-8031FEDF0E11
+      state: >-
+        {{ is_state('binary_sensor.bedroom_presence_sensor_occupancy', 'on') or 
+           is_state('timer.bedroom_presence_timer', 'active') }}
+      icon: >-
+        {% if is_state('binary_sensor.bedroom_people_present', 'on') %}
+        mdi:location-enter
+        {% else %}
+        mdi:location-exit
+        {% endif %}
+- binary_sensor:
     - name: "parent_sleeping"
       unique_id: 6CB2BD82-9ACE-4100-B7B8-DF17E10DD692
       state: >-
-        {{ is_state('binary_sensor.parent_home', 'on') and 
+        {{ states('sensor.people_home') | int > 0 and 
+           not(is_state('media_player.bedroom_apple_tv_media_player', 'playing')) and 
+           is_state('binary_sensor.bedroom_occupancy', 'on') and 
            is_state('binary_sensor.bedroom_blind', 'off') and 
            is_state('binary_sensor.bedroom_light', 'off') }}
       icon: >-
@@ -91,6 +105,7 @@
       unique_id: 51259E4B-BF87-448A-839D-0C1996331806
       state: >-
         {{ is_state('binary_sensor.emil_home', 'on') and 
+           not(is_state('media_player.emils_room_apple_tv_media_player', 'playing')) and 
            is_state('binary_sensor.emils_room_blind', 'off') and 
            is_state('binary_sensor.emils_room_light', 'off') }}
       icon: >-
@@ -104,6 +119,7 @@
       unique_id: 56C0C9A8-6803-4F0F-8C5F-9FC9B67D9694
       state: >-
         {{ is_state('binary_sensor.charlie_home', 'on') and 
+           not(is_state('media_player.charlies_room_apple_tv_media_player', 'playing')) and 
            is_state('binary_sensor.charlies_room_blind', 'off') and 
            is_state('binary_sensor.charlies_room_light', 'off') }}
       icon: >-
@@ -111,4 +127,35 @@
         mdi:sleep
         {% else %}
         mdi:sleep-off
+        {% endif %}
+- binary_sensor:
+    - name: "everyone_sleeping"
+      unique_id: 879F46F0-962B-4061-8BD3-15C179BD85D3
+      state: >-
+        {{ is_state('binary_sensor.charlie_sleeping', 'on') and 
+           is_state('binary_sensor.emil_sleeping', 'on') and 
+           is_state('binary_sensor.parent_sleeping', 'on') }}
+      icon: >-
+        {% if is_state('binary_sensor.charlie_sleeping', 'on') %}
+        mdi:sleep
+        {% else %}
+        mdi:sleep-off
+        {% endif %}
+- sensor:
+    - name: people_home
+      unique_id: 13A8D2F1-2B67-45C3-8B9D-4A0D1D12F3C8
+      state: >-
+        {{
+          (is_state('binary_sensor.anders_home', 'on') | int ) +
+          (is_state('binary_sensor.monique_home', 'on') | int ) +
+          (is_state('binary_sensor.charlie_home', 'on') | int ) +
+          (is_state('binary_sensor.emil_home', 'on') | int ) +
+          (is_state('input_boolean.house_sitter', 'on') | int ) 
+        }}
+      unit_of_measurement: ""
+      icon: >-
+        {% if is_state('sensor.people_home', '0') %}
+        mdi:account-off-outline
+        {% else %}
+        mdi:account
         {% endif %}

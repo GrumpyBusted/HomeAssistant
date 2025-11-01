@@ -6,11 +6,13 @@
       unit_of_measurement: lx
       state: >-
         {% set sensors = [
-          states('sensor.driveway_motion_sensor_entrance_illuminance_signify'),
-          states('sensor.driveway_motion_sensor_street_illuminance_signify'),
-          states('sensor.driveway_motion_sensor_house_east_illuminance_signify'),
-          states('sensor.driveway_motion_sensor_house_south_illuminance_signify')
+          states('sensor.driveway_motion_sensor_entrance_illuminance'),
+          states('sensor.driveway_motion_sensor_street_illuminance'),
+          states('sensor.driveway_motion_sensor_house_east_illuminance'),
+          states('sensor.driveway_motion_sensor_house_south_illuminance'),
+          states('sensor.garden_motion_sensor_house_north_illuminance'),
+          states('sensor.garden_motion_sensor_house_west_illuminance')
         ] %}
         {% set valid_values = sensors | map('float', default=none) | select('!=', none) | list %}
-        {{ (valid_values | min)|round(0) if valid_values | length > 0 else 'unavailable' }}
+        {{ (valid_values | sum / valid_values | length)|round(0) if valid_values | length > 0 else 'unavailable' }}
       icon: mdi:brightness-6

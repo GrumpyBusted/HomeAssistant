@@ -3,13 +3,13 @@ charlies_room_light_desk_adjust:
   description: Regulær lysstyrke på lys ved skrivebord på Charlies værelse
   sequence:
   - variables:
-      light_entity: light.charlies_room_light_desk_mid_philips_hue
+      light_entity: light.charlies_room_light_desk_mid
       step: '{{ brightness_step | int }}'
   - target:
       entity_id:
-      - light.charlies_room_light_desk_left_philips_hue
-      - light.charlies_room_light_desk_mid_philips_hue
-      - light.charlies_room_light_desk_right_philips_hue
+      - light.charlies_room_light_desk_left
+      - light.charlies_room_light_desk_mid
+      - light.charlies_room_light_desk_right
     data:
       transition: 0.5
       brightness: "{% set current_brightness = state_attr(light_entity, 'brightness')
@@ -45,159 +45,6 @@ charlies_room_light_desk_adjust:
         data: {}
   mode: queued
   max: 10
-patio_light_sunset:
-  alias: Terrasse lys solnedgang scene
-  description: Lys scene på terrasse til hygge lys med sol nedgangs farver
-  sequence:
-  - parallel:
-    - action: light.turn_on
-      metadata: {}
-      data:
-        transition: 1
-        brightness_pct: 40
-        rgb_color:
-        - 253
-        - 160
-        - 83
-      target:
-        entity_id:
-        - light.patio_light_table_philips_hue
-    - action: light.turn_on
-      metadata: {}
-      data:
-        transition: 1
-        brightness_pct: 40
-        rgb_color:
-        - 240
-        - 106
-        - 92
-      target:
-        entity_id:
-        - light.patio_light_main_philips_hue
-    - action: light.turn_on
-      metadata: {}
-      data:
-        transition: 1
-        brightness_pct: 40
-        rgb_color:
-        - 199
-        - 83
-        - 253
-      target:
-        entity_id:
-        - light.patio_light_bar_ledvance_philips_hue
-living_room_light_dining:
-  alias: Stue lys spise scene
-  description: Lys scene til stuen til spise situation
-  sequence:
-  - parallel:
-    - action: light.turn_on
-      metadata: {}
-      data:
-        transition: 1
-        kelvin: 2700
-        brightness_pct: 100
-      target:
-        entity_id:
-        - light.living_room_light_dining_table_philips_hue
-        - light.living_room_light_extra_philips_hue
-    - action: light.turn_on
-      metadata: {}
-      data:
-        transition: 1
-        kelvin: 2700
-        brightness_pct: 75
-      target:
-        entity_id:
-        - light.living_room_light_china_cabinet_philips_hue
-    - action: light.turn_on
-      metadata: {}
-      data:
-        transition: 1
-        kelvin: 2300
-        brightness_pct: 50
-      target:
-        entity_id:
-        - light.living_room_light_escher_philips_hue
-        - light.living_room_light_joakim_philips_hue
-        - light.living_room_light_sofa_spot_philips_hue
-    - action: light.turn_off
-      metadata: {}
-      data:
-        transition: 1
-      target:
-        entity_id:
-        - light.living_room_light_sofa_receiver_philips_hue
-        - light.living_room_light_sofa_window_philips_hue
-        - light.living_room_tv_light_strip_philips_hue
-    - action: light.turn_on
-      metadata: {}
-      data: {}
-      target:
-        entity_id:
-        - light.living_room_light_glass_cabinet_philips_hue
-    - action: light.turn_off
-      metadata: {}
-      data: {}
-      target:
-        entity_id:
-        - light.living_room_light_bookcase_philips_hue
-        - light.living_room_light_lamp_philips_hue
-  - event: living_room_light_scene
-    event_data:
-      scene: dining
-living_room_light_tv:
-  alias: Stue lys TV scene
-  description: Lys scene til stuen til TV situation
-  sequence:
-  - parallel:
-    - action: light.turn_on
-      metadata: {}
-      data:
-        transition: 1
-        kelvin: 2700
-        brightness_pct: 75
-      target:
-        entity_id:
-        - light.living_room_tv_light_strip_philips_hue
-        - light.living_room_light_escher_philips_hue
-        - light.living_room_light_joakim_philips_hue
-        - light.living_room_light_sofa_spot_philips_hue
-    - action: light.turn_on
-      metadata: {}
-      data:
-        transition: 1
-        kelvin: 2300
-        brightness_pct: 50
-      target:
-        entity_id:
-        - light.living_room_light_sofa_receiver_philips_hue
-        - light.living_room_light_sofa_window_philips_hue
-        - light.living_room_light_china_cabinet_philips_hue
-    - action: light.turn_off
-      metadata: {}
-      data:
-        transition: 1
-      target:
-        entity_id:
-        - light.living_room_light_dining_table_philips_hue
-        - light.living_room_light_extra_philips_hue
-    - action: light.turn_on
-      metadata: {}
-      data: {}
-      target:
-        entity_id:
-        - light.living_room_light_lamp_philips_hue
-    - action: light.turn_off
-      metadata: {}
-      data: {}
-      target:
-        entity_id:
-        - light.living_room_light_bookcase_philips_hue
-        - light.living_room_light_glass_cabinet_philips_hue
-  - event: living_room_light_scene
-    event_data:
-      scene: tv
 bedroom_light_sunrise:
   alias: Soveværelse lys solopgang scene
   description: Lys scene til soveværelse til vågn op
@@ -208,7 +55,7 @@ bedroom_light_sunrise:
   - choose:
     - conditions:
       - condition: state
-        entity_id: light.bedroom_light_philips_hue
+        entity_id: light.bedroom_lights
         state: 'off'
       sequence:
       - action: light.turn_on
@@ -221,7 +68,7 @@ bedroom_light_sunrise:
           - 255
         target:
           entity_id:
-          - light.bedroom_light_anders_philips_hue
+          - light.bedroom_light_anders
       - action: timer.start
         metadata: {}
         data:
@@ -230,10 +77,10 @@ bedroom_light_sunrise:
           entity_id: timer.bedroom_light_sunrise_delay_timer
     - conditions:
       - condition: state
-        entity_id: light.bedroom_light_monique_philips_hue
+        entity_id: light.bedroom_light_monique
         state: 'off'
       - condition: numeric_state
-        entity_id: light.bedroom_light_anders_philips_hue
+        entity_id: light.bedroom_light_anders
         attribute: brightness
         above: 1
         below: 170
@@ -248,7 +95,7 @@ bedroom_light_sunrise:
           - 255
         target:
           entity_id:
-          - light.bedroom_light_monique_philips_hue
+          - light.bedroom_light_monique
       - action: timer.start
         metadata: {}
         data:
@@ -257,12 +104,12 @@ bedroom_light_sunrise:
           entity_id: timer.bedroom_light_sunrise_delay_timer
     - conditions:
       - condition: state
-        entity_id: light.bedroom_light_window_philips_hue
+        entity_id: light.bedroom_light_window
         state: 'off'
       - condition: numeric_state
         entity_id:
-        - light.bedroom_light_anders_philips_hue
-        - light.bedroom_light_monique_philips_hue
+        - light.bedroom_light_anders
+        - light.bedroom_light_monique
         attribute: brightness
         above: 1
         below: 170
@@ -277,7 +124,7 @@ bedroom_light_sunrise:
           - 94
         target:
           entity_id:
-          - light.bedroom_light_window_philips_hue
+          - light.bedroom_light_window
       - action: timer.start
         metadata: {}
         data:
@@ -286,13 +133,13 @@ bedroom_light_sunrise:
           entity_id: timer.bedroom_light_sunrise_delay_timer
     - conditions:
       - condition: state
-        entity_id: light.bedroom_light_closet_philips_hue
+        entity_id: light.bedroom_light_closet
         state: 'off'
       - condition: numeric_state
         entity_id:
-        - light.bedroom_light_anders_philips_hue
-        - light.bedroom_light_monique_philips_hue
-        - light.bedroom_light_window_philips_hue
+        - light.bedroom_light_anders
+        - light.bedroom_light_monique
+        - light.bedroom_light_window
         attribute: brightness
         above: 1
         below: 170
@@ -307,7 +154,7 @@ bedroom_light_sunrise:
           - 128
         target:
           entity_id:
-          - light.bedroom_light_closet_philips_hue
+          - light.bedroom_light_closet
       - action: timer.start
         metadata: {}
         data:
@@ -322,7 +169,7 @@ bedroom_light_sunrise:
         kelvin: 2700
         brightness_pct: 80
       target:
-        entity_id: light.bedroom_light_philips_hue
+        entity_id: light.bedroom_lights
 bedroom_light_sunset:
   alias: Soveværelse lys solnedgang scene
   description: Lys scene til soveværelse til gå i seng
@@ -345,7 +192,7 @@ bedroom_light_sunset:
         transition: 1
         kelvin: 2700
       target:
-        entity_id: light.bedroom_light_philips_hue
+        entity_id: light.bedroom_lights
   - parallel:
     - action: light.turn_on
       data:
@@ -357,7 +204,7 @@ bedroom_light_sunset:
         - 63
       target:
         entity_id:
-        - light.bedroom_light_anders_philips_hue
+        - light.bedroom_light_anders
     - action: light.turn_on
       data:
         transition: 5
@@ -368,7 +215,7 @@ bedroom_light_sunset:
         - 204
       target:
         entity_id:
-        - light.bedroom_light_monique_philips_hue
+        - light.bedroom_light_monique
     - action: light.turn_on
       data:
         transition: 5
@@ -379,7 +226,7 @@ bedroom_light_sunset:
         - 77
       target:
         entity_id:
-        - light.bedroom_light_closet_philips_hue
+        - light.bedroom_light_closet
     - action: light.turn_on
       data:
         transition: 5
@@ -390,7 +237,7 @@ bedroom_light_sunset:
         - 148
       target:
         entity_id:
-        - light.bedroom_light_window_philips_hue
+        - light.bedroom_light_window
   - delay:
       hours: 0
       minutes: 0
@@ -406,7 +253,7 @@ bedroom_light_sunset:
         - 63
       target:
         entity_id:
-        - light.bedroom_light_anders_philips_hue
+        - light.bedroom_light_anders
     - action: light.turn_on
       data:
         transition: '{{ transition }}'
@@ -417,7 +264,7 @@ bedroom_light_sunset:
         - 204
       target:
         entity_id:
-        - light.bedroom_light_monique_philips_hue
+        - light.bedroom_light_monique
     - action: light.turn_on
       data:
         transition: '{{ transition }}'
@@ -428,7 +275,7 @@ bedroom_light_sunset:
         - 77
       target:
         entity_id:
-        - light.bedroom_light_closet_philips_hue
+        - light.bedroom_light_closet
     - action: light.turn_on
       data:
         transition: '{{ transition }}'
@@ -439,7 +286,7 @@ bedroom_light_sunset:
         - 148
       target:
         entity_id:
-        - light.bedroom_light_window_philips_hue
+        - light.bedroom_light_window
 stue_tand_tv:
   alias: Stue TV tænd
   description: Automatik til at tænde TV i stuen

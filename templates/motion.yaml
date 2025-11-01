@@ -1,0 +1,72 @@
+- binary_sensor:
+    - name: driveway_motion_sensor_street_detected
+      unique_id: 98A05976-CB35-4897-B97A-8E6DCB0131DD
+      device_class: motion
+      state: >-
+        {{ is_state('binary_sensor.driveway_motion_sensor_street_occupancy', 'on') or is_state('timer.driveway_motion_sensor_street_timer', 'active') }}
+      icon: >
+        {% if is_state('binary_sensor.driveway_motion_sensor_street_detected', 'on') %}
+        mdi:motion
+        {% else %}
+        mdi:motion-outline
+        {% endif %}
+- binary_sensor:
+    - name: driveway_motion_sensor_entrance_detected
+      unique_id: 650BE45B-0882-445C-BBEF-FF1D8800360E
+      device_class: motion
+      state: >-
+        {{ is_state('binary_sensor.driveway_motion_sensor_entrance_occupancy', 'on') or is_state('timer.driveway_motion_sensor_entrance_timer', 'active') }}
+      icon: >
+        {% if is_state('binary_sensor.driveway_motion_sensor_entrance_detected', 'on') %}
+        mdi:motion
+        {% else %}
+        mdi:motion-outline
+        {% endif %}
+- binary_sensor:
+    - name: driveway_motion_sensor_house_south_detected
+      unique_id: BDBB83F1-58B2-4FD0-8A3B-F9DEC5385051
+      device_class: motion
+      state: >-
+        {{ is_state('binary_sensor.driveway_motion_sensor_house_south_occupancy', 'on') or is_state('timer.driveway_motion_sensor_house_south_timer', 'active') }}
+      icon: >
+        {% if is_state('binary_sensor.driveway_motion_sensor_house_south_detected', 'on') %}
+        mdi:motion
+        {% else %}
+        mdi:motion-outline
+        {% endif %}
+- binary_sensor:
+    - name: garden_motion_sensor_house_east_detected
+      unique_id: 6E783DC1-7E4A-4A6E-9D47-FA8A0C3792CB
+      device_class: motion
+      state: >-
+        {{ is_state('binary_sensor.garden_motion_sensor_house_east_occupancy', 'on') or is_state('timer.garden_motion_sensor_house_east_timer', 'active') }}
+      icon: >
+        {% if is_state('binary_sensor.garden_motion_sensor_house_east_detected', 'on') %}
+        mdi:motion
+        {% else %}
+        mdi:motion-outline
+        {% endif %}
+- binary_sensor:
+    - name: garden_motion_sensor_house_north_detected
+      unique_id: C7817528-1212-4FC4-9BA7-F754D0DA9DD9
+      device_class: motion
+      state: >-
+        {{ is_state('binary_sensor.garden_motion_sensor_house_north_occupancy', 'on') or is_state('timer.garden_motion_sensor_house_north_timer', 'active') }}
+      icon: >
+        {% if is_state('binary_sensor.garden_motion_sensor_house_north_detected', 'on') %}
+        mdi:motion
+        {% else %}
+        mdi:motion-outline
+        {% endif %}
+- binary_sensor:
+    - name: garden_motion_sensor_house_west_detected
+      unique_id: 2E34C1A4-F47D-445D-8BCB-F2D0210015EE
+      device_class: motion
+      state: >-
+        {{ is_state('binary_sensor.garden_motion_sensor_house_west_occupancy', 'on') or is_state('timer.garden_motion_sensor_house_west_timer', 'active') }}
+      icon: >
+        {% if is_state('binary_sensor.garden_motion_sensor_house_west_detected', 'on') %}
+        mdi:motion
+        {% else %}
+        mdi:motion-outline
+        {% endif %}

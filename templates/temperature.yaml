@@ -6,7 +6,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {{ state_attr('climate.utility_room_temperature_sensor_tado', 'current_temperature')|round(1) }}
+        {{ state_attr('climate.utility_room_temperature_sensor', 'current_temperature')|round(1) }}
 - sensor:
     - name: utility_room_target_temperature
       unique_id: 5749D3E7-43F2-457B-AA05-742FB392F66C
@@ -16,7 +16,7 @@
       icon: "mdi:thermometer"
       state: >-
         {%- if is_state('script.home_exercising_radiator_valves', 'off') %}
-          {{ state_attr('climate.utility_room_temperature_sensor_tado', 'temperature')|round(1) }}
+          {{ state_attr('climate.utility_room_temperature_sensor', 'temperature')|round(1) }}
         {%- else %}
           23
         {%- endif %}
@@ -28,7 +28,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {{ states('sensor.hallway_temperature_sensor_temperature_tado')|round(1) }}
+        {{ states('sensor.hallway_temperature_sensor_temperature')|round(1) }}
 - sensor:
     - name: hallway_target_temperature
       unique_id: 01623DA3-1F3D-412F-8AAC-426D7F30343F
@@ -38,7 +38,7 @@
       icon: "mdi:thermometer"
       state: >-
         {%- if is_state('script.home_exercising_radiator_valves', 'off') %}
-          {{ state_attr('climate.hallway_radiator_thermostat_tado', 'temperature')|round(1) }}
+          {{ state_attr('climate.hallway_radiator_thermostat', 'temperature')|round(1) }}
         {%- else %}
           23
         {%- endif %}
@@ -50,7 +50,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {{ state_attr('climate.toilet_radiator_thermostat_tado', 'current_temperature')|round(1) }}
+        {{ state_attr('climate.toilet_radiator_thermostat', 'current_temperature')|round(1) }}
 - sensor:
     - name: toilet_target_temperature
       unique_id: 408B2FFA-F28D-4D03-99ED-E1AF518E33AF
@@ -60,7 +60,7 @@
       icon: "mdi:thermometer"
       state: >-
         {%- if is_state('script.home_exercising_radiator_valves', 'off') %}
-          {{ state_attr('climate.toilet_radiator_thermostat_tado', 'temperature')|round(1) }}
+          {{ state_attr('climate.toilet_radiator_thermostat', 'temperature')|round(1) }}
         {%- else %}
           23
         {%- endif %}
@@ -72,8 +72,8 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {{ (state_attr('climate.bathroom_radiator_thermostat_wall_tado', 'current_temperature') + 
-            state_attr('climate.bathroom_radiator_thermostat_floor_tado', 'current_temperature'))/2|round(1) }}
+        {{ (state_attr('climate.bathroom_radiator_thermostat_wall', 'current_temperature') + 
+            state_attr('climate.bathroom_radiator_thermostat_floor', 'current_temperature'))/2|round(1) }}
 - sensor:
     - name: bathroom_target_temperature
       unique_id: 2580B7A9-621D-4006-A19B-1E558D1C5A99
@@ -83,7 +83,7 @@
       icon: "mdi:thermometer"
       state: >-
         {%- if is_state('script.home_exercising_radiator_valves', 'off') %}
-          {{ state_attr('climate.bathroom_radiator_thermostat_wall_tado', 'temperature')|round(1) }}
+          {{ state_attr('climate.bathroom_radiator_thermostat_wall', 'temperature')|round(1) }}
         {%- else %}
           23
         {%- endif %}
@@ -95,8 +95,8 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {{ (states('sensor.emils_room_temperature_sensor_temperature_tado')|round(2) + 
-            state_attr('climate.emils_room_pure_hot_cool_dyson', 'current_temperature')|round(2))/2|round(1) }}
+        {{ (states('sensor.emils_room_temperature_sensor_temperature')|round(2) + 
+            state_attr('climate.emils_room_air_purifier', 'current_temperature')|round(2))/2|round(1) }}
 - sensor:
     - name: emils_room_target_temperature
       unique_id: 90C81B40-9757-4BBF-892D-2EDA13331287
@@ -106,7 +106,7 @@
       icon: "mdi:thermometer"
       state: >-
         {%- if is_state('script.home_exercising_radiator_valves', 'off') %}
-          {{ state_attr('climate.emils_room_radiator_thermostat_tado', 'temperature')|round(1) }}
+          {{ state_attr('climate.emils_room_radiator_thermostat', 'temperature')|round(1) }}
         {%- else %}
           23
         {%- endif %}
@@ -118,7 +118,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {{ state_attr('climate.charlies_room_radiator_thermostat_tado', 'current_temperature')|round(1) }}
+        {{ state_attr('climate.charlies_room_radiator_thermostat', 'current_temperature')|round(1) }}
 - sensor:
     - name: charlies_room_target_temperature
       unique_id: 11EB4DEF-5434-4301-B8A0-1CA73099D240
@@ -128,7 +128,7 @@
       icon: "mdi:thermometer"
       state: >-
         {%- if is_state('script.home_exercising_radiator_valves', 'off') %}
-          {{ state_attr('climate.charlies_room_radiator_thermostat_tado', 'temperature')|round(1) }}
+          {{ state_attr('climate.charlies_room_radiator_thermostat', 'temperature')|round(1) }}
         {%- else %}
           23
         {%- endif %}
@@ -140,7 +140,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {{ states('sensor.bedroom_weather_station_temperature_netatmo')|round(1) }}
+        {{ states('sensor.bedroom_weather_station_temperature')|round(1) }}
 - sensor:
     - name: bedroom_target_temperature
       unique_id: C5EE6CD6-C042-48D3-9F08-56ECE1D1EB43
@@ -150,7 +150,7 @@
       icon: "mdi:thermometer"
       state: >-
         {%- if is_state('script.home_exercising_radiator_valves', 'off') %}
-          {{ state_attr('climate.bedroom_radiator_thermostat_tado', 'temperature')|round(1) }}
+          {{ state_attr('climate.bedroom_radiator_thermostat', 'temperature')|round(1) }}
         {%- else %}
           23
         {%- endif %}
@@ -162,7 +162,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {{ states('sensor.living_room_temperature_sensor_temperature_tado')|round(1) }}
+        {{ states('sensor.living_room_temperature_sensor_temperature')|round(1) }}
 - sensor:
     - name: living_room_target_temperature
       unique_id: 213A7B32-B903-4C2E-905B-B8D6F7AB5CFB
@@ -172,7 +172,7 @@
       icon: "mdi:thermometer"
       state: >-
         {%- if is_state('script.home_exercising_radiator_valves', 'off') %}
-          {{ state_attr('climate.living_room_radiator_thermostat_dining_table_tado', 'temperature')|round(1) }}
+          {{ state_attr('climate.living_room_radiator_thermostat_dining_table', 'temperature')|round(1) }}
         {%- else %}
           23
         {%- endif %}
@@ -184,7 +184,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:home-thermometer-outline"
       state: >-
-        {{ states('sensor.garden_weather_station_temperature_netatmo')|round(1) }}
+        {{ states('sensor.garden_weather_station_temperature')|round(1) }}
 - sensor:
     - name: home_current_temperature
       unique_id: C3DB0A8D-9F30-488D-9CD1-3EA2D2AEEB61
@@ -226,7 +226,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:home-thermometer"
       state: >-
-        {{ state_attr('climate.home_heat_pump_panasonic', 'current_temperature')|float }}
+        {{ state_attr('climate.home_heat_pump', 'current_temperature')|float }}
 - sensor:
     - name: home_heat_pump_offset_temperature
       unique_id: D00A30BF-C412-4A93-908E-2E1F1CDF78CB
@@ -235,4 +235,4 @@
       unit_of_measurement: "°C"
       icon: "mdi:home-thermometer"
       state: >-
-        {{ state_attr('climate.home_heat_pump_panasonic', 'temperature')|float }}
+        {{ state_attr('climate.home_heat_pump', 'temperature')|float }}

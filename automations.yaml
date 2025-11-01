@@ -1,63 +1,64 @@
 - id: '1735603602121'
   alias: Stue lys
-  description: Automatik for lys på Stuen
+  description: Automatik til at styre lys i stuen
   triggers:
   - trigger: state
     entity_id:
-    - event.living_room_switch_button_1_philips_hue
+    - event.living_room_switch_button_1
     attribute: event_type
     to: short_release
     id: button_1_short
   - trigger: state
     entity_id:
-    - event.living_room_switch_button_1_philips_hue
+    - event.living_room_switch_button_1
     attribute: event_type
     to: long_release
     id: button_1_long
   - trigger: state
     entity_id:
-    - event.living_room_switch_button_2_philips_hue
+    - event.living_room_switch_button_2
     attribute: event_type
     to: short_release
     id: button_2_short
   - trigger: state
     entity_id:
-    - event.living_room_switch_button_2_philips_hue
+    - event.living_room_switch_button_2
     attribute: event_type
     to: long_release
     id: button_2_long
   - trigger: state
     entity_id:
-    - event.living_room_switch_button_3_philips_hue
+    - event.living_room_switch_button_3
     attribute: event_type
     to: short_release
     id: button_3_short
   - trigger: state
     entity_id:
-    - event.living_room_switch_button_3_philips_hue
+    - event.living_room_switch_button_3
     attribute: event_type
     to: long_release
     id: button_3_long
   - trigger: state
     entity_id:
-    - event.living_room_switch_button_4_philips_hue
+    - event.living_room_switch_button_4
     attribute: event_type
     to: short_release
     id: button_4_short
   - trigger: state
     entity_id:
-    - event.living_room_switch_button_4_philips_hue
+    - event.living_room_switch_button_4
     attribute: event_type
     to: long_release
     id: button_4_long
   - trigger: state
     entity_id:
-    - event.living_room_switch_rotary_philips_hue
+    - event.living_room_switch_rotary
     id: rotary
   - trigger: state
     entity_id:
-    - binary_sensor.family_home
-    to: 'off'
+    - sensor.people_home
+    to: '0'
+    id: no_one_home
   - trigger: state
     entity_id:
     - binary_sensor.living_room_light
@@ -66,25 +67,10 @@
       hours: 0
       minutes: 15
       seconds: 0
-  - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    id: lights_on
   conditions: []
   actions:
   - choose:
-    - conditions:
-      - condition: trigger
-        id:
-        - button_1_short
-      - condition: state
-        entity_id: binary_sensor.living_room_light
-        state: 'on'
-      sequence:
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 1
-        target:
-          entity_id: light.living_room_light_philips_hue
     - conditions:
       - condition: trigger
         id:
@@ -97,30 +83,193 @@
           kelvin: 2700
           brightness_pct: 80
         target:
-          entity_id: light.living_room_light_philips_hue
+          entity_id:
+          - light.living_room_light_bookcase_left
+          - light.living_room_light_bookcase_right
+          - light.living_room_light_cabinet_left
+          - light.living_room_light_cabinet_right
+          - light.living_room_light_tv_left
+          - light.living_room_light_tv_right
+          - light.living_room_light_escher
+          - light.living_room_light_window_left
+          - light.living_room_light_window_right
+          - light.living_room_light_strip_skylight
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.living_room_light_dining_table_spot_cabinet
+          - light.living_room_light_dining_table_spot_sofa
+          - light.living_room_light_strip_glass_cabinet
+          - light.living_room_light_strip_receiver
+          - light.living_room_tv_light_strip
+          - light.living_room_smart_plug_lamp
     - conditions:
       - condition: trigger
         id:
         - button_2_short
       sequence:
-      - action: script.living_room_light_dining
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2700
+          brightness_pct: 100
+        target:
+          entity_id:
+          - light.living_room_light_dining_table_spot_cabinet
+          - light.living_room_light_dining_table_spot_sofa
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2700
+          brightness_pct: 75
+        target:
+          entity_id:
+          - light.living_room_light_strip_skylight
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2300
+          brightness_pct: 75
+        target:
+          entity_id:
+          - light.living_room_light_bookcase_left
+          - light.living_room_light_bookcase_right
+          - light.living_room_light_cabinet_left
+          - light.living_room_light_cabinet_right
+          - light.living_room_light_strip_glass_cabinet
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2300
+          brightness_pct: 50
+        target:
+          entity_id:
+          - light.living_room_light_tv_left
+          - light.living_room_tv_light_strip
+      - action: light.turn_on
         metadata: {}
         data: {}
+        target:
+          entity_id:
+          - light.living_room_smart_plug_lamp
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.living_room_light_tv_right
+          - light.living_room_light_escher
+          - light.living_room_light_window_left
+          - light.living_room_light_window_right
+          - light.living_room_light_strip_receiver
     - conditions:
       - condition: trigger
         id:
         - button_3_short
       sequence:
-      - action: script.living_room_light_tv
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2700
+          brightness_pct: 75
+        target:
+          entity_id:
+          - light.living_room_light_tv_left
+          - light.living_room_light_tv_right
+          - light.living_room_light_escher
+          - light.living_room_light_window_left
+          - light.living_room_light_window_right
+          - light.living_room_light_strip_receiver
+          - light.living_room_tv_light_strip
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2300
+          brightness_pct: 50
+        target:
+          entity_id:
+          - light.living_room_light_strip_glass_cabinet
+          - light.living_room_light_strip_skylight
+      - action: light.turn_on
         metadata: {}
         data: {}
+        target:
+          entity_id:
+          - light.living_room_smart_plug_lamp
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.living_room_light_bookcase_left
+          - light.living_room_light_bookcase_right
+          - light.living_room_light_cabinet_left
+          - light.living_room_light_cabinet_right
+          - light.living_room_light_dining_table_spot_cabinet
+          - light.living_room_light_dining_table_spot_sofa
     - conditions:
       - condition: trigger
         id:
-        - button_1_long
-        - button_2_long
-        - button_3_long
-        - button_4_long
+        - button_4_short
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 3000
+          brightness_pct: 100
+        target:
+          entity_id:
+          - light.living_room_light_bookcase_left
+          - light.living_room_light_bookcase_right
+          - light.living_room_light_cabinet_left
+          - light.living_room_light_cabinet_right
+          - light.living_room_light_tv_left
+          - light.living_room_light_tv_right
+          - light.living_room_light_escher
+          - light.living_room_light_window_left
+          - light.living_room_light_window_right
+          - light.living_room_light_dining_table_spot_cabinet
+          - light.living_room_light_dining_table_spot_sofa
+          - light.living_room_light_strip_glass_cabinet
+          - light.living_room_light_strip_receiver
+          - light.living_room_light_strip_skylight
+          - light.living_room_tv_light_strip
+      - action: light.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - light.living_room_smart_plug_lamp
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: trigger
+          id:
+          - button_1_long
+          - button_2_long
+          - button_3_long
+          - button_4_long
+          - no_one_home
+        - condition: and
+          conditions:
+          - condition: trigger
+            id:
+            - lights_on
+          - condition: state
+            entity_id: sensor.people_home
+            state: '0'
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -128,7 +277,23 @@
           transition: 1
         target:
           entity_id:
-          - light.living_room_light_philips_hue
+          - light.living_room_light_bookcase_left
+          - light.living_room_light_bookcase_right
+          - light.living_room_light_cabinet_left
+          - light.living_room_light_cabinet_right
+          - light.living_room_light_tv_left
+          - light.living_room_light_tv_right
+          - light.living_room_light_escher
+          - light.living_room_light_window_left
+          - light.living_room_light_window_right
+          - light.living_room_light_dining_table_spot_cabinet
+          - light.living_room_light_dining_table_spot_sofa
+          - light.living_room_light_strip_glass_cabinet
+          - light.living_room_light_strip_receiver
+          - light.living_room_light_strip_skylight
+          - light.living_room_tv_light_strip
+          - light.living_room_light_extra
+          - light.living_room_smart_plug_lamp
     - conditions:
       - condition: trigger
         id:
@@ -137,7 +302,7 @@
       - choose:
         - conditions:
           - condition: state
-            entity_id: event.living_room_switch_rotary_philips_hue
+            entity_id: event.living_room_switch_rotary
             attribute: event_type
             state: clock_wise
           - condition: state
@@ -147,62 +312,45 @@
           - action: light.turn_on
             metadata: {}
             data:
-              brightness_pct: '{{ (state_attr(''event.living_room_switch_rotary_philips_hue'',
+              brightness_pct: '{{ (state_attr(''event.living_room_switch_rotary'',
                 ''steps'')|float / 3.60)|round(0) }}'
             target:
-              entity_id: light.living_room_light_philips_hue
+              entity_id: light.living_room_lights
         - conditions:
           - condition: state
-            entity_id: event.living_room_switch_rotary_philips_hue
+            entity_id: event.living_room_switch_rotary
             attribute: event_type
             state: clock_wise
           sequence:
           - action: light.turn_on
             metadata: {}
             data:
-              brightness_step_pct: '{{ (state_attr(''event.living_room_switch_rotary_philips_hue'',
+              brightness_step_pct: '{{ (state_attr(''event.living_room_switch_rotary'',
                 ''steps'')|float / 3.60)|round(0) }}'
             target:
-              entity_id: "{% set lights = state_attr('light.living_room_light_philips_hue',
-                'entity_id') | expand() | selectattr('state', 'eq', 'on') | map(attribute='entity_id')
+              entity_id: "{% set lights = state_attr('light.living_room_lights', 'entity_id')
+                | expand() | selectattr('state', 'eq', 'on') | map(attribute='entity_id')
                 | list %} {% if lights | length > 0 -%}\n  {{ lights }}      \n{%-
-                else -%}\n  {{ 'light.living_room_light_philips_hue' }}      \n{%-
-                endif %}"
+                else -%}\n  {{ 'light.living_room_lights' }}      \n{%- endif %}"
         default:
         - action: light.turn_on
           metadata: {}
           data:
-            brightness_step_pct: '{{ (state_attr(''event.living_room_switch_rotary_philips_hue'',
+            brightness_step_pct: '{{ (state_attr(''event.living_room_switch_rotary'',
               ''steps'')|float / -3.60)|round(0) }}'
           target:
-            entity_id: '{{ state_attr(''light.living_room_light_philips_hue'', ''entity_id'')
+            entity_id: '{{ state_attr(''light.living_room_lights'', ''entity_id'')
               | expand() | selectattr(''state'', ''eq'', ''on'') | map(attribute=''entity_id'')
               | list }}      '
-    - conditions:
-      - condition: state
-        entity_id: input_boolean.home_house_sitter
-        state: 'on'
-      sequence: []
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.family_home
-        state: 'off'
-      sequence:
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 0
-        target:
-          entity_id:
-          - light.living_room_light_philips_hue
   mode: queued
+  max: 10
 - id: '1735658670560'
   alias: Indkørsel billader lås op
   description: Hvis en af bilerne er hjemme og tilsluttet, lås billaderen op
   triggers:
   - trigger: state
     entity_id:
-    - sensor.driveway_ev_charger_status_description_wallbox
+    - sensor.driveway_ev_charger_status_description
     to: Locked, car connected
   - trigger: state
     entity_id:
@@ -215,21 +363,17 @@
   - trigger: state
     entity_id:
     - sensor.volvo_ex30_charging_connection_status
-    from: Disconnected
+    to: connection_status_connected_ac
   - trigger: state
     entity_id:
     - sensor.volvo_xc40_charging_connection_status
-    to: Connected AC
-  - trigger: state
-    entity_id:
-    - binary_sensor.family_home
-    to: 'on'
+    to: connection_status_connected_ac
   conditions: []
   actions:
   - if:
     - condition: template
-      value_template: '{{ states(''sensor.volvo_ex30_last_data_update'') | as_datetime
-        + timedelta(seconds=5) < now() }}'
+      value_template: '{{ states(''button.volvo_ex30_update_data'') | as_datetime
+        + timedelta(seconds=30) < now() }}'
     then:
     - action: button.press
       metadata: {}
@@ -239,8 +383,8 @@
     - delay: 00:00:02
   - if:
     - condition: template
-      value_template: '{{ states(''sensor.volvo_xc40_last_data_update'') | as_datetime
-        + timedelta(seconds=5) < now() }}'
+      value_template: '{{ states(''button.volvo_xc40_update_data'') | as_datetime
+        + timedelta(seconds=30) < now() }}'
     then:
     - action: button.press
       metadata: {}
@@ -248,94 +392,78 @@
       target:
         entity_id: button.volvo_xc40_update_data
     - delay: 00:00:02
-  - choose:
-    - conditions:
+  - if:
+    - condition: and
+      conditions:
       - condition: state
-        entity_id: binary_sensor.family_home
-        state: 'on'
-      - condition: state
-        entity_id: lock.driveway_ev_charger_lock_wallbox
-        state: locked
-      - condition: state
-        entity_id: sensor.driveway_ev_charger_status_description_wallbox
+        entity_id: sensor.driveway_ev_charger_status_description
         state: Locked, car connected
-      - condition: state
-        entity_id: device_tracker.volvo_ex30_location
-        state: home
-      - condition: not
+      - condition: or
         conditions:
-        - condition: state
-          entity_id: sensor.volvo_ex30_charging_connection_status
-          state: Disconnected
-      sequence:
-      - action: lock.unlock
-        metadata: {}
-        data: {}
-        target:
-          entity_id: lock.driveway_ev_charger_lock_wallbox
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.family_home
-        state: 'on'
-      - condition: state
-        entity_id: lock.driveway_ev_charger_lock_wallbox
-        state: locked
-      - condition: state
-        entity_id: sensor.driveway_ev_charger_status_description_wallbox
-        state: Locked, car connected
-      - condition: state
-        entity_id: device_tracker.volvo_xc40_location
-        state: home
-      - condition: state
-        entity_id: sensor.volvo_xc40_charging_connection_status
-        state: Connected AC
-      sequence:
-      - action: lock.unlock
-        metadata: {}
-        data: {}
-        target:
-          entity_id: lock.driveway_ev_charger_lock_wallbox
+        - condition: and
+          conditions:
+          - condition: state
+            entity_id: device_tracker.volvo_ex30_location
+            state: home
+          - condition: state
+            entity_id: sensor.volvo_ex30_charging_connection_status
+            state: connection_status_connected_ac
+        - condition: and
+          conditions:
+          - condition: state
+            entity_id: device_tracker.volvo_xc40_location
+            state: home
+          - condition: state
+            entity_id: sensor.volvo_xc40_charging_connection_status
+            state: connection_status_connected_ac
+    then:
+    - action: lock.unlock
+      metadata: {}
+      data: {}
+      target:
+        entity_id: lock.driveway_ev_charger_lock
   mode: queued
+  max: 10
 - id: '1735725983183'
   alias: Garage lys
-  description: Automatik for lys i garage
+  description: Automatik til at styre lys i garage
   triggers:
   - trigger: state
     entity_id:
-    - event.garage_switch_button_1_philips_hue
+    - event.garage_switch_button_1
     id: button_1
   - trigger: state
     entity_id:
-    - event.garage_switch_button_2_philips_hue
+    - event.garage_switch_button_2
     id: button_2
   - trigger: state
     entity_id:
-    - event.garage_switch_button_3_philips_hue
+    - event.garage_switch_button_3
     id: button_3
   - trigger: state
     entity_id:
-    - event.garage_switch_button_4_philips_hue
+    - event.garage_switch_button_4
     id: button_4
   - trigger: state
     entity_id:
-    - binary_sensor.family_home
-    to: 'off'
+    - binary_sensor.people_home
+    to: '0'
+    id: no_one_home
   - trigger: state
     entity_id:
-    - lock.garage_door_lock_yale
+    - lock.garage_door
     to: locked
+    id: door_locked
   - trigger: state
     entity_id:
-    - binary_sensor.garage_door_sensor_opening_philips_hue
+    - lock.garage_door
+    to: unlocked
+    id: door_unlocked
+  - trigger: state
+    entity_id:
+    - binary_sensor.garage_door_sensor_opening
     to: 'on'
-  - trigger: state
-    entity_id:
-    - binary_sensor.garage_door_sensor_opening_philips_hue
-    to: 'off'
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 30
+    id: door_opened
   - trigger: state
     entity_id:
     - binary_sensor.garage_light
@@ -344,8 +472,7 @@
       hours: 0
       minutes: 15
       seconds: 0
-  - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    id: lights_on
   conditions: []
   actions:
   - choose:
@@ -359,9 +486,7 @@
         data: {}
         target:
           entity_id:
-          - light.garage_light_main_philips_hue
-          - light.garage_light_spots_philips_hue
-          - light.garage_light_projector_philips_hue
+          - light.garage_lights
     - conditions:
       - condition: trigger
         id:
@@ -371,7 +496,7 @@
         metadata: {}
         data: {}
         target:
-          entity_id: light.garage_light_main_philips_hue
+          entity_id: light.garage_light_main
     - conditions:
       - condition: trigger
         id:
@@ -381,7 +506,7 @@
         metadata: {}
         data: {}
         target:
-          entity_id: light.garage_light_spots_philips_hue
+          entity_id: light.garage_light_spots
     - conditions:
       - condition: trigger
         id:
@@ -391,49 +516,31 @@
         metadata: {}
         data: {}
         target:
-          entity_id: light.garage_light_projector_philips_hue
+          entity_id: light.garage_light_projector
     - conditions:
-      - condition: state
-        entity_id: binary_sensor.garage_door_sensor_opening_philips_hue
-        state: 'on'
+      - condition: trigger
+        id:
+        - door_opened
+        - door_unlocked
       sequence:
       - action: light.turn_on
         metadata: {}
         data: {}
         target:
-          entity_id: light.garage_light_main_philips_hue
+          entity_id: light.garage_light_main
     - conditions:
-      - condition: state
-        entity_id: lock.garage_door_lock_yale
-        state: locked
+      - condition: trigger
+        id:
+        - door_locked
       sequence:
       - action: light.turn_off
         metadata: {}
         data: {}
         target:
           entity_id:
-          - light.garage_light_main_philips_hue
-          - light.garage_light_spots_philips_hue
-          - light.garage_light_projector_philips_hue
-    - conditions:
-      - condition: state
-        entity_id: input_boolean.home_house_sitter
-        state: 'on'
-      sequence: []
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.family_home
-        state: 'off'
-      sequence:
-      - action: light.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id:
-          - light.garage_light_main_philips_hue
-          - light.garage_light_spots_philips_hue
-          - light.garage_light_projector_philips_hue
+          - light.garage_lights
   mode: queued
+  max: 10
 - id: '1735733828705'
   alias: Hjem - Ingen hjemme
   description: Når alle har forladt hjemme
@@ -448,7 +555,7 @@
       seconds: 0
   conditions:
   - condition: state
-    entity_id: input_boolean.home_house_sitter
+    entity_id: input_boolean.house_sitter
     state: 'off'
   actions:
   - action: climate.turn_off
@@ -528,7 +635,7 @@
       entity_id: binary_sensor.family_home
       state: 'on'
     - condition: state
-      entity_id: input_boolean.home_house_sitter
+      entity_id: input_boolean.house_sitter
       state: 'on'
   - condition: state
     entity_id: climate.living_room_heat_pump_panasonic
@@ -992,38 +1099,49 @@
   mode: queued
 - id: '1735847242174'
   alias: Terrasse lys
-  description: Automatik for lys på terrassen
+  description: Automatik til at styre lys på terrassen
   triggers:
   - trigger: state
     entity_id:
-    - event.patio_switch_button_1_philips_hue
+    - event.patio_switch_button_1
     id: button_1_short
     attribute: event_type
     to: short_release
   - trigger: state
     entity_id:
-    - event.patio_switch_button_1_philips_hue
+    - event.patio_switch_button_1
     id: button_1_long
     attribute: event_type
     to: long_release
   - trigger: state
     entity_id:
-    - event.patio_switch_button_2_philips_hue
+    - event.patio_switch_button_2
     id: button_2
   - trigger: state
     entity_id:
-    - event.patio_switch_button_3_philips_hue
+    - event.patio_switch_button_3
     id: button_3
   - trigger: state
     entity_id:
-    - event.patio_switch_button_4_philips_hue
+    - event.patio_switch_button_4
     id: button_4
     attribute: event_type
     to: initial_press
   - trigger: state
     entity_id:
-    - binary_sensor.family_home
-    to: 'off'
+    - binary_sensor.patio_door
+    to: 'on'
+    id: door_opened
+  - trigger: state
+    entity_id:
+    - lock.patio_door
+    to: locked
+    id: door_locked
+  - trigger: state
+    entity_id:
+    - sensor.people_home
+    to: '0'
+    id: no_one_home
   - trigger: state
     entity_id:
     - binary_sensor.patio_light
@@ -1033,8 +1151,6 @@
       minutes: 15
       seconds: 0
     id: lights_on
-  - trigger: state
-    entity_id: input_boolean.home_house_sitter
   conditions: []
   actions:
   - choose:
@@ -1050,7 +1166,8 @@
           kelvin: 2700
           brightness_pct: 60
         target:
-          entity_id: light.patio_light_philips_hue
+          entity_id:
+          - light.patio_lights
     - conditions:
       - condition: trigger
         id:
@@ -1063,7 +1180,8 @@
           kelvin: 3000
           brightness_pct: 100
         target:
-          entity_id: light.patio_light_philips_hue
+          entity_id:
+          - light.patio_lights
     - conditions:
       - condition: trigger
         id:
@@ -1075,7 +1193,8 @@
           transition: 0.5
           brightness_step_pct: 10
         target:
-          entity_id: light.patio_light_philips_hue
+          entity_id:
+          - light.patio_lights
     - conditions:
       - condition: trigger
         id:
@@ -1087,102 +1206,144 @@
           transition: 0.5
           brightness_step_pct: -10
         target:
-          entity_id: light.patio_light_philips_hue
+          entity_id:
+          - light.patio_lights
     - conditions:
       - condition: trigger
         id:
         - button_4
       sequence:
-      - action: script.patio_light_sunset
+      - action: light.turn_on
         metadata: {}
-        data: {}
+        data:
+          transition: 1
+          brightness_pct: 40
+          rgb_color:
+          - 253
+          - 160
+          - 83
+        target:
+          entity_id:
+          - light.patio_light_dining_table
+          - light.patio_light_sofa
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          brightness_pct: 40
+          rgb_color:
+          - 240
+          - 106
+          - 92
+        target:
+          entity_id:
+          - light.patio_light_main
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          brightness_pct: 40
+          rgb_color:
+          - 199
+          - 83
+          - 253
+        target:
+          entity_id:
+          - light.patio_light_bar
     - conditions:
+      - condition: trigger
+        id:
+        - door_opened
       - condition: state
-        entity_id: input_boolean.home_house_sitter
-        state: 'on'
-      sequence: []
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.family_home
+        entity_id: binary_sensor.patio_light
         state: 'off'
+      - condition: numeric_state
+        entity_id: sensor.home_outside_avarage_illuminance_15m
+        below: 100
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2700
+          brightness_pct: 60
+        target:
+          entity_id:
+          - light.patio_light_main
+    - conditions:
+      - condition: trigger
+        id:
+        - no_one_home
+        - door_locked
       sequence:
       - action: light.turn_off
         metadata: {}
         data:
-          transition: 0
+          transition: 1
         target:
-          entity_id: light.patio_light_philips_hue
+          entity_id:
+          - light.patio_lights
     - conditions:
       - condition: trigger
         id:
         - lights_on
-      - condition: numeric_state
-        entity_id: sensor.home_outside_current_temperature
-        below: 10
+      - condition: or
+        conditions:
+        - condition: numeric_state
+          entity_id: sensor.home_outside_current_temperature
+          below: 15
+        - condition: state
+          entity_id: sensor.people_home
+          state: '0'
       sequence:
       - action: light.turn_off
         metadata: {}
         data:
           transition: 0
         target:
-          entity_id: light.patio_light_philips_hue
+          entity_id: light.patio_lights
   mode: queued
+  max: 10
 - id: '1735851968042'
   alias: Gang lys
-  description: Automatik for lys i gangen
+  description: Automatik til at styre lys i gangen
   triggers:
   - trigger: state
     entity_id:
-    - event.hallway_switch_button_1_philips_hue
+    - event.hallway_switch_button_1
     id: button_1_short
     attribute: event_type
     to: short_release
   - trigger: state
     entity_id:
-    - event.hallway_switch_button_1_philips_hue
+    - event.hallway_switch_button_1
     id: button_1_long
     attribute: event_type
     to: long_release
   - trigger: state
     entity_id:
-    - event.hallway_switch_button_2_philips_hue
+    - event.hallway_switch_button_2
     id: button_2
   - trigger: state
     entity_id:
-    - event.hallway_switch_button_3_philips_hue
+    - event.hallway_switch_button_3
     id: button_3
   - trigger: state
     entity_id:
-    - event.hallway_switch_button_4_philips_hue
+    - event.hallway_switch_button_4
     id: button_4
     attribute: event_type
     to: initial_press
   - trigger: state
     entity_id:
-    - binary_sensor.family_home
-    to: 'off'
+    - sensor.people_home
+    to: '0'
+    id: no_one_home
   - trigger: state
     entity_id:
-    - binary_sensor.anders_home
-    - binary_sensor.monique_home
-    - binary_sensor.emil_home
-    - binary_sensor.charlie_home
-    to: 'on'
-    id: someone_home
-  - trigger: state
-    entity_id: binary_sensor.bedroom_blind
-    to: 'off'
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_door
-  - trigger: state
-    entity_id:
-    - light.bedroom_light_philips_hue
-    attribute: brightness
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_light
-    to: 'off'
+    - sensor.people_home
+    from: '0'
+    id: anyone_home
   - trigger: state
     entity_id:
     - binary_sensor.hallway_light
@@ -1191,14 +1352,7 @@
       hours: 0
       minutes: 15
       seconds: 0
-  - trigger: state
-    entity_id: input_boolean.home_house_sitter
-  - trigger: state
-    entity_id: light.bedroom_light_philips_hue
-    attribute: brightness
-  - trigger: state
-    entity_id:
-    - binary_sensor.parent_sleeping
+    id: lights_on
   conditions: []
   actions:
   - choose:
@@ -1206,6 +1360,7 @@
       - condition: trigger
         id:
         - button_1_short
+        - anyone_home
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -1214,7 +1369,8 @@
           kelvin: 2700
           brightness_pct: 75
         target:
-          entity_id: light.hallway_light_philips_hue
+          entity_id:
+          - light.hallway_lights
     - conditions:
       - condition: trigger
         id:
@@ -1227,7 +1383,8 @@
           kelvin: 3000
           brightness_pct: 100
         target:
-          entity_id: light.hallway_light_philips_hue
+          entity_id:
+          - light.hallway_lights
     - conditions:
       - condition: trigger
         id:
@@ -1239,7 +1396,8 @@
           transition: 0.5
           brightness_step_pct: 10
         target:
-          entity_id: light.hallway_light_philips_hue
+          entity_id:
+          - light.hallway_lights
     - conditions:
       - condition: trigger
         id:
@@ -1251,11 +1409,13 @@
           transition: 0.5
           brightness_step_pct: -10
         target:
-          entity_id: light.hallway_light_philips_hue
+          entity_id:
+          - light.hallway_lights
     - conditions:
       - condition: trigger
         id:
         - button_4
+        - no_one_home
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -1263,77 +1423,14 @@
           transition: 1
         target:
           entity_id:
-          - light.hallway_light_philips_hue
-    - conditions:
-      - condition: state
-        entity_id: input_boolean.home_house_sitter
-        state: 'on'
-      sequence: []
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.family_home
-        state: 'off'
-      sequence:
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 1
-        target:
-          entity_id:
-          - light.hallway_light_philips_hue
+          - light.hallway_lights
     - conditions:
       - condition: trigger
         id:
-        - someone_home
+        - lights_on
       - condition: state
-        entity_id: binary_sensor.parent_sleeping
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.bedroom_door
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'off'
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          kelvin: 2700
-          brightness_pct: 20
-          transition: 3
-        target:
-          entity_id:
-          - light.hallway_light_bathroom_philips_hue
-          - light.hallway_light_toilet_philips_hue
-    - conditions:
-      - condition: trigger
-        id:
-        - someone_home
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'off'
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          transition: 1
-          kelvin: 2700
-          brightness_pct: 75
-        target:
-          entity_id: light.hallway_light_philips_hue
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.bedroom_door
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.parent_sleeping
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'on'
-      - condition: state
-        entity_id: input_select.monique_nap_time_state
-        state: 'off'
+        entity_id: sensor.people_home
+        state: '0'
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -1341,58 +1438,36 @@
           transition: 1
         target:
           entity_id:
-          - light.hallway_light_philips_hue
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.bedroom_door
-        state: 'on'
-      - condition: numeric_state
-        entity_id: light.bedroom_light_philips_hue
-        attribute: brightness
-        above: 50
-      - condition: state
-        entity_id: input_select.monique_nap_time_state
-        state: 'off'
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          transition: 1
-          kelvin: 2700
-          brightness_pct: 75
-        target:
-          entity_id: light.hallway_light_philips_hue
+          - light.hallway_lights
   mode: queued
+  max: 10
 - id: '1735852365839'
   alias: Emils værelse lys
-  description: Automatik for lys på Emils værelse
+  description: Automatik til at styre lys på Emils værelse
   triggers:
   - trigger: state
     entity_id:
-    - event.emils_room_switch_button_1_philips_hue
+    - event.emils_room_switch_button_1
     id: button_1_short
     attribute: event_type
     to: short_release
   - trigger: state
     entity_id:
-    - event.emils_room_switch_button_1_philips_hue
+    - event.emils_room_switch_button_1
     id: button_1_long
     attribute: event_type
     to: long_release
   - trigger: state
     entity_id:
-    - event.emils_room_switch_button_2_philips_hue
+    - event.emils_room_switch_button_2
     id: button_2
   - trigger: state
     entity_id:
-    - event.emils_room_switch_button_3_philips_hue
+    - event.emils_room_switch_button_3
     id: button_3
   - trigger: state
     entity_id:
-    - event.emils_room_switch_button_4_philips_hue
+    - event.emils_room_switch_button_4
     id: button_4
     attribute: event_type
     to: initial_press
@@ -1400,6 +1475,7 @@
     entity_id:
     - binary_sensor.emil_home
     to: 'off'
+    id: emil_leaving
   - trigger: state
     entity_id:
     - binary_sensor.emils_room_light
@@ -1408,11 +1484,9 @@
       hours: 0
       minutes: 15
       seconds: 0
-  - trigger: state
-    entity_id: input_boolean.home_house_sitter
-  - trigger: state
-    entity_id:
-    - input_datetime.emil_bedtime_alarm
+    id: lights_on
+  - trigger: time
+    at: input_datetime.emil_bedtime_alarm
     id: bedtime
   - trigger: time
     at: input_datetime.emil_wake_up_alarm
@@ -1432,7 +1506,8 @@
           kelvin: 2700
           brightness_pct: 80
         target:
-          entity_id: light.emils_room_light_philips_hue
+          entity_id:
+          - light.emils_room_lights
     - conditions:
       - condition: trigger
         id:
@@ -1445,10 +1520,11 @@
           kelvin: 3000
           brightness_pct: 100
         target:
-          entity_id: light.emils_room_light_philips_hue
+          entity_id:
+          - light.emils_room_lights
     - conditions:
       - condition: state
-        entity_id: light.emils_room_light_philips_hue
+        entity_id: binary_sensor.emils_room_light
         state: 'off'
       - condition: trigger
         id:
@@ -1462,7 +1538,8 @@
           kelvin: 2300
           brightness: 10
         target:
-          entity_id: light.emils_room_light_philips_hue
+          entity_id:
+          - light.emils_room_lights
     - conditions:
       - condition: trigger
         id:
@@ -1474,7 +1551,8 @@
           transition: 0.5
           brightness_step_pct: 10
         target:
-          entity_id: light.emils_room_light_philips_hue
+          entity_id:
+          - light.emils_room_lights
     - conditions:
       - condition: trigger
         id:
@@ -1486,7 +1564,8 @@
           transition: 0.5
           brightness_step_pct: -10
         target:
-          entity_id: light.emils_room_light_philips_hue
+          entity_id:
+          - light.emils_room_lights
     - conditions:
       - condition: trigger
         id:
@@ -1498,15 +1577,17 @@
           transition: 1
         target:
           entity_id:
-          - light.emils_room_light_philips_hue
+          - light.emils_room_lights
     - conditions:
-      - condition: state
-        entity_id: input_boolean.home_house_sitter
-        state: 'on'
-      sequence: []
-    - conditions:
+      - condition: trigger
+        id:
+        - emil_leaving
+        - lights_on
       - condition: state
         entity_id: binary_sensor.emil_home
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.house_sitter
         state: 'off'
       sequence:
       - action: light.turn_off
@@ -1515,28 +1596,36 @@
           transition: 1
         target:
           entity_id:
-          - light.emils_room_light_philips_hue
+          - light.emils_room_lights
     - conditions:
-      - condition: state
-        entity_id: binary_sensor.emils_room_light
-        state: 'off'
       - condition: trigger
         id:
         - wake_up
+      - condition: state
+        entity_id: binary_sensor.emil_home
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.emils_room_light
+        state: 'off'
       sequence:
       - action: light.turn_on
         metadata: {}
         data:
           transition: 60
-          brightness: 10
+          kelvin: 2700
+          brightness_pct: 80
         target:
-          entity_id: light.emils_room_light_philips_hue
+          entity_id:
+          - light.emils_room_lights
     - conditions:
       - condition: trigger
         id:
         - bedtime
+      - condition: state
+        entity_id: binary_sensor.emil_home
+        state: 'on'
       - condition: numeric_state
-        entity_id: light.emils_room_light_philips_hue
+        entity_id: light.emils_room_lights
         attribute: brightness
         above: 30
       sequence:
@@ -1546,37 +1635,45 @@
           transition: 10
           brightness: 30
         target:
-          entity_id: light.emils_room_light_philips_hue
+          entity_id:
+          - light.emils_room_lights
   mode: queued
+  max: 10
 - id: '1736082177257'
   alias: Charlies værelse lys
-  description: Automatik for lys på Charlies værelse
+  description: Automatik til at styre lys på Charlies værelse
   triggers:
   - trigger: state
     entity_id:
-    - event.charlies_room_switch_button_1_philips_hue
-    id: button_1
+    - event.charlies_room_switch_button_1
+    id: button_1_short
     attribute: event_type
-    to: initial_press
+    to: short_release
   - trigger: state
     entity_id:
-    - event.charlies_room_switch_button_2_philips_hue
+    - event.charlies_room_switch_button_1
+    id: button_1_long
+    attribute: event_type
+    to: long_release
+  - trigger: state
+    entity_id:
+    - event.charlies_room_switch_button_2
     id: button_2_short
     attribute: event_type
     to: short_release
   - trigger: state
     entity_id:
-    - event.charlies_room_switch_button_2_philips_hue
+    - event.charlies_room_switch_button_2
     id: button_2
   - trigger: state
     entity_id:
-    - event.charlies_room_switch_button_3_philips_hue
+    - event.charlies_room_switch_button_3
     id: button_3
     attribute: event_type
     to: initial_press
   - trigger: state
     entity_id:
-    - event.charlies_room_switch_button_4_philips_hue
+    - event.charlies_room_switch_button_4
     id: button_4
     attribute: event_type
     to: initial_press
@@ -1584,14 +1681,12 @@
     entity_id:
     - binary_sensor.charlie_home
     to: 'off'
+    id: charlie_leaving
   - trigger: state
     entity_id:
     - binary_sensor.charlie_home
     to: 'on'
     id: charlie_home
-  - trigger: time
-    at: input_datetime.charlie_wake_up_alarm
-    id: wake_up
   - trigger: state
     entity_id:
     - binary_sensor.charlies_room_light
@@ -1600,26 +1695,27 @@
       hours: 0
       minutes: 15
       seconds: 0
-  - trigger: state
-    entity_id: input_boolean.home_house_sitter
-  - trigger: state
-    entity_id:
-    - input_datetime.charlie_bedtime_alarm
+    id: lights_on
+  - trigger: time
+    at: input_datetime.charlie_bedtime_alarm
     id: bedtime
+  - trigger: time
+    at: input_datetime.charlie_wake_up_alarm
+    id: wake_up
   conditions: []
   actions:
   - choose:
     - conditions:
       - condition: trigger
         id:
-        - button_1
+        - button_1_short
       sequence:
       - parallel:
         - action: light.turn_on
           metadata: {}
           data: {}
           target:
-            entity_id: light.charlies_room_light_bed_philips_hue
+            entity_id: light.charlies_room_smart_plug_string_lights
         - action: light.turn_on
           metadata: {}
           data:
@@ -1627,9 +1723,40 @@
             brightness_pct: 80
           target:
             entity_id:
-            - light.charlies_room_light_desk_right_philips_hue
-            - light.charlies_room_light_desk_mid_philips_hue
-            - light.charlies_room_light_desk_left_philips_hue
+            - light.charlies_room_light_desk_right
+            - light.charlies_room_light_desk_mid
+            - light.charlies_room_light_desk_left
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1_long
+      sequence:
+      - parallel:
+        - action: light.turn_on
+          metadata: {}
+          data: {}
+          target:
+            entity_id: light.charlies_room_smart_plug_string_lights
+        - action: light.turn_on
+          metadata: {}
+          data:
+            transition: 1
+            brightness_pct: 100
+          target:
+            entity_id:
+            - light.charlies_room_light_desk_right
+            - light.charlies_room_light_desk_mid
+            - light.charlies_room_light_desk_left
+        - action: light.turn_on
+          metadata: {}
+          data:
+            transition: 1
+            kelvin: 2700
+            brightness_pct: 100
+          target:
+            entity_id:
+            - light.charlies_room_light_dresser
+            - light.charlies_room_light_bed_lamp
     - conditions:
       - condition: trigger
         id:
@@ -1642,15 +1769,15 @@
           brightness_pct: 80
         target:
           entity_id:
-          - light.charlies_room_light_desk_right_philips_hue
-          - light.charlies_room_light_desk_mid_philips_hue
-          - light.charlies_room_light_desk_left_philips_hue
+          - light.charlies_room_light_desk_right
+          - light.charlies_room_light_desk_mid
+          - light.charlies_room_light_desk_left
     - conditions:
       - condition: trigger
         id:
         - button_2
       - condition: state
-        entity_id: event.charlies_room_switch_button_2_philips_hue
+        entity_id: event.charlies_room_switch_button_2
         attribute: event_type
         state: repeat
       sequence:
@@ -1667,7 +1794,7 @@
         metadata: {}
         data: {}
         target:
-          entity_id: light.charlies_room_light_bed_philips_hue
+          entity_id: light.charlies_room_smart_plug_string_lights
     - conditions:
       - condition: trigger
         id:
@@ -1679,29 +1806,17 @@
           transition: 1
         target:
           entity_id:
-          - light.charlies_room_light_philips_hue
+          - light.charlies_room_lights
     - conditions:
-      - condition: state
-        entity_id: input_boolean.home_house_sitter
-        state: 'on'
-      sequence: []
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.charlies_room_light
-        state: 'off'
       - condition: trigger
         id:
-        - charlie_home
-        - wake_up
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        target:
-          entity_id: light.charlies_room_light_bed_philips_hue
-        data: {}
-    - conditions:
+        - charlie_leaving
+        - lights_on
       - condition: state
         entity_id: binary_sensor.charlie_home
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.house_sitter
         state: 'off'
       sequence:
       - action: light.turn_off
@@ -1710,11 +1825,28 @@
           transition: 1
         target:
           entity_id:
-          - light.charlies_room_light_philips_hue
+          - light.charlies_room_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - charlie_home
+        - wake_up
+      - condition: state
+        entity_id: binary_sensor.charlie_home
+        state: 'on'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id: light.charlies_room_smart_plug_string_lights
+        data: {}
     - conditions:
       - condition: trigger
         id:
         - bedtime
+      - condition: state
+        entity_id: binary_sensor.charlie_home
+        state: 'on'
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -1722,56 +1854,56 @@
           transition: 10
         target:
           entity_id:
-          - light.charlies_room_light_desk_left_philips_hue
-          - light.charlies_room_light_desk_mid_philips_hue
-          - light.charlies_room_light_desk_right_philips_hue
-          - light.charlies_room_light_dresser_philips_hue
+          - light.charlies_room_light_desk_left
+          - light.charlies_room_light_desk_mid
+          - light.charlies_room_light_desk_right
+          - light.charlies_room_light_dresser
   mode: queued
+  max: 10
 - id: '1736083584615'
   alias: Soveværelse lys
-  description: Automatik for lys på soveværelset
+  description: Automatik til at styre lys på soveværelset
   triggers:
   - trigger: state
     entity_id:
-    - event.bedroom_switch_button_1_philips_hue
+    - event.bedroom_switch_button_1
+    attribute: event_type
+    to: initial_press
     id: button_1
-    attribute: event_type
-    to: initial_press
   - trigger: state
     entity_id:
-    - event.bedroom_switch_button_2_philips_hue
+    - event.bedroom_switch_button_2
+    attribute: event_type
+    to: initial_press
     id: button_2
-    attribute: event_type
-    to: initial_press
   - trigger: state
     entity_id:
-    - event.bedroom_switch_button_3_philips_hue
+    - event.bedroom_switch_button_3
+    attribute: event_type
+    to: initial_press
     id: button_3
-    attribute: event_type
-    to: initial_press
   - trigger: state
     entity_id:
-    - event.bedroom_switch_button_4_philips_hue
-    id: button_4
+    - event.bedroom_switch_button_4
     attribute: event_type
     to: initial_press
+    id: button_4
   - trigger: state
     entity_id:
     - binary_sensor.parent_home
     to: 'off'
+    id: parents_left_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_occupancy
+    to: 'off'
+    id: bedroom_empty
   - trigger: state
     entity_id:
     - sensor.anders_iphone_battery_state
     - sensor.monique_iphone_battery_state
     to: Charging
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_light
-    to: 'on'
-    for:
-      hours: 0
-      minutes: 15
-      seconds: 0
+    id: charging
   - trigger: time
     at: input_datetime.monique_wake_up_alarm
     id: wake_up
@@ -1783,14 +1915,13 @@
     id: sunrise_script
   - trigger: state
     entity_id:
-    - input_select.monique_nap_time_state
-    to: 'off'
-    id: nap_time_over
-  - trigger: state
-    entity_id:
-    - input_select.monique_nap_time_state
-  - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    - binary_sensor.bedroom_light
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+    id: lights_on
   conditions: []
   actions:
   - choose:
@@ -1799,6 +1930,11 @@
         id:
         - button_1
       sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
       - action: light.turn_on
         metadata: {}
         data:
@@ -1806,12 +1942,7 @@
           kelvin: 2700
           brightness_pct: 80
         target:
-          entity_id: light.bedroom_light_philips_hue
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
+          entity_id: light.bedroom_lights
     - conditions:
       - condition: trigger
         id:
@@ -1824,62 +1955,84 @@
         id:
         - button_3
       sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
       - action: script.bedroom_light_sunset
         data:
           transition: 180
           brightness_from: 200
           brightness_to: 50
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
     - conditions:
       - condition: trigger
         id:
         - button_4
       sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
       - action: light.turn_off
         metadata: {}
         data:
           transition: 1
         target:
           entity_id:
-          - light.bedroom_light_philips_hue
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
+          - light.bedroom_lights
     - conditions:
+      - condition: trigger
+        id:
+        - parents_left_home
       - condition: state
-        entity_id: input_boolean.home_house_sitter
-        state: 'on'
-      sequence: []
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.parent_home
+        entity_id: input_boolean.house_sitter
         state: 'off'
       sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
       - action: light.turn_off
         metadata: {}
         data:
           transition: 1
         target:
           entity_id:
-          - light.bedroom_light_philips_hue
+          - light.bedroom_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - lights_on
+        - bedroom_empty
+      - condition: state
+        entity_id: binary_sensor.bedroom_occupancy
+        state: 'off'
+      sequence:
       - action: timer.cancel
         metadata: {}
         data: {}
         target:
           entity_id: timer.bedroom_light_sunrise_delay_timer
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.bedroom_lights
     - conditions:
-      - condition: state
-        entity_id: binary_sensor.bedroom_light
-        state: 'off'
       - condition: trigger
         id:
         - wake_up
+      - condition: state
+        entity_id: binary_sensor.bedroom_light
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
       sequence:
       - action: script.bedroom_light_sunrise
         data: {}
@@ -1891,93 +2044,43 @@
       - action: script.bedroom_light_sunrise
         data: {}
     - conditions:
-      - condition: state
-        entity_id: input_select.monique_nap_time_state
-        state: prepare
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          brightness_pct: 50
-          transition: 1
-        target:
-          entity_id:
-          - light.bedroom_light_philips_hue
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
-    - conditions:
-      - condition: state
-        entity_id: input_select.monique_nap_time_state
-        state: sleeping
-      sequence:
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 60
-        target:
-          entity_id:
-          - light.bedroom_light_philips_hue
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
-    - conditions:
       - condition: trigger
         id:
-        - nap_time_over
-      sequence:
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 1
-        target:
-          entity_id:
-          - light.bedroom_light_philips_hue
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.anders_home
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.monique_home
-        state: 'on'
-      - condition: state
-        entity_id: sensor.anders_iphone_battery_state
-        state: Charging
-      - condition: state
-        entity_id: sensor.monique_iphone_battery_state
-        state: Charging
-      sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 10
-        target:
-          entity_id:
-          - light.bedroom_light_philips_hue
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.anders_home
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.monique_home
-        state: 'on'
-      - condition: state
-        entity_id: sensor.monique_iphone_battery_state
-        state: Charging
+        - charging
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.anders_home
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.monique_home
+          state: 'on'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.anders_home
+          state: 'off'
+        - condition: and
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.anders_home
+            state: 'on'
+          - condition: state
+            entity_id: sensor.anders_iphone_battery_state
+            state: Charging
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.monique_home
+          state: 'off'
+        - condition: and
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.monique_home
+            state: 'on'
+          - condition: state
+            entity_id: sensor.monique_iphone_battery_state
+            state: Charging
       sequence:
       - action: timer.cancel
         metadata: {}
@@ -1990,30 +2093,9 @@
           transition: 10
         target:
           entity_id:
-          - light.bedroom_light_philips_hue
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.anders_home
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.monique_home
-        state: 'off'
-      - condition: state
-        entity_id: sensor.anders_iphone_battery_state
-        state: Charging
-      sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 10
-        target:
-          entity_id:
-          - light.bedroom_light_philips_hue
+          - light.bedroom_lights
+  mode: queued
+  max: 10
 - id: '1736103151599'
   alias: Emils værelse - Rullegardin
   description: Automatik for rullegardin på Emils værelse
@@ -2045,13 +2127,13 @@
     entity_id:
     - binary_sensor.emils_room_light
   - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    entity_id: input_boolean.house_sitter
   conditions: []
   actions:
   - choose:
     - conditions:
       - condition: state
-        entity_id: input_boolean.home_house_sitter
+        entity_id: input_boolean.house_sitter
         state: 'on'
       sequence: []
     - conditions:
@@ -2142,13 +2224,13 @@
     - sensor.home_avarage_outside_illuminance_15m
     above: 2
   - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    entity_id: input_boolean.house_sitter
   conditions: []
   actions:
   - choose:
     - conditions:
       - condition: state
-        entity_id: input_boolean.home_house_sitter
+        entity_id: input_boolean.house_sitter
         state: 'on'
       sequence: []
     - conditions:
@@ -2242,7 +2324,7 @@
   - trigger: time
     at: '16:00:00'
   - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    entity_id: input_boolean.house_sitter
   - trigger: state
     entity_id:
     - sensor.anders_iphone_battery_state
@@ -2253,7 +2335,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: input_boolean.home_house_sitter
+        entity_id: input_boolean.house_sitter
         state: 'on'
       sequence: []
     - conditions:
@@ -2421,7 +2503,7 @@
           entity_id: cover.bedroom_blind_ikea
   mode: queued
 - id: '1737201831964'
-  alias: Indkørsel - Billader sæt pris
+  alias: Indkørsel billader sæt pris
   description: Sæt elektricitets prisen på billader
   triggers:
   - trigger: state
@@ -2437,9 +2519,9 @@
   - action: number.set_value
     metadata: {}
     data:
-      value: '{{ state_attr(''sensor.energy_data_service'', ''current_price'') }}'
+      value: '{{ states(''sensor.home_electricity_price_current'') }}'
     target:
-      entity_id: number.driveway_ev_charger_energy_price_wallbox
+      entity_id: number.driveway_ev_charger_energy_price
   mode: single
 - id: '1737240652738'
   alias: Teknik solcelle batteri sæt operating mode
@@ -2618,7 +2700,7 @@
     - automation.emils_room_heating
     to: 'on'
   - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    entity_id: input_boolean.house_sitter
   - trigger: time
     at:
       entity_id: input_datetime.emil_wake_up_alarm
@@ -2648,7 +2730,7 @@
           entity_id: climate.emils_room_radiator_thermostat_tado
     - conditions:
       - condition: state
-        entity_id: input_boolean.home_house_sitter
+        entity_id: input_boolean.house_sitter
         state: 'on'
       sequence:
       - action: climate.set_temperature
@@ -2734,7 +2816,7 @@
       entity_id: input_datetime.charlie_wake_up_alarm
       offset: 00:15:00
   - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    entity_id: input_boolean.house_sitter
   conditions: []
   actions:
   - action: timer.cancel
@@ -2756,7 +2838,7 @@
           entity_id: climate.charlies_room_radiator_thermostat_tado
     - conditions:
       - condition: state
-        entity_id: input_boolean.home_house_sitter
+        entity_id: input_boolean.house_sitter
         state: 'on'
       sequence:
       - action: climate.set_temperature
@@ -2826,7 +2908,7 @@
     - automation.bedroom_heating
     to: 'on'
   - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    entity_id: input_boolean.house_sitter
   - trigger: time
     at:
       entity_id: input_datetime.monique_wake_up_alarm
@@ -2856,7 +2938,7 @@
           entity_id: climate.bedroom_radiator_thermostat_tado
     - conditions:
       - condition: state
-        entity_id: input_boolean.home_house_sitter
+        entity_id: input_boolean.house_sitter
         state: 'on'
       sequence:
       - action: climate.set_temperature
@@ -2935,7 +3017,7 @@
     entity_id:
     - sensor.toilet_target_temperature
   - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    entity_id: input_boolean.house_sitter
   - trigger: state
     entity_id:
     - automation.toilet_heating
@@ -2956,7 +3038,7 @@
           entity_id: climate.toilet_radiator_thermostat_tado
     - conditions:
       - condition: state
-        entity_id: input_boolean.home_house_sitter
+        entity_id: input_boolean.house_sitter
         state: 'on'
       sequence:
       - action: climate.set_temperature
@@ -3015,7 +3097,7 @@
     entity_id:
     - sensor.bathroom_target_temperature
   - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    entity_id: input_boolean.house_sitter
   - trigger: state
     entity_id:
     - automation.bathroom_heating
@@ -3038,7 +3120,7 @@
           - climate.bathroom_radiator_thermostat_wall_tado
     - conditions:
       - condition: state
-        entity_id: input_boolean.home_house_sitter
+        entity_id: input_boolean.house_sitter
         state: 'on'
       sequence:
       - action: climate.set_temperature
@@ -3105,7 +3187,7 @@
     entity_id:
     - sensor.utility_room_target_temperature
   - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    entity_id: input_boolean.house_sitter
   - trigger: state
     entity_id:
     - automation.utility_room_heating
@@ -3128,7 +3210,7 @@
           - climate.utility_room_radiator_thermostat_wall_tado
     - conditions:
       - condition: state
-        entity_id: input_boolean.home_house_sitter
+        entity_id: input_boolean.house_sitter
         state: 'on'
       sequence:
       - action: climate.set_temperature
@@ -3202,7 +3284,7 @@
     - automation.living_room_heating
     to: 'on'
   - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    entity_id: input_boolean.house_sitter
   - trigger: time
     at:
       entity_id: input_datetime.monique_wake_up_alarm
@@ -3234,7 +3316,7 @@
           - climate.living_room_radiator_thermostat_sofa_tado
     - conditions:
       - condition: state
-        entity_id: input_boolean.home_house_sitter
+        entity_id: input_boolean.house_sitter
         state: 'on'
       sequence:
       - action: climate.set_temperature
@@ -3354,7 +3436,7 @@
     entity_id:
     - sensor.hallway_target_temperature
   - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    entity_id: input_boolean.house_sitter
   - trigger: state
     entity_id:
     - automation.hallway_heating
@@ -3377,7 +3459,7 @@
           - climate.kitchen_radiator_thermostat_tado
     - conditions:
       - condition: state
-        entity_id: input_boolean.home_house_sitter
+        entity_id: input_boolean.house_sitter
         state: 'on'
       sequence:
       - action: climate.set_temperature
@@ -3447,7 +3529,7 @@
     - binary_sensor.family_home
     to: 'off'
   - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    entity_id: input_boolean.house_sitter
   conditions: []
   actions:
   - choose:
@@ -3456,7 +3538,7 @@
         entity_id: binary_sensor.family_home
         state: 'off'
       - condition: state
-        entity_id: input_boolean.home_house_sitter
+        entity_id: input_boolean.house_sitter
         state: 'off'
       sequence:
       - action: timer.finish
@@ -3537,7 +3619,7 @@
     - binary_sensor.parent_home
     to: 'off'
   - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    entity_id: input_boolean.house_sitter
   conditions: []
   actions:
   - choose:
@@ -3546,7 +3628,7 @@
         entity_id: binary_sensor.parent_home
         state: 'off'
       - condition: state
-        entity_id: input_boolean.home_house_sitter
+        entity_id: input_boolean.house_sitter
         state: 'off'
       sequence:
       - action: timer.finish
@@ -3627,7 +3709,7 @@
     - binary_sensor.emil_home
     to: 'off'
   - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    entity_id: input_boolean.house_sitter
   conditions: []
   actions:
   - choose:
@@ -3636,7 +3718,7 @@
         entity_id: binary_sensor.emil_home
         state: 'off'
       - condition: state
-        entity_id: input_boolean.home_house_sitter
+        entity_id: input_boolean.house_sitter
         state: 'off'
       sequence:
       - action: timer.finish
@@ -3717,7 +3799,7 @@
     - binary_sensor.charlie_home
     to: 'off'
   - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    entity_id: input_boolean.house_sitter
   conditions: []
   actions:
   - choose:
@@ -3726,7 +3808,7 @@
         entity_id: binary_sensor.charlie_home
         state: 'off'
       - condition: state
-        entity_id: input_boolean.home_house_sitter
+        entity_id: input_boolean.house_sitter
         state: 'off'
       sequence:
       - action: timer.finish
@@ -3841,7 +3923,7 @@
     metadata: {}
     data: {}
     target:
-      entity_id: input_boolean.home_house_sitter
+      entity_id: input_boolean.house_sitter
   mode: single
 - id: '1737916297775'
   alias: Indkørsel lys
@@ -3849,291 +3931,158 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_entrance_occupancy_signify
+    - binary_sensor.driveway_motion_sensor_street_detected
     to: 'on'
+    id: detected_street
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_house_east_occupancy_signify
+    - binary_sensor.driveway_motion_sensor_street_detected
+    to: 'off'
+    id: cleared_street
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_house_south_detected
     to: 'on'
+    id: detected_south
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_house_south_occupancy_signify
+    - binary_sensor.driveway_motion_sensor_house_south_detected
+    to: 'off'
+    id: cleared_south
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_entrance_detected
     to: 'on'
+    id: detected_entrance
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_street_occupancy_signify
+    - binary_sensor.driveway_motion_sensor_entrance_detected
+    to: 'off'
+    id: cleared_entrance
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_east_detected
     to: 'on'
+    id: detected_east
   - trigger: state
     entity_id:
-    - timer.driveway_light_courtyard_timer
-    to: idle
-  - trigger: state
-    entity_id:
-    - timer.driveway_light_house_east_timer
-    to: idle
-  - trigger: state
-    entity_id:
-    - timer.driveway_light_house_south_timer
-    to: idle
-  - trigger: state
-    entity_id:
-    - timer.driveway_light_street_timer
-    to: idle
+    - binary_sensor.garden_motion_sensor_house_east_detected
+    to: 'off'
+    id: cleared_east
   - trigger: numeric_state
     entity_id:
-    - sensor.home_avarage_outside_illuminance_15m
-    below: 2
+    - sensor.home_outside_avarage_illuminance_15m
+    below: 100
+    id: twilight
   - trigger: time
-    at: '21:30:00'
-  - trigger: state
-    entity_id: input_boolean.home_house_sitter
+    at: '22:00:00'
+    id: night
   conditions: []
   actions:
-  - variables:
-      night_light: "{{ now().strftime('%H:%M') > '12:00' and \n   now().strftime('%H:%M')
-        < '21:30' and\n   states('sensor.home_avarage_outside_illuminance_15m')|float(0)
-        < 2 }}"
-  - if:
-    - condition: numeric_state
-      entity_id: sensor.home_avarage_outside_illuminance_15m
-      above: 2
-    then:
-    - action: light.turn_off
-      metadata: {}
-      data:
-        transition: 1
-      target:
-        entity_id:
-        - light.driveway_light_entrance_spot_1_signify
-        - light.driveway_light_entrance_spot_2_signify
-        - light.driveway_light_entrance_spot_3_signify
-        - light.driveway_light_right_1_signify
-        - light.driveway_light_right_2_signify
-        - light.driveway_light_right_3_signify
-        - light.driveway_light_left_1_signify
-        - light.driveway_light_left_2_signify
-        - light.driveway_light_left_3_signify
-        - light.driveway_light_left_4_philips
-        - light.driveway_light_left_5_signify
-        - light.driveway_light_left_6_signify
-        - light.driveway_light_left_7_philips
-        - light.driveway_light_left_8_signify
-        - light.driveway_light_left_9_signify
-        - light.driveway_light_house_east_gledopto
-        - light.driveway_light_house_south_gledopto
-    else:
-    - if:
-      - condition: state
-        entity_id: binary_sensor.driveway_motion_sensor_entrance_occupancy_signify
-        state: 'on'
-      then:
-      - action: timer.start
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - detected_street
+        - detected_south
+      - condition: numeric_state
+        entity_id: sensor.home_outside_avarage_illuminance_15m
+        below: 100
+      sequence:
+      - action: light.turn_on
         metadata: {}
         data:
-          duration: 00:02:00
+          brightness_pct: 100
+          transition: 1
         target:
-          entity_id: timer.driveway_light_entrance_timer
-    - if:
-      - condition: state
-        entity_id: binary_sensor.driveway_motion_sensor_street_occupancy_signify
-        state: 'on'
-      then:
-      - action: timer.start
+          entity_id:
+          - light.driveway_light_right_1
+          - light.driveway_light_right_2
+          - light.driveway_light_right_3
+          - light.driveway_light_left_1
+          - light.driveway_light_left_2
+          - light.driveway_light_left_3
+          - light.driveway_light_left_4
+          - light.driveway_light_left_5
+          - light.driveway_light_left_6
+          - light.driveway_light_left_7
+          - light.driveway_light_left_8
+          - light.driveway_light_left_9
+    - conditions:
+      - condition: trigger
+        id:
+        - detected_entrance
+      - condition: numeric_state
+        entity_id: sensor.home_outside_avarage_illuminance_15m
+        below: 100
+      sequence:
+      - action: light.turn_on
         metadata: {}
         data:
-          duration: 00:03:00
+          brightness_pct: 100
+          transition: 1
         target:
-          entity_id: timer.driveway_light_street_timer
-    - if:
-      - condition: state
-        entity_id: binary_sensor.driveway_motion_sensor_house_south_occupancy_signify
-        state: 'on'
-      then:
-      - action: timer.start
+          entity_id:
+          - light.driveway_light_right_2
+          - light.driveway_light_right_3
+          - light.driveway_light_left_1
+          - light.driveway_light_left_2
+          - light.driveway_light_left_3
+          - light.driveway_light_left_4
+          - light.driveway_light_left_5
+          - light.driveway_light_left_6
+          - light.driveway_light_left_7
+          - light.driveway_light_left_8
+          - light.driveway_light_left_9
+    - conditions:
+      - condition: trigger
+        id:
+        - detected_east
+      - condition: numeric_state
+        entity_id: sensor.home_outside_avarage_illuminance_15m
+        below: 100
+      sequence:
+      - action: light.turn_on
         metadata: {}
         data:
-          duration: 00:03:00
+          brightness_pct: 100
+          transition: 1
         target:
-          entity_id: timer.driveway_light_house_south_timer
-    - if:
-      - condition: state
-        entity_id: binary_sensor.driveway_motion_sensor_house_east_occupancy_signify
-        state: 'on'
-      then:
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:02:00
-        target:
-          entity_id: timer.driveway_light_house_east_timer
-    - if:
-      - condition: or
+          entity_id:
+          - light.driveway_light_left_1
+    - conditions:
+      - condition: and
         conditions:
+        - condition: trigger
+          id:
+          - cleared_street
+          - cleared_south
+          - cleared_entrance
+          - cleared_east
+          - night
+          - twilight
         - condition: state
-          entity_id: timer.driveway_light_entrance_timer
-          state: active
+          entity_id: binary_sensor.driveway_motion_sensor_street_detected
+          state: 'off'
         - condition: state
-          entity_id: timer.driveway_light_house_east_timer
-          state: active
+          entity_id: binary_sensor.driveway_motion_sensor_house_south_detected
+          state: 'off'
         - condition: state
-          entity_id: timer.driveway_light_street_timer
-          state: active
-        - condition: template
-          value_template: '{{ night_light }}'
-      then:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          brightness_pct: 100
-          transition: 1
-        target:
-          entity_id:
-          - light.driveway_light_house_east_gledopto
-      else:
-      - action: light.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id:
-          - light.driveway_light_house_east_gledopto
-    - if:
-      - condition: or
-        conditions:
+          entity_id: binary_sensor.driveway_motion_sensor_entrance_detected
+          state: 'off'
         - condition: state
-          entity_id: timer.driveway_light_entrance_timer
-          state: active
-        - condition: state
-          entity_id: timer.driveway_light_house_south_timer
-          state: active
-        - condition: state
-          entity_id: timer.driveway_light_street_timer
-          state: active
-        - condition: template
-          value_template: '{{ night_light }}'
-      then:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          brightness_pct: 100
-          transition: 1
-        target:
-          entity_id:
-          - light.driveway_light_house_south_gledopto
-      else:
-      - action: light.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id:
-          - light.driveway_light_house_south_gledopto
-    - if:
-      - condition: state
-        entity_id: timer.driveway_light_entrance_timer
-        state: active
-      then:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          brightness_pct: 100
-          transition: 1
-        target:
-          entity_id:
-          - light.driveway_light_entrance_spot_1_signify
-          - light.driveway_light_entrance_spot_2_signify
-          - light.driveway_light_entrance_spot_3_signify
-      else:
-      - action: light.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id:
-          - light.driveway_light_entrance_spot_1_signify
-          - light.driveway_light_entrance_spot_2_signify
-          - light.driveway_light_entrance_spot_3_signify
-    - if:
-      - condition: state
-        entity_id: timer.driveway_light_entrance_timer
-        state: active
-      then:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          brightness_pct: 100
-          transition: 1
-        target:
-          entity_id:
-          - light.driveway_light_left_1_signify
-      else:
-      - action: light.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id:
-          - light.driveway_light_left_1_signify
-    - if:
-      - condition: state
-        entity_id: timer.driveway_light_house_south_timer
-        state: active
-      then:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          brightness_pct: 80
-          kelvin: 2700
-          transition: 1
-        target:
-          entity_id:
-          - light.driveway_light_right_1_signify
-      else:
-      - action: light.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id:
-          - light.driveway_light_right_1_signify
-    - choose:
-      - conditions:
-        - condition: or
-          conditions:
-          - condition: state
-            entity_id: timer.driveway_light_entrance_timer
-            state: active
-          - condition: state
-            entity_id: timer.driveway_light_house_south_timer
-            state: active
-          - condition: state
-            entity_id: timer.driveway_light_street_timer
-            state: active
-        sequence:
-        - action: light.turn_on
-          metadata: {}
-          data:
-            brightness_pct: 80
-            kelvin: 2700
-            transition: 1
-          target:
-            entity_id:
-            - light.driveway_light_right_2_signify
-            - light.driveway_light_right_3_signify
-        - action: light.turn_on
-          metadata: {}
-          data:
-            brightness_pct: 100
-            transition: 1
-          target:
-            entity_id:
-            - light.driveway_light_left_2_signify
-            - light.driveway_light_left_3_signify
-            - light.driveway_light_left_4_philips
-            - light.driveway_light_left_5_signify
-            - light.driveway_light_left_6_signify
-            - light.driveway_light_left_7_philips
-            - light.driveway_light_left_8_signify
-            - light.driveway_light_left_9_signify
-      - conditions:
-        - condition: template
-          value_template: '{{ night_light }}'
-        sequence:
+          entity_id: binary_sensor.garden_motion_sensor_house_east_detected
+          state: 'off'
+      sequence:
+      - if:
+        - condition: numeric_state
+          entity_id: sensor.home_outside_avarage_illuminance_15m
+          below: 100
+        - condition: time
+          before: '22:00:00'
+        - condition: time
+          after: '12:00:00'
+        then:
         - action: light.turn_on
           metadata: {}
           data:
@@ -4141,129 +4090,45 @@
             transition: 1
           target:
             entity_id:
-            - light.driveway_light_right_2_signify
-            - light.driveway_light_right_3_signify
-            - light.driveway_light_left_2_signify
-            - light.driveway_light_left_3_signify
-            - light.driveway_light_left_4_philips
-            - light.driveway_light_left_5_signify
-            - light.driveway_light_left_6_signify
-            - light.driveway_light_left_7_philips
-            - light.driveway_light_left_8_signify
-            - light.driveway_light_left_9_signify
-      default:
-      - action: light.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id:
-          - light.driveway_light_right_2_signify
-          - light.driveway_light_right_3_signify
-          - light.driveway_light_left_2_signify
-          - light.driveway_light_left_3_signify
-          - light.driveway_light_left_4_philips
-          - light.driveway_light_left_5_signify
-          - light.driveway_light_left_6_signify
-          - light.driveway_light_left_7_philips
-          - light.driveway_light_left_8_signify
-          - light.driveway_light_left_9_signify
-  mode: restart
-- id: '1738003454800'
-  alias: Monique middagslur
-  description: Automatik til at styre Moniques middagslur
-  triggers:
-  - trigger: state
-    entity_id:
-    - input_boolean.monique_nap_time_toggle
-  - trigger: state
-    entity_id:
-    - input_select.monique_nap_time_state
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_blind
-  conditions: []
-  actions:
-  - action: system_log.write
-    metadata: {}
-    data:
-      level: error
-      message: '{{ trigger.entity_id }}'
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ trigger.entity_id == ''input_boolean.monique_nap_time_toggle''
-          }}'
-      sequence:
-      - if:
-        - condition: state
-          entity_id: input_boolean.monique_nap_time_toggle
-          state: 'off'
-        then:
-        - action: input_select.select_option
+            - light.driveway_light_right_2
+            - light.driveway_light_right_3
+            - light.driveway_light_left_2
+            - light.driveway_light_left_3
+            - light.driveway_light_left_4
+            - light.driveway_light_left_5
+            - light.driveway_light_left_6
+            - light.driveway_light_left_7
+            - light.driveway_light_left_8
+            - light.driveway_light_left_9
+        - action: light.turn_off
           metadata: {}
           data:
-            option: 'off'
+            transition: 1
           target:
-            entity_id: input_select.monique_nap_time_state
+            entity_id:
+            - light.driveway_light_right_1
+            - light.driveway_light_left_1
         else:
-        - action: input_select.select_option
+        - action: light.turn_off
           metadata: {}
           data:
-            option: prepare
+            transition: 1
           target:
-            entity_id: input_select.monique_nap_time_state
-    - conditions:
-      - condition: template
-        value_template: '{{ trigger.entity_id == ''input_select.monique_nap_time_state''
-          }}'
-      sequence:
-      - if:
-        - condition: state
-          entity_id: input_select.monique_nap_time_state
-          state: 'off'
-        then:
-        - action: input_boolean.turn_off
-          metadata: {}
-          data: {}
-          target:
-            entity_id: input_boolean.monique_nap_time_toggle
-        else:
-        - action: input_boolean.turn_on
-          metadata: {}
-          data: {}
-          target:
-            entity_id: input_boolean.monique_nap_time_toggle
-    default:
-    - choose:
-      - conditions:
-        - condition: state
-          entity_id: input_select.monique_nap_time_state
-          state: prepare
-        - condition: state
-          entity_id: binary_sensor.bedroom_blind
-          state: 'off'
-        sequence:
-        - action: input_select.select_option
-          metadata: {}
-          data:
-            option: sleep
-          target:
-            entity_id: input_select.monique_nap_time_state
-      - conditions:
-        - condition: state
-          entity_id: input_select.monique_nap_time_state
-          state: sleep
-        - condition: state
-          entity_id: binary_sensor.bedroom_blind
-          state: 'on'
-        sequence:
-        - action: input_select.select_option
-          metadata: {}
-          data:
-            option: 'off'
-          target:
-            entity_id: input_select.monique_nap_time_state
-  mode: restart
+            entity_id:
+            - light.driveway_light_right_1
+            - light.driveway_light_right_2
+            - light.driveway_light_right_3
+            - light.driveway_light_left_1
+            - light.driveway_light_left_2
+            - light.driveway_light_left_3
+            - light.driveway_light_left_4
+            - light.driveway_light_left_5
+            - light.driveway_light_left_6
+            - light.driveway_light_left_7
+            - light.driveway_light_left_8
+            - light.driveway_light_left_9
+  mode: queued
+  max: 10
 - id: '1738962148356'
   alias: Garage 3D Printer
   description: Automatik til at slukke for 3D printer
@@ -5924,7 +5789,7 @@
   - action: input_datetime.set_datetime
     metadata: {}
     data:
-      datetime: '{{ now() }}'
+      datetime: '{{ now() + timedelta(seconds=10) }}'
     target:
       entity_id: input_datetime.monique_bedtime_alarm
   mode: restart
@@ -5942,7 +5807,7 @@
   - action: input_datetime.set_datetime
     metadata: {}
     data:
-      datetime: '{{ now() }}'
+      datetime: '{{ now() + timedelta(seconds=10) }}'
     target:
       entity_id: input_datetime.emil_bedtime_alarm
   mode: restart
@@ -5960,7 +5825,7 @@
   - action: input_datetime.set_datetime
     metadata: {}
     data:
-      datetime: '{{ now() }}'
+      datetime: '{{ now() + timedelta(seconds=10) }}'
     target:
       entity_id: input_datetime.charlie_bedtime_alarm
   mode: restart
@@ -7535,8 +7400,6 @@
       - sensor.charlies_room_temperature_sensor_temperature_tado
       - sensor.utility_room_smart_plug_washer_power_aqara
       - sensor.utility_room_smart_plug_dryer_power_aqara
-      - sensor.volvo_xc40_status
-      - sensor.volvo_ex30_status
       unavailable_entities: "{% set ns = namespace(unavailable=[]) %} \n{% for entity
         in monitored_entities if states(entity) == 'unavailable' %}\n  {% set ns.unavailable
         = ns.unavailable + [entity] %}\n{% endfor %}\n{{ ns.unavailable }}"
@@ -7624,58 +7487,52 @@
     stored_traces: 100
 - id: '1747337340117'
   alias: Entre lys
-  description: Automatik til at styre lys i entre
+  description: Automatik til at styre lys i entreen
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.entrance_motion_sensor_motion_hue
+    - binary_sensor.entrance_motion_sensor_motion
     to: 'on'
+    id: motion_started
   - trigger: state
     entity_id:
-    - timer.driveway_light_entrance_timer
-    to: active
+    - binary_sensor.entrance_motion_sensor_motion
+    to: 'off'
+    id: motion_ended
   - trigger: state
     entity_id:
     - timer.entrance_light_timer
-    - timer.driveway_light_entrance_timer
     to: idle
+    id: timer_ended
+  - trigger: state
+    entity_id:
+    - sensor.people_home
+    to: '0'
+    id: no_one_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_entrance_occupancy
+    to: 'on'
+    id: person_outside_detected
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_entrance_occupancy
+    to: 'off'
+    id: person_outside_cleared
   conditions: []
   actions:
-  - if:
-    - condition: numeric_state
-      entity_id: sensor.entrance_motion_sensor_illuminance_hue
-      above: 100
-    then:
-    - action: light.turn_off
-      metadata: {}
-      data:
-        transition: 1
-      target:
-        entity_id:
-        - light.entrance_light_mirror_hue
-        - light.entrance_light_door_hue
-    else:
-    - if:
-      - condition: state
-        entity_id: binary_sensor.entrance_motion_sensor_motion_hue
-        state: 'on'
-      then:
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:01:00
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_started
+      - condition: numeric_state
+        entity_id: sensor.entrance_motion_sensor_illuminance
+        below: 200
+      sequence:
+      - action: timer.pause
         target:
           entity_id: timer.entrance_light_timer
-    - if:
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: timer.entrance_light_timer
-          state: active
-        - condition: state
-          entity_id: timer.driveway_light_entrance_timer
-          state: active
-      then:
       - action: light.turn_on
         metadata: {}
         data:
@@ -7684,18 +7541,62 @@
           transition: 1
         target:
           entity_id:
-          - light.entrance_light_mirror_hue
-          - light.entrance_light_door_hue
-      else:
+          - light.entrance_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - person_outside_detected
+      - condition: numeric_state
+        entity_id: sensor.home_outside_avarage_illuminance_15m
+        below: 100
+      sequence:
+      - action: timer.pause
+        target:
+          entity_id: timer.entrance_light_timer
+      - action: light.turn_on
+        metadata: {}
+        data:
+          kelvin: 2700
+          brightness_pct: 80
+          transition: 1
+        target:
+          entity_id:
+          - light.entrance_lights
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: trigger
+          id:
+          - motion_ended
+          - person_outside_cleard
+        - condition: state
+          entity_id: binary_sensor.entrance_motion_sensor_motion
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.driveway_motion_sensor_entrance_occupancy
+          state: 'off'
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:01:00
+        target:
+          entity_id: timer.entrance_light_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - timer_ended
+        - no_one_home
+      sequence:
       - action: light.turn_off
         metadata: {}
         data:
           transition: 1
         target:
           entity_id:
-          - light.entrance_light_mirror_hue
-          - light.entrance_light_door_hue
-  mode: restart
+          - light.entrance_lights
+  mode: queued
+  max: 10
 - id: '1747340588102'
   alias: Toilet lys
   description: Automatik til at styre lys på toilettet
@@ -7704,45 +7605,67 @@
     entity_id:
     - binary_sensor.toilet_motion_sensor_motion
     to: 'on'
+    id: motion_started
+  - trigger: state
+    entity_id:
+    - binary_sensor.toilet_motion_sensor_motion
+    to: 'off'
+    id: motion_ended
   - trigger: state
     entity_id:
     - timer.toilet_light_timer
     to: idle
+    id: timer_ended
+  - trigger: state
+    entity_id:
+    - sensor.people_home
+    to: '0'
+    id: no_one_home
   conditions: []
   actions:
-  - if:
-    - condition: state
-      entity_id: binary_sensor.toilet_motion_sensor_motion
-      state: 'on'
-    then:
-    - action: timer.start
-      metadata: {}
-      data:
-        duration: 00:04:00
-      target:
-        entity_id: timer.toilet_light_timer
-  - if:
-    - condition: state
-      entity_id: timer.toilet_light_timer
-      state: active
-    then:
-    - action: light.turn_on
-      metadata: {}
-      data:
-        brightness_pct: 100
-        transition: 1
-      target:
-        entity_id:
-        - light.toilet_light
-    else:
-    - action: light.turn_off
-      metadata: {}
-      data:
-        transition: 1
-      target:
-        entity_id:
-        - light.toilet_light
-  mode: restart
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_started
+      sequence:
+      - action: timer.pause
+        target:
+          entity_id: timer.toilet_light_timer
+      - action: light.turn_on
+        metadata: {}
+        data:
+          brightness_pct: 100
+          transition: 1
+        target:
+          entity_id:
+          - light.toilet_light
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_ended
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.toilet_light_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - timer_ended
+        - no_one_home
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.toilet_light
+  mode: queued
+  max: 10
 - id: '1748709891445'
   alias: Bryggers lys
   description: Automatik til at styre lys i bryggerset
@@ -7751,44 +7674,36 @@
     entity_id:
     - binary_sensor.utility_room_motion_sensor_motion
     to: 'on'
+    id: motion_started
+  - trigger: state
+    entity_id:
+    - binary_sensor.utility_room_motion_sensor_motion
+    to: 'off'
+    id: motion_ended
   - trigger: state
     entity_id:
     - timer.utility_room_light_timer
     to: idle
+    id: timer_ended
+  - trigger: state
+    entity_id:
+    - sensor.people_home
+    to: '0'
+    id: no_one_home
   conditions: []
   actions:
-  - if:
-    - condition: numeric_state
-      entity_id: sensor.utility_room_motion_sensor_illuminance
-      above: 100
-    then:
-    - action: light.turn_off
-      metadata: {}
-      data:
-        transition: 1
-      target:
-        entity_id:
-        - light.utility_room_light_spot_1
-        - light.utility_room_light_spot_2
-        - light.utility_room_light_spot_3
-        - light.utility_room_light_spot_4
-    else:
-    - if:
-      - condition: state
-        entity_id: binary_sensor.utility_room_motion_sensor_motion
-        state: 'on'
-      then:
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:02:00
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_started
+      - condition: numeric_state
+        entity_id: sensor.utility_room_motion_sensor_illuminance
+        below: 400
+      sequence:
+      - action: timer.pause
         target:
           entity_id: timer.utility_room_light_timer
-    - if:
-      - condition: state
-        entity_id: timer.utility_room_light_timer
-        state: active
-      then:
       - action: light.turn_on
         metadata: {}
         data:
@@ -7797,19 +7712,1039 @@
           transition: 1
         target:
           entity_id:
-          - light.utility_room_light_spot_1
-          - light.utility_room_light_spot_2
-          - light.utility_room_light_spot_3
-          - light.utility_room_light_spot_4
-      else:
+          - light.utility_room_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_ended
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.utility_room_light_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - no_one_home
+        - timer_ended
+      sequence:
       - action: light.turn_off
         metadata: {}
         data:
           transition: 1
         target:
           entity_id:
-          - light.utility_room_light_spot_1
-          - light.utility_room_light_spot_2
-          - light.utility_room_light_spot_3
-          - light.utility_room_light_spot_4
+          - light.utility_room_lights
+  mode: queued
+  max: 10
+- id: '1760275142990'
+  alias: Køkken lys
+  description: Automatik til at styre lys i køkkenet
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.kitchen_switch_button_1
+    attribute: event_type
+    to: short_release
+    id: button_1_short
+  - trigger: state
+    entity_id:
+    - event.kitchen_switch_button_1
+    attribute: event_type
+    to: long_release
+    id: button_1_long
+  - trigger: state
+    entity_id:
+    - event.kitchen_switch_button_2
+    attribute: event_type
+    to: short_release
+    id: button_2_short
+  - trigger: state
+    entity_id:
+    - event.kitchen_switch_button_2
+    attribute: event_type
+    to: long_release
+    id: button_2_long
+  - trigger: state
+    entity_id:
+    - event.kitchen_switch_button_3
+    attribute: event_type
+    to: short_release
+    id: button_3_short
+  - trigger: state
+    entity_id:
+    - event.kitchen_switch_button_3
+    attribute: event_type
+    to: long_release
+    id: button_3_long
+  - trigger: state
+    entity_id:
+    - event.kitchen_switch_button_4
+    attribute: event_type
+    to: short_release
+    id: button_4_short
+  - trigger: state
+    entity_id:
+    - event.kitchen_switch_button_4
+    attribute: event_type
+    to: long_release
+    id: button_4_long
+  - trigger: state
+    entity_id:
+    - event.kitchen_switch_rotary
+    id: rotary
+  - trigger: state
+    entity_id:
+    - sensor.people_home
+    to: '0'
+    id: no_one_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.kitchen_light
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+    id: lights_on
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1_short
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2700
+          brightness_pct: 80
+        target:
+          entity_id:
+          - light.kitchen_light_strip_countertop
+          - light.kitchen_light_pendant_island_left
+          - light.kitchen_light_pendant_island_right
+          - light.kitchen_light_pendant_sink_left
+          - light.kitchen_light_pendant_sink_right
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.kitchen_light_spot_island
+          - light.kicthen_light_spot_cooktop
+          - light.kitchen_light_spot_oven
+          - light.kitchen_light_spot_sink
+          - light.kitchen_light_spot_fridge
+          - light.kitchen_light_spot_hallway
+    - conditions:
+      - condition: trigger
+        id:
+        - button_2_short
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2300
+          brightness_pct: 50
+        target:
+          entity_id:
+          - light.kitchen_light_strip_countertop
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2300
+          brightness_pct: 15
+        target:
+          entity_id:
+          - light.kitchen_light_pendant_island_left
+          - light.kitchen_light_pendant_island_right
+          - light.kitchen_light_pendant_sink_left
+          - light.kitchen_light_pendant_sink_right
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.kitchen_light_spot_island
+          - light.kicthen_light_spot_cooktop
+          - light.kitchen_light_spot_oven
+          - light.kitchen_light_spot_sink
+          - light.kitchen_light_spot_fridge
+          - light.kitchen_light_spot_hallway
+    - conditions:
+      - condition: trigger
+        id:
+        - button_3_short
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2700
+          brightness_pct: 80
+        target:
+          entity_id:
+          - light.kitchen_light_pendant_island_left
+          - light.kitchen_light_pendant_island_right
+          - light.kitchen_light_pendant_sink_left
+          - light.kitchen_light_pendant_sink_right
+          - light.kitchen_light_strip_countertop
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2700
+          brightness_pct: 50
+        target:
+          entity_id:
+          - light.kitchen_light_spot_island
+          - light.kicthen_light_spot_cooktop
+          - light.kitchen_light_spot_oven
+          - light.kitchen_light_spot_sink
+          - light.kitchen_light_spot_fridge
+          - light.kitchen_light_spot_hallway
+    - conditions:
+      - condition: trigger
+        id:
+        - button_4_short
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 3000
+          brightness_pct: 100
+        target:
+          entity_id:
+          - light.kitchen_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1_long
+        - button_2_long
+        - button_3_long
+        - button_4_long
+        - no_one_home
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.kitchen_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - light_on
+      - condition: state
+        entity_id: sensor.people_home
+        state: '0'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.kitchen_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - rotary
+      sequence:
+      - choose:
+        - conditions:
+          - condition: state
+            entity_id: event.kitchen_switch_rotary
+            attribute: event_type
+            state: clock_wise
+          - condition: state
+            entity_id: binary_sensor.kitchen_light
+            state: 'off'
+          sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              brightness_pct: '{{ (state_attr(''event.kitchen_switch_rotary'', ''steps'')|float
+                / 3.60)|round(0) }}'
+            target:
+              entity_id: light.kitchen_lights
+        - conditions:
+          - condition: state
+            entity_id: event.kitchen_switch_rotary
+            attribute: event_type
+            state: clock_wise
+          sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              brightness_step_pct: '{{ (state_attr(''event.kitchen_switch_rotary'',
+                ''steps'')|float / 3.60)|round(0) }}'
+            target:
+              entity_id: "{% set lights = state_attr('light.kitchen_lights', 'entity_id')
+                | expand() | selectattr('state', 'eq', 'on') | map(attribute='entity_id')
+                | list %} {% if lights | length > 0 -%}\n  {{ lights }}      \n{%-
+                else -%}\n  {{ 'light.kitchen_lights' }}      \n{%- endif %}"
+        default:
+        - action: light.turn_on
+          metadata: {}
+          data:
+            brightness_step_pct: '{{ (state_attr(''event.kitchen_switch_rotary'',
+              ''steps'')|float / -3.60)|round(0) }}'
+          target:
+            entity_id: '{{ state_attr(''light.kitchen_lights'', ''entity_id'') | expand()
+              | selectattr(''state'', ''eq'', ''on'') | map(attribute=''entity_id'')
+              | list }}      '
+  mode: queued
+  max: 10
+- id: '1760825733513'
+  alias: Have lys hus nord
+  description: Automatik til at styre lys i haven på nord siden af huset
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_north_detected
+    to: 'on'
+    id: detected_north
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_north_detected
+    to: 'off'
+    id: cleared_north
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_east_detected
+    to: 'on'
+    id: detected_east
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_east_detected
+    to: 'off'
+    id: cleared_east
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - detected_north
+        - detected_east
+      - condition: numeric_state
+        entity_id: sensor.home_outside_avarage_illuminance_15m
+        below: 100
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          brightness_pct: 100
+          transition: 1
+        target:
+          entity_id:
+          - light.garden_light_house_north
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: trigger
+          id:
+          - cleared_north
+          - cleared_east
+        - condition: state
+          entity_id: binary_sensor.garden_motion_sensor_house_north_detected
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.garden_motion_sensor_house_east_detected
+          state: 'off'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.garden_light_house_north
+  mode: queued
+  max: 10
+- id: '1760825948230'
+  alias: Have lys hus vest
+  description: Automatik til at styre lys i haven på vest siden af huset
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_west_detected
+    to: 'on'
+    id: detected_west
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_west_detected
+    to: 'off'
+    id: cleared_west
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_house_south_detected
+    to: 'on'
+    id: detected_south
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_house_south_detected
+    to: 'off'
+    id: cleared_south
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - detected_west
+        - detected_south
+      - condition: numeric_state
+        entity_id: sensor.home_outside_avarage_illuminance_15m
+        below: 100
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          brightness_pct: 100
+          transition: 1
+        target:
+          entity_id:
+          - light.garden_light_house_west
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: trigger
+          id:
+          - cleared_west
+          - cleared_south
+        - condition: state
+          entity_id: binary_sensor.garden_motion_sensor_house_west_detected
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.driveway_motion_sensor_house_south_detected
+          state: 'off'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.garden_light_house_west
+  mode: queued
+  max: 10
+- id: '1760878547397'
+  alias: Indkørsel bevægelsessensor vej
+  description: Håndtering af bevægelsessensoren i indkørslen ved vejen
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_street_occupancy
+    to: 'on'
+    id: motion_started
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_street_occupancy
+    to: 'off'
+    id: motion_ended
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_started
+      sequence:
+      - action: timer.pause
+        target:
+          entity_id: timer.driveway_motion_sensor_street_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_ended
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.driveway_motion_sensor_street_timer
+  mode: queued
+  max: 10
+- id: '1760878795560'
+  alias: Indkørsel bevægelsessensor hus syd
+  description: Håndtering af bevægelsessensoren i indkørslen på syd siden af huset
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_house_south_occupancy
+    to: 'on'
+    id: motion_started
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_house_south_occupancy
+    to: 'off'
+    id: motion_ended
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_started
+      sequence:
+      - action: timer.pause
+        target:
+          entity_id: timer.driveway_motion_sensor_house_south_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_ended
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.driveway_motion_sensor_house_south_timer
+  mode: queued
+  max: 10
+- id: '1760878828758'
+  alias: Indkørsel bevægelsessensor entre
+  description: Håndtering af bevægelsessensoren i indkørslen ved hoveddøren
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_entrance_occupancy
+    to: 'on'
+    id: motion_started
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_entrance_occupancy
+    to: 'off'
+    id: motion_ended
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_started
+      sequence:
+      - action: timer.pause
+        target:
+          entity_id: timer.driveway_motion_sensor_entrance_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_ended
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.driveway_motion_sensor_entrance_timer
+  mode: queued
+  max: 10
+- id: '1760878858273'
+  alias: Have bevægelsessensor hus øst
+  description: Håndtering af bevægelsessensoren i haven på øst siden af huset
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_east_occupancy
+    to: 'on'
+    id: motion_started
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_east_occupancy
+    to: 'off'
+    id: motion_ended
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_started
+      sequence:
+      - action: timer.pause
+        target:
+          entity_id: timer.garden_motion_sensor_house_east_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_ended
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.garden_motion_sensor_house_east_timer
+  mode: queued
+  max: 10
+- id: '1760878885972'
+  alias: Have bevægelsessensor hus nord
+  description: Håndtering af bevægelsessensoren i haven på nord siden af huset
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_north_occupancy
+    to: 'on'
+    id: motion_started
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_north_occupancy
+    to: 'off'
+    id: motion_ended
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_started
+      sequence:
+      - action: timer.pause
+        target:
+          entity_id: timer.garden_motion_sensor_house_north_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_ended
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.garden_motion_sensor_house_north_timer
+  mode: queued
+  max: 10
+- id: '1760878906998'
+  alias: Have bevægelsessensor hus vest
+  description: Håndtering af bevægelsessensoren i haven på vest siden af huset
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_west_occupancy
+    to: 'on'
+    id: motion_started
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_west_occupancy
+    to: 'off'
+    id: motion_ended
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_started
+      sequence:
+      - action: timer.pause
+        target:
+          entity_id: timer.garden_motion_sensor_house_west_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_ended
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.garden_motion_sensor_house_west_timer
+  mode: queued
+  max: 10
+- id: '1760882456215'
+  alias: Have lys hus øst
+  description: Automatik til at styre lys i haven på øst siden af huset
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_east_detected
+    to: 'on'
+    id: detected_east
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_east_detected
+    to: 'off'
+    id: cleared_east
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_entrance_detected
+    to: 'on'
+    id: detected_entrance
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_entrance_detected
+    to: 'off'
+    id: cleared_entrance
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - detected_east
+        - detected_entrance
+      - condition: numeric_state
+        entity_id: sensor.home_outside_avarage_illuminance_15m
+        below: 100
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          brightness_pct: 100
+          transition: 1
+        target:
+          entity_id:
+          - light.garden_light_house_east
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: trigger
+          id:
+          - cleared_east
+          - cleared_entrance
+        - condition: state
+          entity_id: binary_sensor.garden_motion_sensor_house_east_detected
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.driveway_motion_sensor_entrance_detected
+          state: 'off'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.garden_light_house_east
+  mode: queued
+  max: 10
+- id: '1760882975403'
+  alias: Indkørsel lys hus syd
+  description: Automatik til at styre lys i indkørslen på syd siden af huset
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_house_south_detected
+    to: 'on'
+    id: detected_south
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_house_south_detected
+    to: 'off'
+    id: cleared_south
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_entrance_detected
+    to: 'on'
+    id: detected_entrance
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_entrance_detected
+    to: 'off'
+    id: cleared_entrance
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_street_detected
+    to: 'on'
+    id: detected_street
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_street_detected
+    to: 'off'
+    id: cleared_street
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_west_detected
+    to: 'on'
+    id: detected_west
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_west_detected
+    to: 'off'
+    id: cleared_west
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - detected_south
+        - detected_entrance
+        - detected_street
+        - detected_west
+      - condition: numeric_state
+        entity_id: sensor.home_outside_avarage_illuminance_15m
+        below: 100
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          brightness_pct: 100
+          transition: 1
+        target:
+          entity_id:
+          - light.driveway_light_house_south
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: trigger
+          id:
+          - cleared_south
+          - cleared_entrance
+          - cleared_street
+          - cleared_west
+        - condition: state
+          entity_id: binary_sensor.driveway_motion_sensor_house_south_detected
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.driveway_motion_sensor_entrance_detected
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.driveway_motion_sensor_street_detected
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.garden_motion_sensor_house_west_detected
+          state: 'off'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.driveway_light_house_south
+  mode: queued
+  max: 10
+- id: '1760883022741'
+  alias: Indkørsel lys entre
+  description: Automatik til at styre lys i indkørslen ved hoveddøren
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_entrance_detected
+    to: 'on'
+    id: detected_entrance
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_motion_sensor_entrance_detected
+    to: 'off'
+    id: cleared_entrance
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - detected_entrance
+      - condition: numeric_state
+        entity_id: sensor.home_outside_avarage_illuminance_15m
+        below: 100
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          brightness_pct: 100
+          transition: 1
+        target:
+          entity_id:
+          - light.driveway_light_entrance_spot_1
+          - light.driveway_light_entrance_spot_2
+          - light.driveway_light_entrance_spot_3
+    - conditions:
+      - condition: trigger
+        id:
+        - cleared_entrance
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.driveway_light_entrance_spot_1
+          - light.driveway_light_entrance_spot_2
+          - light.driveway_light_entrance_spot_3
+  mode: queued
+  max: 10
+- id: '1760968576162'
+  alias: Soveværelse tilstedeværelse
+  description: Automatik til at styre soveværelse tilstedeværelsessensor
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_presence_sensor_occupancy
+    to: 'on'
+    id: detected
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_presence_sensor_occupancy
+    to: 'off'
+    id: cleared
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - detected
+      sequence:
+      - action: timer.pause
+        target:
+          entity_id: timer.bedroom_presence_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - cleared
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:05:00
+        target:
+          entity_id: timer.bedroom_presence_timer
+  mode: queued
+  max: 10
+- id: '1761149575145'
+  alias: Hjem røgalarm
+  description: Automatik til at styre og koordinere røgalarmer
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.home_smoke_alarm
+    to: 'on'
+  conditions: []
+  actions:
+  - variables:
+      active: "{{ states.binary_sensor\n   | selectattr('attributes.device_class',
+        'equalto', 'smoke')\n   | selectattr('state', 'equalto', 'on')\n   | map(attribute='name')\n
+        \  | list }}\n"
+      message: "{% if active | length == 0 %}\n  Ingen røg registreret!\n{% elif active
+        | length == 1 %}\n  Der er registreret røg ved {{ active[0] }}!\n{% else %}\n
+        \ Der er registreret røg ved {{ active[:-1] | join(', ') }} og {{ active[-1]
+        }}!\n{% endif %}  \n"
+      phones:
+      - notify.mobile_app_anders_iphone
+  - repeat:
+      for_each: '{{ phones }}'
+      sequence:
+      - data:
+          title: Røgalarm
+          message: '{{ message }}'
+          data:
+            push:
+              sound:
+                name: default
+                critical: 1
+                volume: 1
+              interruption-level: critical
+            presentation_options:
+            - alert
+            - sound
+            - badge
+        action: '{{ repeat.item }}'
+  - action: siren.turn_on
+    metadata: {}
+    data:
+      volume_level: 0.2
+    target:
+      entity_id:
+      - siren.emils_room_smoke_alarm_siren
+      - siren.charlies_room_smoke_alarm_siren
+      - siren.bedroom_smoke_alarm_siren
   mode: restart
+- id: '1761840992462'
+  alias: Terrasse dør lås
+  description: Automatik til at styre terrasse dør låsen
+  triggers:
+  - device_id: 9c87fd2b8353e2ac719fa63031007fb8
+    domain: zha
+    type: remote_button_short_press
+    subtype: remote_button_short_press
+    trigger: device
+    id: short_press
+  - device_id: 9c87fd2b8353e2ac719fa63031007fb8
+    domain: zha
+    type: remote_button_long_press
+    subtype: remote_button_long_press
+    trigger: device
+    id: long_press
+  - trigger: state
+    entity_id:
+    - sensor.people_home
+    to: '0'
+    id: no_one_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.everyone_sleeping
+    id: sleeping
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - short_press
+      - condition: state
+        entity_id: lock.patio_door
+        state: locked
+      sequence:
+      - action: lock.unlock
+        metadata: {}
+        data:
+          code: '12233'
+        target:
+          entity_id: lock.patio_door
+    - conditions:
+      - condition: trigger
+        id:
+        - long_press
+        - short_press
+        - no_one_home
+        - sleeping
+      sequence:
+      - action: lock.lock
+        metadata: {}
+        data: {}
+        target:
+          entity_id: lock.patio_door
+      - if:
+        - condition: not
+          conditions:
+          - condition: or
+            conditions:
+            - condition: state
+              entity_id: lock.patio_door
+              state: locked
+            - condition: state
+              entity_id: lock.patio_door
+              state: locking
+        then:
+        - delay:
+            hours: 0
+            minutes: 0
+            seconds: 10
+            milliseconds: 0
+        - action: lock.lock
+          metadata: {}
+          data: {}
+          target:
+            entity_id: lock.patio_door
+  mode: queued
+  max: 10

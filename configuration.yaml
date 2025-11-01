@@ -16,33 +16,6 @@ template: !include_dir_merge_list ./templates
 automation custom: !include_dir_merge_list ./automations
 script custom: !include_dir_merge_named ./scripts
 
-mqtt:
-  sensor:
-    - name: "Water Meter Usage"
-      state_topic: "watermeter/0/sensor/mydatajson"
-      unit_of_measurement: "m³"
-      value_template: "{{ value_json.CurrentValue }}"
-      device_class: water
-      state_class: total_increasing
-      availability:
-        - topic: "watermeter/0/online"
-          payload_available: "True"
-          payload_not_available: "False"
-    - name: "Water Meter Month Start Value"
-      state_topic: "watermeter/0/sensor/mydatajson"
-      unit_of_measurement: "m³"
-      value_template: "{{ value_json.MonthStartValue }}"
-      device_class: water
-      state_class: total_increasing
-    - name: "Water Meter Room Temperature"
-      state_topic: "watermeter/0/sensor/mydatajson"
-      value_template: "{{ value_json.RoomTemp }}"
-      unit_of_measurement: "°C"
-    - name: "Water Meter Water Temperature"
-      state_topic: "watermeter/0/sensor/mydatajson"
-      value_template: "{{ value_json.WaterTemp }}"
-      unit_of_measurement: "°C"
-
 shell_command:
   pushupdates_to_github: /bin/bash pushupdates.sh
 
