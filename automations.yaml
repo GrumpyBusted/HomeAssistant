@@ -2103,45 +2103,57 @@
   - trigger: state
     entity_id:
     - binary_sensor.emil_home
+    to: 'off'
+    id: emil_leaving
   - trigger: state
     entity_id:
     - binary_sensor.emil_home
-    from: 'off'
     to: 'on'
-    id: comming_home
+    id: emil_home
   - trigger: time
     at:
     - '12:00:00'
+    id: noon
+  - trigger: time
+    at: input_datetime.emil_bedtime_alarm
+    id: bedtime
+  - trigger: time
+    at:
+      entity_id: input_datetime.emil_wake_up_alarm
+      offset: 01:00:00
+    id: wake_up
   - trigger: numeric_state
     entity_id:
-    - sensor.home_avarage_outside_illuminance_15m
+    - sensor.home_outside_avarage_illuminance_15m
     below: 1
+    id: dark_outside
   - trigger: numeric_state
     entity_id:
-    - sensor.home_avarage_outside_illuminance_15m
+    - sensor.home_outside_avarage_illuminance_15m
     above: 2
+    id: light_outside
   - trigger: state
     entity_id:
-    - binary_sensor.emils_room_window_sensor_open_aqara
+    - binary_sensor.emils_room_window_sensor
+    to: 'off'
+    id: window_closed
   - trigger: state
     entity_id:
-    - binary_sensor.emils_room_light
-  - trigger: state
+    - binary_sensor.emils_room_window_sensor
+    to: 'on'
+    id: window_opened
+  conditions:
+  - condition: state
     entity_id: input_boolean.house_sitter
-  conditions: []
+    state: 'off'
   actions:
   - choose:
     - conditions:
-      - condition: state
-        entity_id: input_boolean.house_sitter
-        state: 'on'
-      sequence: []
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.emils_room_window_sensor_open_aqara
-        state: 'on'
+      - condition: trigger
+        id:
+        - window_opened
       - condition: numeric_state
-        entity_id: cover.emils_room_blind_ikea
+        entity_id: cover.emils_room_blind
         attribute: current_position
         below: 50
       sequence:
@@ -2150,23 +2162,38 @@
         data:
           position: 50
         target:
-          entity_id: cover.emils_room_blind_ikea
+          entity_id: cover.emils_room_blind
     - conditions:
-      - condition: state
-        entity_id: binary_sensor.emils_room_window_sensor_open_aqara
-        state: 'on'
-      sequence: []
-    - conditions:
+      - condition: trigger
+        id:
+        - window_closed
       - condition: numeric_state
-        entity_id: sensor.home_avarage_outside_illuminance_15m
-        below: 1
+        entity_id: cover.emils_room_blind
+        attribute: current_position
+        below: 51
       sequence:
       - action: cover.close_cover
         metadata: {}
         data: {}
         target:
-          entity_id: cover.emils_room_blind_ikea
+          entity_id: cover.emils_room_blind
     - conditions:
+      - condition: trigger
+        id:
+        - emil_leaving
+      - condition: numeric_state
+        entity_id: sensor.home_outside_avarage_illuminance_15m
+        above: 1
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.emils_room_blind
+    - conditions:
+      - condition: trigger
+        id:
+        - light_outside
       - condition: state
         entity_id: binary_sensor.emil_home
         state: 'off'
@@ -2175,35 +2202,53 @@
         metadata: {}
         data: {}
         target:
-          entity_id: cover.emils_room_blind_ikea
+          entity_id: cover.emils_room_blind
     - conditions:
       - condition: trigger
         id:
-        - comming_home
+        - emil_home
+        - noon
+        - wake_up
+      - condition: numeric_state
+        entity_id: sensor.home_outside_avarage_illuminance_15m
+        above: 1
       sequence:
       - action: cover.set_cover_position
         metadata: {}
         data:
           position: 40
         target:
-          entity_id: cover.emils_room_blind_ikea
+          entity_id: cover.emils_room_blind
     - conditions:
-      - condition: numeric_state
-        entity_id: cover.emils_room_blind_ikea
-        attribute: current_position
-        below: 40
-      - condition: numeric_state
-        entity_id: light.emils_room_light_philips_hue
-        attribute: brightness
-        above: 50
+      - condition: trigger
+        id:
+        - emil_home
+        - dark_outside
+        - bedtime
+      - condition: state
+        entity_id: binary_sensor.emils_room_window_sensor
+        state: 'on'
       sequence:
       - action: cover.set_cover_position
         metadata: {}
         data:
-          position: 40
+          position: 80
         target:
-          entity_id: cover.emils_room_blind_ikea
+          entity_id: cover.emils_room_blind
+    - conditions:
+      - condition: trigger
+        id:
+        - emil_home
+        - dark_outside
+        - bedtime
+      sequence:
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.emils_room_blind
   mode: queued
+  max: 10
 - id: '1736106304486'
   alias: Charlies værelse - Rullegardin
   description: Automatik for rullegardin på Charlies værelse
@@ -2211,39 +2256,61 @@
   - trigger: state
     entity_id:
     - binary_sensor.charlie_home
+    to: 'on'
+    id: charlie_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlie_home
+    to: 'off'
+    id: charlie_leaving
   - trigger: time
     at:
     - '12:00:00'
+    id: noon
+  - trigger: time
+    at: input_datetime.charlie_bedtime_alarm
+    id: bedtime
+  - trigger: time
+    at:
+      entity_id: input_datetime.charlie_wake_up_alarm
+      offset: 01:00:00
     id: wake_up
   - trigger: numeric_state
     entity_id:
-    - sensor.home_avarage_outside_illuminance_15m
+    - sensor.home_outside_avarage_illuminance_15m
     below: 1
+    id: dark_outside
   - trigger: numeric_state
     entity_id:
-    - sensor.home_avarage_outside_illuminance_15m
+    - sensor.home_outside_avarage_illuminance_15m
     above: 2
-  - trigger: state
+    id: light_outside
+  conditions:
+  - condition: state
     entity_id: input_boolean.house_sitter
-  conditions: []
+    state: 'off'
   actions:
   - choose:
     - conditions:
-      - condition: state
-        entity_id: input_boolean.house_sitter
-        state: 'on'
-      sequence: []
-    - conditions:
+      - condition: trigger
+        id:
+        - charlie_leaving
+        - charlie_home
+        - noon
+        - wake_up
       - condition: numeric_state
-        entity_id: sensor.home_avarage_outside_illuminance_15m
-        below: 1
+        entity_id: sensor.home_outside_avarage_illuminance_15m
+        above: 1
       sequence:
-      - action: cover.close_cover
+      - action: cover.open_cover
         metadata: {}
         data: {}
         target:
-          entity_id: cover.charlies_room_blind_ikea
+          entity_id: cover.charlies_room_blind
     - conditions:
+      - condition: trigger
+        id:
+        - light_outside
       - condition: state
         entity_id: binary_sensor.charlie_home
         state: 'off'
@@ -2252,35 +2319,21 @@
         metadata: {}
         data: {}
         target:
-          entity_id: cover.charlies_room_blind_ikea
+          entity_id: cover.charlies_room_blind
     - conditions:
-      - condition: state
-        entity_id: binary_sensor.charlies_room_blind
-        state: 'off'
       - condition: trigger
         id:
-        - wake_up
+        - charlie_home
+        - dark_outside
+        - bedtime
       sequence:
-      - action: cover.open_cover
+      - action: cover.close_cover
         metadata: {}
         data: {}
         target:
-          entity_id: cover.charlies_room_blind_ikea
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.charlies_room_blind
-        state: 'off'
-      - condition: numeric_state
-        entity_id: light.charlies_room_light_desk_mid_philips_hue
-        attribute: brightness
-        above: 50
-      sequence:
-      - action: cover.open_cover
-        metadata: {}
-        data: {}
-        target:
-          entity_id: cover.charlies_room_blind_ikea
+          entity_id: cover.charlies_room_blind
   mode: queued
+  max: 10
 - id: '1736106591926'
   alias: Soveværelse - Rullegardin
   description: Automatik for rullegardin på soveværelse
