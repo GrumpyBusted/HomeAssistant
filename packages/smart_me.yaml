@@ -8,7 +8,7 @@ rest:
     authentication: basic
     username: !secret smartme_username
     password: !secret smartme_password
-    scan_interval: 30
+    scan_interval: 300
     sensor:
       - name: "Smart-Me Kamstrup Omnipower Meter Name"
         unique_id: B9943DF9-CF60-44D2-B7BC-17DA24B0B643
