@@ -11,13 +11,13 @@ rest:
     scan_interval: 30
     sensor:
       - name: "Smart-Me Kamstrup Omnipower Meter Name"
-        unique_id: "71daa447-39b8-4650-9211-b5dcb4028afc"
+        unique_id: B9943DF9-CF60-44D2-B7BC-17DA24B0B643
         value_template: "{{ value_json.Name }}"
         json_attributes:
           - "Name"
           - "Serial"
       - name: "Smart-Me Kamstrup Omnipower Meter Active Usage"
-        unique_id: "1ca0f92d-de6a-4849-ae42-8224c0d94961"
+        unique_id: FD9D7727-F401-4539-972D-713EC05179EA
         value_template: "{{ value_json.ActivePower }}"
         unit_of_measurement: "kW"
         device_class: "power"
@@ -26,7 +26,7 @@ rest:
           - "ActivePowerUnit"
           - "ActivePower"
       - name: "Smart-Me Kamstrup Omnipower Meter Current Counter"
-        unique_id: "fb5828b7-2508-437c-86c4-cb96225dfe3d"
+        unique_id: 63120B6E-7476-4755-85AD-AF24357720C0
         value_template: "{{ value_json.CounterReading | round(2) }}"
         unit_of_measurement: "kWh"
         device_class: "power"
