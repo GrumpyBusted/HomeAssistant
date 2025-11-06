@@ -1257,9 +1257,9 @@
       - condition: state
         entity_id: binary_sensor.patio_light
         state: 'off'
-      - condition: numeric_state
-        entity_id: sensor.home_outside_avarage_illuminance_15m
-        below: 100
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'off'
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -2122,15 +2122,15 @@
       entity_id: input_datetime.emil_wake_up_alarm
       offset: 01:00:00
     id: wake_up
-  - trigger: numeric_state
+  - trigger: state
     entity_id:
-    - sensor.home_outside_avarage_illuminance_15m
-    below: 1
+    - binary_sensor.home_outside_light
+    to: "off"
     id: dark_outside
-  - trigger: numeric_state
+  - trigger: state
     entity_id:
-    - sensor.home_outside_avarage_illuminance_15m
-    above: 2
+    - binary_sensor.home_outside_light
+    to: "on"
     id: light_outside
   - trigger: state
     entity_id:
@@ -2181,9 +2181,9 @@
       - condition: trigger
         id:
         - emil_leaving
-      - condition: numeric_state
-        entity_id: sensor.home_outside_avarage_illuminance_15m
-        above: 1
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'on'
       sequence:
       - action: cover.open_cover
         metadata: {}
@@ -2209,9 +2209,9 @@
         - emil_home
         - noon
         - wake_up
-      - condition: numeric_state
-        entity_id: sensor.home_outside_avarage_illuminance_15m
-        above: 1
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'on'
       sequence:
       - action: cover.set_cover_position
         metadata: {}
@@ -2275,15 +2275,15 @@
       entity_id: input_datetime.charlie_wake_up_alarm
       offset: 01:00:00
     id: wake_up
-  - trigger: numeric_state
+  - trigger: state
     entity_id:
-    - sensor.home_outside_avarage_illuminance_15m
-    below: 1
+    - binary_sensor.home_outside_light
+    to: 'off'
     id: dark_outside
-  - trigger: numeric_state
+  - trigger: state
     entity_id:
-    - sensor.home_outside_avarage_illuminance_15m
-    above: 2
+    - binary_sensor.home_outside_light
+    to: 'on'
     id: light_outside
   conditions:
   - condition: state
@@ -2298,9 +2298,9 @@
         - charlie_home
         - noon
         - wake_up
-      - condition: numeric_state
-        entity_id: sensor.home_outside_avarage_illuminance_15m
-        above: 1
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'on'
       sequence:
       - action: cover.open_cover
         metadata: {}
@@ -2344,14 +2344,14 @@
     from: 'off'
     to: 'on'
     id: parent_home
-  - trigger: numeric_state
+  - trigger: state
     entity_id:
-    - sensor.home_avarage_outside_illuminance_15m
-    below: 5
-  - trigger: numeric_state
+    - binary_sensor.home_outside_light
+    to: "off"
+  - trigger: state
     entity_id:
-    - sensor.home_avarage_outside_illuminance_15m
-    above: 5
+    - binary_sensor.home_outside_light
+    to: "on"
   - trigger: event
     event_type: bedroom_light_sunrise_script
     id: sunrise_scene
@@ -2481,9 +2481,9 @@
         target:
           entity_id: cover.bedroom_blind_ikea
     - conditions:
-      - condition: numeric_state
-        entity_id: sensor.home_avarage_outside_illuminance_15m
-        below: 5
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: "off"
       - condition: state
         entity_id: binary_sensor.parent_home
         state: 'off'
@@ -2494,9 +2494,9 @@
         target:
           entity_id: cover.bedroom_blind_ikea
     - conditions:
-      - condition: numeric_state
-        entity_id: sensor.home_avarage_outside_illuminance_15m
-        above: 5
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: "on"
       - condition: state
         entity_id: binary_sensor.parent_home
         state: 'off'
@@ -4022,10 +4022,10 @@
     - binary_sensor.garden_motion_sensor_house_east_detected
     to: 'off'
     id: cleared_east
-  - trigger: numeric_state
+  - trigger: state
     entity_id:
-    - sensor.home_outside_avarage_illuminance_15m
-    below: 100
+    - binary_sensor.home_outside_light
+    to: "off"
     id: twilight
   - trigger: time
     at: '22:00:00'
@@ -4038,9 +4038,9 @@
         id:
         - detected_street
         - detected_south
-      - condition: numeric_state
-        entity_id: sensor.home_outside_avarage_illuminance_15m
-        below: 100
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: "off"
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -4065,9 +4065,9 @@
       - condition: trigger
         id:
         - detected_entrance
-      - condition: numeric_state
-        entity_id: sensor.home_outside_avarage_illuminance_15m
-        below: 100
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: "off"
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -4092,9 +4092,9 @@
       - condition: trigger
         id:
         - detected_east
-      - condition: numeric_state
-        entity_id: sensor.home_outside_avarage_illuminance_15m
-        below: 100
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: "off"
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -4130,9 +4130,9 @@
           state: 'off'
       sequence:
       - if:
-        - condition: numeric_state
-          entity_id: sensor.home_outside_avarage_illuminance_15m
-          below: 100
+        - condition: state
+          entity_id: binary_sensor.home_outside_light
+          state: "off"
         - condition: time
           before: '22:00:00'
         - condition: time
@@ -7607,9 +7607,9 @@
       - condition: trigger
         id:
         - person_outside_detected
-      - condition: numeric_state
-        entity_id: sensor.home_outside_avarage_illuminance_15m
-        below: 100
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'off'
       sequence:
       - action: timer.pause
         target:
@@ -8100,9 +8100,9 @@
         id:
         - detected_north
         - detected_east
-      - condition: numeric_state
-        entity_id: sensor.home_outside_avarage_illuminance_15m
-        below: 100
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: "off"
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -8167,9 +8167,9 @@
         id:
         - detected_west
         - detected_south
-      - condition: numeric_state
-        entity_id: sensor.home_outside_avarage_illuminance_15m
-        below: 100
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: "off"
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -8462,9 +8462,9 @@
         id:
         - detected_east
         - detected_entrance
-      - condition: numeric_state
-        entity_id: sensor.home_outside_avarage_illuminance_15m
-        below: 100
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: "off"
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -8551,9 +8551,9 @@
         - detected_entrance
         - detected_street
         - detected_west
-      - condition: numeric_state
-        entity_id: sensor.home_outside_avarage_illuminance_15m
-        below: 100
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: "off"
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -8615,9 +8615,9 @@
       - condition: trigger
         id:
         - detected_entrance
-      - condition: numeric_state
-        entity_id: sensor.home_outside_avarage_illuminance_15m
-        below: 100
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: "off"
       sequence:
       - action: light.turn_on
         metadata: {}
