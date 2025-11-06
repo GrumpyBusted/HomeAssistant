@@ -2125,12 +2125,12 @@
   - trigger: state
     entity_id:
     - binary_sensor.home_outside_light
-    to: "off"
+    to: 'off'
     id: dark_outside
   - trigger: state
     entity_id:
     - binary_sensor.home_outside_light
-    to: "on"
+    to: 'on'
     id: light_outside
   - trigger: state
     entity_id:
@@ -2347,11 +2347,11 @@
   - trigger: state
     entity_id:
     - binary_sensor.home_outside_light
-    to: "off"
+    to: 'off'
   - trigger: state
     entity_id:
     - binary_sensor.home_outside_light
-    to: "on"
+    to: 'on'
   - trigger: event
     event_type: bedroom_light_sunrise_script
     id: sunrise_scene
@@ -2483,7 +2483,7 @@
     - conditions:
       - condition: state
         entity_id: binary_sensor.home_outside_light
-        state: "off"
+        state: 'off'
       - condition: state
         entity_id: binary_sensor.parent_home
         state: 'off'
@@ -2496,7 +2496,7 @@
     - conditions:
       - condition: state
         entity_id: binary_sensor.home_outside_light
-        state: "on"
+        state: 'on'
       - condition: state
         entity_id: binary_sensor.parent_home
         state: 'off'
@@ -4025,7 +4025,7 @@
   - trigger: state
     entity_id:
     - binary_sensor.home_outside_light
-    to: "off"
+    to: 'off'
     id: twilight
   - trigger: time
     at: '22:00:00'
@@ -4040,13 +4040,14 @@
         - detected_south
       - condition: state
         entity_id: binary_sensor.home_outside_light
-        state: "off"
+        state: 'off'
       sequence:
       - action: light.turn_on
         metadata: {}
         data:
           brightness_pct: 100
           transition: 1
+          color_temp: 3000
         target:
           entity_id:
           - light.driveway_light_right_1
@@ -4067,7 +4068,7 @@
         - detected_entrance
       - condition: state
         entity_id: binary_sensor.home_outside_light
-        state: "off"
+        state: 'off'
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -4094,7 +4095,7 @@
         - detected_east
       - condition: state
         entity_id: binary_sensor.home_outside_light
-        state: "off"
+        state: 'off'
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -4132,7 +4133,7 @@
       - if:
         - condition: state
           entity_id: binary_sensor.home_outside_light
-          state: "off"
+          state: 'off'
         - condition: time
           before: '22:00:00'
         - condition: time
@@ -8102,7 +8103,7 @@
         - detected_east
       - condition: state
         entity_id: binary_sensor.home_outside_light
-        state: "off"
+        state: 'off'
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -8169,7 +8170,7 @@
         - detected_south
       - condition: state
         entity_id: binary_sensor.home_outside_light
-        state: "off"
+        state: 'off'
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -8464,7 +8465,7 @@
         - detected_entrance
       - condition: state
         entity_id: binary_sensor.home_outside_light
-        state: "off"
+        state: 'off'
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -8553,7 +8554,7 @@
         - detected_west
       - condition: state
         entity_id: binary_sensor.home_outside_light
-        state: "off"
+        state: 'off'
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -8617,7 +8618,7 @@
         - detected_entrance
       - condition: state
         entity_id: binary_sensor.home_outside_light
-        state: "off"
+        state: 'off'
       sequence:
       - action: light.turn_on
         metadata: {}
