@@ -405,17 +405,27 @@
           - condition: state
             entity_id: device_tracker.volvo_ex30_location
             state: home
-          - condition: state
-            entity_id: sensor.volvo_ex30_charging_connection_status
-            state: connection_status_connected_ac
+          - condition: or
+            conditions:
+            - condition: state
+              entity_id: sensor.volvo_ex30_charging_connection_status
+              state: connection_status_connected_ac
+            - condition: state
+              entity_id: sensor.volvo_ex30_charging_connection_status
+              state: connection_status_unspecified
         - condition: and
           conditions:
           - condition: state
             entity_id: device_tracker.volvo_xc40_location
             state: home
-          - condition: state
-            entity_id: sensor.volvo_xc40_charging_connection_status
-            state: connection_status_connected_ac
+          - condition: or
+            conditions:
+            - condition: state
+              entity_id: sensor.volvo_xc40_charging_connection_status
+              state: connection_status_connected_ac
+            - condition: state
+              entity_id: sensor.volvo_xc40_charging_connection_status
+              state: connection_status_unspecified
     then:
     - action: lock.unlock
       metadata: {}
@@ -466,13 +476,9 @@
     id: door_opened
   - trigger: state
     entity_id:
-    - binary_sensor.garage_light
-    to: 'on'
-    for:
-      hours: 0
-      minutes: 15
-      seconds: 0
-    id: lights_on
+    - sensor.people_home
+    to: '0'
+    id: no_one_home
   conditions: []
   actions:
   - choose:
@@ -532,6 +538,7 @@
       - condition: trigger
         id:
         - door_locked
+        - no_one_home
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -2097,7 +2104,7 @@
   mode: queued
   max: 10
 - id: '1736103151599'
-  alias: Emils værelse - Rullegardin
+  alias: Emils værelse rullegardin
   description: Automatik for rullegardin på Emils værelse
   triggers:
   - trigger: state
@@ -2250,7 +2257,7 @@
   mode: queued
   max: 10
 - id: '1736106304486'
-  alias: Charlies værelse - Rullegardin
+  alias: Charlies værelse rullegardin
   description: Automatik for rullegardin på Charlies værelse
   triggers:
   - trigger: state
@@ -2335,7 +2342,7 @@
   mode: queued
   max: 10
 - id: '1736106591926'
-  alias: Soveværelse - Rullegardin
+  alias: Soveværelse rullegardin
   description: Automatik for rullegardin på soveværelse
   triggers:
   - trigger: state
@@ -2348,22 +2355,15 @@
     entity_id:
     - binary_sensor.home_outside_light
     to: 'off'
+    id: dark_outside
   - trigger: state
     entity_id:
     - binary_sensor.home_outside_light
     to: 'on'
+    id: light_outside
   - trigger: event
     event_type: bedroom_light_sunrise_script
     id: sunrise_scene
-  - trigger: state
-    entity_id:
-    - input_select.monique_nap_time_state
-    to: sleeping
-  - trigger: state
-    entity_id:
-    - input_select.monique_nap_time_state
-    to: 'off'
-    id: nap_time_over
   - trigger: state
     entity_id:
     - weather.home_forecast
@@ -2377,26 +2377,22 @@
   - trigger: time
     at: '16:00:00'
   - trigger: state
-    entity_id: input_boolean.house_sitter
-  - trigger: state
     entity_id:
     - sensor.anders_iphone_battery_state
     - sensor.monique_iphone_battery_state
     to: Charging
-  conditions: []
+  conditions:
+  - condition: state
+    entity_id: input_boolean.house_sitter
+    state: 'off'
   actions:
   - choose:
-    - conditions:
-      - condition: state
-        entity_id: input_boolean.house_sitter
-        state: 'on'
-      sequence: []
     - conditions:
       - condition: trigger
         id:
         - sunrise_scene
       - condition: numeric_state
-        entity_id: cover.bedroom_blind_ikea
+        entity_id: cover.bedroom_blind
         attribute: current_position
         below: 100
       sequence:
@@ -2404,7 +2400,7 @@
         metadata: {}
         data: {}
         target:
-          entity_id: cover.bedroom_blind_ikea
+          entity_id: cover.bedroom_blind
     - conditions:
       - condition: state
         entity_id: binary_sensor.anders_home
@@ -2431,7 +2427,7 @@
         metadata: {}
         data: {}
         target:
-          entity_id: cover.bedroom_blind_ikea
+          entity_id: cover.bedroom_blind
     - conditions:
       - condition: state
         entity_id: binary_sensor.anders_home
@@ -2455,7 +2451,7 @@
         metadata: {}
         data: {}
         target:
-          entity_id: cover.bedroom_blind_ikea
+          entity_id: cover.bedroom_blind
     - conditions:
       - condition: state
         entity_id: binary_sensor.anders_home
@@ -2479,7 +2475,7 @@
         metadata: {}
         data: {}
         target:
-          entity_id: cover.bedroom_blind_ikea
+          entity_id: cover.bedroom_blind
     - conditions:
       - condition: state
         entity_id: binary_sensor.home_outside_light
@@ -2492,7 +2488,7 @@
         metadata: {}
         data: {}
         target:
-          entity_id: cover.bedroom_blind_ikea
+          entity_id: cover.bedroom_blind
     - conditions:
       - condition: state
         entity_id: binary_sensor.home_outside_light
@@ -2518,7 +2514,7 @@
           entity_id: cover.bedroom_blind_ikea
     - conditions:
       - condition: numeric_state
-        entity_id: cover.bedroom_blind_ikea
+        entity_id: cover.bedroom_blind
         attribute: current_position
         above: 60
       - condition: template
