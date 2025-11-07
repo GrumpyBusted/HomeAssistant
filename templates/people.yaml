@@ -132,11 +132,11 @@
     - name: "everyone_sleeping"
       unique_id: 879F46F0-962B-4061-8BD3-15C179BD85D3
       state: >-
-        {{ is_state('binary_sensor.charlie_sleeping', 'on') and 
-           is_state('binary_sensor.emil_sleeping', 'on') and 
+        {{ (is_state('binary_sensor.charlie_home', 'off') or is_state('binary_sensor.charlie_sleeping', 'on')) and 
+           (is_state('binary_sensor.emil_home', 'off') or is_state('binary_sensor.emil_sleeping', 'on')) and 
            is_state('binary_sensor.parent_sleeping', 'on') }}
       icon: >-
-        {% if is_state('binary_sensor.charlie_sleeping', 'on') %}
+        {% if is_state('binary_sensor.everyone_sleeping', 'on') %}
         mdi:sleep
         {% else %}
         mdi:sleep-off

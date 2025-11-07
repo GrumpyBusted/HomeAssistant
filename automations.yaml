@@ -363,12 +363,19 @@
   - trigger: state
     entity_id:
     - sensor.volvo_ex30_charging_connection_status
-    to: connection_status_connected_ac
+    to:
+    - connection_status_connected_ac
+    - connection_status_unspecified
   - trigger: state
     entity_id:
     - sensor.volvo_xc40_charging_connection_status
-    to: connection_status_connected_ac
-  conditions: []
+    to:
+    - connection_status_connected_ac
+    - connection_status_unspecified
+  conditions:
+  - condition: state
+    entity_id: sensor.driveway_ev_charger_status_description
+    state: Locked, car connected
   actions:
   - if:
     - condition: template
@@ -395,9 +402,6 @@
   - if:
     - condition: and
       conditions:
-      - condition: state
-        entity_id: sensor.driveway_ev_charger_status_description
-        state: Locked, car connected
       - condition: or
         conditions:
         - condition: and
@@ -479,6 +483,11 @@
     - sensor.people_home
     to: '0'
     id: no_one_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.everyone_sleeping
+    to: 'on'
+    id: sleeping
   conditions: []
   actions:
   - choose:
@@ -539,6 +548,7 @@
         id:
         - door_locked
         - no_one_home
+        - sleeping
       sequence:
       - action: light.turn_off
         metadata: {}
