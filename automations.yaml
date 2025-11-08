@@ -4113,88 +4113,101 @@
           entity_id:
           - light.driveway_light_left_1
     - conditions:
-      - condition: and
-        conditions:
-        - condition: trigger
-          id:
-          - cleared_street
-          - cleared_south
-          - cleared_entrance
-          - cleared_east
-          - night
-          - twilight
-        - condition: state
-          entity_id: binary_sensor.driveway_motion_sensor_street_detected
-          state: 'off'
-        - condition: state
-          entity_id: binary_sensor.driveway_motion_sensor_house_south_detected
-          state: 'off'
-        - condition: state
-          entity_id: binary_sensor.driveway_motion_sensor_entrance_detected
-          state: 'off'
-        - condition: state
-          entity_id: binary_sensor.garden_motion_sensor_house_east_detected
-          state: 'off'
+      - condition: trigger
+        id:
+        - cleared_street
+        - cleared_south
+        - cleared_entrance
+        - cleared_east
+        - twilight
+      - condition: state
+        entity_id: binary_sensor.driveway_motion_sensor_street_detected
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.driveway_motion_sensor_house_south_detected
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.driveway_motion_sensor_entrance_detected
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.garden_motion_sensor_house_east_detected
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'off'
+      - condition: time
+        before: '22:00:00'
+      - condition: time
+        after: '12:00:00'
       sequence:
-      - if:
-        - condition: state
-          entity_id: binary_sensor.home_outside_light
-          state: 'off'
-        - condition: time
-          before: '22:00:00'
-        - condition: time
-          after: '12:00:00'
-        then:
-        - action: light.turn_on
-          metadata: {}
-          data:
-            brightness_pct: 10
-            transition: 1
-            color_temp: 2500
-          target:
-            entity_id:
-            - light.driveway_light_right_2
-            - light.driveway_light_right_3
-            - light.driveway_light_left_2
-            - light.driveway_light_left_3
-            - light.driveway_light_left_4
-            - light.driveway_light_left_5
-            - light.driveway_light_left_6
-            - light.driveway_light_left_7
-            - light.driveway_light_left_8
-            - light.driveway_light_left_9
-        - action: light.turn_off
-          metadata: {}
-          data:
-            transition: 1
-          target:
-            entity_id:
-            - light.driveway_light_right_1
-            - light.driveway_light_left_1
-        else:
-        - action: light.turn_off
-          metadata: {}
-          data:
-            transition: 1
-          target:
-            entity_id:
-            - light.driveway_light_right_1
-            - light.driveway_light_right_2
-            - light.driveway_light_right_3
-            - light.driveway_light_left_1
-            - light.driveway_light_left_2
-            - light.driveway_light_left_3
-            - light.driveway_light_left_4
-            - light.driveway_light_left_5
-            - light.driveway_light_left_6
-            - light.driveway_light_left_7
-            - light.driveway_light_left_8
-            - light.driveway_light_left_9
-  - action: light.turn_on
-    metadata: {}
-    data: {}
-    target:
-      entity_id: light.driveway_light_right_2
+      - action: light.turn_on
+        metadata: {}
+        data:
+          brightness_pct: 10
+          transition: 1
+          color_temp: 2500
+        target:
+          entity_id:
+          - light.driveway_light_right_2
+          - light.driveway_light_right_3
+          - light.driveway_light_left_2
+          - light.driveway_light_left_3
+          - light.driveway_light_left_4
+          - light.driveway_light_left_5
+          - light.driveway_light_left_6
+          - light.driveway_light_left_7
+          - light.driveway_light_left_8
+          - light.driveway_light_left_9
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.driveway_light_right_1
+          - light.driveway_light_left_1
+    - conditions:
+      - condition: trigger
+        id:
+        - cleared_street
+        - cleared_south
+        - cleared_entrance
+        - cleared_east
+        - night
+      - condition: state
+        entity_id: binary_sensor.driveway_motion_sensor_street_detected
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.driveway_motion_sensor_house_south_detected
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.driveway_motion_sensor_entrance_detected
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.garden_motion_sensor_house_east_detected
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'off'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.driveway_light_right_1
+          - light.driveway_light_right_2
+          - light.driveway_light_right_3
+          - light.driveway_light_left_1
+          - light.driveway_light_left_2
+          - light.driveway_light_left_3
+          - light.driveway_light_left_4
+          - light.driveway_light_left_5
+          - light.driveway_light_left_6
+          - light.driveway_light_left_7
+          - light.driveway_light_left_8
+          - light.driveway_light_left_9
   mode: queued
   max: 10
 - id: '1738962148356'

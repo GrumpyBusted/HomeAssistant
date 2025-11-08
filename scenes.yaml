@@ -1,1 +1,150 @@
-[]
+- id: '1762626328912'
+  name: Indkørsel lys julestemning
+  entities:
+    light.driveway_light_left_1:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.52
+      - 0.39
+    light.driveway_light_left_2:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.54
+      - 0.34
+    light.driveway_light_left_3:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.5
+      - 0.39
+    light.driveway_light_left_4:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.56
+      - 0.35
+    light.driveway_light_left_5:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.51
+      - 0.38
+    light.driveway_light_left_6:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.54
+      - 0.34
+    light.driveway_light_left_7:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.52
+      - 0.39
+    light.driveway_light_left_8:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.42
+      - 0.43
+    light.driveway_light_left_9:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.5
+      - 0.39
+    light.driveway_light_right_1:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.5
+      - 0.39
+    light.driveway_light_right_2:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.33
+      - 0.43
+    light.driveway_light_right_3:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.54
+      - 0.34
+- id: '1762626547486'
+  name: Indkørsel lys halloween
+  entities:
+    light.driveway_light_left_1:
+      state: 'on'
+      brightness: 40
+      xy_color:
+      - 0.56
+      - 0.38
+    light.driveway_light_left_2:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.57
+      - 0.36
+    light.driveway_light_left_3:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.56
+      - 0.32
+    light.driveway_light_left_4:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.52
+      - 0.3
+    light.driveway_light_left_5:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.44
+      - 0.33
+    light.driveway_light_left_6:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.56
+      - 0.38
+    light.driveway_light_left_7:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.52
+      - 0.3
+    light.driveway_light_left_8:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.43
+      - 0.36
+    light.driveway_light_left_9:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.56
+      - 0.38
+    light.driveway_light_right_1:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.56
+      - 0.38
+    light.driveway_light_right_2:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.43
+      - 0.36
+    light.driveway_light_right_3:
+      state: 'on'
+      brightness: 38
+      xy_color:
+      - 0.57
+      - 0.36
