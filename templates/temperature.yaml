@@ -95,8 +95,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {{ (states('sensor.emils_room_temperature_sensor_temperature')|round(2) + 
-            state_attr('climate.emils_room_air_purifier', 'current_temperature')|round(2))/2|round(1) }}
+        {{ states('sensor.emils_room_temperature_sensor_temperature')|round(1) }}
 - sensor:
     - name: emils_room_target_temperature
       unique_id: 90C81B40-9757-4BBF-892D-2EDA13331287
