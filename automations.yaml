@@ -8831,95 +8831,27 @@
   max: 10
 - id: '1762796343850'
   alias: Indkørsel billader
-  description: Hvis en af bilerne er hjemme og tilsluttet, lås billaderen op
+  description: Håndtere billader entiteter
   triggers:
   - trigger: state
-    entity_id:
-    - sensor.driveway_ev_charger_status_description
-    to: Locked, car connected
-  - trigger: state
-    entity_id:
-    - device_tracker.volvo_ex30_location
-    to: home
-  - trigger: state
-    entity_id:
-    - device_tracker.volvo_xc40_location
-    to: home
-  - trigger: state
-    entity_id:
-    - sensor.volvo_ex30_charging_connection_status
-    to:
-    - connection_status_connected_ac
-    - connection_status_unspecified
-  - trigger: state
-    entity_id:
-    - sensor.volvo_xc40_charging_connection_status
-    to:
-    - connection_status_connected_ac
-    - connection_status_unspecified
-  conditions:
-  - condition: state
     entity_id: sensor.driveway_ev_charger_status_description
-    state: Locked, car connected
+  conditions: []
   actions:
   - if:
-    - condition: template
-      value_template: '{{ states(''button.volvo_ex30_update_data'') | as_datetime
-        + timedelta(seconds=30) < now() }}'
+    - condition: state
+      entity_id: sensor.driveway_ev_charger_status_description
+      state: Locked, car connected
     then:
-    - action: button.press
+    - action: switch.turn_on
       metadata: {}
       data: {}
       target:
-        entity_id: button.volvo_ex30_update_data
-    - delay: 00:00:02
-  - if:
-    - condition: template
-      value_template: '{{ states(''button.volvo_xc40_update_data'') | as_datetime
-        + timedelta(seconds=30) < now() }}'
-    then:
-    - action: button.press
+        entity_id: switch.driveway_ev_charger_pause
+    else:
+    - action: switch.turn_off
       metadata: {}
       data: {}
       target:
-        entity_id: button.volvo_xc40_update_data
-    - delay: 00:00:02
-  - if:
-    - condition: and
-      conditions:
-      - condition: or
-        conditions:
-        - condition: and
-          conditions:
-          - condition: state
-            entity_id: device_tracker.volvo_ex30_location
-            state: home
-          - condition: or
-            conditions:
-            - condition: state
-              entity_id: sensor.volvo_ex30_charging_connection_status
-              state: connection_status_connected_ac
-            - condition: state
-              entity_id: sensor.volvo_ex30_charging_connection_status
-              state: connection_status_unspecified
-        - condition: and
-          conditions:
-          - condition: state
-            entity_id: device_tracker.volvo_xc40_location
-            state: home
-          - condition: or
-            conditions:
-            - condition: state
-              entity_id: sensor.volvo_xc40_charging_connection_status
-              state: connection_status_connected_ac
-            - condition: state
-              entity_id: sensor.volvo_xc40_charging_connection_status
-              state: connection_status_unspecified
-    then:
-    - action: lock.unlock
-      metadata: {}
-      data: {}
-      target:
-        entity_id: lock.driveway_ev_charger_lock
+        entity_id: switch.driveway_ev_charger_pause
   mode: queued
   max: 10
