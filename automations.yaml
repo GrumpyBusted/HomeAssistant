@@ -8829,29 +8829,3 @@
             entity_id: lock.patio_door
   mode: queued
   max: 10
-- id: '1762796343850'
-  alias: Indkørsel billader
-  description: Håndtere billader entiteter
-  triggers:
-  - trigger: state
-    entity_id: sensor.driveway_ev_charger_status_description
-  conditions: []
-  actions:
-  - if:
-    - condition: state
-      entity_id: sensor.driveway_ev_charger_status_description
-      state: Locked, car connected
-    then:
-    - action: switch.turn_on
-      metadata: {}
-      data: {}
-      target:
-        entity_id: switch.driveway_ev_charger_pause
-    else:
-    - action: switch.turn_off
-      metadata: {}
-      data: {}
-      target:
-        entity_id: switch.driveway_ev_charger_pause
-  mode: queued
-  max: 10
