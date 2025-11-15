@@ -1,9 +1,6 @@
 # Loads default set of integrations. Do not remove.
 default_config:
 
-lovelace:
-  mode: yaml
-
 homeassistant:
   packages: !include_dir_named packages
 
