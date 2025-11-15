@@ -4174,21 +4174,25 @@
         - cleared_entrance
         - cleared_east
         - night
-      - condition: state
-        entity_id: binary_sensor.driveway_motion_sensor_street_detected
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.driveway_motion_sensor_house_south_detected
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.driveway_motion_sensor_entrance_detected
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.garden_motion_sensor_house_east_detected
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.home_outside_light
-        state: 'off'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.home_outside_light
+          state: 'on'
+        - condition: and
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.driveway_motion_sensor_street_detected
+            state: 'off'
+          - condition: state
+            entity_id: binary_sensor.driveway_motion_sensor_house_south_detected
+            state: 'off'
+          - condition: state
+            entity_id: binary_sensor.driveway_motion_sensor_entrance_detected
+            state: 'off'
+          - condition: state
+            entity_id: binary_sensor.garden_motion_sensor_house_east_detected
+            state: 'off'
       sequence:
       - action: light.turn_off
         metadata: {}
