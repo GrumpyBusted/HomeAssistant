@@ -192,14 +192,14 @@
       unit_of_measurement: "°C"
       icon: "mdi:home-thermometer"
       state: >-
-        {{ (states('sensor.living_room_current_temperature')|float +
-           states('sensor.bedroom_current_temperature')|float +
-           states('sensor.charlies_room_current_temperature')|float +
-           states('sensor.emils_room_current_temperature')|float +
-           states('sensor.bathroom_current_temperature')|float +
-           states('sensor.toilet_current_temperature')|float +
-           states('sensor.hallway_current_temperature')|float +
-           states('sensor.utility_room_current_temperature')|float) / 
+        {{ (states('sensor.living_room_current_temperature')|float(0) +
+           states('sensor.bedroom_current_temperature')|float(0) +
+           states('sensor.charlies_room_current_temperature')|float(0) +
+           states('sensor.emils_room_current_temperature')|float(0) +
+           states('sensor.bathroom_current_temperature')|float(0) +
+           states('sensor.toilet_current_temperature')|float(0) +
+           states('sensor.hallway_current_temperature')|float(0) +
+           states('sensor.utility_room_current_temperature')|float(0)) / 
            8|round(1) }}
 - sensor:
     - name: home_minimum_temperature
@@ -209,14 +209,14 @@
       unit_of_measurement: "°C"
       icon: "mdi:home-thermometer"
       state: >-
-        {{ min(states('sensor.living_room_current_temperature')|float,
-           states('sensor.bedroom_current_temperature')|float,
-           states('sensor.charlies_room_current_temperature')|float,
-           states('sensor.emils_room_current_temperature')|float,
-           states('sensor.bathroom_current_temperature')|float,
-           states('sensor.toilet_current_temperature')|float,
-           states('sensor.hallway_current_temperature')|float,
-           states('sensor.utility_room_current_temperature')|float) }}
+        {{ min(states('sensor.living_room_current_temperature')|float(0),
+           states('sensor.bedroom_current_temperature')|float(0),
+           states('sensor.charlies_room_current_temperature')|float(0),
+           states('sensor.emils_room_current_temperature')|float(0),
+           states('sensor.bathroom_current_temperature')|float(0),
+           states('sensor.toilet_current_temperature')|float(0),
+           states('sensor.hallway_current_temperature')|float(0),
+           states('sensor.utility_room_current_temperature')|float(0)) }}
 - sensor:
     - name: home_heat_pump_current_temperature
       unique_id: 6393DFA9-ABB7-47B4-99CE-7BE0ED98AE12
@@ -225,7 +225,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:home-thermometer"
       state: >-
-        {{ state_attr('climate.home_heat_pump', 'current_temperature')|float }}
+        {{ state_attr('climate.home_heat_pump', 'current_temperature')|float(0) }}
 - sensor:
     - name: home_heat_pump_offset_temperature
       unique_id: D00A30BF-C412-4A93-908E-2E1F1CDF78CB
@@ -234,4 +234,4 @@
       unit_of_measurement: "°C"
       icon: "mdi:home-thermometer"
       state: >-
-        {{ state_attr('climate.home_heat_pump', 'temperature')|float }}
+        {{ state_attr('climate.home_heat_pump', 'temperature')|float(0) }}

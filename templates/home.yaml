@@ -18,7 +18,6 @@
     - name: home_electricity_price_current
       unique_id: D7DB8554-A6CD-4CA2-AA50-D3956C985089 
       device_class: monetary
-      state_class: measurement
       unit_of_measurement: "kr/kWh"
       icon: mdi:cash
       attributes:

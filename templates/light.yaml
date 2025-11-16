@@ -155,7 +155,7 @@
       unique_id: 623F4237-23C4-46A3-BCD1-3D34DF729C28
       device_class: light
       state: >-
-        {{ states('sensor.home_outside_avarage_illuminance_15m')|int > 50 }}
+        {{ states('sensor.home_outside_avarage_illuminance_15m')|int(0) > 50 }}
       icon: >
         {% if is_state('binary_sensor.home_light_outside', 'on') %}
         mdi:white-balance-sunny

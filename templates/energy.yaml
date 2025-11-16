@@ -1,0 +1,100 @@
+- sensor:
+    - name: energy_price_optimal_window_start
+      unique_id: ADDA8D93-A8FC-4F02-9A0C-F6E9451A8CAA
+      device_class: timestamp
+      icon: "mdi:clock-outline"
+      state: >-
+        {% set data = state_attr('sensor.energy_data_service', 'raw_today') %}
+        {% if not data %}
+          {{ none }}
+        {% else %}
+          {# --- Configuration --- #}
+          {% set window_minutes = 150 %}   {# 2.5 hour window #}
+          {% set search_hours = 10 %}      {# Look 10 hours ahead #}
+
+          {# --- Current time rounded to nearest 15 minutes (local time) --- #}
+          {% set now_local = now().replace(
+            minute=(now().minute // 15) * 15,
+            second=0, microsecond=0
+          ) %}
+          {% set end_local = now_local + timedelta(hours=search_hours) %}
+
+          {# --- Convert all raw timestamps to local time and flatten structure --- #}
+          {% set rows = [] %}
+          {% for r in data %}
+            {% set rows = rows + [ as_local(r.hour) ] %}
+          {% endfor %}
+
+          {# --- Filter for times between now and search horizon --- #}
+          {% set rows = rows
+            | select('>=', now_local)
+            | select('<=', end_local)
+            | list
+          %}
+
+          {% if rows | length == 0 %}
+            {{ none }}
+          {% else %}
+
+            {# --- Sort one time (CPU efficient) --- #}
+            {% set rows = rows | sort %}
+
+            {# --- Track best (cheapest) window --- #}
+            {% set best = namespace(price=999999, start=now_local) %}
+
+            {# --- Main loop: test each possible start time --- #}
+            {% for i in range(rows | length) %}
+              {% set start_time = rows[i] %}
+              {% set end_time = start_time + timedelta(minutes=window_minutes) %}
+
+              {# Build segment: prices from start_time to end_time #}
+              {% set segment = [] %}
+              {% for r in data %}
+                {% if as_local(r.hour) >= start_time and as_local(r.hour) < end_time %}
+                  {% set segment = segment + [ r.price ] %}
+                {% endif %}
+              {% endfor %}
+
+              {% if segment | length > 0 %}
+                {% set avg = (segment | sum) / (segment | length) %}
+                {% if avg < best.price %}
+                  {% set best.price = avg %}
+                  {% set best.start = start_time %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+
+            {# Return final timestamp in correct local format #}
+            {{ as_local(best.start).isoformat() }}
+
+          {% endif %}
+        {% endif %}
+      attributes:
+        time_until_start: >-
+          {# 
+            Friendly time difference rounded to nearest 15 minutes.
+            Format H:MM (no leading zero)
+          #}
+          {% set ts = states('sensor.energy_price_optimal_window_start') %}
+          {% if ts in ['unknown', 'unavailable', none] %}
+            {{ none }}
+          {% else %}
+            {% set start = ts | as_datetime %}
+            {% set diff_seconds = (start - now()).total_seconds() %}
+
+            {% if diff_seconds < 0 %}
+              0:00
+            {% else %}
+              {# Convert to minutes #}
+              {% set total_minutes = diff_seconds / 60 %}
+
+              {# Round to nearest 15 minutes #}
+              {% set rounded = ((total_minutes / 15) | round(0) * 15) | int(0) %}
+
+              {# Split #}
+              {% set hours = rounded // 60 %}
+              {% set minutes = rounded % 60 %}
+
+              {{ hours }}:{% if minutes < 10 %}0{% endif %}{{ minutes }}
+            {% endif %}
+          {% endif %}
