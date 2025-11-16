@@ -13,29 +13,15 @@
           {% set search_hours = 10 %}      {# Look 10 hours ahead #}
 
           {# --- Current time rounded to nearest 15 minutes (local time) --- #}
-          {% set now_local = now().replace(
-            minute=(now().minute // 15) * 15,
-            second=0, microsecond=0
-          ) %}
+          {% set now_local = now().replace(minute=(now().minute // 15) * 15, second=0, microsecond=0) %}
           {% set end_local = now_local + timedelta(hours=search_hours) %}
 
-          {# --- Convert all raw timestamps to local time and flatten structure --- #}
-          {% set rows = [] %}
-          {% for r in data %}
-            {% set rows = rows + [ as_local(r.hour) ] %}
-          {% endfor %}
-
           {# --- Filter for times between now and search horizon --- #}
-          {% set rows = rows
-            | select('>=', now_local)
-            | select('<=', end_local)
-            | list
-          %}
+          {% set rows = data | map(attribute='hour') | select('>=', now_local) | select('<=', end_local) | list %}
 
           {% if rows | length == 0 %}
             {{ none }}
           {% else %}
-
             {# --- Sort one time (CPU efficient) --- #}
             {% set rows = rows | sort %}
 
@@ -43,20 +29,15 @@
             {% set best = namespace(price=999999, start=now_local) %}
 
             {# --- Main loop: test each possible start time --- #}
-            {% for i in range(rows | length) %}
-              {% set start_time = rows[i] %}
+            {% for row in rows  %}
+              {% set start_time = row %}
               {% set end_time = start_time + timedelta(minutes=window_minutes) %}
 
               {# Build segment: prices from start_time to end_time #}
-              {% set segment = [] %}
-              {% for r in data %}
-                {% if as_local(r.hour) >= start_time and as_local(r.hour) < end_time %}
-                  {% set segment = segment + [ r.price ] %}
-                {% endif %}
-              {% endfor %}
+              {% set segment = data | selectattr('hour', '>=', start_time) | selectattr('hour', '>=', end_time) | list %}
 
               {% if segment | length > 0 %}
-                {% set avg = (segment | sum) / (segment | length) %}
+                {% set avg = (segment | map(attribute='price') | sum) / (segment | length) %}
                 {% if avg < best.price %}
                   {% set best.price = avg %}
                   {% set best.start = start_time %}
@@ -65,8 +46,7 @@
             {% endfor %}
 
             {# Return final timestamp in correct local format #}
-            {{ as_local(best.start).isoformat() }}
-
+            {{ best.start }}
           {% endif %}
         {% endif %}
       attributes:
@@ -89,7 +69,7 @@
               {% set total_minutes = diff_seconds / 60 %}
 
               {# Round to nearest 15 minutes #}
-              {% set rounded = ((total_minutes / 15) | round(0) * 15) | int(0) %}
+              {% set rounded = ((total_minutes / 15) | round(0) * 15) | int %}
 
               {# Split #}
               {% set hours = rounded // 60 %}
@@ -98,3 +78,5 @@
               {{ hours }}:{% if minutes < 10 %}0{% endif %}{{ minutes }}
             {% endif %}
           {% endif %}
+        local_time: >-
+          {{ as_datetime(states('sensor.energy_price_optimal_window_start')) | as_local }} 
