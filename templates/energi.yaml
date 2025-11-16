@@ -1,0 +1,12 @@
+- sensor:
+    - name: energy_price_optimal_window_start
+      unique_id: ADDA8D93-A8FC-4F02-9A0C-F6E9451A8CAA
+      device_class: timestamp
+      icon: "mdi:clock-outline"
+      state: >-
+        {% set data = state_attr('sensor.energy_data_service', 'raw_today') %}
+        {% if not data %}
+          {{ none }}
+        {% else %}
+          {% now() %}
+        {% endif %}
