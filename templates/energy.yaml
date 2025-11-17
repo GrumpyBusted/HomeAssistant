@@ -85,3 +85,15 @@
           {% else %}
             {{ as_datetime(ts) | as_local }}
           {% endif %}
+- sensor:
+    - name: "energy_prices"
+      unique_id: 0C05E38F-9128-402F-AD98-0DB74EED65C3
+      state: >
+        {{ states('sensor.energy_data_service') }}
+      attributes:
+        prices: >
+          {% set data = state_attr('sensor.energy_data_service', 'raw_today') %}
+          {{ data | map(attribute='price') | list }}
+        times: >
+          {% set data = state_attr('sensor.energy_data_service', 'raw_today') %}
+          {{ data | map(attribute='hour') | list }}
