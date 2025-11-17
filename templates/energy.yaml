@@ -34,7 +34,7 @@
               {% set end_time = start_time + timedelta(minutes=window_minutes) %}
 
               {# Build segment: prices from start_time to end_time #}
-              {% set segment = data | selectattr('hour', '>=', start_time) | selectattr('hour', '>=', end_time) | list %}
+              {% set segment = data | selectattr('hour', '>=', start_time) | selectattr('hour', '<=', end_time) | list %}
 
               {% if segment | length > 0 %}
                 {% set avg = (segment | map(attribute='price') | sum) / (segment | length) %}
@@ -79,4 +79,9 @@
             {% endif %}
           {% endif %}
         local_time: >-
-          {{ as_datetime(states('sensor.energy_price_optimal_window_start')) | as_local }} 
+          {% set ts = best.start if best is defined else states('sensor.energy_price_optimal_window_start') %}
+          {% if ts in ['unknown', 'unavailable', none] %}
+            {{ none }}
+          {% else %}
+            {{ as_datetime(ts) | as_local }}
+          {% endif %}

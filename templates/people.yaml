@@ -159,3 +159,183 @@
         {% else %}
         mdi:account
         {% endif %}
+- sensor:
+    - name: anders_distance_from_home
+      unique_id: B6281AE6-4B56-4057-BDE5-CDF6F061FEE3
+      unit_of_measurement: "km"
+      device_class: distance
+      state_class: measurement
+      icon: mdi:map-marker-distance
+      state: >-
+        {% set person_entity = states.person.anders %}
+        {% if person_entity.state != 'unknown' and person_entity.state != 'unavailable' %}
+          {% set person_lat = person_entity.attributes.latitude %}
+          {% set person_lon = person_entity.attributes.longitude %}
+          {% set home_lat = state_attr('zone.home', 'latitude') %}
+          {% set home_lon = state_attr('zone.home', 'longitude') %}
+          {% if person_lat is not none and person_lon is not none and home_lat is not none and home_lon is not none %}
+            {{ distance(person_lat, person_lon, home_lat, home_lon) | round(1) }}
+          {% else %}
+            unknown
+          {% endif %}
+        {% else %}
+          unknown
+        {% endif %}
+- sensor:
+    - name: monique_distance_from_home
+      unique_id: 9DF74356-3728-4200-98CB-DC9CF53FD3C5
+      unit_of_measurement: "km"
+      device_class: distance
+      state_class: measurement
+      icon: mdi:map-marker-distance
+      state: >-
+        {% set person_entity = states.person.monique %}
+        {% if person_entity.state != 'unknown' and person_entity.state != 'unavailable' %}
+          {% set person_lat = person_entity.attributes.latitude %}
+          {% set person_lon = person_entity.attributes.longitude %}
+          {% set home_lat = state_attr('zone.home', 'latitude') %}
+          {% set home_lon = state_attr('zone.home', 'longitude') %}
+          {% if person_lat is not none and person_lon is not none and home_lat is not none and home_lon is not none %}
+            {{ distance(person_lat, person_lon, home_lat, home_lon) | round(1) }}
+          {% else %}
+            unknown
+          {% endif %}
+        {% else %}
+          unknown
+        {% endif %}
+- sensor:
+    - name: emil_distance_from_home
+      unique_id: C5AFEF61-8351-4869-B5E5-B5710FBC2453
+      unit_of_measurement: "km"
+      device_class: distance
+      state_class: measurement
+      icon: mdi:map-marker-distance
+      state: >-
+        {% set person_entity = states.person.emil %}
+        {% if person_entity.state != 'unknown' and person_entity.state != 'unavailable' %}
+          {% set person_lat = person_entity.attributes.latitude %}
+          {% set person_lon = person_entity.attributes.longitude %}
+          {% set home_lat = state_attr('zone.home', 'latitude') %}
+          {% set home_lon = state_attr('zone.home', 'longitude') %}
+          {% if person_lat is not none and person_lon is not none and home_lat is not none and home_lon is not none %}
+            {{ distance(person_lat, person_lon, home_lat, home_lon) | round(1) }}
+          {% else %}
+            unknown
+          {% endif %}
+        {% else %}
+          unknown
+        {% endif %}
+- sensor:
+    - name: charlie_distance_from_home
+      unique_id: C0ECA464-3824-4585-A699-8BA5CC9BB800
+      unit_of_measurement: "km"
+      device_class: distance
+      state_class: measurement
+      icon: mdi:map-marker-distance
+      state: >-
+        {% set person_entity = states.person.charlie %}
+        {% if person_entity.state != 'unknown' and person_entity.state != 'unavailable' %}
+          {% set person_lat = person_entity.attributes.latitude %}
+          {% set person_lon = person_entity.attributes.longitude %}
+          {% set home_lat = state_attr('zone.home', 'latitude') %}
+          {% set home_lon = state_attr('zone.home', 'longitude') %}
+          {% if person_lat is not none and person_lon is not none and home_lat is not none and home_lon is not none %}
+            {{ distance(person_lat, person_lon, home_lat, home_lon) | round(1) }}
+          {% else %}
+            unknown
+          {% endif %}
+        {% else %}
+          unknown
+        {% endif %}
+- sensor:
+    - name: anders_location
+      unique_id: 4818FDD2-DEA0-467D-AC77-9539DD7AC69E
+      icon: mdi:map
+      state: >-
+        {% set name = 'anders' %}
+        {% set geo_sensor = 'sensor.' ~ name ~ '_iphone_geocoded_location' %}
+        {% set person_state = states('person.' ~ name) %}
+        {% if person_state == 'home' %}
+          Hjemme
+        {% elif person_state not in ['', 'not_home', 'away', 'unknown', 'unavailable', None] %}
+          {% set zone_entity = 'zone.' ~ person_state %}
+          {% set zone_name = state_attr(zone_entity, 'friendly_name') or person_state %}
+          {{ zone_name }}
+        {% elif is_state('sensor.' ~ name ~ '_iphone_activity', 'Automotive') %}
+          På farten
+        {% elif is_state_attr(geo_sensor, 'ISO Country Code', 'DK') and state_attr(geo_sensor, 'Locality') is not none %}
+          {{ state_attr(geo_sensor, 'Locality') }}
+        {% elif state_attr(geo_sensor, 'Country') is not none %}
+          {{ state_attr(geo_sensor, 'Country') }}
+        {% else %}
+          Fortabt
+        {% endif %}
+- sensor:
+    - name: monique_location
+      unique_id: 4818FDD2-DEA0-467D-AC77-9539DD7AC69A
+      icon: mdi:map
+      state: >-
+        {% set name = 'monique' %}
+        {% set geo_sensor = 'sensor.' ~ name ~ '_iphone_geocoded_location' %}
+        {% set person_state = states('person.' ~ name) %}
+        {% if person_state == 'home' %}
+          Hjemme
+        {% elif person_state not in ['', 'not_home', 'away', 'unknown', 'unavailable', None] %}
+          {% set zone_entity = 'zone.' ~ person_state %}
+          {% set zone_name = state_attr(zone_entity, 'friendly_name') or person_state %}
+          {{ zone_name }}
+        {% elif is_state('sensor.' ~ name ~ '_iphone_activity', 'Automotive') %}
+          På farten
+        {% elif is_state_attr(geo_sensor, 'ISO Country Code', 'DK') and state_attr(geo_sensor, 'Locality') is not none %}
+          {{ state_attr(geo_sensor, 'Locality') }}
+        {% elif state_attr(geo_sensor, 'Country') is not none %}
+          {{ state_attr(geo_sensor, 'Country') }}
+        {% else %}
+          Fortabt
+        {% endif %}
+- sensor:
+    - name: emil_location
+      unique_id: 4818FDD2-DEA0-467D-AC77-9539DD7AC69B
+      icon: mdi:map
+      state: >-
+        {% set name = 'emil' %}
+        {% set geo_sensor = 'sensor.' ~ name ~ '_iphone_geocoded_location' %}
+        {% set person_state = states('person.' ~ name) %}
+        {% if person_state == 'home' %}
+          Hjemme
+        {% elif person_state not in ['', 'not_home', 'away', 'unknown', 'unavailable', None] %}
+          {% set zone_entity = 'zone.' ~ person_state %}
+          {% set zone_name = state_attr(zone_entity, 'friendly_name') or person_state %}
+          {{ zone_name }}
+        {% elif is_state('sensor.' ~ name ~ '_iphone_activity', 'Automotive') %}
+          På farten
+        {% elif is_state_attr(geo_sensor, 'ISO Country Code', 'DK') and state_attr(geo_sensor, 'Locality') is not none %}
+          {{ state_attr(geo_sensor, 'Locality') }}
+        {% elif state_attr(geo_sensor, 'Country') is not none %}
+          {{ state_attr(geo_sensor, 'Country') }}
+        {% else %}
+          Fortabt
+        {% endif %}
+- sensor:
+    - name: charlie_location
+      unique_id: 4818FDD2-DEA0-467D-AC77-9539DD7AC69C
+      icon: mdi:map
+      state: >-
+        {% set name = 'charlie' %}
+        {% set geo_sensor = 'sensor.' ~ name ~ '_iphone_geocoded_location' %}
+        {% set person_state = states('person.' ~ name) %}
+        {% if person_state == 'home' %}
+          Hjemme
+        {% elif person_state not in ['', 'not_home', 'away', 'unknown', 'unavailable', None] %}
+          {% set zone_entity = 'zone.' ~ person_state %}
+          {% set zone_name = state_attr(zone_entity, 'friendly_name') or person_state %}
+          {{ zone_name }}
+        {% elif is_state('sensor.' ~ name ~ '_iphone_activity', 'Automotive') %}
+          På farten
+        {% elif is_state_attr(geo_sensor, 'ISO Country Code', 'DK') and state_attr(geo_sensor, 'Locality') is not none %}
+          {{ state_attr(geo_sensor, 'Locality') }}
+        {% elif state_attr(geo_sensor, 'Country') is not none %}
+          {{ state_attr(geo_sensor, 'Country') }}
+        {% else %}
+          Fortabt
+        {% endif %}
