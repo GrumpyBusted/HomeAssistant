@@ -255,7 +255,9 @@
         {% set name = 'anders' %}
         {% set geo_sensor = 'sensor.' ~ name ~ '_iphone_geocoded_location' %}
         {% set person_state = states('person.' ~ name) %}
-        {% if person_state == 'home' %}
+        {% if states('input_text.anders_location_override') != '' %}
+          {{ states('input_text.anders_location_override') }}
+        {% elif person_state == 'home' %}
           Hjemme
         {% elif person_state not in ['', 'not_home', 'away', 'unknown', 'unavailable', None] %}
           {% set zone_entity = 'zone.' ~ person_state %}
