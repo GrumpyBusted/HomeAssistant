@@ -159,6 +159,17 @@
         {% else %}
         mdi:account
         {% endif %}
+- binary_sensor:
+    - name: "people_home"
+      unique_id: CB35C9C7-CCB8-4C0D-A1D2-6959B54081D4
+      state: >-
+        {{ not(is_state('sensor.people_home', '0')) }}
+      icon: >-
+        {% if is_state('binary_sensor.people_home', 'on') %}
+        mdi:home-heart
+        {% else %}
+        mdi:home-outline
+        {% endif %}
 - sensor:
     - name: anders_distance_from_home
       unique_id: B6281AE6-4B56-4057-BDE5-CDF6F061FEE3
@@ -266,7 +277,7 @@
         {% elif is_state('sensor.' ~ name ~ '_iphone_activity', 'Automotive') %}
           På farten
         {% elif is_state_attr(geo_sensor, 'ISO Country Code', 'DK') and state_attr(geo_sensor, 'Locality') is not none %}
-          {{ state_attr(geo_sensor, 'Locality') }}
+          {{ state_attr(geo_sensor, 'Locality').replace('København', 'KBH') }}
         {% elif state_attr(geo_sensor, 'Country') is not none %}
           {{ state_attr(geo_sensor, 'Country') }}
         {% else %}
@@ -289,7 +300,7 @@
         {% elif is_state('sensor.' ~ name ~ '_iphone_activity', 'Automotive') %}
           På farten
         {% elif is_state_attr(geo_sensor, 'ISO Country Code', 'DK') and state_attr(geo_sensor, 'Locality') is not none %}
-          {{ state_attr(geo_sensor, 'Locality') }}
+          {{ state_attr(geo_sensor, 'Locality').replace('København', 'KBH') }}
         {% elif state_attr(geo_sensor, 'Country') is not none %}
           {{ state_attr(geo_sensor, 'Country') }}
         {% else %}
@@ -312,7 +323,7 @@
         {% elif is_state('sensor.' ~ name ~ '_iphone_activity', 'Automotive') %}
           På farten
         {% elif is_state_attr(geo_sensor, 'ISO Country Code', 'DK') and state_attr(geo_sensor, 'Locality') is not none %}
-          {{ state_attr(geo_sensor, 'Locality') }}
+          {{ state_attr(geo_sensor, 'Locality').replace('København', 'KBH') }}
         {% elif state_attr(geo_sensor, 'Country') is not none %}
           {{ state_attr(geo_sensor, 'Country') }}
         {% else %}
@@ -335,7 +346,7 @@
         {% elif is_state('sensor.' ~ name ~ '_iphone_activity', 'Automotive') %}
           På farten
         {% elif is_state_attr(geo_sensor, 'ISO Country Code', 'DK') and state_attr(geo_sensor, 'Locality') is not none %}
-          {{ state_attr(geo_sensor, 'Locality') }}
+          {{ state_attr(geo_sensor, 'Locality').replace('København', 'KBH') }}
         {% elif state_attr(geo_sensor, 'Country') is not none %}
           {{ state_attr(geo_sensor, 'Country') }}
         {% else %}

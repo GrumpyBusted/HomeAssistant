@@ -14,16 +14,3 @@
         {% else %}
         mdi:fire-off
         {% endif %}
-- sensor:
-    - name: home_electricity_price_current
-      unique_id: D7DB8554-A6CD-4CA2-AA50-D3956C985089 
-      device_class: monetary
-      unit_of_measurement: "kr/kWh"
-      icon: mdi:cash
-      attributes:
-        currency: >-
-          {{ state_attr('sensor.energy_data_service', 'currency') }}
-        region: >-
-          {{ state_attr('sensor.energy_data_service', 'region_code') }}
-      state: >-
-        {{ state_attr('sensor.energy_data_service', 'current_price')|round(2) }}

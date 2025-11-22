@@ -56,12 +56,20 @@
     id: rotary
   - trigger: state
     entity_id:
-    - sensor.people_home
-    to: '0'
+    - binary_sensor.people_home
+    from: 'on'
+    to: 'off'
     id: no_one_home
   - trigger: state
     entity_id:
+    - binary_sensor.everyone_sleeping
+    from: 'off'
+    to: 'on'
+    id: sleeping
+  - trigger: state
+    entity_id:
     - binary_sensor.living_room_light
+    from: 'off'
     to: 'on'
     for:
       hours: 0
@@ -268,8 +276,16 @@
             id:
             - lights_on
           - condition: state
-            entity_id: sensor.people_home
-            state: '0'
+            entity_id: binary_sensor.people_home
+            state: 'off'
+        - condition: and
+          conditions:
+          - condition: trigger
+            id:
+            - sleeping
+          - condition: state
+            entity_id: media_player.living_room_apple_tv_media_player
+            state: 'off'
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -344,6 +360,8 @@
               | list }}      '
   mode: queued
   max: 10
+  trace:
+    stored_traces: 20
 - id: '1735658670560'
   alias: Indkørsel billader lås op
   description: Hvis en af bilerne er hjemme og tilsluttet, lås billaderen op
@@ -438,6 +456,8 @@
         entity_id: lock.driveway_ev_charger_lock
   mode: queued
   max: 10
+  trace:
+    stored_traces: 20
 - id: '1735725983183'
   alias: Garage lys
   description: Automatik til at styre lys i garage
@@ -461,7 +481,8 @@
   - trigger: state
     entity_id:
     - binary_sensor.people_home
-    to: '0'
+    from: 'on'
+    to: 'off'
     id: no_one_home
   - trigger: state
     entity_id:
@@ -476,16 +497,19 @@
   - trigger: state
     entity_id:
     - binary_sensor.garage_door_sensor_opening
+    from: 'off'
     to: 'on'
     id: door_opened
   - trigger: state
     entity_id:
-    - sensor.people_home
-    to: '0'
+    - binary_sensor.people_home
+    from: 'on'
+    to: 'off'
     id: no_one_home
   - trigger: state
     entity_id:
     - binary_sensor.everyone_sleeping
+    from: 'off'
     to: 'on'
     id: sleeping
   conditions: []
@@ -558,6 +582,8 @@
           - light.garage_lights
   mode: queued
   max: 10
+  trace:
+    stored_traces: 20
 - id: '1735733828705'
   alias: Hjem - Ingen hjemme
   description: Når alle har forladt hjemme
@@ -565,6 +591,7 @@
   - trigger: state
     entity_id:
     - binary_sensor.family_home
+    from: 'on'
     to: 'off'
     for:
       hours: 0
@@ -641,6 +668,7 @@
   - trigger: state
     entity_id:
     - binary_sensor.family_home
+    from: 'off'
     to: 'on'
   - trigger: state
     entity_id:
@@ -976,144 +1004,181 @@
   mode: queued
   max: 10
 - id: '1735842629315'
-  alias: Entre - Dørlås
-  description: Når en af os kommer hjem, lås dør op
+  alias: Entre dør lås
+  description: Automatik til at låse hoveddøren op og i baseret på hvem der er hjemme
   triggers:
   - trigger: state
     entity_id:
     - binary_sensor.anders_home
-    - binary_sensor.monique_home
-    - binary_sensor.emil_home
-    - binary_sensor.charlie_home
+    from: 'off'
     to: 'on'
-    id: someone_home
+    id: anders_home
   - trigger: state
     entity_id:
-    - binary_sensor.family_home
+    - binary_sensor.monique_home
+    from: 'off'
+    to: 'on'
+    id: monique_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_home
+    from: 'off'
+    to: 'on'
+    id: emil_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlie_home
+    from: 'off'
+    to: 'on'
+    id: charlie_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.people_home
+    from: 'on'
     to: 'off'
+    id: no_one_home
   - trigger: state
     entity_id:
-    - switch.entrance_door_lock_autolock_yale
-    to: 'off'
-    for:
-      hours: 0
-      minutes: 3
-      seconds: 0
-    enabled: true
+    - binary_sensor.everyone_sleeping
+    from: 'off'
+    to: 'on'
+    id: sleeping
   - trigger: state
     entity_id:
-    - select.entrance_door_lock_volume_yale
-    for:
-      hours: 0
-      minutes: 5
-      seconds: 0
-    from: high
-  - trigger: state
-    entity_id:
-    - timer.entrance_door_active_autolock_timer
+    - timer.entrance_door_locking_timer
     to: idle
+    id: auto_locking_expired
   conditions: []
   actions:
-  - parallel:
-    - sequence:
-      - delay: 00:00:30
-      - if:
-        - condition: or
-          conditions:
-          - condition: state
-            entity_id: select.entrance_door_lock_autolock_yale
-            state: 'off'
-          - condition: not
-            conditions:
-            - condition: state
-              entity_id: select.entrance_door_lock_volume_yale
-              state: high
-        then:
-        - action: timer.start
-          metadata: {}
-          data:
-            duration: 00:05:00
-          target:
-            entity_id: timer.entrance_door_active_autolock_timer
-    - choose:
-      - conditions:
-        - condition: trigger
-          id:
-          - someone_home
-        sequence:
-        - if:
-          - condition: not
-            conditions:
-            - condition: state
-              entity_id: select.entrance_door_lock_volume_yale
-              state: 'off'
-          then:
-          - action: select.select_option
-            target:
-              entity_id: select.entrance_door_lock_volume_yale
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - anders_home
+      - condition: state
+        entity_id: lock.entrance_door
+        state: locked
+      sequence:
+      - action: lock.unlock
+        metadata: {}
+        data:
+          code: '141095'
+        target:
+          entity_id: lock.entrance_door
+    - conditions:
+      - condition: trigger
+        id:
+        - monique_home
+      - condition: state
+        entity_id: lock.entrance_door
+        state: locked
+      sequence:
+      - action: lock.unlock
+        metadata: {}
+        data:
+          code: '280239'
+        target:
+          entity_id: lock.entrance_door
+    - conditions:
+      - condition: trigger
+        id:
+        - emil_home
+      - condition: state
+        entity_id: lock.entrance_door
+        state: locked
+      sequence:
+      - action: lock.unlock
+        metadata: {}
+        data:
+          code: '180321'
+        target:
+          entity_id: lock.entrance_door
+    - conditions:
+      - condition: trigger
+        id:
+        - charlie_home
+      - condition: state
+        entity_id: lock.entrance_door
+        state: locked
+      sequence:
+      - action: lock.unlock
+        metadata: {}
+        data:
+          code: '041023'
+        target:
+          entity_id: lock.entrance_door
+    - conditions:
+      - condition: trigger
+        id:
+        - no_one_home
+        - sleeping
+      - condition: state
+        entity_id: lock.entrance_door
+        state:
+        - unlocked
+      sequence:
+      - action: lock.lock
+        metadata: {}
+        data: {}
+        target:
+          entity_id: lock.entrance_door
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:00:10
+        target:
+          entity_id: timer.entrance_door_locking_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - auto_locking_expired
+      - condition: state
+        entity_id: lock.entrance_door
+        state:
+        - unlocked
+      sequence:
+      - variables:
+          persons:
+          - device: notify.mobile_app_anders_iphone
+            sensor: sensor.anders_distance_from_home
+          - device: notify.mobile_app_monique_iphone
+            sensor: sensor.monique_distance_from_home
+          - device: notify.mobile_app_emil_iphone
+            sensor: sensor.emil_distance_from_home
+          - device: notify.mobile_app_charlie_iphone
+            sensor: sensor.charlie_distance_from_home
+          notify_persons: "{% set ns = namespace(list=[]) %} {% for person in persons
+            %}\n  {% set distance = states(person.sensor) | float %}\n  {% set ns.list
+            = ns.list + [{'device': person.device, 'distance': distance}] %}\n{% endfor
+            %}  {% set notify_persons = ns.list | selectattr('distance', 'lt', 0.2)
+            | list %}  {% if notify_persons | count == 0 %}\n  {% set first_distance
+            = ((ns.list | sort(attribute='distance'))[0]).distance | float %}\n  {%
+            set notify_persons = ns.list | selectattr('distance', 'lt', first_distance
+            + 2.0) | list %}\n{% endif %} {{ notify_persons | map(attribute='device')
+            | list }}"
+          title: Advarsel
+          message: Hoveddøren kunne ikke låses automatisk!
+      - action: persistent_notification.create
+        data:
+          title: '{{ title }}'
+          message: '{{ message }}'
+          notification_id: entrance_door_auto_lock_warning
+      - repeat:
+          for_each: '{{ notify_persons }}'
+          sequence:
+          - action: '{{ repeat.item }} '
             data:
-              option: 'off'
-        - if:
-          - condition: state
-            entity_id: switch.entrance_door_lock_autolock_yale
-            state: 'on'
-          then:
-          - action: switch.turn_off
-            target:
-              entity_id: switch.entrance_door_lock_autolock_yale
-            data: {}
-        - if:
-          - condition: state
-            entity_id: lock.entrance_door_lock_yale
-            state: locked
-          then:
-          - action: lock.unlock
-            metadata: {}
-            data:
-              code: '137900'
-            target:
-              entity_id: lock.entrance_door_lock_yale
-            enabled: true
-      default:
-      - parallel:
-        - sequence:
-          - if:
-            - condition: state
-              entity_id: lock.entrance_door_lock_yale
-              state: unlocked
-            then:
-            - action: lock.lock
-              metadata: {}
-              data: {}
-              target:
-                entity_id: lock.entrance_door_lock_yale
-        - sequence:
-          - delay: 00:00:05
-          - if:
-            - condition: state
-              entity_id: switch.entrance_door_lock_autolock_yale
-              state: 'off'
-            then:
-            - action: switch.turn_on
-              metadata: {}
-              data: {}
-              target:
-                entity_id: switch.entrance_door_lock_autolock_yale
-        - sequence:
-          - delay: 00:00:10
-          - if:
-            - condition: not
-              conditions:
-              - condition: state
-                entity_id: select.entrance_door_lock_volume_yale
-                state: high
-            then:
-            - action: select.select_option
-              target:
-                entity_id: select.entrance_door_lock_volume_yale
+              title: '{{ title }}'
+              message: '{{ message }}'
               data:
-                option: high
+                push:
+                  sound:
+                    name: default
+                    critical: 1
   mode: queued
+  max: 10
+  trace:
+    stored_traces: 100
 - id: '1735847242174'
   alias: Terrasse lys
   description: Automatik til at styre lys på terrassen
@@ -1146,7 +1211,8 @@
     to: initial_press
   - trigger: state
     entity_id:
-    - binary_sensor.patio_door
+    - binary_sensor.patio_door_sensor
+    from: 'off'
     to: 'on'
     id: door_opened
   - trigger: state
@@ -1155,13 +1221,20 @@
     to: locked
     id: door_locked
   - trigger: state
+    entity_id: binary_sensor.everyone_sleeping
+    from: 'off'
+    to: 'on'
+    id: sleeping
+  - trigger: state
     entity_id:
-    - sensor.people_home
-    to: '0'
+    - binary_sensor.people_home
+    from: 'on'
+    to: 'off'
     id: no_one_home
   - trigger: state
     entity_id:
     - binary_sensor.patio_light
+    from: 'off'
     to: 'on'
     for:
       hours: 0
@@ -1292,6 +1365,7 @@
         id:
         - no_one_home
         - door_locked
+        - sleeping
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -1310,8 +1384,8 @@
           entity_id: sensor.home_outside_current_temperature
           below: 15
         - condition: state
-          entity_id: sensor.people_home
-          state: '0'
+          entity_id: binary_sensor.people_home
+          state: 'off'
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -1321,6 +1395,8 @@
           entity_id: light.patio_lights
   mode: queued
   max: 10
+  trace:
+    stored_traces: 50
 - id: '1735851968042'
   alias: Gang lys
   description: Automatik til at styre lys i gangen
@@ -1353,17 +1429,20 @@
     to: initial_press
   - trigger: state
     entity_id:
-    - sensor.people_home
-    to: '0'
+    - binary_sensor.people_home
+    from: 'on'
+    to: 'off'
     id: no_one_home
   - trigger: state
     entity_id:
-    - sensor.people_home
-    from: '0'
+    - binary_sensor.people_home
+    from: 'off'
+    to: 'on'
     id: anyone_home
   - trigger: state
     entity_id:
     - binary_sensor.hallway_light
+    from: 'off'
     to: 'on'
     for:
       hours: 0
@@ -1446,8 +1525,8 @@
         id:
         - lights_on
       - condition: state
-        entity_id: sensor.people_home
-        state: '0'
+        entity_id: binary_sensor.people_home
+        state: 'off'
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -1458,6 +1537,8 @@
           - light.hallway_lights
   mode: queued
   max: 10
+  trace:
+    stored_traces: 100
 - id: '1735852365839'
   alias: Emils værelse lys
   description: Automatik til at styre lys på Emils værelse
@@ -1491,11 +1572,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.emil_home
+    from: 'on'
     to: 'off'
     id: emil_leaving
   - trigger: state
     entity_id:
     - binary_sensor.emils_room_light
+    from: 'off'
     to: 'on'
     for:
       hours: 0
@@ -1656,6 +1739,8 @@
           - light.emils_room_lights
   mode: queued
   max: 10
+  trace:
+    stored_traces: 20
 - id: '1736082177257'
   alias: Charlies værelse lys
   description: Automatik til at styre lys på Charlies værelse
@@ -1697,16 +1782,19 @@
   - trigger: state
     entity_id:
     - binary_sensor.charlie_home
+    from: 'on'
     to: 'off'
     id: charlie_leaving
   - trigger: state
     entity_id:
     - binary_sensor.charlie_home
+    from: 'off'
     to: 'on'
     id: charlie_home
   - trigger: state
     entity_id:
     - binary_sensor.charlies_room_light
+    from: 'off'
     to: 'on'
     for:
       hours: 0
@@ -1877,6 +1965,8 @@
           - light.charlies_room_light_dresser
   mode: queued
   max: 10
+  trace:
+    stored_traces: 20
 - id: '1736083584615'
   alias: Soveværelse lys
   description: Automatik til at styre lys på soveværelset
@@ -1908,11 +1998,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.parent_home
+    from: 'on'
     to: 'off'
     id: parents_left_home
   - trigger: state
     entity_id:
     - binary_sensor.bedroom_occupancy
+    from: 'on'
     to: 'off'
     id: bedroom_empty
   - trigger: state
@@ -1933,6 +2025,7 @@
   - trigger: state
     entity_id:
     - binary_sensor.bedroom_light
+    from: 'off'
     to: 'on'
     for:
       hours: 0
@@ -2113,6 +2206,8 @@
           - light.bedroom_lights
   mode: queued
   max: 10
+  trace:
+    stored_traces: 50
 - id: '1736103151599'
   alias: Emils værelse rullegardin
   description: Automatik for rullegardin på Emils værelse
@@ -2120,11 +2215,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.emil_home
+    from: 'on'
     to: 'off'
     id: emil_leaving
   - trigger: state
     entity_id:
     - binary_sensor.emil_home
+    from: 'off'
     to: 'on'
     id: emil_home
   - trigger: time
@@ -2142,21 +2239,25 @@
   - trigger: state
     entity_id:
     - binary_sensor.home_outside_light
+    from: 'on'
     to: 'off'
     id: dark_outside
   - trigger: state
     entity_id:
     - binary_sensor.home_outside_light
+    from: 'off'
     to: 'on'
     id: light_outside
   - trigger: state
     entity_id:
     - binary_sensor.emils_room_window_sensor
+    from: 'on'
     to: 'off'
     id: window_closed
   - trigger: state
     entity_id:
     - binary_sensor.emils_room_window_sensor
+    from: 'off'
     to: 'on'
     id: window_opened
   conditions:
@@ -2266,6 +2367,8 @@
           entity_id: cover.emils_room_blind
   mode: queued
   max: 10
+  trace:
+    stored_traces: 20
 - id: '1736106304486'
   alias: Charlies værelse rullegardin
   description: Automatik for rullegardin på Charlies værelse
@@ -2273,11 +2376,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.charlie_home
+    from: 'off'
     to: 'on'
     id: charlie_home
   - trigger: state
     entity_id:
     - binary_sensor.charlie_home
+    from: 'on'
     to: 'off'
     id: charlie_leaving
   - trigger: time
@@ -2295,11 +2400,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.home_outside_light
+    from: 'on'
     to: 'off'
     id: dark_outside
   - trigger: state
     entity_id:
     - binary_sensor.home_outside_light
+    from: 'off'
     to: 'on'
     id: light_outside
   conditions:
@@ -2351,6 +2458,8 @@
           entity_id: cover.charlies_room_blind
   mode: queued
   max: 10
+  trace:
+    stored_traces: 20
 - id: '1736106591926'
   alias: Soveværelse rullegardin
   description: Automatik for rullegardin på soveværelse
@@ -2364,11 +2473,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.home_outside_light
+    from: 'on'
     to: 'off'
     id: dark_outside
   - trigger: state
     entity_id:
     - binary_sensor.home_outside_light
+    from: 'off'
     to: 'on'
     id: light_outside
   - trigger: event
@@ -2567,21 +2678,21 @@
   triggers:
   - trigger: state
     entity_id:
-    - sensor.energy_data_service
-    attribute: current_price
+    - sensor.energy_price
   - trigger: time_pattern
-    minutes: '0'
+    minutes: /15
     seconds: '0'
-    hours: '*'
   conditions: []
   actions:
   - action: number.set_value
     metadata: {}
     data:
-      value: '{{ states(''sensor.home_electricity_price_current'') }}'
+      value: '{{ states(''sensor.energy_price'') }}'
     target:
       entity_id: number.driveway_ev_charger_energy_price
   mode: single
+  trace:
+    stored_traces: 10
 - id: '1737240652738'
   alias: Teknik solcelle batteri sæt operating mode
   description: Sæt operation mode på solcelle batteri for at lade om natten hvis billigere
@@ -2646,6 +2757,7 @@
     - binary_sensor.volvo_xc40_door_rear_right
     - binary_sensor.volvo_xc40_door_rear_left
     - binary_sensor.volvo_xc40_tailgate
+    from: 'on'
     to: 'off'
     for:
       hours: 0
@@ -2654,6 +2766,7 @@
   - trigger: state
     entity_id:
     - binary_sensor.volvo_xc40_engine_status
+    from: 'on'
     to: 'off'
     for:
       hours: 0
@@ -2699,6 +2812,7 @@
     - binary_sensor.volvo_ex30_door_rear_right
     - binary_sensor.volvo_ex30_door_rear_left
     - binary_sensor.volvo_ex30_tailgate
+    from: 'on'
     to: 'off'
     for:
       hours: 0
@@ -2707,6 +2821,7 @@
   - trigger: state
     entity_id:
     - binary_sensor.volvo_ex30_engine_status
+    from: 'on'
     to: 'off'
     for:
       hours: 0
@@ -2757,6 +2872,7 @@
   - trigger: state
     entity_id:
     - automation.emils_room_heating
+    from: 'off'
     to: 'on'
   - trigger: state
     entity_id: input_boolean.house_sitter
@@ -2865,6 +2981,7 @@
   - trigger: state
     entity_id:
     - automation.charlies_room_heating
+    from: 'off'
     to: 'on'
   - trigger: time
     at:
@@ -2965,6 +3082,7 @@
   - trigger: state
     entity_id:
     - automation.bedroom_heating
+    from: 'off'
     to: 'on'
   - trigger: state
     entity_id: input_boolean.house_sitter
@@ -3080,6 +3198,7 @@
   - trigger: state
     entity_id:
     - automation.toilet_heating
+    from: 'off'
     to: 'on'
   conditions: []
   actions:
@@ -3160,6 +3279,7 @@
   - trigger: state
     entity_id:
     - automation.bathroom_heating
+    from: 'off'
     to: 'on'
   conditions: []
   actions:
@@ -3250,6 +3370,7 @@
   - trigger: state
     entity_id:
     - automation.utility_room_heating
+    from: 'off'
     to: 'on'
   conditions: []
   actions:
@@ -3341,6 +3462,7 @@
   - trigger: state
     entity_id:
     - automation.living_room_heating
+    from: 'off'
     to: 'on'
   - trigger: state
     entity_id: input_boolean.house_sitter
@@ -3499,6 +3621,7 @@
   - trigger: state
     entity_id:
     - automation.hallway_heating
+    from: 'off'
     to: 'on'
   conditions: []
   actions:
@@ -3586,6 +3709,7 @@
   - trigger: state
     entity_id:
     - binary_sensor.family_home
+    from: 'on'
     to: 'off'
   - trigger: state
     entity_id: input_boolean.house_sitter
@@ -3676,6 +3800,7 @@
   - trigger: state
     entity_id:
     - binary_sensor.parent_home
+    from: 'on'
     to: 'off'
   - trigger: state
     entity_id: input_boolean.house_sitter
@@ -3766,6 +3891,7 @@
   - trigger: state
     entity_id:
     - binary_sensor.emil_home
+    from: 'on'
     to: 'off'
   - trigger: state
     entity_id: input_boolean.house_sitter
@@ -3856,6 +3982,7 @@
   - trigger: state
     entity_id:
     - binary_sensor.charlie_home
+    from: 'on'
     to: 'off'
   - trigger: state
     entity_id: input_boolean.house_sitter
@@ -3968,6 +4095,8 @@
     metadata: {}
     data: {}
   mode: single
+  trace:
+    stored_traces: 10
 - id: '1737835831554'
   alias: Hjem huspasser slår fra
   description: Automatik til at slår huspasser fra
@@ -3975,6 +4104,7 @@
   - trigger: state
     entity_id:
     - binary_sensor.family_home
+    from: 'off'
     to: 'on'
   conditions: []
   actions:
@@ -3991,46 +4121,55 @@
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_street_detected
+    from: 'off'
     to: 'on'
     id: detected_street
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_street_detected
+    from: 'on'
     to: 'off'
     id: cleared_street
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_house_south_detected
+    from: 'off'
     to: 'on'
     id: detected_south
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_house_south_detected
+    from: 'on'
     to: 'off'
     id: cleared_south
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_entrance_detected
+    from: 'off'
     to: 'on'
     id: detected_entrance
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_entrance_detected
+    from: 'on'
     to: 'off'
     id: cleared_entrance
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_east_detected
+    from: 'off'
     to: 'on'
     id: detected_east
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_east_detected
+    from: 'on'
     to: 'off'
     id: cleared_east
   - trigger: state
     entity_id:
     - binary_sensor.home_outside_light
+    from: 'on'
     to: 'off'
     id: twilight
   - trigger: time
@@ -4214,6 +4353,8 @@
           - light.driveway_light_left_9
   mode: queued
   max: 10
+  trace:
+    stored_traces: 100
 - id: '1738962148356'
   alias: Garage 3D Printer
   description: Automatik til at slukke for 3D printer
@@ -4229,6 +4370,7 @@
   - trigger: state
     entity_id:
     - light.garage_light_main_philips_hue
+    from: 'on'
     to: 'off'
   conditions:
   - condition: state
@@ -4271,8 +4413,8 @@
   - trigger: state
     entity_id:
     - binary_sensor.emils_room_window_sensor_open_aqara
-    to: 'on'
     from: 'off'
+    to: 'on'
     id: window_open
   conditions: []
   actions:
@@ -5000,7 +5142,7 @@
   description: Automatik til at sende configuration filer etc til GitHub repository
   triggers:
   - trigger: time
-    at: '20:40:00'
+    at: '23:00:00'
   - trigger: event
     event_type: event_homeassistant_restarted
   - trigger: event
@@ -5012,6 +5154,8 @@
   - action: shell_command.pushupdates_to_github
     data: {}
   mode: single
+  trace:
+    stored_traces: 20
 - id: '1739615474729'
   alias: Stue medieafspiller
   description: Automatik til at styrer TV og receiver i stuen
@@ -5878,6 +6022,8 @@
     target:
       entity_id: input_datetime.monique_bedtime_alarm
   mode: restart
+  trace:
+    stored_traces: 10
 - id: '1740423743719'
   alias: Emil sæt sengetid
   description: Sæt sengetid input hjælper for Emil, når webhook er kaldt
@@ -5896,6 +6042,8 @@
     target:
       entity_id: input_datetime.emil_bedtime_alarm
   mode: restart
+  trace:
+    stored_traces: 10
 - id: '1740423776035'
   alias: Charlie sæt sengetid
   description: Sæt sengetid input hjælper for Charlie, når webhook er kaldt
@@ -5914,6 +6062,8 @@
     target:
       entity_id: input_datetime.charlie_bedtime_alarm
   mode: restart
+  trace:
+    stored_traces: 10
 - id: '1740595186366'
   alias: Entre dørklokke
   description: Trigger når dørklokke er aktiveret
@@ -5921,6 +6071,7 @@
   - trigger: state
     entity_id:
     - binary_sensor.entrance_doorbell_ringing_eufy
+    from: 'off'
     to: 'on'
   conditions: []
   actions:
@@ -7577,11 +7728,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.entrance_motion_sensor_motion
+    from: 'off'
     to: 'on'
     id: motion_started
   - trigger: state
     entity_id:
     - binary_sensor.entrance_motion_sensor_motion
+    from: 'on'
     to: 'off'
     id: motion_ended
   - trigger: state
@@ -7591,22 +7744,48 @@
     id: timer_ended
   - trigger: state
     entity_id:
-    - sensor.people_home
-    to: '0'
+    - binary_sensor.people_home
+    from: 'on'
+    to: 'off'
     id: no_one_home
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_entrance_occupancy
+    from: 'off'
     to: 'on'
     id: person_outside_detected
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_entrance_occupancy
+    from: 'on'
     to: 'off'
     id: person_outside_cleared
   conditions: []
   actions:
   - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_started
+      - condition: numeric_state
+        entity_id: sensor.entrance_motion_sensor_illuminance
+        below: 200
+      - condition: state
+        entity_id: binary_sensor.everyone_sleeping
+        state: 'on'
+      sequence:
+      - action: timer.pause
+        target:
+          entity_id: timer.entrance_light_timer
+      - action: light.turn_on
+        metadata: {}
+        data:
+          kelvin: 2700
+          brightness_pct: 30
+          transition: 1
+        target:
+          entity_id:
+          - light.entrance_lights
     - conditions:
       - condition: trigger
         id:
@@ -7682,6 +7861,8 @@
           - light.entrance_lights
   mode: queued
   max: 10
+  trace:
+    stored_traces: 20
 - id: '1747340588102'
   alias: Toilet lys
   description: Automatik til at styre lys på toilettet
@@ -7689,11 +7870,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.toilet_motion_sensor_motion
+    from: 'off'
     to: 'on'
     id: motion_started
   - trigger: state
     entity_id:
     - binary_sensor.toilet_motion_sensor_motion
+    from: 'on'
     to: 'off'
     id: motion_ended
   - trigger: state
@@ -7703,12 +7886,32 @@
     id: timer_ended
   - trigger: state
     entity_id:
-    - sensor.people_home
-    to: '0'
+    - binary_sensor.people_home
+    from: 'on'
+    to: 'off'
     id: no_one_home
   conditions: []
   actions:
   - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_started
+      - condition: state
+        entity_id: binary_sensor.everyone_sleeping
+        state: 'on'
+      sequence:
+      - action: timer.pause
+        target:
+          entity_id: timer.toilet_light_timer
+      - action: light.turn_on
+        metadata: {}
+        data:
+          brightness_pct: 10
+          transition: 1
+        target:
+          entity_id:
+          - light.toilet_light
     - conditions:
       - condition: trigger
         id:
@@ -7751,6 +7954,8 @@
           - light.toilet_light
   mode: queued
   max: 10
+  trace:
+    stored_traces: 20
 - id: '1748709891445'
   alias: Bryggers lys
   description: Automatik til at styre lys i bryggerset
@@ -7758,11 +7963,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.utility_room_motion_sensor_motion
+    from: 'off'
     to: 'on'
     id: motion_started
   - trigger: state
     entity_id:
     - binary_sensor.utility_room_motion_sensor_motion
+    from: 'on'
     to: 'off'
     id: motion_ended
   - trigger: state
@@ -7772,12 +7979,36 @@
     id: timer_ended
   - trigger: state
     entity_id:
-    - sensor.people_home
-    to: '0'
+    - binary_sensor.people_home
+    from: 'on'
+    to: 'off'
     id: no_one_home
   conditions: []
   actions:
   - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - motion_started
+      - condition: numeric_state
+        entity_id: sensor.utility_room_motion_sensor_illuminance
+        below: 400
+      - condition: state
+        entity_id: binary_sensor.everyone_sleeping
+        state: 'on'
+      sequence:
+      - action: timer.pause
+        target:
+          entity_id: timer.utility_room_light_timer
+      - action: light.turn_on
+        metadata: {}
+        data:
+          kelvin: 2700
+          brightness_pct: 30
+          transition: 1
+        target:
+          entity_id:
+          - light.utility_room_lights
     - conditions:
       - condition: trigger
         id:
@@ -7824,6 +8055,8 @@
           - light.utility_room_lights
   mode: queued
   max: 10
+  trace:
+    stored_traces: 20
 - id: '1760275142990'
   alias: Køkken lys
   description: Automatik til at styre lys i køkkenet
@@ -7882,12 +8115,20 @@
     id: rotary
   - trigger: state
     entity_id:
-    - sensor.people_home
-    to: '0'
+    - binary_sensor.people_home
+    from: 'on'
+    to: 'off'
     id: no_one_home
   - trigger: state
     entity_id:
+    - binary_sensor.living_room_light
+    from: 'on'
+    to: 'off'
+    id: living_room_light_off
+  - trigger: state
+    entity_id:
     - binary_sensor.kitchen_light
+    from: 'off'
     to: 'on'
     for:
       hours: 0
@@ -8019,6 +8260,7 @@
         - button_3_long
         - button_4_long
         - no_one_home
+        - living_room_light_off
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -8032,8 +8274,8 @@
         id:
         - light_on
       - condition: state
-        entity_id: sensor.people_home
-        state: '0'
+        entity_id: binary_sensor.people_home
+        state: 'off'
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -8092,6 +8334,8 @@
               | list }}      '
   mode: queued
   max: 10
+  trace:
+    stored_traces: 20
 - id: '1760825733513'
   alias: Have lys hus nord
   description: Automatik til at styre lys i haven på nord siden af huset
@@ -8099,21 +8343,25 @@
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_north_detected
+    from: 'off'
     to: 'on'
     id: detected_north
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_north_detected
+    from: 'on'
     to: 'off'
     id: cleared_north
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_east_detected
+    from: 'off'
     to: 'on'
     id: detected_east
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_east_detected
+    from: 'on'
     to: 'off'
     id: cleared_east
   conditions: []
@@ -8159,6 +8407,8 @@
           - light.garden_light_house_north
   mode: queued
   max: 10
+  trace:
+    stored_traces: 20
 - id: '1760825948230'
   alias: Have lys hus vest
   description: Automatik til at styre lys i haven på vest siden af huset
@@ -8166,21 +8416,25 @@
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_west_detected
+    from: 'off'
     to: 'on'
     id: detected_west
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_west_detected
+    from: 'on'
     to: 'off'
     id: cleared_west
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_house_south_detected
+    from: 'off'
     to: 'on'
     id: detected_south
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_house_south_detected
+    from: 'on'
     to: 'off'
     id: cleared_south
   conditions: []
@@ -8226,6 +8480,8 @@
           - light.garden_light_house_west
   mode: queued
   max: 10
+  trace:
+    stored_traces: 20
 - id: '1760878547397'
   alias: Indkørsel bevægelsessensor vej
   description: Håndtering af bevægelsessensoren i indkørslen ved vejen
@@ -8233,11 +8489,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_street_occupancy
+    from: 'off'
     to: 'on'
     id: motion_started
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_street_occupancy
+    from: 'on'
     to: 'off'
     id: motion_ended
   conditions: []
@@ -8264,6 +8522,8 @@
           entity_id: timer.driveway_motion_sensor_street_timer
   mode: queued
   max: 10
+  trace:
+    stored_traces: 5
 - id: '1760878795560'
   alias: Indkørsel bevægelsessensor hus syd
   description: Håndtering af bevægelsessensoren i indkørslen på syd siden af huset
@@ -8271,11 +8531,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_house_south_occupancy
+    from: 'off'
     to: 'on'
     id: motion_started
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_house_south_occupancy
+    from: 'on'
     to: 'off'
     id: motion_ended
   conditions: []
@@ -8302,6 +8564,8 @@
           entity_id: timer.driveway_motion_sensor_house_south_timer
   mode: queued
   max: 10
+  trace:
+    stored_traces: 5
 - id: '1760878828758'
   alias: Indkørsel bevægelsessensor entre
   description: Håndtering af bevægelsessensoren i indkørslen ved hoveddøren
@@ -8309,11 +8573,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_entrance_occupancy
+    from: 'off'
     to: 'on'
     id: motion_started
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_entrance_occupancy
+    from: 'on'
     to: 'off'
     id: motion_ended
   conditions: []
@@ -8340,6 +8606,8 @@
           entity_id: timer.driveway_motion_sensor_entrance_timer
   mode: queued
   max: 10
+  trace:
+    stored_traces: 5
 - id: '1760878858273'
   alias: Have bevægelsessensor hus øst
   description: Håndtering af bevægelsessensoren i haven på øst siden af huset
@@ -8347,11 +8615,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_east_occupancy
+    from: 'off'
     to: 'on'
     id: motion_started
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_east_occupancy
+    from: 'on'
     to: 'off'
     id: motion_ended
   conditions: []
@@ -8378,6 +8648,8 @@
           entity_id: timer.garden_motion_sensor_house_east_timer
   mode: queued
   max: 10
+  trace:
+    stored_traces: 5
 - id: '1760878885972'
   alias: Have bevægelsessensor hus nord
   description: Håndtering af bevægelsessensoren i haven på nord siden af huset
@@ -8385,11 +8657,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_north_occupancy
+    from: 'off'
     to: 'on'
     id: motion_started
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_north_occupancy
+    from: 'on'
     to: 'off'
     id: motion_ended
   conditions: []
@@ -8416,6 +8690,8 @@
           entity_id: timer.garden_motion_sensor_house_north_timer
   mode: queued
   max: 10
+  trace:
+    stored_traces: 5
 - id: '1760878906998'
   alias: Have bevægelsessensor hus vest
   description: Håndtering af bevægelsessensoren i haven på vest siden af huset
@@ -8423,11 +8699,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_west_occupancy
+    from: 'off'
     to: 'on'
     id: motion_started
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_west_occupancy
+    from: 'on'
     to: 'off'
     id: motion_ended
   conditions: []
@@ -8454,6 +8732,8 @@
           entity_id: timer.garden_motion_sensor_house_west_timer
   mode: queued
   max: 10
+  trace:
+    stored_traces: 5
 - id: '1760882456215'
   alias: Have lys hus øst
   description: Automatik til at styre lys i haven på øst siden af huset
@@ -8461,21 +8741,25 @@
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_east_detected
+    from: 'off'
     to: 'on'
     id: detected_east
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_east_detected
+    from: 'on'
     to: 'off'
     id: cleared_east
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_entrance_detected
+    from: 'off'
     to: 'on'
     id: detected_entrance
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_entrance_detected
+    from: 'on'
     to: 'off'
     id: cleared_entrance
   conditions: []
@@ -8521,6 +8805,8 @@
           - light.garden_light_house_east
   mode: queued
   max: 10
+  trace:
+    stored_traces: 20
 - id: '1760882975403'
   alias: Indkørsel lys hus syd
   description: Automatik til at styre lys i indkørslen på syd siden af huset
@@ -8528,41 +8814,49 @@
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_house_south_detected
+    from: 'off'
     to: 'on'
     id: detected_south
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_house_south_detected
+    from: 'on'
     to: 'off'
     id: cleared_south
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_entrance_detected
+    from: 'off'
     to: 'on'
     id: detected_entrance
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_entrance_detected
+    from: 'on'
     to: 'off'
     id: cleared_entrance
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_street_detected
+    from: 'off'
     to: 'on'
     id: detected_street
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_street_detected
+    from: 'on'
     to: 'off'
     id: cleared_street
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_west_detected
+    from: 'off'
     to: 'on'
     id: detected_west
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_west_detected
+    from: 'on'
     to: 'off'
     id: cleared_west
   conditions: []
@@ -8618,6 +8912,8 @@
           - light.driveway_light_house_south
   mode: queued
   max: 10
+  trace:
+    stored_traces: 20
 - id: '1760883022741'
   alias: Indkørsel lys entre
   description: Automatik til at styre lys i indkørslen ved hoveddøren
@@ -8625,11 +8921,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_entrance_detected
+    from: 'off'
     to: 'on'
     id: detected_entrance
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_entrance_detected
+    from: 'on'
     to: 'off'
     id: cleared_entrance
   conditions: []
@@ -8669,6 +8967,8 @@
           - light.driveway_light_entrance_spot_3
   mode: queued
   max: 10
+  trace:
+    stored_traces: 20
 - id: '1760968576162'
   alias: Soveværelse tilstedeværelse
   description: Automatik til at styre soveværelse tilstedeværelsessensor
@@ -8676,11 +8976,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.bedroom_presence_sensor_occupancy
+    from: 'off'
     to: 'on'
     id: detected
   - trigger: state
     entity_id:
     - binary_sensor.bedroom_presence_sensor_occupancy
+    from: 'on'
     to: 'off'
     id: cleared
   conditions: []
@@ -8707,12 +9009,15 @@
           entity_id: timer.bedroom_presence_timer
   mode: queued
   max: 10
+  trace:
+    stored_traces: 5
 - id: '1761149575145'
   alias: Hjem røgalarm
   description: Automatik til at styre og koordinere røgalarmer
   triggers:
   - trigger: state
     entity_id: binary_sensor.home_smoke_alarm
+    from: 'off'
     to: 'on'
   conditions: []
   actions:
@@ -8758,78 +9063,502 @@
   alias: Terrasse dør lås
   description: Automatik til at styre terrasse dør låsen
   triggers:
-  - device_id: 9c87fd2b8353e2ac719fa63031007fb8
-    domain: zha
-    type: remote_button_short_press
-    subtype: remote_button_short_press
-    trigger: device
-    id: short_press
-  - device_id: 9c87fd2b8353e2ac719fa63031007fb8
-    domain: zha
-    type: remote_button_long_press
-    subtype: remote_button_long_press
-    trigger: device
-    id: long_press
   - trigger: state
     entity_id:
-    - sensor.people_home
-    to: '0'
+    - binary_sensor.people_home
+    from: 'on'
+    to: 'off'
     id: no_one_home
   - trigger: state
     entity_id:
     - binary_sensor.everyone_sleeping
+    from: 'off'
+    to: 'on'
     id: sleeping
+  - trigger: state
+    entity_id:
+    - timer.patio_door_locking_timer
+    to:
+    - idle
+    id: auto_locking_expired
   conditions: []
   actions:
   - choose:
     - conditions:
       - condition: trigger
         id:
-        - short_press
-      - condition: state
-        entity_id: lock.patio_door
-        state: locked
-      sequence:
-      - action: lock.unlock
-        metadata: {}
-        data:
-          code: '12233'
-        target:
-          entity_id: lock.patio_door
-    - conditions:
-      - condition: trigger
-        id:
-        - long_press
-        - short_press
         - no_one_home
         - sleeping
+      - condition: state
+        entity_id: lock.patio_door
+        state: unlocked
       sequence:
       - action: lock.lock
         metadata: {}
         data: {}
         target:
           entity_id: lock.patio_door
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:00:10
+        target:
+          entity_id: timer.patio_door_locking_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - auto_locking_expired
+      - condition: state
+        entity_id: lock.patio_door
+        state:
+        - unlocked
+      sequence:
+      - action: lock.lock
+        metadata: {}
+        data: {}
+        target:
+          entity_id: lock.patio_door
+      - delay: 00:00:01
       - if:
         - condition: not
           conditions:
-          - condition: or
-            conditions:
-            - condition: state
-              entity_id: lock.patio_door
-              state: locked
-            - condition: state
-              entity_id: lock.patio_door
-              state: locking
-        then:
-        - delay:
-            hours: 0
-            minutes: 0
-            seconds: 10
-            milliseconds: 0
-        - action: lock.lock
-          metadata: {}
-          data: {}
-          target:
+          - condition: state
             entity_id: lock.patio_door
+            state: locked
+        then:
+        - variables:
+            persons:
+            - device: notify.mobile_app_anders_iphone
+              sensor: sensor.anders_distance_from_home
+            - device: notify.mobile_app_monique_iphone
+              sensor: sensor.monique_distance_from_home
+            - device: notify.mobile_app_emil_iphone
+              sensor: sensor.emil_distance_from_home
+            - device: notify.mobile_app_charlie_iphone
+              sensor: sensor.charlie_distance_from_home
+            notify_persons: "{% set ns = namespace(list=[]) %} {% for person in persons
+              %}\n  {% set distance = states(person.sensor) | float %}\n  {% set ns.list
+              = ns.list + [{'device': person.device, 'distance': distance}] %}\n{%
+              endfor %}  {% set notify_persons = ns.list | selectattr('distance',
+              'lt', 0.2) | list %}  {% if notify_persons | count == 0 %}\n  {% set
+              first_distance = ((ns.list | sort(attribute='distance'))[0]).distance
+              | float %}\n  {% set notify_persons = ns.list | selectattr('distance',
+              'lt', first_distance + 2.0) | list %}\n{% endif %} {{ notify_persons
+              | map(attribute='device') | list }}"
+            title: Advarsel
+            message: Terrassedøren kunne ikke låses automatisk!
+        - action: persistent_notification.create
+          data:
+            title: '{{ title }}'
+            message: '{{ message }}'
+            notification_id: patio_door_auto_lock_warning
+        - repeat:
+            for_each: '{{ notify_persons }}'
+            sequence:
+            - action: '{{ repeat.item }} '
+              data:
+                title: '{{ title }}'
+                message: '{{ message }}'
+                data:
+                  push:
+                    sound:
+                      name: default
+                      critical: 1
   mode: queued
   max: 10
+  trace:
+    stored_traces: 50
+- id: '1763801218547'
+  alias: Hjem ventilation forvarme
+  description: Styring af forvarme til Nilan ventilationsanlæg
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.everyone_sleeping
+  - trigger: state
+    entity_id: binary_sensor.people_home
+  - trigger: numeric_state
+    entity_id: sensor.home_outside_current_temperature
+    below: 1
+  - trigger: numeric_state
+    entity_id: sensor.home_outside_current_temperature
+    above: 3
+  actions:
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.home_outside_current_temperature
+        below: 1
+      - condition: state
+        entity_id: binary_sensor.people_home
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.everyone_sleeping
+        state: 'off'
+      sequence:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.storage_smart_plug_ventilation_preheating
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: numeric_state
+          entity_id: sensor.home_outside_current_temperature
+          above: 3
+        - condition: state
+          entity_id: binary_sensor.people_home
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.everyone_sleeping
+          state: 'on'
+      sequence:
+      - action: switch.turn_off
+        target:
+          entity_id: switch.storage_smart_plug_ventilation_preheating
+  mode: restart
+  trace:
+    stored_traces: 30
+- id: '1763826566164'
+  alias: Hjem dør lås
+  description: Kontrol af at dører er låst
+  triggers:
+  - trigger: state
+    entity_id:
+    - lock.entrance_door
+    - lock.patio_door
+    - lock.utility_room_door
+    - lock.garage_door
+    to: unlocked
+    id: door_unlocked
+  - trigger: event
+    event_type: home_door_lock
+    id: lock
+  - trigger: event
+    event_type: ios.notification_action_fired
+    event_data:
+      actionName: DOOR_LOCK_ACTION
+    id: lock_action
+  - trigger: state
+    entity_id:
+    - timer.home_door_locking_timer
+    to:
+    - idle
+    id: locking_expired
+  conditions: []
+  actions:
+  - variables:
+      persons:
+      - device: notify.mobile_app_anders_iphone
+        sensor: sensor.anders_distance_from_home
+      - device: notify.mobile_app_monique_iphone
+        sensor: sensor.monique_distance_from_home
+      - device: notify.mobile_app_emil_iphone
+        sensor: sensor.emil_distance_from_home
+      - device: notify.mobile_app_charlie_iphone
+        sensor: sensor.charlie_distance_from_home
+      notify_persons: "{% set ns = namespace(list=[]) %}\n{% for person in persons
+        %}\n  {% set distance = states(person.sensor) | float %}\n  {% set ns.list
+        = ns.list + [{\n      'device': person.device,\n      'distance': distance\n
+        \ }] %}\n{% endfor %} \n{% set notify_persons = ns.list | selectattr('distance',
+        'lt', 0.2) | list %} \n{% if notify_persons | count == 0 %}\n  {% set first_distance
+        = ((ns.list | sort(attribute='distance'))[0]).distance | float %}\n  {% set
+        notify_persons = ns.list | selectattr('distance', 'lt', first_distance + 2.0)
+        | list %}\n{% endif %}\n{{ notify_persons | map(attribute='device') | list
+        }}"
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - door_unlocked
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.everyone_sleeping
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.people_home
+          state: 'off'
+      sequence:
+      - variables:
+          title: Information
+          message: 'Følgende døre er ulåste:
+
+            {% for door in doors | select(''is_state'', ''unlocked'') | list -%}
+
+            - {{ state_attr(door, ''friendly_name'') }}
+
+            {% endfor -%}'
+      - data:
+          title: '{{ title }}'
+          message: '{{ message }}'
+          notification_id: home_door_lock_warning
+        action: persistent_notification.create
+      - repeat:
+          for_each: '{{ notify_persons }}'
+          sequence:
+          - data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                push:
+                  category: DOOR_LOCK
+                  actions:
+                  - action: home_door_lock
+                    title: Lås
+                  sound:
+                    name: default
+            action: '{{ repeat.item }} '
+    - conditions:
+      - condition: trigger
+        id:
+        - lock
+        - lock_action
+      sequence:
+      - repeat:
+          for_each: '{{ doors }}'
+          sequence:
+          - if:
+            - condition: template
+              value_template: '{{ is_state(repeat.item, ''unlocked'') }}'
+            then:
+            - target:
+                entity_id: '{{ repeat.item }}'
+              action: lock.lock
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:00:10
+        target:
+          entity_id: timer.home_door_locking_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - locking_expired
+      - condition: template
+        value_template: '{{ doors | select(''is_state'', ''unlocked'') | list | count
+          > 0 }}
+
+          '
+      sequence:
+      - variables:
+          title: Advarsel
+          message: "Følgende døre kunne ikke fjern låses: \n{% for door in doors |
+            select('is_state', 'unlocked') | list -%}\n- {{ state_attr(door, 'friendly_name')
+            }}\n{% endfor -%}"
+      - data:
+          title: '{{ title }}'
+          message: '{{ message }}'
+          notification_id: home_door_lock_warning
+        action: persistent_notification.create
+      - repeat:
+          for_each: '{{ notify_persons }}'
+          sequence:
+          - data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                push:
+                  sound:
+                    name: default
+                    critical: 1
+            action: '{{ repeat.item }} '
+  variables:
+    doors:
+    - lock.entrance_door
+    - lock.patio_door
+    - lock.utility_room_door
+    - lock.garage_door
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 50
+- id: '1763846508906'
+  alias: Bryggers dør lås
+  description: Automatik til at låse bryggersdøren op og i baseret på hvem der er
+    hjemme
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.people_home
+    from: 'on'
+    to: 'off'
+    id: no_one_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.everyone_sleeping
+    from: 'off'
+    to: 'on'
+    id: sleeping
+  - trigger: state
+    entity_id:
+    - timer.utility_room_door_locking_timer
+    to: idle
+    id: auto_locking_expired
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - no_one_home
+        - sleeping
+      - condition: state
+        entity_id: lock.utility_room_door
+        state: unlocked
+      sequence:
+      - action: lock.lock
+        metadata: {}
+        data: {}
+        target:
+          entity_id: lock.utility_room_door
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:00:10
+        target:
+          entity_id: timer.utility_room_door_locking_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - auto_locking_expired
+      - condition: state
+        entity_id: lock.utility_room_door
+        state:
+        - unlocked
+      sequence:
+      - variables:
+          persons:
+          - device: notify.mobile_app_anders_iphone
+            sensor: sensor.anders_distance_from_home
+          - device: notify.mobile_app_monique_iphone
+            sensor: sensor.monique_distance_from_home
+          - device: notify.mobile_app_emil_iphone
+            sensor: sensor.emil_distance_from_home
+          - device: notify.mobile_app_charlie_iphone
+            sensor: sensor.charlie_distance_from_home
+          notify_persons: "{% set ns = namespace(list=[]) %} {% for person in persons
+            %}\n  {% set distance = states(person.sensor) | float %}\n  {% set ns.list
+            = ns.list + [{'device': person.device, 'distance': distance}] %}\n{% endfor
+            %}  {% set notify_persons = ns.list | selectattr('distance', 'lt', 0.2)
+            | list %}  {% if notify_persons | count == 0 %}\n  {% set first_distance
+            = ((ns.list | sort(attribute='distance'))[0]).distance | float %}\n  {%
+            set notify_persons = ns.list | selectattr('distance', 'lt', first_distance
+            + 2.0) | list %}\n{% endif %} {{ notify_persons | map(attribute='device')
+            | list }}"
+          title: Advarsel
+          message: Bryggers døren kunne ikke låses automatisk!
+      - action: persistent_notification.create
+        data:
+          title: '{{ title }}'
+          message: '{{ message }}'
+          notification_id: utility_room_door_auto_lock_warning
+      - repeat:
+          for_each: '{{ notify_persons }}'
+          sequence:
+          - action: '{{ repeat.item }} '
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                push:
+                  sound:
+                    name: default
+                    critical: 1
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 100
+- id: '1763847410643'
+  alias: Garage dør lås
+  description: Automatik til at låse garage døren op og i baseret på hvem der er hjemme
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.people_home
+    from: 'on'
+    to: 'off'
+    id: no_one_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.everyone_sleeping
+    from: 'off'
+    to: 'on'
+    id: sleeping
+  - trigger: state
+    entity_id:
+    - timer.garage_door_locking_timer
+    to: idle
+    id: auto_locking_expired
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - no_one_home
+        - sleeping
+      - condition: state
+        entity_id: lock.garage_door
+        state: unlocked
+      sequence:
+      - action: lock.lock
+        metadata: {}
+        data: {}
+        target:
+          entity_id: lock.garage_door
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:00:10
+        target:
+          entity_id: timer.garage_door_locking_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - auto_locking_expired
+      - condition: state
+        entity_id: lock.garage_door
+        state:
+        - unlocked
+      sequence:
+      - variables:
+          persons:
+          - device: notify.mobile_app_anders_iphone
+            sensor: sensor.anders_distance_from_home
+          - device: notify.mobile_app_monique_iphone
+            sensor: sensor.monique_distance_from_home
+          - device: notify.mobile_app_emil_iphone
+            sensor: sensor.emil_distance_from_home
+          - device: notify.mobile_app_charlie_iphone
+            sensor: sensor.charlie_distance_from_home
+          notify_persons: "{% set ns = namespace(list=[]) %} {% for person in persons
+            %}\n  {% set distance = states(person.sensor) | float %}\n  {% set ns.list
+            = ns.list + [{'device': person.device, 'distance': distance}] %}\n{% endfor
+            %}  {% set notify_persons = ns.list | selectattr('distance', 'lt', 0.2)
+            | list %}  {% if notify_persons | count == 0 %}\n  {% set first_distance
+            = ((ns.list | sort(attribute='distance'))[0]).distance | float %}\n  {%
+            set notify_persons = ns.list | selectattr('distance', 'lt', first_distance
+            + 2.0) | list %}\n{% endif %} {{ notify_persons | map(attribute='device')
+            | list }}"
+          title: Advarsel
+          message: Garage døren kunne ikke låses automatisk!
+      - action: persistent_notification.create
+        data:
+          title: '{{ title }}'
+          message: '{{ message }}'
+          notification_id: garage_door_auto_lock_warning
+      - repeat:
+          for_each: '{{ notify_persons }}'
+          sequence:
+          - action: '{{ repeat.item }} '
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                push:
+                  sound:
+                    name: default
+                    critical: 1
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 100

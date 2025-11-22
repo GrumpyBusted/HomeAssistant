@@ -86,14 +86,15 @@
             {{ as_datetime(ts) | as_local }}
           {% endif %}
 - sensor:
-    - name: "energy_prices"
+    - name: "energy_price"
       unique_id: 0C05E38F-9128-402F-AD98-0DB74EED65C3
+      device_class: monetary
+      unit_of_measurement: "kr/kWh"
+      icon: "mdi:cash"
       state: >
-        {{ states('sensor.energy_data_service') }}
+        {{ state_attr('sensor.energy_data_service', 'current_price') }}
       attributes:
-        prices: >
-          {% set data = state_attr('sensor.energy_data_service', 'raw_today') %}
-          {{ data | map(attribute='price') | list }}
-        times: >
-          {% set data = state_attr('sensor.energy_data_service', 'raw_today') %}
-          {{ data | map(attribute='hour') | list }}
+        currency: >-
+          {{ state_attr('sensor.energy_data_service', 'currency') }}
+        region: >-
+          {{ state_attr('sensor.energy_data_service', 'region_code') }}
