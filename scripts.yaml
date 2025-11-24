@@ -774,6 +774,16 @@ home_set_radiator_temperature:
   mode: parallel
 test_script:
   sequence:
+  - action: shell_command.append_to_file
+    metadata: {}
+    data:
+      line: '{{ now().isoformat() }},123'
+      file: /config/data/meter_reading_electricity.csv
+  - action: shell_command.csv_to_json
+    metadata: {}
+    data:
+      csvfile: /config/data/meter_reading_electricity.csv
+      jsonfile: /config/data/meter_reading_electricity.json
   - action: file.read_file
     metadata: {}
     data:
@@ -782,7 +792,7 @@ test_script:
     response_variable: res
   - data:
       action: set_state_attributes
-      entity_id: sensor.anders_location
+      entity_id: sensor.meter_readings_electricity
       state: '{{ now() }}'
       attributes:
       - test: '{{ res.data }}'

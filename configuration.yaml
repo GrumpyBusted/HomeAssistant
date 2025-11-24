@@ -24,6 +24,7 @@ script custom: !include_dir_merge_named ./scripts
 shell_command:
   pushupdates_to_github: "/bin/bash pushupdates.sh"
   append_to_file: '/bin/bash append_to_file.sh "{{ file }}" "{{ line }}"'
+  csv_to_json: '/bin/bash csv_to_json.sh {{ csvfile }} {{ jsonfile }}'
 
 rest_command:
   tado_get_auth_token:
