@@ -49,3 +49,9 @@ rest_command:
     method: "GET"
     headers:
       Authorization: "basic {{ basic_token }}"
+
+command_line:
+  - sensor:
+      name: meter_reading_electricity
+      command: "cat /data/meter_reading_electricity.csv"
+      value_template: "{{ value | multiply(0.001) | round(1) }}"
