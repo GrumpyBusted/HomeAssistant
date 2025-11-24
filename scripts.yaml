@@ -772,38 +772,3 @@ home_set_radiator_temperature:
       entity_id: '{{ entities_to_update }}'
     action: climate.set_temperature
   mode: parallel
-notifiser_personer_der_er_tattest_pa_hjem:
-  alias: Personer der skal notificeres
-  description: Find de personer der er hjemme eller tættest på hjem
-  sequence:
-  - variables:
-      persons:
-      - device: notify.mobile_app_anders_iphone
-        sensor: sensor.anders_distance_from_home
-      - device: notify.mobile_app_monique_iphone
-        sensor: sensor.monique_distance_from_home
-      - device: notify.mobile_app_emil_iphone
-        sensor: sensor.emil_distance_from_home
-      - device: notify.mobile_app_charlie_iphone
-        sensor: sensor.charlie_distance_from_home
-  - variables:
-      notify_persons: "{% set ns = namespace(list=[]) %}\n{% for person in persons
-        %}\n  {% set distance = states(person.sensor) | float %}\n  {% set ns.list
-        = ns.list + [{\n      'device': person.device,\n      'distance': distance\n
-        \ }] %}\n{% endfor %}\n{% set notify_persons = ns.list | selectattr('distance',
-        'lt', 0.2) | list %}\n{% if notify_persons | count == 0 %}\n  {% set first_distance
-        = ((ns.list | sort(attribute='distance'))[0]).distance | float %}\n  {% set
-        notify_persons = ns.list | selectattr('distance', 'lt', first_distance + 2.0)
-        | list %}\n{% endif %} \n{{ notify_persons | map(attribute='device') | list
-        }}"
-  mode: parallel
-  max: 100
-read_file:
-  sequence:
-  - action: file.read_file
-    data:
-      file_name: /config/data/meter_reading_electricity.json
-      file_encoding: JSON
-    response_variable: filedata
-  alias: read file
-  description: ''
