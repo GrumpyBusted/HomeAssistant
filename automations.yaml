@@ -502,6 +502,12 @@
     id: door_opened
   - trigger: state
     entity_id:
+    - binary_sensor.garage_door_sensor_opening
+    from: 'on'
+    to: 'off'
+    id: door_closed
+  - trigger: state
+    entity_id:
     - binary_sensor.people_home
     from: 'on'
     to: 'off'
@@ -573,6 +579,20 @@
         - door_locked
         - no_one_home
         - sleeping
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - light.garage_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - door_closed
+      - condition: state
+        entity_id: lock.garage_door
+        state: locked
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -9229,6 +9249,19 @@
     - lock.garage_door
     to: unlocked
     id: door_unlocked
+  - trigger: state
+    entity_id:
+    - lock.entrance_door
+    - lock.patio_door
+    - lock.utility_room_door
+    - lock.garage_door
+    to:
+    - unlocked
+    id: door_unlocked_10m
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
   - trigger: event
     event_type: home_door_lock
     id: lock
@@ -9266,17 +9299,24 @@
         }}"
   - choose:
     - conditions:
-      - condition: trigger
-        id:
-        - door_unlocked
       - condition: or
         conditions:
-        - condition: state
-          entity_id: binary_sensor.everyone_sleeping
-          state: 'on'
-        - condition: state
-          entity_id: binary_sensor.people_home
-          state: 'off'
+        - condition: and
+          conditions:
+          - condition: trigger
+            id:
+            - door_unlocked
+          - condition: state
+            entity_id: binary_sensor.people_home
+            state: 'off'
+        - condition: and
+          conditions:
+          - condition: trigger
+            id:
+            - door_unlocked_10m
+          - condition: state
+            entity_id: binary_sensor.everyone_sleeping
+            state: 'on'
       sequence:
       - variables:
           title: Information

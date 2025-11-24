@@ -9,6 +9,7 @@
 !scripts/
 !templates/
 !themes/
+!data/
 
 # Allow specific file types globally
 !.gitignore
