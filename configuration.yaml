@@ -11,6 +11,7 @@ frontend:
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
+sensor: !include sensors.yaml
 binary_sensor: !include binary_sensors.yaml
 template: !include_dir_merge_list ./templates
 automation custom: !include_dir_merge_list ./automations
@@ -61,10 +62,3 @@ command_line:
           unknown
         {% endif %}
 
-sensor:
-  - platform: command_line
-    name: meter_reading_electricity_sensor
-    command: "cat /config/data/meter_reading_electricity.csv"
-    value_template: "{{ value }}"
-    attribute_templates:
-      readings: "hej"

@@ -6,4 +6,9 @@
 #   sensors:
 #     thermestat etc.
 ###############################################################################
-[]
+- platform: command_line
+  name: meter_reading_electricity_sensor
+  command: "cat /config/data/meter_reading_electricity.csv"
+  value_template: "{{ value }}"
+  attribute_templates:
+    readings: "hej"

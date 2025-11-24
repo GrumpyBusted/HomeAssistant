@@ -14,4 +14,3 @@
         {% else %}
         mdi:fire-off
         {% endif %}
-
