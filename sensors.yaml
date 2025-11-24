@@ -1,14 +1,4 @@
-###############################################################################
-# Global or system wide sensors
-#
-# Start in column 1 of the file with a hyphen, like:
-# - platform: template
-#   sensors:
-#     thermestat etc.
-###############################################################################
 - platform: command_line
-  name: meter_reading_electricity_sensor
-  command: "cat /config/data/meter_reading_electricity.csv"
+  name: test_loader
+  command: "echo OK"
   value_template: "{{ value }}"
-  attribute_templates:
-    readings: "hej"

@@ -11,8 +11,8 @@ frontend:
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
-sensor: !include sensors.yaml
 binary_sensor: !include binary_sensors.yaml
+sensor: !include sensors.yaml
 template: !include_dir_merge_list ./templates
 automation custom: !include_dir_merge_list ./automations
 script custom: !include_dir_merge_named ./scripts
@@ -50,15 +50,4 @@ rest_command:
     headers:
       Authorization: "basic {{ basic_token }}"
 
-command_line:
-  - sensor:
-      name: meter_reading_electricity_command_line
-      command: "cat /config/data/meter_reading_electricity.csv"
-      value_template: >
-        {% set lines = value.split('\n') | reject('equalto','') | list %}
-        {% if lines | count > 0 %}
-          {{ lines[-1].split(',')[1] | float }}
-        {% else %}
-          unknown
-        {% endif %}
 
