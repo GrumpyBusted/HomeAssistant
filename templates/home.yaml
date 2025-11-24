@@ -14,12 +14,3 @@
         {% else %}
         mdi:fire-off
         {% endif %}
-- sensor:
-    - name: "Electricity Readings"
-      state: >
-        {% set f = '/config/data/meter_reading_electricity.json' %}
-        {% set content = open(f) %}
-        {{ content }}
-      attributes:
-        parsed: >
-          {{ state_attr('sensor.electricity_readings','raw') | default('[]') | from_json }}

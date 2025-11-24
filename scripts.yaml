@@ -798,3 +798,12 @@ notifiser_personer_der_er_tattest_pa_hjem:
         }}"
   mode: parallel
   max: 100
+read_file:
+  sequence:
+  - action: file.read_file
+    data:
+      file_name: /config/data/meter_reading_electricity.json
+      file_encoding: JSON
+    response_variable: filedata
+  alias: read file
+  description: ''

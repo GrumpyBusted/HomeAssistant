@@ -1,7 +1,6 @@
 # Loads default set of integrations. Do not remove.
 default_config:
 
-
 homeassistant:
   packages: !include_dir_named packages
   allowlist_external_dirs:
@@ -11,11 +10,9 @@ homeassistant:
 frontend:
   themes: !include_dir_merge_named themes
 
-# sensor: !include sensors.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
-binary_sensor: !include binary_sensors.yaml
 template: !include_dir_merge_list ./templates
 automation custom: !include_dir_merge_list ./automations
 script custom: !include_dir_merge_named ./scripts
@@ -52,9 +49,3 @@ rest_command:
     method: "GET"
     headers:
       Authorization: "basic {{ basic_token }}"
-
-sensor:
-  - platform: command_line
-    name: meter_reading_electricity_sensor
-    command: "cat /config/data/meter_reading_electricity.csv"
-    value_template: "{{ value | list | last }}"
