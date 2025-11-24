@@ -114,6 +114,8 @@
           - light.living_room_light_strip_receiver
           - light.living_room_tv_light_strip
           - light.living_room_smart_plug_lamp
+          - light.living_room_light_coffee_table_1
+          - light.living_room_light_coffee_table_2
     - conditions:
       - condition: trigger
         id:
@@ -178,6 +180,8 @@
           - light.living_room_light_window_left
           - light.living_room_light_window_right
           - light.living_room_light_strip_receiver
+          - light.living_room_light_coffee_table_1
+          - light.living_room_light_coffee_table_2
     - conditions:
       - condition: trigger
         id:
@@ -198,6 +202,16 @@
           - light.living_room_light_window_right
           - light.living_room_light_strip_receiver
           - light.living_room_tv_light_strip
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          kelvin: 2100
+          brightness_pct: 80
+        target:
+          entity_id:
+          - light.living_room_light_coffee_table_1
+          - light.living_room_light_coffee_table_2
       - action: light.turn_on
         metadata: {}
         data:
@@ -254,6 +268,8 @@
           - light.living_room_light_strip_receiver
           - light.living_room_light_strip_skylight
           - light.living_room_tv_light_strip
+          - light.living_room_light_coffee_table_1
+          - light.living_room_light_coffee_table_2
       - action: light.turn_on
         metadata: {}
         data: {}
@@ -310,6 +326,8 @@
           - light.living_room_tv_light_strip
           - light.living_room_light_extra
           - light.living_room_smart_plug_lamp
+          - light.living_room_light_coffee_table_1
+          - light.living_room_light_coffee_table_2
     - conditions:
       - condition: trigger
         id:
