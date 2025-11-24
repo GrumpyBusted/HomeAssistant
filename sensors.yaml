@@ -1,4 +1,1 @@
-- platform: command_line
-  name: test_loader
-  command: "echo OK"
-  value_template: "{{ value }}"
+[]
