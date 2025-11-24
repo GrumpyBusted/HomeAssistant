@@ -772,3 +772,18 @@ home_set_radiator_temperature:
       entity_id: '{{ entities_to_update }}'
     action: climate.set_temperature
   mode: parallel
+test_script:
+  sequence:
+  - action: file.read_file
+    metadata: {}
+    data:
+      file_name: /config/data/meter_reading_electricity.json
+      file_encoding: JSON
+    response_variable: res
+  - data:
+      action: set_state_attributes
+      entity_id: sensor.anders_location
+      state: '{{ now() }}'
+      attributes:
+      - test: '{{ res.data }}'
+    action: python_script.hass_entities
