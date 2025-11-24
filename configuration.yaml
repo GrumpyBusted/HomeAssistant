@@ -18,8 +18,8 @@ script custom: !include_dir_merge_named ./scripts
 
 shell_command:
   pushupdates_to_github: "/bin/bash pushupdates.sh"
-  append_to_file: 'echo "{{ line }}" >> "{{ file }}"'
-  
+  append_to_file: '/bin/bash append_line.sh "{{ file }}" "{{ line }}"'
+
 rest_command:
   tado_get_auth_token:
     url: "https://auth.tado.com/oauth/token"
