@@ -51,13 +51,20 @@ rest_command:
 
 command_line:
   - sensor:
-      name: meter_reading_electricity
-      command: "ls"
+      name: meter_reading_electricity_command_line
+      command: "cat /config/data/meter_reading_electricity.csv"
       value_template: >
-        {% set res = value.split('\n') | list | last %}
-        {{ res }}
+        {% set lines = value.split('\n') | reject('equalto','') | list %}
+        {% if lines | count > 0 %}
+          {{ lines[-1].split(',')[1] | float }}
+        {% else %}
+          unknown
+        {% endif %}
 
 sensor:
-  - platform: file
-    name: file_meter_reading_electricity
-    file_path: append_to_file.sh
+  - platform: command_line
+    name: meter_reading_electricity_sensor
+    command: "cat /config/data/meter_reading_electricity.csv"
+    value_template: "{{ value }}"
+    attribute_templates:
+      readings: "hej"

@@ -88,7 +88,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 80
         target:
           entity_id:
@@ -125,7 +125,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 100
         target:
           entity_id:
@@ -135,7 +135,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 75
         target:
           entity_id:
@@ -144,7 +144,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2300
+          color_temp_kelvin: 2300
           brightness_pct: 75
         target:
           entity_id:
@@ -157,7 +157,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2300
+          color_temp_kelvin: 2300
           brightness_pct: 50
         target:
           entity_id:
@@ -191,7 +191,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 75
         target:
           entity_id:
@@ -206,7 +206,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2100
+          color_temp_kelvin: 2100
           brightness_pct: 80
         target:
           entity_id:
@@ -216,7 +216,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2300
+          color_temp_kelvin: 2300
           brightness_pct: 50
         target:
           entity_id:
@@ -249,7 +249,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 3000
+          color_temp_kelvin: 3000
           brightness_pct: 100
         target:
           entity_id:
@@ -1291,7 +1291,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 60
         target:
           entity_id:
@@ -1305,7 +1305,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 3000
+          color_temp_kelvin: 3000
           brightness_pct: 100
         target:
           entity_id:
@@ -1393,7 +1393,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 60
         target:
           entity_id:
@@ -1500,7 +1500,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 75
         target:
           entity_id:
@@ -1514,7 +1514,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 3000
+          color_temp_kelvin: 3000
           brightness_pct: 100
         target:
           entity_id:
@@ -1641,7 +1641,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 80
         target:
           entity_id:
@@ -1655,7 +1655,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 3000
+          color_temp_kelvin: 3000
           brightness_pct: 100
         target:
           entity_id:
@@ -1673,7 +1673,7 @@
         metadata: {}
         data:
           transition: 60
-          kelvin: 2300
+          color_temp_kelvin: 2300
           brightness: 10
         target:
           entity_id:
@@ -1750,7 +1750,7 @@
         metadata: {}
         data:
           transition: 60
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 80
         target:
           entity_id:
@@ -1894,7 +1894,7 @@
           metadata: {}
           data:
             transition: 1
-            kelvin: 2700
+            color_temp_kelvin: 2700
             brightness_pct: 100
           target:
             entity_id:
@@ -2087,7 +2087,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 80
         target:
           entity_id: light.bedroom_lights
@@ -7818,7 +7818,7 @@
       - action: light.turn_on
         metadata: {}
         data:
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 30
           transition: 1
         target:
@@ -7838,7 +7838,7 @@
       - action: light.turn_on
         metadata: {}
         data:
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 80
           transition: 1
         target:
@@ -7858,7 +7858,7 @@
       - action: light.turn_on
         metadata: {}
         data:
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 80
           transition: 1
         target:
@@ -8041,7 +8041,7 @@
       - action: light.turn_on
         metadata: {}
         data:
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 30
           transition: 1
         target:
@@ -8061,7 +8061,7 @@
       - action: light.turn_on
         metadata: {}
         data:
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 80
           transition: 1
         target:
@@ -8185,7 +8185,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 80
         target:
           entity_id:
@@ -8215,7 +8215,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2300
+          color_temp_kelvin: 2300
           brightness_pct: 50
         target:
           entity_id:
@@ -8224,7 +8224,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2300
+          color_temp_kelvin: 2300
           brightness_pct: 15
         target:
           entity_id:
@@ -8253,7 +8253,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 80
         target:
           entity_id:
@@ -8266,7 +8266,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 2700
+          color_temp_kelvin: 2700
           brightness_pct: 50
         target:
           entity_id:
@@ -8285,7 +8285,7 @@
         metadata: {}
         data:
           transition: 1
-          kelvin: 3000
+          color_temp_kelvin: 3000
           brightness_pct: 100
         target:
           entity_id:
