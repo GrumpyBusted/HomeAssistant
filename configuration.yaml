@@ -11,7 +11,7 @@ homeassistant:
 frontend:
   themes: !include_dir_merge_named themes
 
-sensor: !include sensors.yaml
+# sensor: !include sensors.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
@@ -52,3 +52,9 @@ rest_command:
     method: "GET"
     headers:
       Authorization: "basic {{ basic_token }}"
+
+sensor:
+  - platform: command_line
+    name: meter_reading_electricity_sensor
+    command: "cat /config/data/meter_reading_electricity.csv"
+    value_template: "{{ value | list | last }}"
