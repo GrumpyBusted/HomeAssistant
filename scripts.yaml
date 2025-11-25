@@ -777,7 +777,7 @@ test_script:
   - action: shell_command.append_to_file
     metadata: {}
     data:
-      line: '{{ now().isoformat() }},123'
+      line: '{{ now().isoformat() }},12356'
       file: /config/data/meter_reading_electricity.csv
   - action: shell_command.csv_to_json
     metadata: {}
