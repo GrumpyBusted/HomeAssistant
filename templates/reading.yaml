@@ -1,10 +1,18 @@
 - sensor:
     - name: meter_readings_electricity
-      unique_id: 276CD996-CE6A-4E82-9E01-11914786EED9
+      unique_id: 276CD996-CE6A-4E82-9E01-11914786EED8
       device_class: energy
       state_class: total_increasing
       icon: "mdi:meter-electric"
-      state: ''
+      state: >-
+        {% set raw = state_attr('sensor.meter_readings_electricity', 'raw') | default('', true) %}
+        {% set fixed = raw | replace("'", '"') %}
+        {% set arr = fixed | from_json(default=[]) %}
+        {% if arr and arr[-1] is mapping and 'value' in arr[-1] %}
+          {{ arr[-1].value }}
+        {% else %}
+          0
+        {% endif %}
 - sensor:
     - name: meter_readings_water
       unique_id: 2DE105B5-B9EC-408C-8084-C00805D9838D
