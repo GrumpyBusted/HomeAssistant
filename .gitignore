@@ -16,6 +16,7 @@
 !**/*.yaml
 !**/*.md
 !**/*.sh
+!**/*.csv
 
 # Explicitly ignore secrets.yaml (since !**/*.yaml would otherwise include it)
 secrets.yaml
