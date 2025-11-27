@@ -782,7 +782,7 @@ test2:
   - action: shell_command.append_to_file
     metadata: {}
     data:
-      line: '{{ now().isoformat() }},79834'
+      line: '{{ now().strftime(''%Y-%m-%dT%H:%M:%S'') }},79834'
       file: /config/data/meter_reading_electricity.csv
   - action: shell_command.csv_to_json
     metadata: {}
@@ -799,6 +799,6 @@ test2:
     data:
       action: set_state_attributes
       entity_id: sensor.meter_readings_electricity
-      state: '{{ readings.data[-1].value }}'
+      state: '{{ readings.data[-1].reading }}'
       attributes:
       - raw: '{{ readings.data }}'
