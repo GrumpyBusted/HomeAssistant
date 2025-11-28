@@ -4230,7 +4230,7 @@
         data:
           brightness_pct: 100
           transition: 1
-          color_temp: 3000
+          color_temp_kelvin: 3000
         target:
           entity_id:
           - light.driveway_light_right_1
@@ -4258,7 +4258,7 @@
         data:
           brightness_pct: 100
           transition: 1
-          color_temp: 3000
+          color_temp_kelvin: 3000
         target:
           entity_id:
           - light.driveway_light_right_2
@@ -4285,7 +4285,7 @@
         data:
           brightness_pct: 100
           transition: 1
-          color_temp: 3000
+          color_temp_kelvin: 3000
         target:
           entity_id:
           - light.driveway_light_left_1
@@ -4322,7 +4322,7 @@
         data:
           brightness_pct: 10
           transition: 1
-          color_temp: 2500
+          color_temp_kelvin: 2500
         target:
           entity_id:
           - light.driveway_light_right_2
@@ -9620,3 +9620,90 @@
   max: 10
   trace:
     stored_traces: 100
+- id: '1764364029434'
+  alias: Hjem gem måler aflæsning
+  description: Gem måler aflæsning
+  triggers:
+  - at: 00:01:00
+    trigger: time
+  conditions:
+  - condition: template
+    value_template: '{{ now().day == 1 }}'
+  actions:
+  - action: shell_command.append_to_file
+    metadata: {}
+    data:
+      line: '{{ now().strftime(''%Y-%m-%dT%H:%M:%S'') }},{{ state_attr(''sensor.smart_me_kamstrup_omnipower_meter'',
+        ''CounterReadingImport'') }}'
+      file: /config/data/meter_reading_electricity.csv
+  mode: single
+- id: '1764365776080'
+  alias: Opdater måler aflæsnings sensor
+  description: Håndter ændringer af filer med måler aflæsninger
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.folder_watcher_config_data
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: event.folder_watcher_config_data
+        state:
+        - meter_reading_electricity.csv
+        attribute: file
+      sequence:
+      - action: shell_command.csv_to_json
+        metadata: {}
+        data:
+          csvfile: /config/data/meter_reading_electricity.csv
+          jsonfile: /config/data/meter_reading_electricity.json
+      - action: file.read_file
+        metadata: {}
+        data:
+          file_name: /config/data/meter_reading_electricity.json
+          file_encoding: JSON
+        response_variable: readings
+      - action: python_script.hass_entities
+        data:
+          action: set_state_attributes
+          entity_id: sensor.meter_readings_electricity
+          state: '{{ readings.data[-1].reading }}'
+          attributes:
+          - raw: '{{ readings.data }}'
+      - action: python_script.meter_interpolate
+        data:
+          entity_id: sensor.meter_readings_electricity
+    - conditions:
+      - condition: state
+        entity_id: event.folder_watcher_config_data
+        state:
+        - meter_reading_water.csv
+        attribute: file
+      sequence:
+      - action: shell_command.csv_to_json
+        metadata: {}
+        data:
+          csvfile: /config/data/meter_reading_water.csv
+          jsonfile: /config/data/meter_reading_water.json
+      - action: file.read_file
+        metadata: {}
+        data:
+          file_name: /config/data/meter_reading_water.json
+          file_encoding: JSON
+        response_variable: readings
+      - action: python_script.hass_entities
+        data:
+          action: set_state_attributes
+          entity_id: sensor.meter_readings_water
+          state: '{{ readings.data[-1].reading }}'
+          attributes:
+          - raw: '{{ readings.data }}'
+      - action: python_script.meter_interpolate
+        data:
+          entity_id: sensor.meter_readings_water
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
