@@ -9653,6 +9653,9 @@
     entity_id:
     - sensor.meter_readings_water
     id: water
+  - trigger: homeassistant
+    event: start
+    id: restarted
   conditions: []
   actions:
   - choose:
@@ -9660,7 +9663,9 @@
       - condition: or
         conditions:
         - condition: trigger
-          id: electricity
+          id:
+          - electricity
+          - restarted
         - condition: and
           conditions:
           - condition: trigger
@@ -9696,7 +9701,9 @@
       - condition: or
         conditions:
         - condition: trigger
-          id: water
+          id:
+          - water
+          - restarted
         - condition: and
           conditions:
           - condition: trigger
