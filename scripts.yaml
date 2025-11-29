@@ -772,33 +772,3 @@ home_set_radiator_temperature:
       entity_id: '{{ entities_to_update }}'
     action: climate.set_temperature
   mode: parallel
-test_script:
-  sequence:
-  - data:
-      entity_id: sensor.meter_readings_electricity
-    action: python_script.meter_interpolate
-test2:
-  sequence:
-  - action: shell_command.append_to_file
-    metadata: {}
-    data:
-      line: '{{ now().strftime(''%Y-%m-%dT%H:%M:%S'') }},79834'
-      file: /config/data/meter_reading_electricity.csv
-  - action: shell_command.csv_to_json
-    metadata: {}
-    data:
-      csvfile: /config/data/meter_reading_electricity.csv
-      jsonfile: /config/data/meter_reading_electricity.json
-  - action: file.read_file
-    metadata: {}
-    data:
-      file_name: /config/data/meter_reading_electricity.json
-      file_encoding: JSON
-    response_variable: readings
-  - action: python_script.hass_entities
-    data:
-      action: set_state_attributes
-      entity_id: sensor.meter_readings_electricity
-      state: '{{ readings.data[-1].reading }}'
-      attributes:
-      - raw: '{{ readings.data }}'
