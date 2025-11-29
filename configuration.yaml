@@ -49,8 +49,4 @@ rest_command:
     headers:
       Content-Type: "application/json"
     payload: "{ \"data\": { \"addressID\": \"{{ addressID }}\", \"municipality\": {{ municipality }} } }"
-  smart_me_power_meter:
-    url: "https://api.smart-me.com:443/api/Devices/1f5ed030-14f9-4ed0-a2f5-a005389a53e1"
-    method: "GET"
-    headers:
-      Authorization: "basic {{ basic_token }}"
+

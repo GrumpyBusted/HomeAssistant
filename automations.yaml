@@ -9644,15 +9644,32 @@
   - trigger: state
     entity_id:
     - event.folder_watcher_config_data
+    id: folder
+  - trigger: state
+    entity_id:
+    - sensor.meter_readings_electricity
+    id: electricity
+  - trigger: state
+    entity_id:
+    - sensor.meter_readings_water
+    id: water
   conditions: []
   actions:
   - choose:
     - conditions:
-      - condition: state
-        entity_id: event.folder_watcher_config_data
-        state:
-        - meter_reading_electricity.csv
-        attribute: file
+      - condition: or
+        conditions:
+        - condition: trigger
+          id: electricity
+        - condition: and
+          conditions:
+          - condition: trigger
+            id: folder
+          - condition: state
+            entity_id: event.folder_watcher_config_data
+            state:
+            - meter_reading_electricity.csv
+            attribute: file
       sequence:
       - action: shell_command.csv_to_json
         metadata: {}
@@ -9676,11 +9693,19 @@
         data:
           entity_id: sensor.meter_readings_electricity
     - conditions:
-      - condition: state
-        entity_id: event.folder_watcher_config_data
-        state:
-        - meter_reading_water.csv
-        attribute: file
+      - condition: or
+        conditions:
+        - condition: trigger
+          id: water
+        - condition: and
+          conditions:
+          - condition: trigger
+            id: folder
+          - condition: state
+            entity_id: event.folder_watcher_config_data
+            state:
+            - meter_reading_water.csv
+            attribute: file
       sequence:
       - action: shell_command.csv_to_json
         metadata: {}

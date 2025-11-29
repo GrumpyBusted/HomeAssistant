@@ -26,3 +26,4 @@ rest:
           - "CounterReadingUnit"
           - "CounterReadingImport"
           - "CounterReadingExport"
+          - "ValueDate"
