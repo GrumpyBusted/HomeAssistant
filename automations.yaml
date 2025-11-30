@@ -4339,9 +4339,7 @@
         - conditions:
           - condition: template
             value_template: '{{ now().month == 12 and now().day >= 1 and now().day
-              <= 26 }}
-
-              '
+              <= 26 }}'
           sequence:
           - target:
               entity_id: scene.driveway_light_christmas
@@ -4349,21 +4347,17 @@
         - conditions:
           - condition: template
             value_template: '{{ now().month == 10 and now().day >= 15 and now().day
-              <= 31 }}
-
-              '
+              <= 31 }}'
           sequence:
           - target:
-              entity_id: scene.driveway_light_halloween
+              entity_id: scene.driveway_light_halloween1
             action: scene.turn_on
         - conditions:
           - condition: template
-            value_template: '{{ now().month == 3 and now().day == 17 }}
-
-              '
+            value_template: '{{ now().month == 3 and now().day == 17 }}'
           sequence:
           - target:
-              entity_id: scene.driveway_light_skt_patricks_day
+              entity_id: scene.driveway_light_sankt_patrick
             action: scene.turn_on
         default:
         - action: light.turn_on

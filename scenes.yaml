@@ -1,1 +1,190 @@
-[]
+- id: '1762627000001'
+  name: Indkørsel lys Sankt Patrick
+  entities:
+    light.driveway_light_left_2:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.2
+      - 0.7
+    light.driveway_light_left_3:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.45
+      - 0.45
+    light.driveway_light_left_4:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.22
+      - 0.68
+    light.driveway_light_left_5:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.2
+      - 0.7
+    light.driveway_light_left_6:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.45
+      - 0.45
+    light.driveway_light_left_7:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.22
+      - 0.68
+    light.driveway_light_left_8:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.2
+      - 0.7
+    light.driveway_light_left_9:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.45
+      - 0.45
+    light.driveway_light_right_2:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.22
+      - 0.68
+    light.driveway_light_right_3:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.2
+      - 0.7
+  icon: mdi:leaf-circle
+- id: '1762626328913'
+  name: Indkørsel lys Halloween
+  entities:
+    light.driveway_light_left_2:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.56
+      - 0.42
+    light.driveway_light_left_3:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.32
+      - 0.2
+    light.driveway_light_left_4:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.2
+      - 0.7
+    light.driveway_light_left_5:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.56
+      - 0.42
+    light.driveway_light_left_6:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.32
+      - 0.2
+    light.driveway_light_left_7:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.2
+      - 0.7
+    light.driveway_light_left_8:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.56
+      - 0.42
+    light.driveway_light_left_9:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.32
+      - 0.2
+    light.driveway_light_right_2:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.2
+      - 0.7
+    light.driveway_light_right_3:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.2
+      - 0.7
+- id: '1762626328912'
+  name: Indkørsel lys julestemning
+  entities:
+    light.driveway_light_left_2:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.2
+      - 0.7
+    light.driveway_light_left_3:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.45
+      - 0.45
+    light.driveway_light_left_4:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.2
+      - 0.7
+    light.driveway_light_left_5:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.67
+      - 0.32
+    light.driveway_light_left_6:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.2
+      - 0.7
+    light.driveway_light_left_7:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.45
+      - 0.45
+    light.driveway_light_left_8:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.2
+      - 0.7
+    light.driveway_light_left_9:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.67
+      - 0.32
+    light.driveway_light_right_2:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.45
+      - 0.45
+    light.driveway_light_right_3:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.2
+      - 0.7
