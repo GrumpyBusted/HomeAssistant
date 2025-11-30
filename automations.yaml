@@ -108,7 +108,7 @@
         target:
           entity_id:
           - light.living_room_smart_plug_lamp
-          - light.living_room_smart_plug_chrismas_elf_house
+          - light.living_room_smart_plug_christmas_elf_house
       - action: light.turn_off
         metadata: {}
         data:
@@ -175,7 +175,7 @@
         target:
           entity_id:
           - light.living_room_smart_plug_lamp
-          - light.living_room_smart_plug_chrismas_elf_house
+          - light.living_room_smart_plug_christmas_elf_house
       - action: light.turn_off
         metadata: {}
         data:
@@ -235,7 +235,7 @@
         target:
           entity_id:
           - light.living_room_smart_plug_lamp
-          - light.living_room_smart_plug_chrismas_elf_house
+          - light.living_room_smart_plug_christmas_elf_house
       - action: light.turn_off
         metadata: {}
         data:
@@ -284,7 +284,7 @@
         target:
           entity_id:
           - light.living_room_smart_plug_lamp
-          - light.living_room_smart_plug_chrismas_elf_house
+          - light.living_room_smart_plug_christmas_elf_house
     - conditions:
       - condition: or
         conditions:
@@ -335,7 +335,7 @@
           - light.living_room_tv_light_strip
           - light.living_room_light_extra
           - light.living_room_smart_plug_lamp
-          - light.living_room_smart_plug_chrismas_elf_house
+          - light.living_room_smart_plug_christmas_elf_house
           - light.living_room_light_coffee_table_1
           - light.living_room_light_coffee_table_2
     - conditions:
@@ -4327,24 +4327,6 @@
       - condition: time
         after: '12:00:00'
       sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          brightness_pct: 10
-          transition: 1
-          color_temp_kelvin: 2500
-        target:
-          entity_id:
-          - light.driveway_light_right_2
-          - light.driveway_light_right_3
-          - light.driveway_light_left_2
-          - light.driveway_light_left_3
-          - light.driveway_light_left_4
-          - light.driveway_light_left_5
-          - light.driveway_light_left_6
-          - light.driveway_light_left_7
-          - light.driveway_light_left_8
-          - light.driveway_light_left_9
       - action: light.turn_off
         metadata: {}
         data:
@@ -4353,6 +4335,55 @@
           entity_id:
           - light.driveway_light_right_1
           - light.driveway_light_left_1
+      - choose:
+        - conditions:
+          - condition: template
+            value_template: '{{ now().month == 12 and now().day >= 1 and now().day
+              <= 26 }}
+
+              '
+          sequence:
+          - target:
+              entity_id: scene.driveway_light_christmas
+            action: scene.turn_on
+        - conditions:
+          - condition: template
+            value_template: '{{ now().month == 10 and now().day >= 15 and now().day
+              <= 31 }}
+
+              '
+          sequence:
+          - target:
+              entity_id: scene.driveway_light_halloween
+            action: scene.turn_on
+        - conditions:
+          - condition: template
+            value_template: '{{ now().month == 3 and now().day == 17 }}
+
+              '
+          sequence:
+          - target:
+              entity_id: scene.driveway_light_skt_patricks_day
+            action: scene.turn_on
+        default:
+        - action: light.turn_on
+          metadata: {}
+          data:
+            brightness_pct: 10
+            transition: 1
+            color_temp_kelvin: 2500
+          target:
+            entity_id:
+            - light.driveway_light_right_2
+            - light.driveway_light_right_3
+            - light.driveway_light_left_2
+            - light.driveway_light_left_3
+            - light.driveway_light_left_4
+            - light.driveway_light_left_5
+            - light.driveway_light_left_6
+            - light.driveway_light_left_7
+            - light.driveway_light_left_8
+            - light.driveway_light_left_9
     - conditions:
       - condition: trigger
         id:
