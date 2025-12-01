@@ -259,6 +259,34 @@
           unknown
         {% endif %}
 - sensor:
+    - name: anders_iphone_location_last_updated
+      unique_id: BAA94075-3BD2-40A3-A19A-EFBEC6AD20E2
+      device_class: timestamp      
+      icon: mdi:map-clock
+      state: >-
+        {{ states.device_tracker.anders_iphone.last_updated }} 
+- sensor:
+    - name: monique_iphone_location_last_updated
+      unique_id: F0526FF2-2E75-4B9B-8432-BD22595C0760
+      device_class: timestamp      
+      icon: mdi:map-clock
+      state: >-
+        {{ states.device_tracker.monique_iphone.last_updated }} 
+- sensor:
+    - name: emil_iphone_location_last_updated
+      unique_id: 8EE9F63F-102A-428B-B443-798C03777D5A
+      device_class: timestamp      
+      icon: mdi:map-clock
+      state: >-
+        {{ states.device_tracker.emil_iphone.last_updated }} 
+- sensor:
+    - name: charlie_iphone_location_last_updated
+      unique_id: 5007FE64-7563-4FA5-A24A-87B1A6DDDA3A
+      device_class: timestamp      
+      icon: mdi:map-clock
+      state: >- 
+        {{ states.device_tracker.charlie_iphone.last_updated }} 
+- sensor:
     - name: anders_location
       unique_id: 4818FDD2-DEA0-467D-AC77-9539DD7AC69E
       icon: mdi:map
@@ -269,6 +297,8 @@
         {% if states('input_text.anders_location_override') != '' %}
           {{ states('input_text.anders_location_override') }}
         {% elif person_state == 'home' %}
+          Hjemme
+        {% elif is_state('sensor.' ~ name ~ '_iphone_ssid', 'Palantir') %}
           Hjemme
         {% elif person_state not in ['', 'not_home', 'away', 'unknown', 'unavailable', None] %}
           {% set zone_entity = 'zone.' ~ person_state %}
@@ -293,6 +323,8 @@
         {% set person_state = states('person.' ~ name) %}
         {% if person_state == 'home' %}
           Hjemme
+        {% elif is_state('sensor.' ~ name ~ '_iphone_ssid', 'Palantir') %}
+          Hjemme
         {% elif person_state not in ['', 'not_home', 'away', 'unknown', 'unavailable', None] %}
           {% set zone_entity = 'zone.' ~ person_state %}
           {% set zone_name = state_attr(zone_entity, 'friendly_name') or person_state %}
@@ -316,6 +348,8 @@
         {% set person_state = states('person.' ~ name) %}
         {% if person_state == 'home' %}
           Hjemme
+        {% elif is_state('sensor.' ~ name ~ '_iphone_ssid', 'Palantir') %}
+          Hjemme
         {% elif person_state not in ['', 'not_home', 'away', 'unknown', 'unavailable', None] %}
           {% set zone_entity = 'zone.' ~ person_state %}
           {% set zone_name = state_attr(zone_entity, 'friendly_name') or person_state %}
@@ -338,6 +372,8 @@
         {% set geo_sensor = 'sensor.' ~ name ~ '_iphone_geocoded_location' %}
         {% set person_state = states('person.' ~ name) %}
         {% if person_state == 'home' %}
+          Hjemme
+        {% elif is_state('sensor.' ~ name ~ '_iphone_ssid', 'Palantir') %}
           Hjemme
         {% elif person_state not in ['', 'not_home', 'away', 'unknown', 'unavailable', None] %}
           {% set zone_entity = 'zone.' ~ person_state %}

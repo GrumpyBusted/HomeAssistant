@@ -9774,3 +9774,63 @@
   max: 10
   trace:
     stored_traces: 20
+- id: '1764615121152'
+  alias: Opdater iPhone location
+  description: Opdater iPhone location hvis iPhone-sensorer er mere end 1 time gamle.
+  triggers:
+  - minutes: /10
+    trigger: time_pattern
+  conditions:
+  - condition: template
+    value_template: '{{ stale_locations | count > 0 }}'
+  actions:
+  - repeat:
+      for_each: '{{ stale_locations }}'
+      sequence:
+      - choose:
+        - conditions:
+          - condition: template
+            value_template: '{{ repeat.item == ''sensor.anders_iphone_location_last_updated''
+              }}'
+          sequence:
+          - data:
+              message: request_location_update
+            action: notify.mobile_app_anders_iphone
+        - conditions:
+          - condition: template
+            value_template: '{{ repeat.item == ''sensor.monique_iphone_location_last_updated''
+              }}'
+          sequence:
+          - data:
+              message: request_location_update
+            action: notify.mobile_app_monique_iphone
+        - conditions:
+          - condition: template
+            value_template: '{{ repeat.item == ''sensor.emil_iphone_location_last_updated''
+              }}'
+          sequence:
+          - data:
+              message: request_location_update
+            action: notify.mobile_app_emil_iphone
+        - conditions:
+          - condition: template
+            value_template: '{{ repeat.item == ''sensor.charlie_iphone_location_last_updated''
+              }}'
+          sequence:
+          - data:
+              message: request_location_update
+            action: notify.mobile_app_charlie_iphone
+  variables:
+    iphone_sensors:
+    - sensor.anders_iphone_location_last_updated
+    - sensor.monique_iphone_location_last_updated
+    - sensor.emil_iphone_location_last_updated
+    - sensor.charlie_iphone_location_last_updated
+    stale_locations: "{% set ns = namespace(stale=[]) %} {% for e in iphone_sensors
+      %}\n  {% set s = states(e) %}\n  {% if s not in ['unknown', 'unavailable', '']
+      %}\n    {% set age = (now() - (s | as_datetime)).total_seconds() %}\n    {%
+      if age > 3600 and age < 4200 %} \n      {% set ns.stale = ns.stale + [e] %}\n
+      \   {% endif %}\n  {% endif %}\n{% endfor %} {{ ns.stale }}"
+  mode: single
+  trace:
+    stored_traces: 20
