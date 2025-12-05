@@ -9674,103 +9674,38 @@
       file: /config/data/meter_reading_electricity.csv
   mode: single
 - id: '1764365776080'
-  alias: Opdater måler aflæsnings sensor
-  description: Håndter ændringer af filer med måler aflæsninger
+  alias: Læs elektricitet måler aflæsninger
+  description: Indlæs elektricitet måler aflæsninger og opdater sensor
   triggers:
-  - trigger: state
-    entity_id:
-    - event.folder_watcher_config_data
-    id: folder
-  - trigger: state
-    entity_id:
-    - sensor.meter_readings_electricity
-    id: electricity
-  - trigger: state
-    entity_id:
-    - sensor.meter_readings_water
-    id: water
   - trigger: homeassistant
     event: start
-    id: restarted
+  - trigger: event
+    event_type: folder_data_csv
+    event_data:
+      status: meter_reading_electricity
   conditions: []
   actions:
-  - choose:
-    - conditions:
-      - condition: or
-        conditions:
-        - condition: trigger
-          id:
-          - electricity
-          - restarted
-        - condition: and
-          conditions:
-          - condition: trigger
-            id: folder
-          - condition: state
-            entity_id: event.folder_watcher_config_data
-            state:
-            - meter_reading_electricity.csv
-            attribute: file
-      sequence:
-      - action: shell_command.csv_to_json
-        metadata: {}
-        data:
-          csvfile: /config/data/meter_reading_electricity.csv
-          jsonfile: /config/data/meter_reading_electricity.json
-      - action: file.read_file
-        metadata: {}
-        data:
-          file_name: /config/data/meter_reading_electricity.json
-          file_encoding: JSON
-        response_variable: readings
-      - action: python_script.hass_entities
-        data:
-          action: set_state_attributes
-          entity_id: sensor.meter_readings_electricity
-          state: '{{ readings.data[-1].reading }}'
-          attributes:
-          - raw: '{{ readings.data }}'
-      - action: python_script.meter_interpolate
-        data:
-          entity_id: sensor.meter_readings_electricity
-    - conditions:
-      - condition: or
-        conditions:
-        - condition: trigger
-          id:
-          - water
-          - restarted
-        - condition: and
-          conditions:
-          - condition: trigger
-            id: folder
-          - condition: state
-            entity_id: event.folder_watcher_config_data
-            state:
-            - meter_reading_water.csv
-            attribute: file
-      sequence:
-      - action: shell_command.csv_to_json
-        metadata: {}
-        data:
-          csvfile: /config/data/meter_reading_water.csv
-          jsonfile: /config/data/meter_reading_water.json
-      - action: file.read_file
-        metadata: {}
-        data:
-          file_name: /config/data/meter_reading_water.json
-          file_encoding: JSON
-        response_variable: readings
-      - action: python_script.hass_entities
-        data:
-          action: set_state_attributes
-          entity_id: sensor.meter_readings_water
-          state: '{{ readings.data[-1].reading }}'
-          attributes:
-          - raw: '{{ readings.data }}'
-      - action: python_script.meter_interpolate
-        data:
-          entity_id: sensor.meter_readings_water
+  - action: shell_command.csv_to_json
+    metadata: {}
+    data:
+      csvfile: /config/data/meter_reading_electricity.csv
+      jsonfile: /config/data/meter_reading_electricity.json
+  - action: file.read_file
+    metadata: {}
+    data:
+      file_name: /config/data/meter_reading_electricity.json
+      file_encoding: JSON
+    response_variable: readings
+  - action: python_script.hass_entities
+    data:
+      action: set_state_attributes
+      entity_id: sensor.meter_readings_electricity
+      state: '{{ readings.data[-1].reading }}'
+      attributes:
+      - raw: '{{ readings.data }}'
+  - action: python_script.meter_interpolate
+    data:
+      entity_id: sensor.meter_readings_electricity
   mode: queued
   max: 10
   trace:
@@ -9852,3 +9787,74 @@
         }},{{ state_attr(''sensor.water_meter'', ''total_m3'') }}'
       file: /config/data/meter_reading_water.csv
   mode: single
+- id: '1764973371100'
+  alias: Overvåg data folder
+  description: Overvågning af data folder
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.folder_watcher_config_data
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: event.folder_watcher_config_data
+        state:
+        - meter_reading_electricity.csv
+        attribute: file
+      sequence:
+      - event: folder_data_csv
+        event_data:
+          status: meter_reading_electricity
+    - conditions:
+      - condition: state
+        entity_id: event.folder_watcher_config_data
+        state:
+        - meter_reading_water.csv
+        attribute: file
+      sequence:
+      - event: folder_data_csv
+        event_data:
+          status: meter_reading_water
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
+- id: '1764974327446'
+  alias: Læs vand måler aflæsninger
+  description: Indlæs vand måler aflæsninger og opdater sensor
+  triggers:
+  - trigger: homeassistant
+    event: start
+  - trigger: event
+    event_type: folder_data_csv
+    event_data:
+      status: meter_reading_water
+  conditions: []
+  actions:
+  - action: shell_command.csv_to_json
+    metadata: {}
+    data:
+      csvfile: /config/data/meter_reading_water.csv
+      jsonfile: /config/data/meter_reading_water.json
+  - action: file.read_file
+    metadata: {}
+    data:
+      file_name: /config/data/meter_reading_water.json
+      file_encoding: JSON
+    response_variable: readings
+  - action: python_script.hass_entities
+    data:
+      action: set_state_attributes
+      entity_id: sensor.meter_readings_water
+      state: '{{ readings.data[-1].reading }}'
+      attributes:
+      - raw: '{{ readings.data }}'
+  - action: python_script.meter_interpolate
+    data:
+      entity_id: sensor.meter_readings_water
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
