@@ -4350,7 +4350,7 @@
               <= 31 }}'
           sequence:
           - target:
-              entity_id: scene.driveway_light_halloween1
+              entity_id: scene.driveway_light_halloween
             action: scene.turn_on
         - conditions:
           - condition: template

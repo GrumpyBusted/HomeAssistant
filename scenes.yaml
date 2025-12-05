@@ -126,7 +126,7 @@
       - 0.2
       - 0.7
 - id: '1762626328912'
-  name: Indkørsel lys julestemning
+  name: Indkørsel lys Jul
   entities:
     light.driveway_light_left_2:
       state: 'on'
