@@ -9668,7 +9668,8 @@
   - action: shell_command.append_to_file
     metadata: {}
     data:
-      line: '{{ now().strftime(''%Y-%m-%dT%H:%M:%S'') }},{{ state_attr(''sensor.smart_me_kamstrup_omnipower_meter'',
+      line: '{{ (state_attr(''sensor.smart_me_kamstrup_omnipower_meter'', ''ValueDate'')
+        | as_datetime | as_local).strftime(''%Y-%m-%dT%H:%M:%S'') }},{{ state_attr(''sensor.smart_me_kamstrup_omnipower_meter'',
         ''CounterReadingImport'') }}'
       file: /config/data/meter_reading_electricity.csv
   mode: single
@@ -9838,7 +9839,7 @@
   alias: Aflæs vand måler
   description: Aflæs vand forbrug og gem i CSV fil
   triggers:
-  - at: 00:01:00
+  - at: 00:02:00
     trigger: time
   conditions:
   - condition: template
@@ -9847,7 +9848,7 @@
   - action: shell_command.append_to_file
     metadata: {}
     data:
-      line: '{{ now().strftime(''%Y-%m-%dT%H:%M:%S'') }},{{ state_attr(''sensor.smart_me_kamstrup_omnipower_meter'',
-        ''CounterReadingImport'') }}'
+      line: '{{ (state_attr(''sensor.water_meter'', ''timestamp'') | as_datetime).strftime(''%Y-%m-%dT%H:%M:%S'')
+        }},{{ state_attr(''sensor.water_meter'', ''total_m3'') }}'
       file: /config/data/meter_reading_water.csv
   mode: single
