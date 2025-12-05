@@ -9656,8 +9656,8 @@
   trace:
     stored_traces: 100
 - id: '1764364029434'
-  alias: Hjem gem måler aflæsning
-  description: Gem måler aflæsning
+  alias: Aflæs EL måler
+  description: Aflæs elektricitets forbrug og gem i CSV fil
   triggers:
   - at: 00:01:00
     trigger: time
@@ -9834,3 +9834,20 @@
   mode: single
   trace:
     stored_traces: 20
+- id: '1764966963610'
+  alias: Aflæs vand måler
+  description: Aflæs vand forbrug og gem i CSV fil
+  triggers:
+  - at: 00:01:00
+    trigger: time
+  conditions:
+  - condition: template
+    value_template: '{{ now().day == 1 }}'
+  actions:
+  - action: shell_command.append_to_file
+    metadata: {}
+    data:
+      line: '{{ now().strftime(''%Y-%m-%dT%H:%M:%S'') }},{{ state_attr(''sensor.smart_me_kamstrup_omnipower_meter'',
+        ''CounterReadingImport'') }}'
+      file: /config/data/meter_reading_water.csv
+  mode: single
