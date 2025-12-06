@@ -2512,6 +2512,26 @@
   alias: Soveværelse rullegardin
   description: Automatik for rullegardin på soveværelse
   triggers:
+  - trigger: time
+    at: input_datetime.monique_bedtime_alarm
+    id: bedtime
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_occupancy
+    from: 'on'
+    to: 'off'
+    id: bedroom_empty
+  - trigger: time
+    at:
+      entity_id: input_datetime.monique_wake_up_alarm
+      offset: 00:03:00
+    id: wake_up
+  - trigger: state
+    entity_id:
+    - event.bedroom_switch_button_3
+    attribute: event_type
+    to: initial_press
+    id: button_3
   - trigger: state
     entity_id:
     - binary_sensor.parent_home
@@ -2520,7 +2540,12 @@
     id: parent_home
   - trigger: state
     entity_id:
-    - binary_sensor.home_outside_light
+    - binary_sensor.parent_home
+    from: 'on'
+    to: 'off'
+    id: parent_left
+  - trigger: state
+    entity_id: binary_sensor.home_outside_light
     from: 'on'
     to: 'off'
     id: dark_outside
@@ -2530,26 +2555,20 @@
     from: 'off'
     to: 'on'
     id: light_outside
-  - trigger: event
-    event_type: bedroom_light_sunrise_script
-    id: sunrise_scene
-  - trigger: state
-    entity_id:
-    - weather.home_forecast
-    to: sunny
-  - trigger: numeric_state
-    entity_id:
-    - sun.sun
-    attribute: azimuth
-    above: 240
-    below: 360
-  - trigger: time
-    at: '16:00:00'
-  - trigger: state
-    entity_id:
-    - sensor.anders_iphone_battery_state
-    - sensor.monique_iphone_battery_state
-    to: Charging
+  - value_template: "{{ \n  states('sensor.bedroom_current_temperature')|float(0)
+      >\n  states('sensor.bedroom_target_temperature')|float(0) and\n  state_attr('sun.sun',
+      'elevation')|float(0) > 20 and\n  state_attr('sun.sun', 'azimuth')|float(0)
+      > 240 and\n  state_attr('sun.sun', 'azimuth')|float(0) < 360 and\n  states('weather.home_forecast')
+      == 'sunny' \n}}\n"
+    id: sunny_overheat_on
+    trigger: template
+  - value_template: "{{ not (\n  states('sensor.bedroom_current_temperature')|float(0)
+      >\n  states('sensor.bedroom_target_temperature')|float(0)\n  and state_attr('sun.sun',
+      'elevation')|float(0) > 20\n  and state_attr('sun.sun', 'azimuth')|float(0)
+      > 240\n  and state_attr('sun.sun', 'azimuth')|float(0) < 360\n  and states('weather.home_forecast')
+      == 'sunny'\n) }}\n"
+    id: sunny_overheat_off
+    trigger: template
   conditions:
   - condition: state
     entity_id: input_boolean.house_sitter
@@ -2559,7 +2578,7 @@
     - conditions:
       - condition: trigger
         id:
-        - sunrise_scene
+        - wake_up
       - condition: numeric_state
         entity_id: cover.bedroom_blind
         attribute: current_position
@@ -2571,155 +2590,149 @@
         target:
           entity_id: cover.bedroom_blind
     - conditions:
-      - condition: state
-        entity_id: binary_sensor.anders_home
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.monique_home
-        state: 'on'
-      - condition: state
-        entity_id: sensor.anders_iphone_battery_state
-        state: Charging
-      - condition: state
-        entity_id: sensor.monique_iphone_battery_state
-        state: Charging
-      - condition: state
-        entity_id: timer.bedroom_light_sunset_timer
-        state: active
-      sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunset_timer
-      - action: cover.close_cover
-        metadata: {}
-        data: {}
-        target:
-          entity_id: cover.bedroom_blind
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.anders_home
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.monique_home
-        state: 'on'
-      - condition: state
-        entity_id: sensor.monique_iphone_battery_state
-        state: Charging
-      - condition: state
-        entity_id: timer.bedroom_light_sunset_timer
-        state: active
-      sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunset_timer
-      - action: cover.close_cover
-        metadata: {}
-        data: {}
-        target:
-          entity_id: cover.bedroom_blind
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.anders_home
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.monique_home
-        state: 'off'
-      - condition: state
-        entity_id: sensor.anders_iphone_battery_state
-        state: Charging
-      - condition: state
-        entity_id: timer.bedroom_light_sunset_timer
-        state: active
-      sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunset_timer
-      - action: cover.close_cover
-        metadata: {}
-        data: {}
-        target:
-          entity_id: cover.bedroom_blind
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.home_outside_light
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.parent_home
-        state: 'off'
-      sequence:
-      - action: cover.close_cover
-        metadata: {}
-        data: {}
-        target:
-          entity_id: cover.bedroom_blind
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.home_outside_light
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.parent_home
-        state: 'off'
+      - condition: trigger
+        id:
+        - bedroom_empty
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        below: 100
       sequence:
       - action: cover.open_cover
         metadata: {}
         data: {}
         target:
-          entity_id: cover.bedroom_blind_ikea
+          entity_id: cover.bedroom_blind
     - conditions:
-      - condition: state
-        entity_id: input_select.monique_nap_time_state
-        state: sleeping
+      - condition: trigger
+        id:
+        - bedtime
+        - button_3
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        above: 0
       sequence:
       - action: cover.close_cover
         metadata: {}
         data: {}
         target:
-          entity_id: cover.bedroom_blind_ikea
+          entity_id: cover.bedroom_blind
     - conditions:
+      - condition: trigger
+        id:
+        - parent_left
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'on'
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        below: 100
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind
+    - conditions:
+      - condition: trigger
+        id:
+        - parent_left
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'off'
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        above: 0
+      sequence:
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind
+    - conditions:
+      - condition: trigger
+        id:
+        - parent_home
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        below: 100
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind
+    - conditions:
+      - condition: trigger
+        id:
+        - dark_outside
+      - condition: state
+        entity_id: binary_sensor.parent_home
+        state: 'off'
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        above: 0
+      sequence:
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind
+    - conditions:
+      - condition: trigger
+        id:
+        - light_outside
+      - condition: state
+        entity_id: binary_sensor.parent_home
+        state: 'off'
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        below: 100
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind
+    - conditions:
+      - condition: trigger
+        id:
+        - sunny_overheat_on
       - condition: numeric_state
         entity_id: cover.bedroom_blind
         attribute: current_position
         above: 60
-      - condition: template
-        value_template: "{{ states('sensor.bedroom_current_temperature')|float > \n
-          \  states('sensor.bedroom_target_temperature')|float and\n   state_attr('sun.sun',
-          'elevation') > 20 and\n   state_attr('sun.sun', 'azimuth') > 240 and \n
-          \  state_attr('sun.sun', 'azimuth') < 360 and \n   states('weather.home_forecast')
-          == 'sunny' }}"
       sequence:
       - action: cover.set_cover_position
         metadata: {}
         data:
           position: 60
         target:
-          entity_id: cover.bedroom_blind_ikea
+          entity_id: cover.bedroom_blind
     - conditions:
       - condition: trigger
         id:
-        - parent_home
+        - sunny_overheat_off
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        above: 59
       sequence:
       - action: cover.open_cover
         metadata: {}
         data: {}
         target:
-          entity_id: cover.bedroom_blind_ikea
-    - conditions:
-      - condition: trigger
-        id:
-        - nap_time_over
-      sequence:
-      - action: cover.open_cover
-        metadata: {}
-        data: {}
-        target:
-          entity_id: cover.bedroom_blind_ikea
+          entity_id: cover.bedroom_blind
   mode: queued
+  max: 10
+  trace:
+    stored_traces: 50
 - id: '1737201831964'
   alias: Indkørsel billader sæt pris
   description: Sæt elektricitets prisen på billader
@@ -2727,9 +2740,12 @@
   - trigger: state
     entity_id:
     - sensor.energy_price
-  - trigger: time_pattern
-    minutes: /15
-    seconds: '0'
+  - value_template: '{% set last = state_attr(''automation.driveway_ev_charger_set_price'',
+      ''last_triggered'') %} {{ last is none or ( now() - last ).total_seconds() >
+      3600 }}
+
+      '
+    trigger: template
   conditions: []
   actions:
   - action: number.set_value

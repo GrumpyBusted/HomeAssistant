@@ -77,7 +77,7 @@
     - name: "bedroom_occupancy"
       unique_id: 0A2C2AAA-7F34-484D-9BA5-8031FEDF0E11
       state: >-
-        {{ is_state('binary_sensor.bedroom_presence_sensor_occupancy', 'on') or 
+        {{ states('binary_sensor.bedroom_presence_sensor_occupancy') != 'off' or
            is_state('timer.bedroom_presence_timer', 'active') }}
       icon: >-
         {% if is_state('binary_sensor.bedroom_people_present', 'on') %}
@@ -89,11 +89,29 @@
     - name: "parent_sleeping"
       unique_id: 6CB2BD82-9ACE-4100-B7B8-DF17E10DD692
       state: >-
-        {{ states('sensor.people_home') | int(0) > 0
-          and not is_state('media_player.bedroom_apple_tv_media_player', 'playing')
-          and is_state('binary_sensor.bedroom_occupancy', 'on')
-          and is_state('binary_sensor.bedroom_blind', 'off')
-          and is_state('binary_sensor.bedroom_light', 'off') }}
+        {{
+          states('sensor.people_home') | int > 0 and
+          is_state('media_player.bedroom_apple_tv_media_player', 'playing') and
+          is_state('binary_sensor.bedroom_occupancy', 'on') and
+          is_state('binary_sensor.bedroom_blind', 'off') and
+          is_state('binary_sensor.bedroom_light', 'off') and
+          (
+            (
+              is_state('person.anders', 'home') and
+              is_state('sensor.anders_iphone_battery_state', 'Charging')
+            )
+            or
+            (not is_state('person.anders', 'home'))
+          ) and
+          (
+            (
+              is_state('person.monique', 'home') and
+              is_state('sensor.monique_iphone_battery_state', 'Charging')
+            )
+            or
+            (not is_state('person.monique', 'home'))
+          )
+        }}
       icon: >-
         {% if is_state('binary_sensor.parent_sleeping', 'on') %}
         mdi:sleep
