@@ -308,9 +308,6 @@
           - condition: trigger
             id:
             - sleeping
-          - condition: state
-            entity_id: media_player.living_room_apple_tv_media_player
-            state: 'off'
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -2528,6 +2525,12 @@
     id: wake_up
   - trigger: state
     entity_id:
+    - event.bedroom_switch_button_2
+    attribute: event_type
+    to: initial_press
+    id: button_2
+  - trigger: state
+    entity_id:
     - event.bedroom_switch_button_3
     attribute: event_type
     to: initial_press
@@ -2569,16 +2572,13 @@
       == 'sunny'\n) }}\n"
     id: sunny_overheat_off
     trigger: template
-  conditions:
-  - condition: state
-    entity_id: input_boolean.house_sitter
-    state: 'off'
+  conditions: []
   actions:
   - choose:
     - conditions:
       - condition: trigger
         id:
-        - wake_up
+        - button_2
       - condition: numeric_state
         entity_id: cover.bedroom_blind
         attribute: current_position
@@ -2592,7 +2592,28 @@
     - conditions:
       - condition: trigger
         id:
+        - button_3
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        above: 0
+      sequence:
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.house_sitter
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: trigger
+        id:
+        - wake_up
         - bedroom_empty
+        - button_2
       - condition: numeric_state
         entity_id: cover.bedroom_blind
         attribute: current_position
@@ -3139,7 +3160,7 @@
     - binary_sensor.parent_home
   - trigger: state
     entity_id:
-    - binary_sensor.parent_sleeping
+    - binary_sensor.bedroom_sleeping
   - trigger: state
     entity_id:
     - input_select.monique_nap_time_state
@@ -3227,7 +3248,7 @@
           entity_id: climate.bedroom_radiator_thermostat_tado
     - conditions:
       - condition: state
-        entity_id: binary_sensor.parent_sleeping
+        entity_id: binary_sensor.bedroom_sleeping
         state: 'on'
       sequence:
       - action: climate.set_temperature
@@ -3253,7 +3274,7 @@
     - binary_sensor.family_home
   - trigger: state
     entity_id:
-    - binary_sensor.parent_sleeping
+    - binary_sensor.everyone_sleeping
   - trigger: state
     entity_id:
     - sensor.toilet_target_temperature
@@ -3302,7 +3323,7 @@
           entity_id: climate.toilet_radiator_thermostat_tado
     - conditions:
       - condition: state
-        entity_id: binary_sensor.parent_sleeping
+        entity_id: binary_sensor.everyone_sleeping
         state: 'on'
       sequence:
       - action: climate.set_temperature

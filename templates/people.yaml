@@ -86,34 +86,48 @@
         mdi:location-exit
         {% endif %}
 - binary_sensor:
-    - name: "parent_sleeping"
-      unique_id: 6CB2BD82-9ACE-4100-B7B8-DF17E10DD692
+    - name: "bedroom_sleeping"
+      unique_id: 6A155818-CFAE-4C80-9504-7640D48FEF40
       state: >-
         {{
-          states('sensor.people_home') | int > 0 and
-          is_state('media_player.bedroom_apple_tv_media_player', 'playing') and
+          (is_states('sensor.parent_home', 'on') or is_states('input_boolean.house_sitter', 'on')) and
+          not(is_state('media_player.bedroom_apple_tv_media_player', 'playing')) and
           is_state('binary_sensor.bedroom_occupancy', 'on') and
           is_state('binary_sensor.bedroom_blind', 'off') and
-          is_state('binary_sensor.bedroom_light', 'off') and
-          (
-            (
-              is_state('person.anders', 'home') and
-              is_state('sensor.anders_iphone_battery_state', 'Charging')
-            )
-            or
-            (not is_state('person.anders', 'home'))
-          ) and
-          (
-            (
-              is_state('person.monique', 'home') and
-              is_state('sensor.monique_iphone_battery_state', 'Charging')
-            )
-            or
-            (not is_state('person.monique', 'home'))
-          )
+          is_state('binary_sensor.bedroom_light', 'off')
         }}
       icon: >-
-        {% if is_state('binary_sensor.parent_sleeping', 'on') %}
+        {% if is_state('binary_sensor.bedroom_sleeping', 'on') %}
+        mdi:sleep
+        {% else %}
+        mdi:sleep-off
+        {% endif %}
+- binary_sensor:
+    - name: "anders_sleeping"
+      unique_id: 1995B1D2-43A2-4BFF-A386-429E77A9E9F0
+      state: >-
+        {{
+          is_state('binary_sensor.bedroom_sleeping', 'on') and
+          is_state('person.anders', 'home') and
+          is_state('sensor.anders_iphone_battery_state', 'Charging')
+        }}
+      icon: >-
+        {% if is_state('binary_sensor.anders_sleeping', 'on') %}
+        mdi:sleep
+        {% else %}
+        mdi:sleep-off
+        {% endif %}
+- binary_sensor:
+    - name: "monique_sleeping"
+      unique_id: 1995B1D2-43A2-4BFF-A386-429E77A9E9F0
+      state: >-
+        {{
+          is_state('binary_sensor.bedroom_sleeping', 'on') and
+          is_state('person.monique', 'home') and
+          is_state('sensor.monique_iphone_battery_state', 'Charging')
+        }}
+      icon: >-
+        {% if is_state('binary_sensor.monique_sleeping', 'on') %}
         mdi:sleep
         {% else %}
         mdi:sleep-off
@@ -122,10 +136,12 @@
     - name: "emil_sleeping"
       unique_id: 51259E4B-BF87-448A-839D-0C1996331806
       state: >-
-        {{ is_state('binary_sensor.emil_home', 'on') and 
+        {{ 
+           is_state('binary_sensor.emil_home', 'on') and 
            not(is_state('media_player.emils_room_apple_tv_media_player', 'playing')) and 
            is_state('binary_sensor.emils_room_blind', 'off') and 
-           is_state('binary_sensor.emils_room_light', 'off') }}
+           is_state('binary_sensor.emils_room_light', 'off') 
+        }}
       icon: >-
         {% if is_state('binary_sensor.emil_sleeping', 'on') %}
         mdi:sleep
@@ -136,10 +152,12 @@
     - name: "charlie_sleeping"
       unique_id: 56C0C9A8-6803-4F0F-8C5F-9FC9B67D9694
       state: >-
-        {{ is_state('binary_sensor.charlie_home', 'on') and 
+        {{
+           is_state('binary_sensor.charlie_home', 'on') and 
            not(is_state('media_player.charlies_room_apple_tv_media_player', 'playing')) and 
            is_state('binary_sensor.charlies_room_blind', 'off') and 
-           is_state('binary_sensor.charlies_room_light', 'off') }}
+           is_state('binary_sensor.charlies_room_light', 'off') 
+        }}
       icon: >-
         {% if is_state('binary_sensor.charlie_sleeping', 'on') %}
         mdi:sleep
@@ -150,11 +168,47 @@
     - name: "everyone_sleeping"
       unique_id: 879F46F0-962B-4061-8BD3-15C179BD85D3
       state: >-
-        {{ (is_state('binary_sensor.charlie_home', 'off') or is_state('binary_sensor.charlie_sleeping', 'on')) and 
-           (is_state('binary_sensor.emil_home', 'off') or is_state('binary_sensor.emil_sleeping', 'on')) and 
-           is_state('binary_sensor.parent_sleeping', 'on') }}
+        {{ 
+           (is_state('binary_sensor.anders_home', 'on') and is_state('binary_sensor.anders_sleeping', 'on')) and 
+           (is_state('binary_sensor.monique_home', 'on') and is_state('binary_sensor.monique_sleeping', 'on')) and 
+           (is_state('binary_sensor.charlie_home', 'on') and is_state('binary_sensor.charlie_sleeping', 'on')) and 
+           (is_state('binary_sensor.emil_home', 'on') and is_state('binary_sensor.emil_sleeping', 'on')) and 
+           (is_state('input_boolean.house_sitter', 'on') and is_state('binary_sensor.bedroom_sleeping', 'on')) and
+           is_state('media_player.living_room_apple_tv_media_player', 'off')
+        }}
       icon: >-
         {% if is_state('binary_sensor.everyone_sleeping', 'on') %}
+        mdi:sleep
+        {% else %}
+        mdi:sleep-off
+        {% endif %}
+- binary_sensor:
+    - name: "someone_sleeping"
+      unique_id: B082D7C9-3338-435D-A1BF-156D3BE3DE16
+      state: >-
+        {{
+           (is_state('binary_sensor.anders_home', 'on') and is_state('binary_sensor.anders_sleeping', 'on')) or
+           (is_state('binary_sensor.monique_home', 'on') and is_state('binary_sensor.monique_sleeping', 'on')) or 
+           (is_state('binary_sensor.charlie_home', 'on') and is_state('binary_sensor.charlie_sleeping', 'on')) or 
+           (is_state('binary_sensor.emil_home', 'on') and is_state('binary_sensor.emil_sleeping', 'on')) or
+           (is_state('input_boolean.house_sitter', 'on') and is_state('binary_sensor.bedroom_sleeping', 'on'))
+        }}
+      icon: >-
+        {% if is_state('binary_sensor.someone_sleeping', 'on') %}
+        mdi:sleep
+        {% else %}
+        mdi:sleep-off
+        {% endif %}
+- binary_sensor:
+    - name: "parent_sleeping"
+      unique_id: 6CB2BD82-9ACE-4100-B7B8-DF17E10DD692
+      state: >-
+        {{
+           (is_state('binary_sensor.anders_home', 'on') and is_state('binary_sensor.anders_sleeping', 'on')) and 
+           (is_state('binary_sensor.monique_home', 'on') and is_state('binary_sensor.monique_sleeping', 'on'))
+        }}
+      icon: >-
+        {% if is_state('binary_sensor.parent_sleeping', 'on') %}
         mdi:sleep
         {% else %}
         mdi:sleep-off
