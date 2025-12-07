@@ -1,6 +1,10 @@
 - id: '1762627000001'
   name: Indkørsel lys Sankt Patrick
   entities:
+    light.driveway_light_right_1:
+      state: 'off'
+    light.driveway_light_left_1:
+      state: 'off'
     light.driveway_light_left_2:
       state: 'on'
       brightness: 55
@@ -65,6 +69,10 @@
 - id: '1762626328913'
   name: Indkørsel lys Halloween
   entities:
+    light.driveway_light_right_1:
+      state: 'off'
+    light.driveway_light_left_1:
+      state: 'off'
     light.driveway_light_left_2:
       state: 'on'
       brightness: 55
@@ -125,66 +133,130 @@
       xy_color:
       - 0.2
       - 0.7
+  icon: mdi:halloween
 - id: '1762626328912'
   name: Indkørsel lys Jul
   entities:
+    light.driveway_light_right_1:
+      state: 'off'
+    light.driveway_light_left_1:
+      state: 'off'
     light.driveway_light_left_2:
       state: 'on'
       brightness: 55
-      xy_color:
-      - 0.2
-      - 0.7
+      rgb_color:
+      - 68
+      - 255
+      - 46
     light.driveway_light_left_3:
       state: 'on'
       brightness: 55
-      xy_color:
-      - 0.45
-      - 0.45
+      rgb_color:
+      - 68
+      - 255
+      - 46
     light.driveway_light_left_4:
       state: 'on'
       brightness: 55
-      xy_color:
-      - 0.2
-      - 0.7
+      rgb_color:
+      - 255
+      - 71
+      - 22
     light.driveway_light_left_5:
       state: 'on'
       brightness: 55
-      xy_color:
-      - 0.67
-      - 0.32
+      rgb_color:
+      - 68
+      - 255
+      - 46
     light.driveway_light_left_6:
       state: 'on'
       brightness: 55
-      xy_color:
-      - 0.2
-      - 0.7
+      rgb_color:
+      - 68
+      - 255
+      - 46
     light.driveway_light_left_7:
       state: 'on'
       brightness: 55
-      xy_color:
-      - 0.45
-      - 0.45
+      rgb_color:
+      - 68
+      - 255
+      - 46
     light.driveway_light_left_8:
       state: 'on'
       brightness: 55
-      xy_color:
-      - 0.2
-      - 0.7
+      rgb_color:
+      - 255
+      - 71
+      - 22
     light.driveway_light_left_9:
       state: 'on'
       brightness: 55
-      xy_color:
-      - 0.67
-      - 0.32
+      rgb_color:
+      - 68
+      - 255
+      - 46
     light.driveway_light_right_2:
       state: 'on'
       brightness: 55
-      xy_color:
-      - 0.45
-      - 0.45
+      rgb_color:
+      - 255
+      - 71
+      - 22
     light.driveway_light_right_3:
       state: 'on'
       brightness: 55
-      xy_color:
-      - 0.2
-      - 0.7
+      rgb_color:
+      - 68
+      - 255
+      - 46
+  icon: mdi:pine-tree
+- id: '1765125218672'
+  name: Indkørsel lys skumring
+  entities:
+    light.driveway_light_right_1:
+      state: 'off'
+    light.driveway_light_left_1:
+      state: 'off'
+    light.driveway_light_left_2:
+      state: 'on'
+      brightness_pct: 10
+      color_temp_kelvin: 2500
+    light.driveway_light_left_3:
+      state: 'on'
+      brightness_pct: 10
+      color_temp_kelvin: 2500
+    light.driveway_light_left_4:
+      state: 'on'
+      brightness_pct: 10
+      color_temp_kelvin: 2500
+    light.driveway_light_left_5:
+      state: 'on'
+      brightness_pct: 10
+      color_temp_kelvin: 2500
+    light.driveway_light_left_6:
+      state: 'on'
+      brightness_pct: 10
+      color_temp_kelvin: 2500
+    light.driveway_light_left_7:
+      state: 'on'
+      brightness_pct: 10
+      color_temp_kelvin: 2500
+    light.driveway_light_left_8:
+      state: 'on'
+      brightness_pct: 10
+      color_temp_kelvin: 2500
+    light.driveway_light_left_9:
+      state: 'on'
+      brightness_pct: 10
+      color_temp_kelvin: 2500
+    light.driveway_light_right_2:
+      state: 'on'
+      brightness_pct: 10
+      color_temp_kelvin: 2500
+    light.driveway_light_right_3:
+      state: 'on'
+      brightness_pct: 10
+      color_temp_kelvin: 2500
+  icon: mdi:weather-sunset

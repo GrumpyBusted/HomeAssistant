@@ -1480,10 +1480,14 @@
     id: no_one_home
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.anders_home
+    - binary_sensor.monique_home
+    - binary_sensor.emil_home
+    - binary_sensor.charlie_home
+    - input_boolean.house_sitter
     from: 'off'
     to: 'on'
-    id: anyone_home
+    id: some_home
   - trigger: state
     entity_id:
     - binary_sensor.hallway_light
@@ -1501,7 +1505,6 @@
       - condition: trigger
         id:
         - button_1_short
-        - anyone_home
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -1577,6 +1580,64 @@
         metadata: {}
         data:
           transition: 1
+        target:
+          entity_id:
+          - light.hallway_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - someone_home
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.bedroom_sleeping
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2700
+          brightness_pct: 25
+        target:
+          entity_id:
+          - light.hallway_light_bathroom
+          - light.hallway_light_toilet
+    - conditions:
+      - condition: trigger
+        id:
+        - someone_home
+      - condition: state
+        entity_id: binary_sensor.everyone_sleeping
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2700
+          brightness_pct: 25
+        target:
+          entity_id:
+          - light.hallway_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - someone_home
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2700
+          brightness_pct: 25
         target:
           entity_id:
           - light.hallway_lights
@@ -2160,8 +2221,24 @@
     - conditions:
       - condition: trigger
         id:
-        - lights_on
         - bedroom_empty
+      sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.bedroom_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - lights_on
       - condition: state
         entity_id: binary_sensor.bedroom_occupancy
         state: 'off'
@@ -2558,6 +2635,12 @@
     from: 'off'
     to: 'on'
     id: light_outside
+  - trigger: state
+    entity_id:
+    - sensor.anders_iphone_battery_state
+    - sensor.monique_iphone_battery_state
+    to: Not Charging
+    id: phone_unpluged
   - value_template: "{{ \n  states('sensor.bedroom_current_temperature')|float(0)
       >\n  states('sensor.bedroom_target_temperature')|float(0) and\n  state_attr('sun.sun',
       'elevation')|float(0) > 20 and\n  state_attr('sun.sun', 'azimuth')|float(0)
@@ -2612,12 +2695,35 @@
       - condition: trigger
         id:
         - wake_up
-        - bedroom_empty
         - button_2
       - condition: numeric_state
         entity_id: cover.bedroom_blind
         attribute: current_position
         below: 100
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind
+    - conditions:
+      - condition: trigger
+        id:
+        - bedroom_empty
+        - phone_unpluged
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        below: 100
+      - condition: state
+        entity_id: binary_sensor.bedroom_occupancy
+        state: 'off'
+      - condition: state
+        entity_id: sensor.anders_iphone_battery_state
+        state: Not Charging
+      - condition: state
+        entity_id: sensor.monique_iphone_battery_state
+        state: Not Charging
       sequence:
       - action: cover.open_cover
         metadata: {}
@@ -4266,20 +4372,13 @@
     - conditions:
       - condition: trigger
         id:
-        - detected_street
         - detected_south
       - condition: state
         entity_id: binary_sensor.home_outside_light
         state: 'off'
       sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          brightness_pct: 100
-          transition: 1
-          color_temp_kelvin: 3000
-        target:
-          entity_id:
+      - repeat:
+          for_each:
           - light.driveway_light_right_1
           - light.driveway_light_right_2
           - light.driveway_light_right_3
@@ -4292,6 +4391,48 @@
           - light.driveway_light_left_7
           - light.driveway_light_left_8
           - light.driveway_light_left_9
+          sequence:
+          - action: light.turn_on
+            continue_on_error: true
+            target:
+              entity_id: '{{ repeat.item }}'
+            data:
+              brightness_pct: 100
+              color_temp_kelvin: 3000
+              transition: 1
+          - delay: '00:00:00.1'
+    - conditions:
+      - condition: trigger
+        id:
+        - detected_street
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'off'
+      sequence:
+      - repeat:
+          for_each:
+          - light.driveway_light_right_3
+          - light.driveway_light_right_2
+          - light.driveway_light_right_1
+          - light.driveway_light_left_9
+          - light.driveway_light_left_8
+          - light.driveway_light_left_7
+          - light.driveway_light_left_6
+          - light.driveway_light_left_5
+          - light.driveway_light_left_4
+          - light.driveway_light_left_3
+          - light.driveway_light_left_2
+          - light.driveway_light_left_1
+          sequence:
+          - action: light.turn_on
+            continue_on_error: true
+            target:
+              entity_id: '{{ repeat.item }}'
+            data:
+              brightness_pct: 100
+              color_temp_kelvin: 3000
+              transition: 1
+          - delay: '00:00:00.1'
     - conditions:
       - condition: trigger
         id:
@@ -4300,17 +4441,10 @@
         entity_id: binary_sensor.home_outside_light
         state: 'off'
       sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          brightness_pct: 100
-          transition: 1
-          color_temp_kelvin: 3000
-        target:
-          entity_id:
+      - repeat:
+          for_each:
           - light.driveway_light_right_2
           - light.driveway_light_right_3
-          - light.driveway_light_left_1
           - light.driveway_light_left_2
           - light.driveway_light_left_3
           - light.driveway_light_left_4
@@ -4319,6 +4453,16 @@
           - light.driveway_light_left_7
           - light.driveway_light_left_8
           - light.driveway_light_left_9
+          sequence:
+          - action: light.turn_on
+            continue_on_error: true
+            target:
+              entity_id: '{{ repeat.item }}'
+            data:
+              brightness_pct: 100
+              color_temp_kelvin: 3000
+              transition: 1
+          - delay: '00:00:00.1'
     - conditions:
       - condition: trigger
         id:
@@ -4364,57 +4508,42 @@
       - condition: time
         after: '12:00:00'
       sequence:
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 1
-        target:
-          entity_id:
-          - light.driveway_light_right_1
-          - light.driveway_light_left_1
       - choose:
         - conditions:
           - condition: template
             value_template: '{{ now().month == 12 and now().day >= 1 and now().day
               <= 26 }}'
           sequence:
-          - target:
+          - action: scene.turn_on
+            target:
               entity_id: scene.driveway_light_christmas
-            action: scene.turn_on
+            data:
+              transition: 1
         - conditions:
           - condition: template
             value_template: '{{ now().month == 10 and now().day >= 15 and now().day
               <= 31 }}'
           sequence:
-          - target:
+          - action: scene.turn_on
+            target:
               entity_id: scene.driveway_light_halloween
-            action: scene.turn_on
+            data:
+              transition: 1
         - conditions:
           - condition: template
             value_template: '{{ now().month == 3 and now().day == 17 }}'
           sequence:
-          - target:
+          - action: scene.turn_on
+            target:
               entity_id: scene.driveway_light_sankt_patrick
-            action: scene.turn_on
+            data:
+              transition: 1
         default:
-        - action: light.turn_on
-          metadata: {}
-          data:
-            brightness_pct: 10
-            transition: 1
-            color_temp_kelvin: 2500
+        - action: scene.turn_on
           target:
-            entity_id:
-            - light.driveway_light_right_2
-            - light.driveway_light_right_3
-            - light.driveway_light_left_2
-            - light.driveway_light_left_3
-            - light.driveway_light_left_4
-            - light.driveway_light_left_5
-            - light.driveway_light_left_6
-            - light.driveway_light_left_7
-            - light.driveway_light_left_8
-            - light.driveway_light_left_9
+            entity_id: scene.driveway_light_twlight
+          data:
+            transition: 1
     - conditions:
       - condition: trigger
         id:
@@ -4443,15 +4572,8 @@
             entity_id: binary_sensor.garden_motion_sensor_house_east_detected
             state: 'off'
       sequence:
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 1
-        target:
-          entity_id:
-          - light.driveway_light_right_1
-          - light.driveway_light_right_2
-          - light.driveway_light_right_3
+      - repeat:
+          for_each:
           - light.driveway_light_left_1
           - light.driveway_light_left_2
           - light.driveway_light_left_3
@@ -4461,6 +4583,15 @@
           - light.driveway_light_left_7
           - light.driveway_light_left_8
           - light.driveway_light_left_9
+          - light.driveway_light_right_1
+          - light.driveway_light_right_2
+          - light.driveway_light_right_3
+          sequence:
+          - action: light.turn_off
+            continue_on_error: true
+            target:
+              entity_id: '{{ repeat.item }}'
+          - delay: '00:00:00.1'
   mode: queued
   max: 10
   trace:
@@ -8490,6 +8621,7 @@
         metadata: {}
         data:
           brightness_pct: 100
+          color_temp_kelvin: 2700
           transition: 1
         target:
           entity_id:
@@ -8563,6 +8695,7 @@
         metadata: {}
         data:
           brightness_pct: 100
+          color_temp_kelvin: 2700
           transition: 1
         target:
           entity_id:
@@ -8888,6 +9021,7 @@
         metadata: {}
         data:
           brightness_pct: 100
+          color_temp_kelvin: 2700
           transition: 1
         target:
           entity_id:
@@ -8987,6 +9121,7 @@
         metadata: {}
         data:
           brightness_pct: 100
+          color_temp_kelvin: 2700
           transition: 1
         target:
           entity_id:
@@ -9054,8 +9189,9 @@
       - action: light.turn_on
         metadata: {}
         data:
-          brightness_pct: 100
+          brightness_pct: 70
           transition: 1
+          color_temp_kelvin: 2700
         target:
           entity_id:
           - light.driveway_light_entrance_spot_1

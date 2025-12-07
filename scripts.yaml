@@ -166,7 +166,7 @@ bedroom_light_sunrise:
       metadata: {}
       data:
         transition: 60
-        kelvin: 2700
+        color_temp_kelvin: 2700
         brightness_pct: 80
       target:
         entity_id: light.bedroom_lights
@@ -190,7 +190,7 @@ bedroom_light_sunset:
       metadata: {}
       data:
         transition: 1
-        kelvin: 2700
+        color_temp_kelvin: 2700
       target:
         entity_id: light.bedroom_lights
   - parallel:
