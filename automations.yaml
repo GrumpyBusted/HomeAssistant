@@ -10031,3 +10031,15 @@
   max: 10
   trace:
     stored_traces: 20
+- id: '1765134832184'
+  alias: Køkken rengøring
+  description: Styring af robotstøvsuger for at gør rent i køkket
+  triggers:
+  - trigger: state
+    entity_id: []
+  conditions: []
+  actions: []
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 100

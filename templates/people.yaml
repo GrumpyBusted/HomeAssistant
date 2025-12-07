@@ -90,7 +90,7 @@
       unique_id: 6A155818-CFAE-4C80-9504-7640D48FEF40
       state: >-
         {{
-          (is_states('sensor.parent_home', 'on') or is_states('input_boolean.house_sitter', 'on')) and
+          (is_state('sensor.parent_home', 'on') or is_state('input_boolean.house_sitter', 'on')) and
           not(is_state('media_player.bedroom_apple_tv_media_player', 'playing')) and
           is_state('binary_sensor.bedroom_occupancy', 'on') and
           is_state('binary_sensor.bedroom_blind', 'off') and
@@ -104,7 +104,7 @@
         {% endif %}
 - binary_sensor:
     - name: "anders_sleeping"
-      unique_id: 1995B1D2-43A2-4BFF-A386-429E77A9E9F0
+      unique_id: 535AAF51-944B-411C-9F1B-7793F7CDECB0
       state: >-
         {{
           is_state('binary_sensor.bedroom_sleeping', 'on') and
