@@ -87,7 +87,7 @@
         {% endif %}
 - binary_sensor:
     - name: "bedroom_sleeping"
-      unique_id: 6A155818-CFAE-4C80-9504-7640D48FEF40
+      unique_id: 42D7694F-1E38-4B4E-A01E-06EEDEFB16CD
       state: >-
         {{
           (is_state('sensor.parent_home', 'on') or is_state('input_boolean.house_sitter', 'on')) and
@@ -119,7 +119,7 @@
         {% endif %}
 - binary_sensor:
     - name: "monique_sleeping"
-      unique_id: 1995B1D2-43A2-4BFF-A386-429E77A9E9F0
+      unique_id: 24560F35-F6BF-4997-88D3-2DA6E1029A56
       state: >-
         {{
           is_state('binary_sensor.bedroom_sleeping', 'on') and

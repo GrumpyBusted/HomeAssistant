@@ -2598,7 +2598,6 @@
   - trigger: time
     at:
       entity_id: input_datetime.monique_wake_up_alarm
-      offset: 00:03:00
     id: wake_up
   - trigger: state
     entity_id:
