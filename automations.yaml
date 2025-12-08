@@ -1502,7 +1502,7 @@
     id: bedroom_blind_open
   - trigger: state
     entity_id:
-    - binary_sensor.bedroom_dor
+    - binary_sensor.bedroom_door
     from: 'off'
     to: 'on'
     id: bedroom_door_open
