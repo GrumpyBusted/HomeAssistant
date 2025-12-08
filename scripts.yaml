@@ -268,11 +268,11 @@ bedroom_light_sunset:
     - action: light.turn_on
       data:
         transition: '{{ transition }}'
-        brightness: '{{ brightness_to }}'
+        brightness: '{{ [brightness_to, 128] | max }}'
         rgb_color:
         - 255
-        - 94
-        - 77
+        - 214
+        - 170
       target:
         entity_id:
         - light.bedroom_light_closet

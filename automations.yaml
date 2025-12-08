@@ -1490,6 +1490,24 @@
     id: some_home
   - trigger: state
     entity_id:
+    - binary_sensor.bedroom_sleeping
+    from: 'off'
+    to: 'on'
+    id: sleeping
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_blind
+    from: 'on'
+    to: 'off'
+    id: bedroom_blind_open
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_dor
+    from: 'off'
+    to: 'on'
+    id: bedroom_door_open
+  - trigger: state
+    entity_id:
     - binary_sensor.hallway_light
     from: 'off'
     to: 'on'
@@ -1638,6 +1656,62 @@
           transition: 1
           color_temp_kelvin: 2700
           brightness_pct: 25
+        target:
+          entity_id:
+          - light.hallway_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - bedroom_door_open
+      - condition: state
+        entity_id: binary_sensor.bedroom_sleeping
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'on'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.hallway_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - sleeping
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'on'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.hallway_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - bedroom_blind_open
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 120
+          color_temp_kelvin: 2700
+          brightness_pct: 75
         target:
           entity_id:
           - light.hallway_lights
@@ -2601,6 +2675,17 @@
     id: wake_up
   - trigger: state
     entity_id:
+    - timer.bedroom_blind_timer
+    to: idle
+    id: wake_up_delay
+  - trigger: state
+    entity_id:
+    - event.bedroom_switch_button_1
+    attribute: event_type
+    to: initial_press
+    id: button_1
+  - trigger: state
+    entity_id:
     - event.bedroom_switch_button_2
     attribute: event_type
     to: initial_press
@@ -2611,6 +2696,12 @@
     attribute: event_type
     to: initial_press
     id: button_3
+  - trigger: state
+    entity_id:
+    - event.bedroom_switch_button_4
+    attribute: event_type
+    to: initial_press
+    id: button_4
   - trigger: state
     entity_id:
     - binary_sensor.parent_home
@@ -2660,6 +2751,7 @@
     - conditions:
       - condition: trigger
         id:
+        - button_1
         - button_2
       - condition: numeric_state
         entity_id: cover.bedroom_blind
@@ -2693,7 +2785,15 @@
     - conditions:
       - condition: trigger
         id:
-        - wake_up
+        - button_4
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.bedroom_blind_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - wake_up_delay
         - button_2
       - condition: numeric_state
         entity_id: cover.bedroom_blind
@@ -2744,6 +2844,17 @@
         data: {}
         target:
           entity_id: cover.bedroom_blind
+    - conditions:
+      - condition: trigger
+        id:
+        - wake_up
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.bedroom_blind_timer
     - conditions:
       - condition: trigger
         id:
