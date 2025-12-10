@@ -2189,6 +2189,12 @@
     id: bedroom_empty
   - trigger: state
     entity_id:
+    - binary_sensor.bedroom_presence_sensor_occupancy
+    from: 'off'
+    to: 'on'
+    id: motion
+  - trigger: state
+    entity_id:
     - sensor.anders_iphone_battery_state
     - sensor.monique_iphone_battery_state
     to: Charging
@@ -2309,6 +2315,27 @@
         target:
           entity_id:
           - light.bedroom_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - motion
+      - condition: state
+        entity_id: binary_sensor.bedroom_blind
+        state: 'on'
+      sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2700
+          brightness_pct: 80
+        target:
+          entity_id: light.bedroom_lights
     - conditions:
       - condition: trigger
         id:
@@ -2670,8 +2697,7 @@
     to: 'off'
     id: bedroom_empty
   - trigger: time
-    at:
-      entity_id: input_datetime.monique_wake_up_alarm
+    at: input_datetime.monique_wake_up_alarm
     id: wake_up
   - trigger: state
     entity_id:
@@ -2832,8 +2858,24 @@
     - conditions:
       - condition: trigger
         id:
-        - bedtime
         - button_3
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        above: 0
+      sequence:
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind
+    - conditions:
+      - condition: trigger
+        id:
+        - bedtime
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
       - condition: numeric_state
         entity_id: cover.bedroom_blind
         attribute: current_position
