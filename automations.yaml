@@ -122,6 +122,8 @@
           - light.living_room_tv_light_strip
           - light.living_room_light_coffee_table_1
           - light.living_room_light_coffee_table_2
+          - light.living_room_light_table_lamp_cabinet
+          - light.living_room_light_table_lamp_sofa
     - conditions:
       - condition: trigger
         id:
@@ -159,6 +161,8 @@
           - light.living_room_light_cabinet_left
           - light.living_room_light_cabinet_right
           - light.living_room_light_strip_glass_cabinet
+          - light.living_room_light_table_lamp_cabinet
+          - light.living_room_light_table_lamp_sofa
       - action: light.turn_on
         metadata: {}
         data:
@@ -229,6 +233,8 @@
           entity_id:
           - light.living_room_light_strip_glass_cabinet
           - light.living_room_light_strip_skylight
+          - light.living_room_light_table_lamp_cabinet
+          - light.living_room_light_table_lamp_sofa
       - action: light.turn_on
         metadata: {}
         data: {}
@@ -278,6 +284,8 @@
           - light.living_room_tv_light_strip
           - light.living_room_light_coffee_table_1
           - light.living_room_light_coffee_table_2
+          - light.living_room_light_table_lamp_cabinet
+          - light.living_room_light_table_lamp_sofa
       - action: light.turn_on
         metadata: {}
         data: {}
@@ -335,6 +343,8 @@
           - light.living_room_smart_plug_christmas_elf_house
           - light.living_room_light_coffee_table_1
           - light.living_room_light_coffee_table_2
+          - light.living_room_light_table_lamp_cabinet
+          - light.living_room_light_table_lamp_sofa
     - conditions:
       - condition: trigger
         id:

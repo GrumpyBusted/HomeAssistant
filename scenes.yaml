@@ -260,3 +260,680 @@
       brightness_pct: 10
       color_temp_kelvin: 2500
   icon: mdi:weather-sunset
+- id: '1765399811199'
+  name: Stue julefrokost
+  entities:
+    light.living_room_light_bookcase_left:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 454
+      effect_list:
+      - 'off'
+      - candle
+      - sparkle
+      - glisten
+      - sunrise
+      - sunset
+      supported_color_modes:
+      - color_temp
+      effect: 'off'
+      color_mode: color_temp
+      brightness: 180
+      color_temp_kelvin: 2777
+      color_temp: 360
+      hs_color:
+      - 28.233
+      - 63.317
+      rgb_color:
+      - 255
+      - 170
+      - 94
+      xy_color:
+      - 0.516
+      - 0.387
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys reol venstre
+      supported_features: 44
+      state: 'off'
+    light.living_room_light_bookcase_right:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 454
+      effect_list:
+      - 'off'
+      - candle
+      - sparkle
+      - glisten
+      - sunrise
+      - sunset
+      supported_color_modes:
+      - color_temp
+      effect: 'off'
+      color_mode: color_temp
+      brightness: 180
+      color_temp_kelvin: 2777
+      color_temp: 360
+      hs_color:
+      - 28.233
+      - 63.317
+      rgb_color:
+      - 255
+      - 170
+      - 94
+      xy_color:
+      - 0.516
+      - 0.387
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys reol højre
+      supported_features: 44
+      state: 'off'
+    light.living_room_light_cabinet_left:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 454
+      effect_list:
+      - 'off'
+      - candle
+      - sparkle
+      - glisten
+      - sunrise
+      - sunset
+      supported_color_modes:
+      - color_temp
+      effect: 'off'
+      color_mode: color_temp
+      brightness: 160
+      color_temp_kelvin: 2857
+      color_temp: 350
+      hs_color:
+      - 28.077
+      - 60.925
+      rgb_color:
+      - 255
+      - 172
+      - 100
+      xy_color:
+      - 0.509
+      - 0.385
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys skænk venstre
+      supported_features: 44
+      state: 'on'
+    light.living_room_light_cabinet_right:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 454
+      effect_list:
+      - 'off'
+      - candle
+      - sparkle
+      - glisten
+      - sunrise
+      - sunset
+      supported_color_modes:
+      - color_temp
+      effect: 'off'
+      color_mode: color_temp
+      brightness: 160
+      color_temp_kelvin: 2857
+      color_temp: 350
+      hs_color:
+      - 28.077
+      - 60.925
+      rgb_color:
+      - 255
+      - 172
+      - 100
+      xy_color:
+      - 0.509
+      - 0.385
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys skænk højre
+      supported_features: 44
+      state: 'on'
+    light.living_room_light_coffee_table_1:
+      effect_list:
+      - 0 Christmas Spiri
+      supported_color_modes:
+      - rgb
+      effect: 0 Christmas Spiri
+      color_mode: rgb
+      brightness: 133
+      hs_color:
+      - 29.189
+      - 72.549
+      rgb_color:
+      - 255
+      - 160
+      - 70
+      xy_color:
+      - 0.545
+      - 0.39
+      friendly_name: Stue lys sofabord 1
+      supported_features: 4
+      state: 'on'
+    light.living_room_light_coffee_table_2:
+      effect_list:
+      - 0 Christmas Spiri
+      supported_color_modes:
+      - rgb
+      effect: 0 Christmas Spiri
+      color_mode: rgb
+      brightness: 133
+      hs_color:
+      - 29.189
+      - 72.549
+      rgb_color:
+      - 255
+      - 160
+      - 70
+      xy_color:
+      - 0.545
+      - 0.39
+      friendly_name: Stue lys sofabord 2
+      supported_features: 4
+      state: 'on'
+    light.living_room_light_dining_table_spot_cabinet:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 454
+      effect_list:
+      - 'off'
+      - candle
+      - sparkle
+      - glisten
+      - sunrise
+      - sunset
+      supported_color_modes:
+      - color_temp
+      effect: 'off'
+      color_mode: color_temp
+      brightness: 220
+      color_temp_kelvin: 2941
+      color_temp: 340
+      hs_color:
+      - 27.925
+      - 58.522
+      rgb_color:
+      - 255
+      - 175
+      - 106
+      xy_color:
+      - 0.501
+      - 0.384
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys spisebord spot skænk
+      supported_features: 44
+      state: 'on'
+    light.living_room_light_dining_table_spot_sofa:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 454
+      effect_list:
+      - 'off'
+      - candle
+      - sparkle
+      - glisten
+      - sunrise
+      - sunset
+      supported_color_modes:
+      - color_temp
+      effect: 'off'
+      color_mode: color_temp
+      brightness: 220
+      color_temp_kelvin: 2941
+      color_temp: 340
+      hs_color:
+      - 27.925
+      - 58.522
+      rgb_color:
+      - 255
+      - 175
+      - 106
+      xy_color:
+      - 0.501
+      - 0.384
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys spisebord spot sofa
+      supported_features: 44
+      state: 'on'
+    light.living_room_light_escher:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 454
+      effect_list:
+      - 'off'
+      - candle
+      - sparkle
+      - glisten
+      - sunrise
+      - sunset
+      supported_color_modes:
+      - color_temp
+      effect: 'off'
+      color_mode: color_temp
+      brightness: 170
+      color_temp_kelvin: 2777
+      color_temp: 360
+      hs_color:
+      - 28.233
+      - 63.317
+      rgb_color:
+      - 255
+      - 170
+      - 94
+      xy_color:
+      - 0.516
+      - 0.387
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys Escher
+      supported_features: 44
+      state: 'on'
+    light.living_room_light_strip_glass_cabinet:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - 'off'
+      - candle
+      - fire
+      - prism
+      - sparkle
+      - opal
+      - glisten
+      - underwater
+      - cosmos
+      - sunbeam
+      - enchant
+      - sunrise
+      - sunset
+      supported_color_modes:
+      - color_temp
+      - xy
+      effect: 'off'
+      color_mode: xy
+      brightness: 140
+      color_temp_kelvin:
+      color_temp:
+      hs_color:
+      - 123.093
+      - 76.078
+      rgb_color:
+      - 61
+      - 255
+      - 71
+      xy_color:
+      - 0.192
+      - 0.677
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys glasskab
+      supported_features: 44
+      state: 'on'
+    light.living_room_light_strip_receiver:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - 'off'
+      - candle
+      - fire
+      - prism
+      - sparkle
+      - opal
+      - glisten
+      - underwater
+      - cosmos
+      - sunbeam
+      - enchant
+      - sunrise
+      - sunset
+      supported_color_modes:
+      - color_temp
+      - xy
+      effect: 'off'
+      color_mode: xy
+      brightness: 200
+      color_temp_kelvin:
+      color_temp:
+      hs_color:
+      - 8.056
+      - 84.706
+      rgb_color:
+      - 255
+      - 68
+      - 39
+      xy_color:
+      - 0.665
+      - 0.315
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys anlæg
+      supported_features: 44
+      state: 'on'
+    light.living_room_light_strip_skylight:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - 'off'
+      - candle
+      - fire
+      - prism
+      - sparkle
+      - opal
+      - glisten
+      - underwater
+      - cosmos
+      - sunbeam
+      - enchant
+      - sunrise
+      - sunset
+      supported_color_modes:
+      - color_temp
+      - xy
+      effect: 'off'
+      color_mode: xy
+      brightness: 170
+      color_temp_kelvin:
+      color_temp:
+      hs_color:
+      - 14.924
+      - 77.255
+      rgb_color:
+      - 255
+      - 107
+      - 58
+      xy_color:
+      - 0.618
+      - 0.339
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys ovenlys
+      supported_features: 44
+      state: 'on'
+    light.living_room_light_table_lamp_cabinet:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 500
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode: color_temp
+      brightness: 220
+      color_temp_kelvin: 2702
+      color_temp: 370
+      hs_color:
+      - 28.391
+      - 65.659
+      rgb_color:
+      - 255
+      - 167
+      - 88
+      xy_color:
+      - 0.524
+      - 0.388
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys bordlampe skænk
+      supported_features: 40
+      state: 'on'
+    light.living_room_light_table_lamp_sofa:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 500
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode: color_temp
+      brightness: 220
+      color_temp_kelvin: 2702
+      color_temp: 370
+      hs_color:
+      - 28.391
+      - 65.659
+      rgb_color:
+      - 255
+      - 167
+      - 88
+      xy_color:
+      - 0.524
+      - 0.388
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys bordlampe sofa
+      supported_features: 40
+      state: 'on'
+    light.living_room_light_tv_left:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - 'off'
+      - candle
+      - fire
+      - prism
+      - sparkle
+      - opal
+      - glisten
+      - underwater
+      - cosmos
+      - sunbeam
+      - enchant
+      - sunrise
+      - sunset
+      supported_color_modes:
+      - color_temp
+      - xy
+      effect: 'off'
+      color_mode: xy
+      brightness: 150
+      color_temp_kelvin:
+      color_temp:
+      hs_color:
+      - 15.467
+      - 88.235
+      rgb_color:
+      - 255
+      - 88
+      - 30
+      xy_color:
+      - 0.653
+      - 0.331
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys TV venstre
+      supported_features: 44
+      state: 'on'
+    light.living_room_light_tv_right:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - 'off'
+      - candle
+      - fire
+      - prism
+      - sparkle
+      - opal
+      - glisten
+      - underwater
+      - cosmos
+      - sunbeam
+      - enchant
+      - sunrise
+      - sunset
+      supported_color_modes:
+      - color_temp
+      - xy
+      effect: 'off'
+      color_mode: xy
+      brightness: 150
+      color_temp_kelvin:
+      color_temp:
+      hs_color:
+      - 57.143
+      - 49.412
+      rgb_color:
+      - 255
+      - 249
+      - 129
+      xy_color:
+      - 0.41
+      - 0.451
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys TV højre
+      supported_features: 44
+      state: 'on'
+    light.living_room_light_window_left:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 454
+      effect_list:
+      - 'off'
+      - candle
+      - sparkle
+      - glisten
+      - sunrise
+      - sunset
+      supported_color_modes:
+      - color_temp
+      effect: 'off'
+      color_mode: color_temp
+      brightness: 90
+      color_temp_kelvin: 2631
+      color_temp: 380
+      hs_color:
+      - 28.55
+      - 67.974
+      rgb_color:
+      - 255
+      - 164
+      - 82
+      xy_color:
+      - 0.532
+      - 0.388
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys vindue venstre
+      supported_features: 44
+      state: 'on'
+    light.living_room_light_window_right:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 454
+      effect_list:
+      - 'off'
+      - candle
+      - sparkle
+      - glisten
+      - sunrise
+      - sunset
+      supported_color_modes:
+      - color_temp
+      effect: 'off'
+      color_mode: color_temp
+      brightness: 90
+      color_temp_kelvin: 2631
+      color_temp: 380
+      hs_color:
+      - 28.55
+      - 67.974
+      rgb_color:
+      - 255
+      - 164
+      - 82
+      xy_color:
+      - 0.532
+      - 0.388
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys vindue højre
+      supported_features: 44
+      state: 'on'
+    light.living_room_smart_plug_christmas_elf_house:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys nissehus
+      supported_features: 0
+      state: 'on'
+    light.living_room_smart_plug_lamp:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys lampet
+      supported_features: 0
+      state: 'on'
+    light.living_room_tv_light_strip:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - 'off'
+      - candle
+      - fire
+      - prism
+      - sparkle
+      - opal
+      - glisten
+      - underwater
+      - cosmos
+      - sunbeam
+      - enchant
+      - sunrise
+      - sunset
+      supported_color_modes:
+      - color_temp
+      - xy
+      effect: 'off'
+      color_mode: xy
+      brightness: 180
+      color_temp_kelvin:
+      color_temp:
+      hs_color:
+      - 117.065
+      - 72.157
+      rgb_color:
+      - 80
+      - 255
+      - 71
+      xy_color:
+      - 0.208
+      - 0.665
+      mode: normal
+      dynamics: none
+      friendly_name: Stue lys TV
+      supported_features: 44
+      state: 'on'
+  icon: mdi:christmas-lights
+  metadata: {}
