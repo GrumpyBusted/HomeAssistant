@@ -793,18 +793,18 @@
       color_temp_kelvin:
       color_temp:
       hs_color:
-      - 57.143
-      - 49.412
+      - 15.467
+      - 88.235
       rgb_color:
       - 255
-      - 249
-      - 129
+      - 88
+      - 30
       xy_color:
-      - 0.41
-      - 0.451
+      - 0.653
+      - 0.331
       mode: normal
       dynamics: none
-      friendly_name: Stue lys TV højre
+      friendly_name: Stue lys TV venstre
       supported_features: 44
       state: 'on'
     light.living_room_light_window_left:

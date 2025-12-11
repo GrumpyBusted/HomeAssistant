@@ -1507,8 +1507,8 @@
   - trigger: state
     entity_id:
     - binary_sensor.bedroom_blind
-    from: 'on'
-    to: 'off'
+    from: 'off'
+    to: 'on'
     id: bedroom_blind_open
   - trigger: state
     entity_id:
@@ -2787,7 +2787,6 @@
     - conditions:
       - condition: trigger
         id:
-        - button_1
         - button_2
       - condition: numeric_state
         entity_id: cover.bedroom_blind
@@ -2830,7 +2829,6 @@
       - condition: trigger
         id:
         - wake_up_delay
-        - button_2
       - condition: numeric_state
         entity_id: cover.bedroom_blind
         attribute: current_position
@@ -2861,20 +2859,6 @@
         state: Not Charging
       sequence:
       - action: cover.open_cover
-        metadata: {}
-        data: {}
-        target:
-          entity_id: cover.bedroom_blind
-    - conditions:
-      - condition: trigger
-        id:
-        - button_3
-      - condition: numeric_state
-        entity_id: cover.bedroom_blind
-        attribute: current_position
-        above: 0
-      sequence:
-      - action: cover.close_cover
         metadata: {}
         data: {}
         target:
