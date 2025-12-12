@@ -2697,29 +2697,6 @@
   alias: Soveværelse rullegardin
   description: Automatik for rullegardin på soveværelse
   triggers:
-  - trigger: time
-    at: input_datetime.monique_bedtime_alarm
-    id: bedtime
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_occupancy
-    from: 'on'
-    to: 'off'
-    id: bedroom_empty
-  - trigger: time
-    at: input_datetime.monique_wake_up_alarm
-    id: wake_up
-  - trigger: state
-    entity_id:
-    - timer.bedroom_blind_timer
-    to: idle
-    id: wake_up_delay
-  - trigger: state
-    entity_id:
-    - event.bedroom_switch_button_1
-    attribute: event_type
-    to: initial_press
-    id: button_1
   - trigger: state
     entity_id:
     - event.bedroom_switch_button_2
@@ -2738,6 +2715,23 @@
     attribute: event_type
     to: initial_press
     id: button_4
+  - trigger: time
+    at: input_datetime.monique_wake_up_alarm
+    id: wake_up
+  - trigger: state
+    entity_id:
+    - timer.bedroom_blind_timer
+    to: idle
+    id: wake_up_delay
+  - trigger: time
+    at: input_datetime.monique_bedtime_alarm
+    id: bedtime
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_occupancy
+    from: 'on'
+    to: 'off'
+    id: bedroom_empty
   - trigger: state
     entity_id:
     - binary_sensor.parent_home
@@ -2767,20 +2761,20 @@
     - sensor.monique_iphone_battery_state
     to: Not Charging
     id: phone_unpluged
-  - value_template: "{{ \n  states('sensor.bedroom_current_temperature')|float(0)
+  - trigger: template
+    value_template: "{{ \n  states('sensor.bedroom_current_temperature')|float(0)
       >\n  states('sensor.bedroom_target_temperature')|float(0) and\n  state_attr('sun.sun',
       'elevation')|float(0) > 20 and\n  state_attr('sun.sun', 'azimuth')|float(0)
       > 240 and\n  state_attr('sun.sun', 'azimuth')|float(0) < 360 and\n  states('weather.home_forecast')
       == 'sunny' \n}}\n"
     id: sunny_overheat_on
-    trigger: template
-  - value_template: "{{ not (\n  states('sensor.bedroom_current_temperature')|float(0)
+  - trigger: template
+    value_template: "{{ not (\n  states('sensor.bedroom_current_temperature')|float(0)
       >\n  states('sensor.bedroom_target_temperature')|float(0)\n  and state_attr('sun.sun',
       'elevation')|float(0) > 20\n  and state_attr('sun.sun', 'azimuth')|float(0)
       > 240\n  and state_attr('sun.sun', 'azimuth')|float(0) < 360\n  and states('weather.home_forecast')
       == 'sunny'\n) }}\n"
     id: sunny_overheat_off
-    trigger: template
   conditions: []
   actions:
   - choose:
@@ -2813,11 +2807,6 @@
         target:
           entity_id: cover.bedroom_blind
     - conditions:
-      - condition: state
-        entity_id: input_boolean.house_sitter
-        state: 'on'
-      sequence: []
-    - conditions:
       - condition: trigger
         id:
         - button_4
@@ -2828,35 +2817,28 @@
     - conditions:
       - condition: trigger
         id:
-        - wake_up_delay
-      - condition: numeric_state
-        entity_id: cover.bedroom_blind
-        attribute: current_position
-        below: 100
+        - wake_up
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
       sequence:
-      - action: cover.open_cover
+      - action: timer.start
         metadata: {}
-        data: {}
+        data:
+          duration: 00:03:00
         target:
-          entity_id: cover.bedroom_blind
+          entity_id: timer.bedroom_blind_timer
     - conditions:
       - condition: trigger
         id:
-        - bedroom_empty
-        - phone_unpluged
+        - wake_up_delay
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
       - condition: numeric_state
         entity_id: cover.bedroom_blind
         attribute: current_position
         below: 100
-      - condition: state
-        entity_id: binary_sensor.bedroom_occupancy
-        state: 'off'
-      - condition: state
-        entity_id: sensor.anders_iphone_battery_state
-        state: Not Charging
-      - condition: state
-        entity_id: sensor.monique_iphone_battery_state
-        state: Not Charging
       sequence:
       - action: cover.open_cover
         metadata: {}
@@ -2883,14 +2865,46 @@
     - conditions:
       - condition: trigger
         id:
-        - wake_up
+        - bedroom_empty
+        - phone_unpluged
+      - condition: state
+        entity_id: binary_sensor.parent_home
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.bedroom_occupancy
+        state: 'off'
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        below: 100
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: sensor.monique_iphone_battery_state
+          state: Not Charging
+        - condition: state
+          entity_id: binary_sensor.monique_home
+          state: 'off'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: sensor.anders_iphone_battery_state
+          state: Not Charging
+        - condition: state
+          entity_id: binary_sensor.anders_home
+          state: 'off'
+      - condition: template
+        value_template: '{% set n = now().timestamp() %} {% set b = as_timestamp(states(''input_datetime.monique_bedtime_alarm''),
+          0) %} {% set w = as_timestamp(states(''input_datetime.monique_wake_up_alarm''),
+          0) %} {{ not (b <= n <= w if b < w else b <= n <= b + 43200) }}
+
+          '
       sequence:
-      - action: timer.start
+      - action: cover.open_cover
         metadata: {}
-        data:
-          duration: 00:03:00
+        data: {}
         target:
-          entity_id: timer.bedroom_blind_timer
+          entity_id: cover.bedroom_blind
     - conditions:
       - condition: trigger
         id:
