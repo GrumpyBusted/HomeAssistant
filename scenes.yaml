@@ -937,3 +937,26 @@
       state: 'on'
   icon: mdi:christmas-lights
   metadata: {}
+- id: '1765627457921'
+  name: Terrasse jullys
+  entities:
+    light.patio_light_bar:
+      state: 'on'
+      brightness: 80
+      color_mode: xy
+      xy_color:
+      - 0.691
+      - 0.299
+    light.patio_light_main:
+      state: 'on'
+      brightness: 80
+      color_mode: xy
+      effect: 'off'
+      xy_color:
+      - 0.186
+      - 0.704
+    light.patio_light_sofa:
+      state: 'off'
+    light.patio_light_dining_table:
+      state: 'off'
+  icon: mdi:pine-tree-box
