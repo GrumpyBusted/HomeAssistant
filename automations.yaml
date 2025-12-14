@@ -2468,6 +2468,30 @@
   alias: Emils værelse rullegardin
   description: Automatik for rullegardin på Emils værelse
   triggers:
+  - device_id: 1dd2442d9e607d9f290aebbb666cef43
+    domain: zha
+    type: remote_button_short_press
+    subtype: open
+    trigger: device
+    id: open_short_pressed
+  - trigger: device
+    device_id: 1dd2442d9e607d9f290aebbb666cef43
+    domain: zha
+    type: remote_button_short_press
+    subtype: close
+    id: close_short_pressed
+  - trigger: device
+    device_id: 1dd2442d9e607d9f290aebbb666cef43
+    domain: zha
+    type: remote_button_long_release
+    subtype: open
+    id: open_long_pressed
+  - trigger: device
+    device_id: 1dd2442d9e607d9f290aebbb666cef43
+    domain: zha
+    type: remote_button_long_release
+    subtype: close
+    id: close_long_pressed
   - trigger: state
     entity_id:
     - binary_sensor.emil_home
@@ -2525,6 +2549,45 @@
     - conditions:
       - condition: trigger
         id:
+        - open_short_pressed
+      - condition: numeric_state
+        entity_id: cover.emils_room_blind
+        attribute: current_position
+        below: 100
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.emils_room_blind
+    - conditions:
+      - condition: trigger
+        id:
+        - close_short_pressed
+      - condition: numeric_state
+        entity_id: cover.emils_room_blind
+        attribute: current_position
+        above: 0
+      sequence:
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.emils_room_blind
+    - conditions:
+      - condition: trigger
+        id:
+        - open_long_pressed
+        - close_long_pressed
+      sequence:
+      - action: cover.stop_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.emils_room_blind
+    - conditions:
+      - condition: trigger
+        id:
         - window_opened
       - condition: numeric_state
         entity_id: cover.emils_room_blind
@@ -2558,6 +2621,10 @@
       - condition: state
         entity_id: binary_sensor.home_outside_light
         state: 'on'
+      - condition: numeric_state
+        entity_id: cover.emils_room_blind
+        attribute: current_position
+        below: 100
       sequence:
       - action: cover.open_cover
         metadata: {}
@@ -2571,6 +2638,10 @@
       - condition: state
         entity_id: binary_sensor.emil_home
         state: 'off'
+      - condition: numeric_state
+        entity_id: cover.emils_room_blind
+        attribute: current_position
+        below: 100
       sequence:
       - action: cover.open_cover
         metadata: {}
@@ -2586,6 +2657,10 @@
       - condition: state
         entity_id: binary_sensor.home_outside_light
         state: 'on'
+      - condition: numeric_state
+        entity_id: cover.emils_room_blind
+        attribute: current_position
+        below: 40
       sequence:
       - action: cover.set_cover_position
         metadata: {}
@@ -2602,11 +2677,15 @@
       - condition: state
         entity_id: binary_sensor.emils_room_window_sensor
         state: 'on'
+      - condition: numeric_state
+        entity_id: cover.emils_room_blind
+        attribute: current_position
+        above: 20
       sequence:
       - action: cover.set_cover_position
         metadata: {}
         data:
-          position: 80
+          position: 20
         target:
           entity_id: cover.emils_room_blind
     - conditions:
@@ -2615,6 +2694,10 @@
         - emil_home
         - dark_outside
         - bedtime
+      - condition: numeric_state
+        entity_id: cover.emils_room_blind
+        attribute: current_position
+        above: 0
       sequence:
       - action: cover.close_cover
         metadata: {}
@@ -2629,6 +2712,30 @@
   alias: Charlies værelse rullegardin
   description: Automatik for rullegardin på Charlies værelse
   triggers:
+  - trigger: device
+    device_id: 937baa924ab8fff3bfbd80513dde21d2
+    domain: zha
+    type: remote_button_short_press
+    subtype: open
+    id: open_short_pressed
+  - trigger: device
+    device_id: 937baa924ab8fff3bfbd80513dde21d2
+    domain: zha
+    type: remote_button_short_press
+    subtype: close
+    id: close_short_pressed
+  - device_id: 937baa924ab8fff3bfbd80513dde21d2
+    domain: zha
+    type: remote_button_long_release
+    subtype: open
+    trigger: device
+    id: open_long_pressed
+  - device_id: 937baa924ab8fff3bfbd80513dde21d2
+    domain: zha
+    type: remote_button_long_release
+    subtype: close
+    trigger: device
+    id: close_long_pressed
   - trigger: state
     entity_id:
     - binary_sensor.charlie_home
@@ -2665,12 +2772,60 @@
     from: 'off'
     to: 'on'
     id: light_outside
+  - device_id: 937baa924ab8fff3bfbd80513dde21d2
+    domain: zha
+    type: remote_button_long_release
+    subtype: open
+    trigger: device
   conditions:
   - condition: state
     entity_id: input_boolean.house_sitter
     state: 'off'
   actions:
   - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - open_short_pressed
+      - condition: numeric_state
+        entity_id: cover.charlies_room_blind
+        attribute: current_position
+        below: 100
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.charlies_room_blind
+    - conditions:
+      - condition: trigger
+        id:
+        - close_short_pressed
+      - condition: numeric_state
+        entity_id: cover.charlies_room_blind
+        attribute: current_position
+        above: 0
+      sequence:
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.charlies_room_blind
+    - conditions:
+      - condition: trigger
+        id:
+        - open_long_pressed
+        - close_long_pressed
+      - condition: numeric_state
+        entity_id: cover.charlies_room_blind
+        attribute: current_position
+        above: 0
+      sequence:
+      - action: cover.stop_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.charlies_room_blind
     - conditions:
       - condition: trigger
         id:
@@ -2681,6 +2836,10 @@
       - condition: state
         entity_id: binary_sensor.home_outside_light
         state: 'on'
+      - condition: numeric_state
+        entity_id: cover.charlies_room_blind
+        attribute: current_position
+        below: 100
       sequence:
       - action: cover.open_cover
         metadata: {}
@@ -2694,6 +2853,10 @@
       - condition: state
         entity_id: binary_sensor.charlie_home
         state: 'off'
+      - condition: numeric_state
+        entity_id: cover.charlies_room_blind
+        attribute: current_position
+        below: 100
       sequence:
       - action: cover.open_cover
         metadata: {}
@@ -2706,6 +2869,10 @@
         - charlie_home
         - dark_outside
         - bedtime
+      - condition: numeric_state
+        entity_id: cover.charlies_room_blind
+        attribute: current_position
+        above: 0
       sequence:
       - action: cover.close_cover
         metadata: {}
@@ -2720,6 +2887,30 @@
   alias: Soveværelse rullegardin
   description: Automatik for rullegardin på soveværelse
   triggers:
+  - device_id: 8421d7ed40291054dc9c1406bbf716fe
+    domain: zha
+    type: remote_button_short_press
+    subtype: open
+    trigger: device
+    id: open_short_pressed
+  - trigger: device
+    device_id: 8421d7ed40291054dc9c1406bbf716fe
+    domain: zha
+    type: remote_button_short_press
+    subtype: close
+    id: close_short_pressed
+  - device_id: 8421d7ed40291054dc9c1406bbf716fe
+    domain: zha
+    type: remote_button_long_release
+    subtype: open
+    trigger: device
+    id: open_long_pressed
+  - device_id: 8421d7ed40291054dc9c1406bbf716fe
+    domain: zha
+    type: remote_button_long_release
+    subtype: close
+    trigger: device
+    id: close_long_pressed
   - trigger: state
     entity_id:
     - event.bedroom_switch_button_2
@@ -2801,6 +2992,45 @@
   conditions: []
   actions:
   - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - open_short_pressed
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        below: 100
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind
+    - conditions:
+      - condition: trigger
+        id:
+        - close_short_pressed
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        above: 0
+      sequence:
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind
+    - conditions:
+      - condition: trigger
+        id:
+        - open_long_pressed
+        - close_long_pressed
+      sequence:
+      - action: cover.stop_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.bedroom_blind
     - conditions:
       - condition: trigger
         id:
@@ -5616,13 +5846,13 @@
     - binary_sensor.bedroom_light
   - trigger: numeric_state
     entity_id:
-    - cover.bedroom_blind_ikea
-    attribute: current_position
+    - cover.bedroom_blind
+    attribute: current
     below: 60
   - trigger: numeric_state
     entity_id:
-    - cover.bedroom_blind_ikea
-    attribute: current_position
+    - cover.bedroom_blind
+    attribute: current
     above: 60
   - trigger: state
     entity_id:
@@ -5666,8 +5896,8 @@
           entity_id: climate.bedroom_purifier_hot_cool_dyson
     - conditions:
       - condition: numeric_state
-        entity_id: cover.bedroom_blind_ikea
-        attribute: current_position
+        entity_id: cover.bedroom_blind
+        attribute: current
         below: 60
       sequence:
       - action: dyson_local.set_angle
@@ -5978,12 +6208,12 @@
   triggers:
   - trigger: state
     entity_id:
-    - sensor.bedroom_blind_battery_ikea
-    - sensor.emils_room_blind_battery_ikea
-    - sensor.charlies_room_blind_battery_ikea
-    - sensor.bedroom_blind_switch_battery_ikea
-    - sensor.emils_room_blind_switch_battery_ikea
-    - sensor.charlies_room_blind_switch_battery_ikea
+    - sensor.bedroom_blind_battery
+    - sensor.emils_room_blind_battery
+    - sensor.charlies_room_blind_battery
+    - sensor.bedroom_blind_open_close_remote_battery
+    - sensor.emils_room_blind_open_close_remote_battery
+    - sensor.charlies_room_blind_open_close_remote_battery
   - trigger: time
     at: 03:12:00
   conditions: []
@@ -5991,53 +6221,53 @@
   - action: script.home_create_todo_task
     data:
       subject: Skift batteri i gardinet i soveværelset
-      description: 'Batteri niveau er {{ states(''sensor.bedroom_blind_battery_ikea'')
+      description: 'Batteri niveau er {{ states(''sensor.bedroom_blind_battery'')
         }}% på IKEA rullegardin i soveværelset. Batteri: Genopladelig batteripakke'
-      related_entity_id: sensor.bedroom_blind_battery_ikea
+      related_entity_id: sensor.bedroom_blind_battery
       entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.bedroom_blind_battery_ikea'')|int < 5 }}'
+      is_active: '{{ states(''sensor.bedroom_blind_battery'')|int < 5 }}'
   - action: script.home_create_todo_task
     data:
       subject: Skift batteri i gardinet på Emils værelse
-      description: 'Batteri niveau er {{ states(''sensor.emils_room_blind_battery_ikea'')
+      description: 'Batteri niveau er {{ states(''sensor.emils_room_blind_battery'')
         }}% på IKEA rullegardin på Emils værelse. Batteri: Genopladelig batteripakke'
-      related_entity_id: sensor.emils_room_blind_battery_ikea
+      related_entity_id: sensor.emils_room_blind_battery
       entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.emils_room_blind_battery_ikea'')|int < 5 }}'
+      is_active: '{{ states(''sensor.emils_room_blind_battery'')|int < 5 }}'
   - action: script.home_create_todo_task
     data:
       subject: Skift batteri i gardinet på Charlies værelse
-      description: 'Batteri niveau er {{ states(''sensor.charlies_room_blind_battery_ikea'')
+      description: 'Batteri niveau er {{ states(''sensor.charlies_room_blind_battery'')
         }}% på IKEA rullegardin på Charlies værelse. Batteri: Genopladelig batteripakke'
-      related_entity_id: sensor.charlies_room_blind_battery_ikea
+      related_entity_id: sensor.charlies_room_blind_battery
       entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.charlies_room_blind_battery_ikea'')|int < 5 }}'
+      is_active: '{{ states(''sensor.charlies_room_blind_battery'')|int < 5 }}'
   - action: script.home_create_todo_task
     data:
       subject: Skift batteri i kontakt til gardinet i soveværelset
-      description: 'Batteri niveau er {{ states(''sensor.bedroom_blind_switch_battery_ikea'')
+      description: 'Batteri niveau er {{ states(''sensor.bedroom_blind_open_close_remote_battery'')
         }}% på kontaken til IKEA rullegardin i soveværelset. Batteri: 1 * CR2032'
-      related_entity_id: sensor.bedroom_blind_switch_battery_ikea
+      related_entity_id: sensor.bedroom_blind_open_close_remote_battery
       entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.bedroom_blind_switch_battery_ikea'')|int < 5
-        }}'
+      is_active: '{{ states(''sensor.bedroom_blind_open_close_remote_battery'')|int
+        < 5 }}'
   - action: script.home_create_todo_task
     data:
       subject: Skift batteri i kontakt til gardinet på Emils værelset
-      description: 'Batteri niveau er {{ states(''sensor.emils_room_blind_switch_battery_ikea'')
+      description: 'Batteri niveau er {{ states(''sensor.emils_room_blind_open_close_remote_battery'')
         }}% på kontaken til IKEA rullegardin på Emils værelset. Batteri: 1 * CR2032 '
-      related_entity_id: sensor.emils_room_blind_switch_battery_ikea
+      related_entity_id: sensor.emils_room_blind_open_close_remote_battery
       entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.emils_room_blind_switch_battery_ikea'')|int <
-        5 }}'
+      is_active: '{{ states(''sensor.emils_room_blind_open_close_remote_battery'')|int
+        < 5 }}'
   - action: script.home_create_todo_task
     data:
       subject: Skift batteri i kontakt til gardinet på Charlies værelset
-      description: 'Batteri niveau er {{ states(''sensor.charlies_room_blind_switch_battery_ikea'')
+      description: 'Batteri niveau er {{ states(''sensor.charlies_room_blind_open_close_remote_battery'')
         }}% på kontaken til IKEA rullegardin på Charlies værelset. Batteri: 1 * CR2032'
-      related_entity_id: sensor.charlies_room_blind_switch_battery_ikea
+      related_entity_id: sensor.charlies_room_blind_open_close_remote_battery
       entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.charlies_room_blind_switch_battery_ikea'')|int
+      is_active: '{{ states(''sensor.charlies_room_blind_open_close_remote_battery'')|int
         < 5 }}'
   mode: queued
   max: 10
@@ -7997,9 +8227,9 @@
       - climate.living_room_radiator_thermostat_dining_table_tado
       - climate.toilet_radiator_thermostat_tado
       - climate.utility_room_temperature_sensor_tado
-      - cover.bedroom_blind_ikea
-      - cover.emils_room_blind_ikea
-      - cover.charlies_room_blind_ikea
+      - cover.bedroom_blind
+      - cover.emils_room_blind
+      - cover.charlies_room_blind
       - device_tracker.anders_iphone
       - device_tracker.monique_iphone
       - device_tracker.emil_iphone
