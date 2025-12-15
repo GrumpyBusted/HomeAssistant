@@ -417,14 +417,12 @@
     entity_id:
     - sensor.volvo_ex30_charging_connection_status
     to:
-    - connection_status_connected_ac
-    - connection_status_unspecified
+    - connected
   - trigger: state
     entity_id:
     - sensor.volvo_xc40_charging_connection_status
     to:
-    - connection_status_connected_ac
-    - connection_status_unspecified
+    - connected
   conditions:
   - condition: state
     entity_id: sensor.driveway_ev_charger_status_description
