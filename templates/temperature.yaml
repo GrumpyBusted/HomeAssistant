@@ -72,8 +72,8 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {{ (state_attr('climate.bathroom_radiator_thermostat_wall', 'current_temperature') + 
-            state_attr('climate.bathroom_radiator_thermostat_floor', 'current_temperature'))|float(0)/2|round(1) }}
+        {{ (state_attr('climate.bathroom_radiator_thermostat_wall', 'current_temperature')|float(0) + 
+            state_attr('climate.bathroom_radiator_thermostat_floor', 'current_temperature')|float(0))/2|round(1) }}
 - sensor:
     - name: bathroom_target_temperature
       unique_id: 2580B7A9-621D-4006-A19B-1E558D1C5A99
