@@ -8085,17 +8085,6 @@
     to: locked
   conditions: []
   actions:
-  - if:
-    - condition: template
-      value_template: '{{ states(''sensor.volvo_xc40_last_data_update'') | as_datetime
-        + timedelta(seconds=5) < now() }}'
-    then:
-    - action: button.press
-      metadata: {}
-      data: {}
-      target:
-        entity_id: button.volvo_xc40_update_data
-    - delay: 00:00:02
   - choose:
     - conditions:
       - condition: state
