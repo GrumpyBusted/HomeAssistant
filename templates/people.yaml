@@ -460,3 +460,8 @@
         {% else %}
           Fortabt
         {% endif %}
+- sensor:
+    - name: anders2_location
+      unique_id: 4818FDD2-DEA0-467D-AC77-9539DD7AC69F
+      icon: mdi:map
+      state: "{{ person_location('anders') }}"
