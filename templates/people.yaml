@@ -51,8 +51,10 @@
       unique_id: 1FB2A489-CADC-4F4A-A521-66597D9D6812
       device_class: presence
       state: >-
-        {{ is_state('binary_sensor.monique_home', 'on') or 
-           is_state('binary_sensor.anders_home', 'on') }}
+        {{ 
+          is_state('binary_sensor.monique_home', 'on') or 
+          is_state('binary_sensor.anders_home', 'on') 
+        }}
       icon: >-
         {% if is_state('binary_sensor.parent_home', 'on') %}
         mdi:account-multiple
@@ -65,8 +67,8 @@
       device_class: presence
       state: >-
         {{ is_state('binary_sensor.parent_home', 'on') or 
-           is_state('binary_sensor.emil_home', 'on') or 
-           is_state('binary_sensor.charlie_home', 'on') }}
+          is_state('binary_sensor.emil_home', 'on') or 
+          is_state('binary_sensor.charlie_home', 'on') }}
       icon: >-
         {% if is_state('binary_sensor.parent_home', 'on') %}
         mdi:account-group
@@ -78,7 +80,7 @@
       unique_id: 0A2C2AAA-7F34-484D-9BA5-8031FEDF0E11
       state: >-
         {{ states('binary_sensor.bedroom_presence_sensor_occupancy') != 'off' or
-           is_state('timer.bedroom_presence_timer', 'active') }}
+          is_state('timer.bedroom_presence_timer', 'active') }}
       icon: >-
         {% if is_state('binary_sensor.bedroom_people_present', 'on') %}
         mdi:location-enter
@@ -137,10 +139,10 @@
       unique_id: 51259E4B-BF87-448A-839D-0C1996331806
       state: >-
         {{ 
-           is_state('binary_sensor.emil_home', 'on') and 
-           not(is_state('media_player.emils_room_apple_tv_media_player', 'playing')) and 
-           is_state('binary_sensor.emils_room_blind', 'off') and 
-           is_state('binary_sensor.emils_room_light', 'off') 
+          is_state('binary_sensor.emil_home', 'on') and 
+          not(is_state('media_player.emils_room_apple_tv_media_player', 'playing')) and 
+          is_state('binary_sensor.emils_room_blind', 'off') and 
+          is_state('binary_sensor.emils_room_light', 'off') 
         }}
       icon: >-
         {% if is_state('binary_sensor.emil_sleeping', 'on') %}
@@ -153,10 +155,10 @@
       unique_id: 56C0C9A8-6803-4F0F-8C5F-9FC9B67D9694
       state: >-
         {{
-           is_state('binary_sensor.charlie_home', 'on') and 
-           not(is_state('media_player.charlies_room_apple_tv_media_player', 'playing')) and 
-           is_state('binary_sensor.charlies_room_blind', 'off') and 
-           is_state('binary_sensor.charlies_room_light', 'off') 
+          is_state('binary_sensor.charlie_home', 'on') and 
+          not(is_state('media_player.charlies_room_apple_tv_media_player', 'playing')) and 
+          is_state('binary_sensor.charlies_room_blind', 'off') and 
+          is_state('binary_sensor.charlies_room_light', 'off') 
         }}
       icon: >-
         {% if is_state('binary_sensor.charlie_sleeping', 'on') %}
@@ -169,12 +171,12 @@
       unique_id: 879F46F0-962B-4061-8BD3-15C179BD85D3
       state: >-
         {{ 
-           (is_state('binary_sensor.anders_home', 'on') and is_state('binary_sensor.anders_sleeping', 'on')) and 
-           (is_state('binary_sensor.monique_home', 'on') and is_state('binary_sensor.monique_sleeping', 'on')) and 
-           (is_state('binary_sensor.charlie_home', 'on') and is_state('binary_sensor.charlie_sleeping', 'on')) and 
-           (is_state('binary_sensor.emil_home', 'on') and is_state('binary_sensor.emil_sleeping', 'on')) and 
-           (is_state('input_boolean.house_sitter', 'on') and is_state('binary_sensor.bedroom_sleeping', 'on')) and
-           is_state('media_player.living_room_apple_tv_media_player', 'off')
+          (is_state('binary_sensor.anders_home', 'on') and is_state('binary_sensor.anders_sleeping', 'on')) and 
+          (is_state('binary_sensor.monique_home', 'on') and is_state('binary_sensor.monique_sleeping', 'on')) and 
+          (is_state('binary_sensor.charlie_home', 'on') and is_state('binary_sensor.charlie_sleeping', 'on')) and 
+          (is_state('binary_sensor.emil_home', 'on') and is_state('binary_sensor.emil_sleeping', 'on')) and 
+          (is_state('input_boolean.house_sitter', 'on') and is_state('binary_sensor.bedroom_sleeping', 'on')) and
+          is_state('media_player.living_room_apple_tv_media_player', 'off')
         }}
       icon: >-
         {% if is_state('binary_sensor.everyone_sleeping', 'on') %}
@@ -187,11 +189,11 @@
       unique_id: B082D7C9-3338-435D-A1BF-156D3BE3DE16
       state: >-
         {{
-           (is_state('binary_sensor.anders_home', 'on') and is_state('binary_sensor.anders_sleeping', 'on')) or
-           (is_state('binary_sensor.monique_home', 'on') and is_state('binary_sensor.monique_sleeping', 'on')) or 
-           (is_state('binary_sensor.charlie_home', 'on') and is_state('binary_sensor.charlie_sleeping', 'on')) or 
-           (is_state('binary_sensor.emil_home', 'on') and is_state('binary_sensor.emil_sleeping', 'on')) or
-           (is_state('input_boolean.house_sitter', 'on') and is_state('binary_sensor.bedroom_sleeping', 'on'))
+          (is_state('binary_sensor.anders_home', 'on') and is_state('binary_sensor.anders_sleeping', 'on')) or
+          (is_state('binary_sensor.monique_home', 'on') and is_state('binary_sensor.monique_sleeping', 'on')) or 
+          (is_state('binary_sensor.charlie_home', 'on') and is_state('binary_sensor.charlie_sleeping', 'on')) or 
+          (is_state('binary_sensor.emil_home', 'on') and is_state('binary_sensor.emil_sleeping', 'on')) or
+          (is_state('input_boolean.house_sitter', 'on') and is_state('binary_sensor.bedroom_sleeping', 'on'))
         }}
       icon: >-
         {% if is_state('binary_sensor.someone_sleeping', 'on') %}
@@ -204,8 +206,8 @@
       unique_id: 6CB2BD82-9ACE-4100-B7B8-DF17E10DD692
       state: >-
         {{
-           (is_state('binary_sensor.anders_home', 'on') and is_state('binary_sensor.anders_sleeping', 'on')) and 
-           (is_state('binary_sensor.monique_home', 'on') and is_state('binary_sensor.monique_sleeping', 'on'))
+          (is_state('binary_sensor.anders_home', 'on') and is_state('binary_sensor.anders_sleeping', 'on')) and 
+          (is_state('binary_sensor.monique_home', 'on') and is_state('binary_sensor.monique_sleeping', 'on'))
         }}
       icon: >-
         {% if is_state('binary_sensor.parent_sleeping', 'on') %}
@@ -333,135 +335,56 @@
 - sensor:
     - name: anders_iphone_location_last_updated
       unique_id: BAA94075-3BD2-40A3-A19A-EFBEC6AD20E2
-      device_class: timestamp      
+      device_class: timestamp
       icon: mdi:map-clock
       state: >-
-        {{ states.device_tracker.anders_iphone.last_updated }} 
+        {{ states.device_tracker.anders_iphone.last_updated }}
 - sensor:
     - name: monique_iphone_location_last_updated
       unique_id: F0526FF2-2E75-4B9B-8432-BD22595C0760
-      device_class: timestamp      
+      device_class: timestamp
       icon: mdi:map-clock
       state: >-
-        {{ states.device_tracker.monique_iphone.last_updated }} 
+        {{ states.device_tracker.monique_iphone.last_updated }}
 - sensor:
     - name: emil_iphone_location_last_updated
       unique_id: 8EE9F63F-102A-428B-B443-798C03777D5A
-      device_class: timestamp      
+      device_class: timestamp
       icon: mdi:map-clock
       state: >-
-        {{ states.device_tracker.emil_iphone.last_updated }} 
+        {{ states.device_tracker.emil_iphone.last_updated }}
 - sensor:
     - name: charlie_iphone_location_last_updated
       unique_id: 5007FE64-7563-4FA5-A24A-87B1A6DDDA3A
-      device_class: timestamp      
+      device_class: timestamp
       icon: mdi:map-clock
-      state: >- 
-        {{ states.device_tracker.charlie_iphone.last_updated }} 
+      state: >-
+        {{ states.device_tracker.charlie_iphone.last_updated }}
 - sensor:
     - name: anders_location
       unique_id: 4818FDD2-DEA0-467D-AC77-9539DD7AC69E
       icon: mdi:map
       state: >-
-        {% set name = 'anders' %}
-        {% set geo_sensor = 'sensor.' ~ name ~ '_iphone_geocoded_location' %}
-        {% set person_state = states('person.' ~ name) %}
-        {% if states('input_text.anders_location_override') != '' %}
-          {{ states('input_text.anders_location_override') }}
-        {% elif person_state == 'home' %}
-          Hjemme
-        {% elif is_state('sensor.' ~ name ~ '_iphone_ssid', 'Palantir') %}
-          Hjemme
-        {% elif person_state not in ['', 'not_home', 'away', 'unknown', 'unavailable', None] %}
-          {% set zone_entity = 'zone.' ~ person_state %}
-          {% set zone_name = state_attr(zone_entity, 'friendly_name') or person_state %}
-          {{ zone_name }}
-        {% elif is_state('sensor.' ~ name ~ '_iphone_activity', 'Automotive') %}
-          På farten
-        {% elif is_state_attr(geo_sensor, 'ISO Country Code', 'DK') and state_attr(geo_sensor, 'Locality') is not none %}
-          {{ state_attr(geo_sensor, 'Locality').replace('København', 'KBH') }}
-        {% elif state_attr(geo_sensor, 'Country') is not none %}
-          {{ state_attr(geo_sensor, 'Country') }}
-        {% else %}
-          Fortabt
-        {% endif %}
+        {% from 'person_location.jinja' import person_location %}
+        {{ person_location('anders') }}
 - sensor:
     - name: monique_location
       unique_id: 4818FDD2-DEA0-467D-AC77-9539DD7AC69A
       icon: mdi:map
       state: >-
-        {% set name = 'monique' %}
-        {% set geo_sensor = 'sensor.' ~ name ~ '_iphone_geocoded_location' %}
-        {% set person_state = states('person.' ~ name) %}
-        {% if person_state == 'home' %}
-          Hjemme
-        {% elif is_state('sensor.' ~ name ~ '_iphone_ssid', 'Palantir') %}
-          Hjemme
-        {% elif person_state not in ['', 'not_home', 'away', 'unknown', 'unavailable', None] %}
-          {% set zone_entity = 'zone.' ~ person_state %}
-          {% set zone_name = state_attr(zone_entity, 'friendly_name') or person_state %}
-          {{ zone_name }}
-        {% elif is_state('sensor.' ~ name ~ '_iphone_activity', 'Automotive') %}
-          På farten
-        {% elif is_state_attr(geo_sensor, 'ISO Country Code', 'DK') and state_attr(geo_sensor, 'Locality') is not none %}
-          {{ state_attr(geo_sensor, 'Locality').replace('København', 'KBH') }}
-        {% elif state_attr(geo_sensor, 'Country') is not none %}
-          {{ state_attr(geo_sensor, 'Country') }}
-        {% else %}
-          Fortabt
-        {% endif %}
+        {% from 'person_location.jinja' import person_location %}
+        {{ person_location('monique') }}
 - sensor:
     - name: emil_location
       unique_id: 4818FDD2-DEA0-467D-AC77-9539DD7AC69B
       icon: mdi:map
       state: >-
-        {% set name = 'emil' %}
-        {% set geo_sensor = 'sensor.' ~ name ~ '_iphone_geocoded_location' %}
-        {% set person_state = states('person.' ~ name) %}
-        {% if person_state == 'home' %}
-          Hjemme
-        {% elif is_state('sensor.' ~ name ~ '_iphone_ssid', 'Palantir') %}
-          Hjemme
-        {% elif person_state not in ['', 'not_home', 'away', 'unknown', 'unavailable', None] %}
-          {% set zone_entity = 'zone.' ~ person_state %}
-          {% set zone_name = state_attr(zone_entity, 'friendly_name') or person_state %}
-          {{ zone_name }}
-        {% elif is_state('sensor.' ~ name ~ '_iphone_activity', 'Automotive') %}
-          På farten
-        {% elif is_state_attr(geo_sensor, 'ISO Country Code', 'DK') and state_attr(geo_sensor, 'Locality') is not none %}
-          {{ state_attr(geo_sensor, 'Locality').replace('København', 'KBH') }}
-        {% elif state_attr(geo_sensor, 'Country') is not none %}
-          {{ state_attr(geo_sensor, 'Country') }}
-        {% else %}
-          Fortabt
-        {% endif %}
+        {% from 'person_location.jinja' import person_location %}
+        {{ person_location('emil') }}
 - sensor:
     - name: charlie_location
       unique_id: 4818FDD2-DEA0-467D-AC77-9539DD7AC69C
       icon: mdi:map
       state: >-
-        {% set name = 'charlie' %}
-        {% set geo_sensor = 'sensor.' ~ name ~ '_iphone_geocoded_location' %}
-        {% set person_state = states('person.' ~ name) %}
-        {% if person_state == 'home' %}
-          Hjemme
-        {% elif is_state('sensor.' ~ name ~ '_iphone_ssid', 'Palantir') %}
-          Hjemme
-        {% elif person_state not in ['', 'not_home', 'away', 'unknown', 'unavailable', None] %}
-          {% set zone_entity = 'zone.' ~ person_state %}
-          {% set zone_name = state_attr(zone_entity, 'friendly_name') or person_state %}
-          {{ zone_name }}
-        {% elif is_state('sensor.' ~ name ~ '_iphone_activity', 'Automotive') %}
-          På farten
-        {% elif is_state_attr(geo_sensor, 'ISO Country Code', 'DK') and state_attr(geo_sensor, 'Locality') is not none %}
-          {{ state_attr(geo_sensor, 'Locality').replace('København', 'KBH') }}
-        {% elif state_attr(geo_sensor, 'Country') is not none %}
-          {{ state_attr(geo_sensor, 'Country') }}
-        {% else %}
-          Fortabt
-        {% endif %}
-- sensor:
-    - name: anders2_location
-      unique_id: 4818FDD2-DEA0-467D-AC77-9539DD7AC69F
-      icon: mdi:map
-      state: "{{ person_location('anders') }}"
+        {% from 'person_location.jinja' import person_location %}
+        {{ person_location('charlie') }}
