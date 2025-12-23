@@ -5,7 +5,7 @@
       state_class: total_increasing
       unit_of_measurement: kWh
       icon: "mdi:meter-electric"
-      state: 0
+      state: "0"
 - sensor:
     - name: meter_readings_water
       unique_id: 2DE105B5-B9EC-408C-8084-C00805D9838D
@@ -13,4 +13,49 @@
       state_class: total_increasing
       unit_of_measurement: m³
       icon: "mdi:water-circle"
-      state: 0
+      state: "0"
+- sensor:
+    - name: electricity_grid_import
+      unique_id: 648CC847-9EB1-495F-BFF7-6F19B9DE50BB
+      device_class: energy
+      state_class: total
+      unit_of_measurement: "kWh"
+      icon: "mdi:home-import-outline"
+      state: >-
+        {{ state_attr('sensor.smart_me_kamstrup_omnipower_meter', 'CounterReadingImport') }}
+- sensor:
+    - name: electricity_grid_export
+      unique_id: 804DC4A8-B4A9-4F4B-A907-671FC7C5952B
+      device_class: energy
+      state_class: total
+      unit_of_measurement: "kWh"
+      icon: "mdi:home-export-outline"
+      state: >-
+        {{ state_attr('sensor.smart_me_kamstrup_omnipower_meter', 'CounterReadingExport') }}
+- sensor:
+    - name: electricity_current_usage
+      unique_id: AB3FBC0C-58E7-4042-A5F3-0F50C00C300B
+      device_class: power
+      state_class: measurement
+      unit_of_measurement: "kW"
+      icon: "mdi:transmission-tower"
+      state: >-
+        {{ state_attr('sensor.smart_me_kamstrup_omnipower_meter', 'ActivePower') }}
+- sensor:
+    - name: electricity_production_total
+      unique_id: AB3FBC0C-58E7-4042-A5F3-0F50C00C300C
+      device_class: energy
+      state_class: total
+      unit_of_measurement: "kWh"
+      icon: "mdi:solar-panel"
+      state: >-
+        {{ states('sensor.technic_room_solar_inverter_total_lifetime_energy') }}
+- sensor:
+    - name: electricity_production_current
+      unique_id: AB3FBC0C-58E7-4042-A5F3-0F50C00C300C
+      device_class: power
+      state_class: measurement
+      unit_of_measurement: "kW"
+      icon: "mdi:solar-power"
+      state: >-
+        {{ states('sensor.technic_room_solar_inverter_realtime_power') }}
