@@ -52,10 +52,37 @@
         {{ states('sensor.technic_room_solar_inverter_total_lifetime_energy') }}
 - sensor:
     - name: electricity_production_current
-      unique_id: AB3FBC0C-58E7-4042-A5F3-0F50C00C300C
+      unique_id: AB3FBC0C-58E7-4042-A5F3-0F50C00C300D
       device_class: power
       state_class: measurement
       unit_of_measurement: "kW"
       icon: "mdi:solar-power"
       state: >-
         {{ states('sensor.technic_room_solar_inverter_realtime_power') }}
+- sensor:
+    - name: electricity_battery_charge
+      unique_id: 0CC0EC12-5B08-4E64-8FA4-D2C31C7B2199
+      device_class: energy
+      state_class: total
+      unit_of_measurement: "kWh"
+      icon: "mdi:solar-panel"
+      state: >-
+        {{ states('sensor.technic_room_solar_inverter_total_lifetime_energy') }}
+- sensor:
+    - name: electricity_battery_discharge
+      unique_id: 4E543E6C-82F6-4B6B-B57B-6951BF9C908B
+      device_class: energy
+      state_class: total
+      unit_of_measurement: "kWh"
+      icon: "mdi:solar-panel"
+      state: >-
+        {{ states('sensor.technic_room_solar_inverter_total_lifetime_energy') }}
+- sensor:
+    - name: electricity_battery_power
+      unique_id: 47CD49B0-8F7E-4666-A59A-B9EA2780CD3F
+      device_class: power
+      state_class: measurement
+      unit_of_measurement: "kW"
+      icon: "mdi:flash-circle"
+      state: >-
+        {{ states('sensor.technic_room_solar_battery_charge_discharge_power') | float(0) / 1000 }}
