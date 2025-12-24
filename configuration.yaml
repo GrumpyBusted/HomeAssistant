@@ -24,7 +24,7 @@ script custom: !include_dir_merge_named ./scripts
 shell_command:
   pushupdates_to_github: "/bin/bash pushupdates.sh"
   append_to_file: '/bin/bash append_to_file.sh "{{ file }}" "{{ line }}"'
-  csv_to_json: '/bin/bash csv_to_json.sh {{ csvfile }} {{ jsonfile }}'
+  csv_to_json: "/bin/bash csv_to_json.sh {{ csvfile }} {{ jsonfile }}"
 
 rest_command:
   tado_get_auth_token:
@@ -48,5 +48,11 @@ rest_command:
     method: "POST"
     headers:
       Content-Type: "application/json"
-    payload: "{ \"data\": { \"addressID\": \"{{ addressID }}\", \"municipality\": {{ municipality }} } }"
+    payload: '{ "data": { "addressID": "{{ addressID }}", "municipality": {{ municipality }} } }'
 
+utility_meter:
+  water_meter_hourly:
+    unique_id: cb3fdfff-72e4-422c-ba65-772cb3ece41b
+    source: sensor.water_meter
+    cycle: hourly
+    always_available: true
