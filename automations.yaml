@@ -3292,11 +3292,12 @@
         %}\n  {% endif %}\n{% endfor %}\n{{ g.count }}      \n"
       capacity: "{% set fixed_use = 700 %}\n{% set g = namespace(capacity = 0) %}\n{%
         set start = as_timestamp(charge_end) %}\n{% set end = as_timestamp(use_start)
-        %} \n{% set forecast = state_attr('sensor.solar_forecast_energy_today', 'detailedHourly')
-        %}\n{% set g.capacity = states('sensor.technic_room_solar_battery_installed_capacity_total')|float(0)
-        %}\n{% for p in forecast %}\n  {% set ts = as_timestamp(p.period_start) %}\n
-        \ {% if ts >= start and ts <= end %}\n    {% set g.capacity = max(0, g.capacity
-        - max(0, p.pv_estimate * 1000 - fixed_use)) %}\n  {% endif %}\n{% endfor %}\n{{
+        %} \n{% set forecast = state_attr('sensor.solar_forecast_energy_today',\n'detailedHourly')
+        %}\n{% set g.capacity =\nstates('sensor.technic_room_solar_battery_installed_capacity_total')|float(0)\n%}\n{%
+        set g.capacity = g.capacity * (1 - states('sensor.technic_room_solar_battery_battery_percentage_user')|float(0)
+        / 100) %}\n{% for p in forecast %}\n  {% set ts = as_timestamp(p.period_start)
+        %}\n  {% if ts >= start and ts <= end %}\n    {% set g.capacity = max(0, g.capacity
+        - max(0, p.pv_estimate * 1000 - fixed_use)) %}\n  {% endif %}\n{% endfor %}\n\n{{
         g.capacity|round(0) }}\n"
       schedule: "{{\n  \"[{\\\"start\\\": \\\"\" ~ (as_datetime(charge_start) + timedelta(minutes=1)).strftime('%H:%M')
         ~\n  \"\\\", \\\"stop\\\": \\\"\" ~ as_datetime(charge_end).strftime('%H:%M')

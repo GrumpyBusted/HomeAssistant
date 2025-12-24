@@ -59,12 +59,3 @@
       icon: "mdi:solar-power"
       state: >-
         {{ states('sensor.technic_room_solar_inverter_realtime_power') }}
-- sensor:
-    - name: electricity_battery_power
-      unique_id: 47CD49B0-8F7E-4666-A59A-B9EA2780CD3F
-      device_class: power
-      state_class: measurement
-      unit_of_measurement: "kW"
-      icon: "mdi:flash-circle"
-      state: >-
-        {{ states('sensor.technic_room_solar_battery_charge_discharge_power') | float(0) / 1000 }}
