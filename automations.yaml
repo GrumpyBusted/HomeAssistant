@@ -3272,7 +3272,7 @@
   description: Sæt operation mode på solcelle batteri for at lade om natten hvis billigere
   triggers:
   - trigger: time
-    at: 00:00:01
+    at: 00:01:00
   conditions: []
   actions:
   - variables:
