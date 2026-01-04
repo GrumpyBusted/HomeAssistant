@@ -1230,7 +1230,7 @@
     to: initial_press
   - trigger: state
     entity_id:
-    - binary_sensor.patio_door_sensor
+    - binary_sensor.patio_door
     from: 'off'
     to: 'on'
     id: door_opened
