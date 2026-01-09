@@ -680,127 +680,133 @@
       - switch.utility_room_door_lock_autolock_yale
   mode: queued
 - id: '1735738251165'
-  alias: Stue varmepumpe varme tænd
-  description: Tænder for varmepumpe i stuen, for at varme hurtigere op hvis den ønskede
+  alias: Stue varmepumpe
+  description: Styring af varmepumpe i stuen, for at varme hurtigere op hvis den ønskede
     temperatur er væsentligt koldere end den aktuelle.
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.family_home
-    from: 'off'
-    to: 'on'
+    - sensor.living_room_target_temperature
+  - trigger: state
+    entity_id: sensor.living_room_current_temperature
+    for:
+      minutes: 1
   - trigger: state
     entity_id:
-    - sensor.living_room_target_temperature
-  conditions:
-  - condition: or
-    conditions:
-    - condition: state
-      entity_id: binary_sensor.family_home
-      state: 'on'
-    - condition: state
-      entity_id: input_boolean.house_sitter
-      state: 'on'
-  - condition: state
-    entity_id: climate.living_room_heat_pump_panasonic
-    state: 'off'
-  - condition: template
-    value_template: '{{ states("sensor.living_room_current_temperature")|float < states("sensor.living_room_target_temperature")|float
-      - 1 }}'
-  actions:
-  - action: climate.turn_on
-    target:
-      entity_id: climate.living_room_heat_pump_panasonic
-    data: {}
-  - action: climate.set_preset_mode
-    metadata: {}
-    data:
-      preset_mode: boost
-    target:
-      entity_id: climate.living_room_heat_pump_panasonic
-  - action: climate.set_temperature
-    target:
-      entity_id: climate.living_room_heat_pump_panasonic
-    data:
-      temperature: '{{ states(''sensor.living_room_target_temperature'')|float(0)
-        }}'
-  - action: climate.set_hvac_mode
-    target:
-      entity_id: climate.living_room_heat_pump_panasonic
-    data:
-      hvac_mode: heat
-  - action: climate.set_fan_mode
-    target:
-      entity_id: climate.living_room_heat_pump_panasonic
-    data:
-      fan_mode: Auto
-  - action: climate.set_swing_mode
-    target:
-      entity_id: climate.living_room_heat_pump_panasonic
-    data:
-      swing_mode: Auto
-  - action: automation.turn_on
-    metadata: {}
-    data: {}
-    target:
-      entity_id: automation.living_room_heat_pump_heating_turn_off
-  - action: timer.start
-    metadata: {}
-    data:
-      duration: 00:10:00
-    target:
-      entity_id: timer.living_room_heat_pump_heating_timer
-  mode: queued
-- id: '1735742496976'
-  alias: Stue varmpepumpe varme sluk
-  description: 'Slukker for varmepumpen i stuen efter den er brugt til at hjemme med
-    at varme stuen op. Denne automatik er blever aktiveret af Stue varmepumpe varme
-    tænd.
-
-    '
-  triggers:
+    - binary_sensor.people_home
   - trigger: state
     entity_id:
-    - sensor.living_room_current_temperature
-    - sensor.living_room_target_temperature
-  conditions: []
+    - binary_sensor.everyone_sleeping
   actions:
   - choose:
     - conditions:
+      - condition: template
+        value_template: '{{ states("sensor.living_room_current_temperature")|float(21)
+          < states("sensor.living_room_target_temperature")|float(21) - 1 }}'
       - condition: state
-        entity_id: climate.living_room_heat_pump_panasonic
-        attribute: hvac_action
+        entity_id: binary_sensor.people_home
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.everyone_sleeping
+        state: 'off'
+      - condition: state
+        entity_id: climate.living_room_heat_pump
         state: 'off'
       sequence:
-      - action: automation.turn_off
-        metadata: {}
-        data:
-          stop_actions: false
+      - action: climate.turn_on
         target:
-          entity_id: automation.living_room_heat_pump_heating_turn_off
+          entity_id: climate.living_room_heat_pump
+        data: {}
+      - action: climate.set_temperature
+        target:
+          entity_id: climate.living_room_heat_pump
+        data:
+          temperature: '{{ states(''sensor.living_room_target_temperature'')|float(21)
+            }}'
+      - action: climate.set_hvac_mode
+        target:
+          entity_id: climate.living_room_heat_pump
+        data:
+          hvac_mode: heat
+      - action: climate.set_fan_mode
+        target:
+          entity_id: climate.living_room_heat_pump
+        data:
+          fan_mode: Auto
+      - action: climate.set_swing_mode
+        target:
+          entity_id: climate.living_room_heat_pump
+        data:
+          swing_mode: Auto
     - conditions:
+      - condition: or
+        conditions:
+        - condition: template
+          value_template: '{{ states("sensor.living_room_current_temperature")|float(21)
+            > states("sensor.living_room_target_temperature")|float(21) - 0.5 }}'
+        - condition: state
+          entity_id: binary_sensor.people_home
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.everyone_sleeping
+          state: 'on'
       - condition: state
-        entity_id: climate.living_room_heat_pump_panasonic
+        entity_id: climate.living_room_heat_pump
         state: heat
-      - condition: template
-        value_template: '{{ states("sensor.living_room_current_temperature")|float
-          > states("sensor.living_room_target_temperature")|float - 1 }}    '
-      - condition: state
-        entity_id: timer.living_room_heat_pump_heating_timer
-        state: idle
       sequence:
       - action: climate.turn_off
         metadata: {}
         data: {}
         target:
-          entity_id: climate.living_room_heat_pump_panasonic
-      - action: automation.turn_off
+          entity_id: climate.living_room_heat_pump
+      - action: climate.set_preset_mode
         metadata: {}
         data:
-          stop_actions: false
+          preset_mode: none
         target:
-          entity_id: automation.living_room_heat_pump_heating_turn_off
-  mode: queued
+          entity_id: climate.living_room_heat_pump
+  - if:
+    - condition: state
+      entity_id: climate.living_room_heat_pump
+      state: heat
+    then:
+    - if:
+      - condition: template
+        value_template: '{{ states("sensor.living_room_current_temperature")|float(21)
+          < states("sensor.living_room_target_temperature")|float(21) - 1.5 }}'
+      then:
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.everyone_sleeping
+            attribute: preset_mode
+            state: boost
+        then:
+        - action: climate.set_preset_mode
+          metadata: {}
+          data:
+            preset_mode: boost
+          target:
+            entity_id: climate.living_room_heat_pump
+      else:
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.everyone_sleeping
+            attribute: preset_mode
+            state: none
+        then:
+        - action: climate.set_preset_mode
+          metadata: {}
+          data:
+            preset_mode: none
+          target:
+            entity_id: climate.living_room_heat_pump
+  mode: restart
+  trace:
+    stored_traces: 30
 - id: '1735743298155'
   alias: Hjem varmepumpe
   description: Automatik til styring af central luft-til-vand varmepumpe
