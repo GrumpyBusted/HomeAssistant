@@ -366,7 +366,10 @@
               brightness_pct: '{{ (state_attr(''event.living_room_switch_rotary'',
                 ''steps'')|float / 3.60)|round(0) }}'
             target:
-              entity_id: light.living_room_lights
+              entity_id:
+              - light.living_room_lights
+              - light.living_room_light_coffee_table_1
+              - light.living_room_light_coffee_table_2
         - conditions:
           - condition: state
             entity_id: event.living_room_switch_rotary
@@ -381,8 +384,13 @@
             target:
               entity_id: "{% set lights = state_attr('light.living_room_lights', 'entity_id')
                 | expand() | selectattr('state', 'eq', 'on') | map(attribute='entity_id')
-                | list %} {% if lights | length > 0 -%}\n  {{ lights }}      \n{%-
-                else -%}\n  {{ 'light.living_room_lights' }}      \n{%- endif %}"
+                | list %} {% if is_state('light.living_room_light_coffee_table_1',
+                'on') %}\n  {% set lights = lights + ['light.living_room_light_coffee_table_1']
+                %}\n{% endif %} {% if is_state('light.living_room_light_coffee_table_2',
+                'on') %}\n  {% set lights = lights + ['light.living_room_light_coffee_table_2']
+                %}\n{% endif %} {% if lights | length > 0 -%}\n  {{ lights }}      \n{%-
+                else -%}\n  {{ ['light.living_room_lights', 'light.living_room_light_coffee_table_1',
+                'light.living_room_light_coffee_table_2'] }}      \n{%- endif %}"
         default:
         - action: light.turn_on
           metadata: {}
@@ -390,9 +398,13 @@
             brightness_step_pct: '{{ (state_attr(''event.living_room_switch_rotary'',
               ''steps'')|float / -3.60)|round(0) }}'
           target:
-            entity_id: '{{ state_attr(''light.living_room_lights'', ''entity_id'')
-              | expand() | selectattr(''state'', ''eq'', ''on'') | map(attribute=''entity_id'')
-              | list }}      '
+            entity_id: "{% set lights = state_attr('light.living_room_lights', 'entity_id')
+              | expand() | selectattr('state', 'eq', 'on') | map(attribute='entity_id')
+              | list %}       {% if is_state('light.living_room_light_coffee_table_1',
+              'on') %}\n  {% set lights = lights + ['light.living_room_light_coffee_table_1']
+              %}\n{% endif %} {% if is_state('light.living_room_light_coffee_table_2',
+              'on') %}\n  {% set lights = lights + ['light.living_room_light_coffee_table_2']
+              %}\n{% endif %} {{ lights }}      "
   mode: queued
   max: 10
   trace:
@@ -1493,22 +1505,24 @@
     id: someone_home
   - trigger: state
     entity_id:
-    - binary_sensor.bedroom_sleeping
-    from:
-    - 'off'
-    to:
-    - 'on'
-    id: sleeping
-    for:
-      hours: 0
-      minutes: 1
-      seconds: 0
+    - binary_sensor.hallway_occupancy
+    to: 'off'
+    id: person_cleared
   - trigger: state
     entity_id:
-    - binary_sensor.bedroom_blind
-    from: 'off'
+    - binary_sensor.hallway_occupancy
     to: 'on'
-    id: bedroom_blind_open
+    id: person_detected
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_sleeping
+    to: 'on'
+    id: bedroom_sleeping
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_sleeping
+    to: 'off'
+    id: bedroom_waking
   - trigger: state
     entity_id:
     - binary_sensor.bedroom_door
@@ -1658,13 +1672,16 @@
       - condition: trigger
         id:
         - someone_home
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
       sequence:
       - action: light.turn_on
         metadata: {}
         data:
           transition: 1
           color_temp_kelvin: 2700
-          brightness_pct: 25
+          brightness_pct: 75
         target:
           entity_id:
           - light.hallway_lights
@@ -1672,6 +1689,10 @@
       - condition: trigger
         id:
         - bedroom_door_open
+        - bedroom_sleeping
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'on'
       - condition: state
         entity_id: binary_sensor.bedroom_sleeping
         state: 'on'
@@ -1689,25 +1710,7 @@
     - conditions:
       - condition: trigger
         id:
-        - sleeping
-      - condition: state
-        entity_id: binary_sensor.bedroom_door
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'on'
-      sequence:
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 1
-        target:
-          entity_id:
-          - light.hallway_lights
-    - conditions:
-      - condition: trigger
-        id:
-        - bedroom_blind_open
+        - bedroom_waking
       - condition: state
         entity_id: binary_sensor.bedroom_door
         state: 'on'
@@ -1721,6 +1724,73 @@
           transition: 120
           color_temp_kelvin: 2700
           brightness_pct: 75
+        target:
+          entity_id:
+          - light.hallway_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - person_detected
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.bedroom_sleeping
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: trigger
+        id:
+        - person_detected
+      - condition: state
+        entity_id: binary_sensor.someone_sleeping
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2700
+          brightness_pct: 25
+        target:
+          entity_id:
+          - light.hallway_light_bathroom
+          - light.hallway_light_toilet
+    - conditions:
+      - condition: trigger
+        id:
+        - person_detected
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.people_home
+        state: 'on'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2700
+          brightness_pct: 75
+        target:
+          entity_id:
+          - light.hallway_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - person_cleared
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'on'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
         target:
           entity_id:
           - light.hallway_lights
@@ -8854,6 +8924,18 @@
       minutes: 15
       seconds: 0
     id: lights_on
+  - trigger: state
+    entity_id:
+    - binary_sensor.kitchen_occupancy
+    to:
+    - 'off'
+    id: person_cleared
+  - trigger: state
+    entity_id:
+    - binary_sensor.kitchen_occupancy
+    to:
+    - 'on'
+    id: person_detected
   conditions: []
   actions:
   - choose:
@@ -8988,6 +9070,112 @@
         target:
           entity_id:
           - light.kitchen_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - person_detected
+      - condition: state
+        entity_id: binary_sensor.everyone_sleeping
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.kitchen_light
+        state: 'off'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2300
+          brightness_pct: 10
+        target:
+          entity_id:
+          - light.kitchen_light_strip_countertop
+    - conditions:
+      - condition: trigger
+        id:
+        - person_cleared
+      - condition: state
+        entity_id: binary_sensor.everyone_sleeping
+        state: 'on'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.kitchen_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - person_detected
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2700
+          brightness_pct: 80
+        target:
+          entity_id:
+          - light.kitchen_light_strip_countertop
+          - light.kitchen_light_pendant_island_left
+          - light.kitchen_light_pendant_island_right
+          - light.kitchen_light_pendant_sink_left
+          - light.kitchen_light_pendant_sink_right
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.kitchen_light_spot_island
+          - light.kicthen_light_spot_cooktop
+          - light.kitchen_light_spot_oven
+          - light.kitchen_light_spot_sink
+          - light.kitchen_light_spot_fridge
+          - light.kitchen_light_spot_hallway
+    - conditions:
+      - condition: trigger
+        id:
+        - person_cleared
+      - condition: state
+        entity_id: binary_sensor.kitchen_light
+        state: 'on'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2300
+          brightness_pct: 50
+        target:
+          entity_id:
+          - light.kitchen_light_strip_countertop
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2300
+          brightness_pct: 15
+        target:
+          entity_id:
+          - light.kitchen_light_pendant_island_left
+          - light.kitchen_light_pendant_island_right
+          - light.kitchen_light_pendant_sink_left
+          - light.kitchen_light_pendant_sink_right
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.kitchen_light_spot_island
+          - light.kicthen_light_spot_cooktop
+          - light.kitchen_light_spot_oven
+          - light.kitchen_light_spot_sink
+          - light.kitchen_light_spot_fridge
+          - light.kitchen_light_spot_hallway
     - conditions:
       - condition: trigger
         id:
@@ -10334,6 +10522,9 @@
     event_type: folder_data_csv
     event_data:
       status: meter_reading_electricity
+  - trigger: state
+    entity_id: sensor.meter_readings_electricity
+    to: '0'
   conditions: []
   actions:
   - action: shell_command.csv_to_json
@@ -10482,6 +10673,9 @@
     event_type: folder_data_csv
     event_data:
       status: meter_reading_water
+  - trigger: state
+    entity_id: sensor.meter_readings_water
+    to: '0'
   conditions: []
   actions:
   - action: shell_command.csv_to_json

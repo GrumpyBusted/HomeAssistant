@@ -30,7 +30,9 @@
                is_state('light.living_room_light_strip_receiver', 'off') and 
                is_state('light.living_room_light_strip_skylight', 'off') and 
                is_state('light.living_room_tv_light_strip', 'off') and 
-               is_state('light.living_room_smart_plug_lamp', 'off')) }}
+               is_state('light.living_room_smart_plug_lamp', 'off') and
+               is_state('light.living_room_light_coffee_table_1', 'off') and
+               is_state('light.living_room_light_coffee_table_2', 'off')) }}
       icon: >
         {% if is_state('binary_sensor.living_room_light', 'on') %}
         mdi:lightbulb-group
