@@ -10687,3 +10687,82 @@
   max: 10
   trace:
     stored_traces: 100
+- id: '1768156511533'
+  alias: Loftrum ventilationsanlæg
+  description: Styring af varme genveks ventilationsanlæg
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.home_target_maximum_temperature
+  - trigger: state
+    entity_id:
+    - sensor.home_current_humidity
+  conditions: []
+  actions:
+  - action: number.set_value
+    metadata: {}
+    target:
+      entity_id: number.storage_ventilation_system_temperature_target
+    data:
+      value: '{{ states(''sensor.home_target_maximum_temperature'') }}'
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.home_current_humidity
+        above: 48
+      sequence:
+      - action: climate.set_fan_mode
+        data:
+          fan_mode: high
+        target:
+          entity_id: climate.storage_ventilation_system_ventilation
+      - action: select.select_option
+        data:
+          option: '4'
+        target:
+          entity_id: select.storage_ventilation_system_fan_level
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.home_current_humidity
+        above: 42
+      sequence:
+      - action: climate.set_fan_mode
+        data:
+          fan_mode: medium
+        target:
+          entity_id: climate.storage_ventilation_system_ventilation
+      - action: select.select_option
+        data:
+          option: '3'
+        target:
+          entity_id: select.storage_ventilation_system_fan_level
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.home_current_humidity
+        above: 36
+      sequence:
+      - action: climate.set_fan_mode
+        data:
+          fan_mode: middle
+        target:
+          entity_id: climate.storage_ventilation_system_ventilation
+      - action: select.select_option
+        data:
+          option: '2'
+        target:
+          entity_id: select.storage_ventilation_system_fan_level
+    default:
+    - action: climate.set_fan_mode
+      data:
+        fan_mode: low
+      target:
+        entity_id: climate.storage_ventilation_system_ventilation
+    - action: select.select_option
+      data:
+        option: '1'
+      target:
+        entity_id: select.storage_ventilation_system_fan_level
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 100
