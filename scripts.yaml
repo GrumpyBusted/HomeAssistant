@@ -420,240 +420,30 @@ hjem_motionering_af_radiatorventiler:
       - automation.living_room_heating
       - automation.utility_room_heating
       - automation.toilet_heating
-stue_robotstovsuger_tom_stovbeholder:
-  alias: Stue robotstøvsuger tøm støvbeholder
-  description: Tøm støv beholder i robotstøvsuger over i docking station
-  sequence:
-  - if:
-    - condition: state
-      entity_id: vacuum.living_room_robot_vacuum
-      state: docked
-    then:
-    - action: vacuum.send_command
-      data:
-        command: app_start_collect_dust
-      target:
-        entity_id: vacuum.living_room_robot_vacuum
-    - delay:
-        seconds: 60
-    - action: input_number.set_value
-      metadata: {}
-      data:
-        value: '{{ states(''sensor.living_room_robot_vacuum_total_cleaning_time'')|int
-          }}'
-      target:
-        entity_id: input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin
-home_robot_vacuum_start_cleaning:
-  alias: Stue robotstøvsuger start rengøring
-  description: Start robotstøvsuger med at gøre rum rent i et bestemt rum
-  mode: queued
-  max: 10
-  fields:
-    type:
-      description: Rengøring type
-      required: true
-      selector:
-        select:
-          options:
-          - vac
-          - mop
-          - vac_mop
-      default: vac
-    timeout:
-      description: Tidsgrænse i minutter
-      required: true
-      selector:
-        number:
-          min: 1
-          max: 240
-          unit_of_measurement: min
-          mode: slider
-      default: 30
-    rooms:
-      description: Rum der skal rengøres
-      required: true
-      selector:
-        object: {}
-      default:
-      - Gang
-  sequence:
-  - action: system_log.write
-    data:
-      message: 'Type: {{ type }} - Rooms: {{ rooms }}'
-      level: debug
-  - action: roborock.get_maps
-    data: {}
-    target:
-      entity_id: vacuum.living_room_robot_vacuum
-    response_variable: response
-  - variables:
-      room_ids: "{% set all_rooms = response['vacuum.living_room_robot_vacuum']['maps'][0]['rooms']
-        %} {% set wanted_rooms = rooms %}  {% set room_ids = namespace(value=[]) %}
-        {% for key, value in all_rooms.items() %}\n    {% if value in wanted_rooms
-        %}\n        {% set room_ids.value = room_ids.value + [key] %}\n    {% endif
-        %}\n{% endfor %} {{ room_ids.value }}        "
-  - action: system_log.write
-    data:
-      message: 'Room ids: {{ room_ids }}'
-      level: debug
-  - choose:
-    - conditions:
-      - condition: not
-        conditions:
-        - condition: state
-          entity_id: vacuum.living_room_robot_vacuum
-          state: docked
-      sequence: []
-    - conditions:
-      - condition: template
-        value_template: '{{ type == ''vac'' }}'
-      sequence:
-      - action: vacuum.send_command
-        data:
-          command: set_water_box_custom_mode
-          params:
-            water_box_mode: 200
-          entity_id: select.living_room_robot_vacuum_mop_mode
-      - action: vacuum.set_fan_speed
-        metadata: {}
-        data:
-          fan_speed: max_plus
-        target:
-          entity_id: vacuum.living_room_robot_vacuum
-      - action: select.select_option
-        target:
-          entity_id: select.living_room_robot_vacuum_mop_intensity
-        data:
-          option: 'off'
-      - action: select.select_option
-        target:
-          entity_id: select.living_room_robot_vacuum_mop_mode
-        data:
-          option: standard
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: '{{ (timeout | int * 60) | timestamp_custom(''%H:%M:%S'', false)
-            }}
-
-            '
-        target:
-          entity_id: timer.living_room_robot_vacuum_timer
-      - action: vacuum.send_command
-        data:
-          command: app_segment_clean
-          params:
-          - segments: '{{ room_ids }}'
-        target:
-          entity_id: vacuum.living_room_robot_vacuum
-    - conditions:
-      - condition: template
-        value_template: '{{ type == ''mop'' }}'
-      sequence:
-      - action: vacuum.send_command
-        data:
-          command: set_water_box_custom_mode
-          params:
-            water_box_mode: 203
-          entity_id: select.living_room_robot_vacuum_mop_mode
-      - action: vacuum.send_command
-        target:
-          entity_id: vacuum.living_room_robot_vacuum
-        data:
-          command: app_start_wash
-      - action: vacuum.set_fan_speed
-        metadata: {}
-        data:
-          fan_speed: 'off'
-        target:
-          entity_id: vacuum.living_room_robot_vacuum
-      - action: select.select_option
-        target:
-          entity_id: select.living_room_robot_vacuum_mop_intensity
-        data:
-          option: intense
-      - action: select.select_option
-        target:
-          entity_id: select.living_room_robot_vacuum_mop_mode
-        data:
-          option: deep_plus
-      - action: vacuum.send_command
-        data:
-          command: app_segment_clean
-          params:
-          - segments: '{{ room_ids }}'
-        target:
-          entity_id: vacuum.living_room_robot_vacuum
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: '{{ (timeout | int * 60) | timestamp_custom(''%H:%M:%S'', false)
-            }}
-
-            '
-        target:
-          entity_id: timer.living_room_robot_vacuum_timer
-      - action: vacuum.send_command
-        target:
-          entity_id: vacuum.living_room_robot_vacuum
-        data:
-          command: app_start_wash
-    - conditions:
-      - condition: template
-        value_template: '{{ type == ''vac_mop'' }}'
-      sequence:
-      - action: vacuum.send_command
-        data:
-          command: set_water_box_custom_mode
-          params:
-            water_box_mode: 201
-          entity_id: select.living_room_robot_vacuum_mop_mode
-      - action: vacuum.send_command
-        target:
-          entity_id: vacuum.living_room_robot_vacuum
-        data:
-          command: app_start_wash
-      - action: vacuum.set_fan_speed
-        metadata: {}
-        data:
-          fan_speed: max
-        target:
-          entity_id: vacuum.living_room_robot_vacuum
-      - action: select.select_option
-        target:
-          entity_id: select.living_room_robot_vacuum_mop_intensity
-        data:
-          option: moderate
-      - action: select.select_option
-        target:
-          entity_id: select.living_room_robot_vacuum_mop_mode
-        data:
-          option: standard
-      - action: vacuum.send_command
-        data:
-          command: app_segment_clean
-          params:
-          - segments: '{{ room_ids }}'
-        target:
-          entity_id: vacuum.living_room_robot_vacuum
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: '{{ (timeout | int * 60) | timestamp_custom(''%H:%M:%S'', false)
-            }}
-
-            '
-        target:
-          entity_id: timer.living_room_robot_vacuum_timer
-      - action: vacuum.send_command
-        target:
-          entity_id: vacuum.living_room_robot_vacuum
-        data:
-          command: app_start_wash
 living_room_robot_vacuum_dock:
   alias: Stue robotstøvsuger dock
   description: Returner robotstøvsuger til docking station
   sequence:
+  - action: timer.cancel
+    target:
+      entity_id: timer.living_room_robot_vacuum_timer
+  - action: switch.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: switch.living_room_robot_vacuum_do_not_disturb
+  - action: time.set_value
+    metadata: {}
+    target:
+      entity_id: time.living_room_robot_vacuum_do_not_disturb_begin
+    data:
+      time: 00:00:00
+  - action: time.set_value
+    metadata: {}
+    target:
+      entity_id: time.living_room_robot_vacuum_do_not_disturb_end
+    data:
+      time: '23:59:59'
   - if:
     - condition: not
       conditions:
@@ -666,9 +456,6 @@ living_room_robot_vacuum_dock:
       data: {}
       target:
         entity_id: vacuum.living_room_robot_vacuum
-  - action: timer.cancel
-    target:
-      entity_id: timer.living_room_robot_vacuum_timer
 home_create_todo_task:
   alias: Hjem opret todo opgave
   description: Kontroller om samme opgave allerede findes hvis ikke opret den i smart
@@ -821,3 +608,338 @@ home_set_radiator_temperature:
       entity_id: '{{ entities_to_update }}'
     action: climate.set_temperature
   mode: parallel
+living_room_robot_vacuum_empty_dust_bin:
+  alias: Stue robotstøvsuger tøm støvbeholder
+  description: Tøm støvbeholder i robotstøvsuger over i docking station
+  sequence:
+  - if:
+    - condition: state
+      entity_id: vacuum.living_room_robot_vacuum
+      state: docked
+    then:
+    - action: vacuum.send_command
+      data:
+        command: app_start_collect_dust
+      target:
+        entity_id: vacuum.living_room_robot_vacuum
+    - delay:
+        seconds: 60
+    - action: input_number.set_value
+      metadata: {}
+      data:
+        value: '{{ states(''sensor.living_room_robot_vacuum_total_cleaning_time'')|int
+          }}'
+      target:
+        entity_id: input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin
+living_room_robot_vacuum_start_cleaning:
+  alias: Stue robotstøvsuger start rengøring
+  description: Start robotstøvsuger med at gøre rent i et bestemt rum
+  mode: queued
+  max: 10
+  fields:
+    type:
+      description: Rengøring type
+      required: true
+      selector:
+        select:
+          options:
+          - vac
+          - mop
+          - vac_mop
+      default: vac
+    timeout:
+      description: Tidsgrænse i minutter
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 240
+          unit_of_measurement: min
+          mode: slider
+      default: 30
+    rooms:
+      description: Rum der skal rengøres
+      required: true
+      selector:
+        object: {}
+      default:
+      - Gang
+  sequence:
+  - action: system_log.write
+    data:
+      message: 'Type: {{ type }} - Timeout: {{ timeout }} - Rooms: {{ rooms }}'
+      level: debug
+  - action: roborock.get_maps
+    data: {}
+    target:
+      entity_id: vacuum.living_room_robot_vacuum
+    response_variable: response
+  - variables:
+      room_ids: "{% set all_rooms = response['vacuum.living_room_robot_vacuum']['maps'][0]['rooms']
+        %} {% set wanted_rooms = rooms %}  {% set room_ids = namespace(value=[]) %}
+        {% for key, value in all_rooms.items() %}\n    {% if value in wanted_rooms
+        %}\n        {% set room_ids.value = room_ids.value + [key] %}\n    {% endif
+        %}\n{% endfor %} {{ room_ids.value }}        "
+  - action: system_log.write
+    data:
+      message: 'Room ids: {{ room_ids }}'
+      level: debug
+  - action: switch.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: switch.living_room_robot_vacuum_do_not_disturb
+  - action: time.set_value
+    metadata: {}
+    target:
+      entity_id: time.living_room_robot_vacuum_do_not_disturb_begin
+    data:
+      time: 00:00:00
+  - action: time.set_value
+    metadata: {}
+    target:
+      entity_id: time.living_room_robot_vacuum_do_not_disturb_end
+    data:
+      time: '23:59:59'
+  - if:
+    - condition: state
+      entity_id: vacuum.living_room_robot_vacuum
+      state: docked
+    then:
+    - action: timer.start
+      metadata: {}
+      data:
+        duration: '{{ (timeout | int * 60) | timestamp_custom(''%H:%M:%S'', false)
+          }}
+
+          '
+      target:
+        entity_id: timer.living_room_robot_vacuum_timer
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: '{{ type == ''vac'' }}'
+        sequence:
+        - action: vacuum.send_command
+          data:
+            command: set_water_box_custom_mode
+            params:
+              water_box_mode: 200
+            entity_id: select.living_room_robot_vacuum_mop_mode
+        - action: vacuum.set_fan_speed
+          metadata: {}
+          data:
+            fan_speed: max_plus
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+        - action: select.select_option
+          target:
+            entity_id: select.living_room_robot_vacuum_mop_intensity
+          data:
+            option: 'off'
+        - action: select.select_option
+          target:
+            entity_id: select.living_room_robot_vacuum_mop_mode
+          data:
+            option: standard
+        - action: vacuum.send_command
+          data:
+            command: app_segment_clean
+            params:
+            - segments: '{{ room_ids }}'
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+      - conditions:
+        - condition: template
+          value_template: '{{ type == ''mop'' }}'
+        sequence:
+        - action: vacuum.send_command
+          data:
+            command: set_water_box_custom_mode
+            params:
+              water_box_mode: 203
+            entity_id: select.living_room_robot_vacuum_mop_mode
+        - action: vacuum.send_command
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+          data:
+            command: app_start_wash
+        - action: vacuum.set_fan_speed
+          metadata: {}
+          data:
+            fan_speed: 'off'
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+        - action: select.select_option
+          target:
+            entity_id: select.living_room_robot_vacuum_mop_intensity
+          data:
+            option: intense
+        - action: select.select_option
+          target:
+            entity_id: select.living_room_robot_vacuum_mop_mode
+          data:
+            option: deep_plus
+        - action: vacuum.send_command
+          data:
+            command: app_segment_clean
+            params:
+            - segments: '{{ room_ids }}'
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+        - action: vacuum.send_command
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+          data:
+            command: app_start_wash
+      - conditions:
+        - condition: template
+          value_template: '{{ type == ''vac_mop'' }}'
+        sequence:
+        - action: vacuum.send_command
+          data:
+            command: set_water_box_custom_mode
+            params:
+              water_box_mode: 201
+            entity_id: select.living_room_robot_vacuum_mop_mode
+        - action: vacuum.send_command
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+          data:
+            command: app_start_wash
+        - action: vacuum.set_fan_speed
+          metadata: {}
+          data:
+            fan_speed: max
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+        - action: select.select_option
+          target:
+            entity_id: select.living_room_robot_vacuum_mop_intensity
+          data:
+            option: moderate
+        - action: select.select_option
+          target:
+            entity_id: select.living_room_robot_vacuum_mop_mode
+          data:
+            option: standard
+        - action: vacuum.send_command
+          data:
+            command: app_segment_clean
+            params:
+            - segments: '{{ room_ids }}'
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+        - action: vacuum.send_command
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+          data:
+            command: app_start_wash
+push_notification:
+  alias: Send besked
+  description: Send push notication til nærmeste personer
+  mode: queued
+  max: 10
+  fields:
+    type:
+      description: Besked type
+      required: true
+      selector:
+        select:
+          options:
+          - critical
+          - log
+      default: log
+    title:
+      description: Besked title
+      required: true
+      selector:
+        object: {}
+    message:
+      description: Besked
+      required: true
+      selector:
+        object: {}
+    id:
+      description: Besked id
+      required: false
+      selector:
+        object: {}
+    persistent:
+      description: Vedvarende besked
+      required: false
+      selector:
+        boolean: {}
+      default: false
+  sequence:
+  - action: system_log.write
+    data:
+      message: "Type: {{ type }} \nTitle: {{ title }} \nMessage: {{ message }} \nPersistent:
+        {{ persistent }}"
+      level: debug
+  - variables:
+      persons:
+      - device: notify.mobile_app_anders_iphone
+        sensor: sensor.anders_distance_from_home
+      - device: notify.mobile_app_monique_iphone
+        sensor: sensor.monique_distance_from_home
+      - device: notify.mobile_app_emil_iphone
+        sensor: sensor.emil_distance_from_home
+      - device: notify.mobile_app_charlie_iphone
+        sensor: sensor.charlie_distance_from_home
+      notify_persons: "{% set ns = namespace(list=[]) %}\n{% for person in persons
+        %}\n  {% set distance = states(person.sensor) | float %}\n  {% set ns.list
+        = ns.list + [{\n      'device': person.device,\n      'distance': distance\n
+        \ }] %}\n{% endfor %} \n{% set notify_persons = ns.list | selectattr('distance',
+        'lt', 0.2) | list %} \n{% if notify_persons | count == 0 %}\n  {% set first_distance
+        = ((ns.list | sort(attribute='distance'))[0]).distance | float %}\n  {% set
+        notify_persons = ns.list | selectattr('distance', 'lt', first_distance + 2.0)
+        | list %}\n{% endif %}\n{{ notify_persons | map(attribute='device') | list
+        }}"
+      notification_id: "{% if not id %}\n  {{ now().strftime('%Y-%m-%d-%H-%M-%S')
+        }}-{{ range(0, 100000) | random }}\n{% else %}\n  {{ id }}\n{% endif %}"
+  - action: system_log.write
+    data:
+      message: 'Id: {{ notification_id }}
+
+        Persons: {{ notify_persons }}'
+      level: debug
+  - if:
+    - condition: template
+      value_template: '{{ persistent }}'
+    then:
+    - action: persistent_notification.create
+      data:
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_id: '{{ notification_id }}'
+  - repeat:
+      for_each: '{{ notify_persons }}'
+      sequence:
+      - choose:
+        - conditions:
+          - condition: template
+            value_template: '{{ type == ''log'' }}'
+          sequence:
+          - action: system_log.write
+            data:
+              message: 'Action: {{ repeat.item }}
+
+                Title: {{ title }}
+
+                Message: {{ message }}'
+              level: debug
+        - conditions:
+          - condition: template
+            value_template: '{{ type == ''critical'' }}'
+          sequence:
+          - action: '{{ repeat.item }} '
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                push:
+                  sound:
+                    name: default
+                    critical: 1
+                    volume: 1
