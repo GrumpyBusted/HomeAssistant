@@ -434,6 +434,15 @@ stue_robotstovsuger_tom_stovbeholder:
         command: app_start_collect_dust
       target:
         entity_id: vacuum.living_room_robot_vacuum
+    - delay:
+        seconds: 60
+    - action: input_number.set_value
+      metadata: {}
+      data:
+        value: '{{ states(''sensor.living_room_robot_vacuum_total_cleaning_time'')|int
+          }}'
+      target:
+        entity_id: input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin
 home_robot_vacuum_start_cleaning:
   alias: Stue robotstøvsuger start rengøring
   description: Start robotstøvsuger med at gøre rum rent i et bestemt rum
@@ -450,6 +459,16 @@ home_robot_vacuum_start_cleaning:
           - mop
           - vac_mop
       default: vac
+    timeout:
+      description: Tidsgrænse i minutter
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 240
+          unit_of_measurement: min
+          mode: slider
+      default: 30
     rooms:
       description: Rum der skal rengøres
       required: true
@@ -511,6 +530,15 @@ home_robot_vacuum_start_cleaning:
           entity_id: select.living_room_robot_vacuum_mop_mode
         data:
           option: standard
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: '{{ (timeout | int * 60) | timestamp_custom(''%H:%M:%S'', false)
+            }}
+
+            '
+        target:
+          entity_id: timer.living_room_robot_vacuum_timer
       - action: vacuum.send_command
         data:
           command: app_segment_clean
@@ -556,6 +584,15 @@ home_robot_vacuum_start_cleaning:
           - segments: '{{ room_ids }}'
         target:
           entity_id: vacuum.living_room_robot_vacuum
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: '{{ (timeout | int * 60) | timestamp_custom(''%H:%M:%S'', false)
+            }}
+
+            '
+        target:
+          entity_id: timer.living_room_robot_vacuum_timer
       - action: vacuum.send_command
         target:
           entity_id: vacuum.living_room_robot_vacuum
@@ -599,6 +636,15 @@ home_robot_vacuum_start_cleaning:
           - segments: '{{ room_ids }}'
         target:
           entity_id: vacuum.living_room_robot_vacuum
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: '{{ (timeout | int * 60) | timestamp_custom(''%H:%M:%S'', false)
+            }}
+
+            '
+        target:
+          entity_id: timer.living_room_robot_vacuum_timer
       - action: vacuum.send_command
         target:
           entity_id: vacuum.living_room_robot_vacuum
@@ -620,6 +666,9 @@ living_room_robot_vacuum_dock:
       data: {}
       target:
         entity_id: vacuum.living_room_robot_vacuum
+  - action: timer.cancel
+    target:
+      entity_id: timer.living_room_robot_vacuum_timer
 home_create_todo_task:
   alias: Hjem opret todo opgave
   description: Kontroller om samme opgave allerede findes hvis ikke opret den i smart
