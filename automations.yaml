@@ -1727,7 +1727,7 @@
         id:
         - person_detected
       - condition: state
-        entity_id: binary_sensor.someone_sleeping
+        entity_id: binary_sensor.bedroom_sleeping
         state: 'on'
       - condition: state
         entity_id: binary_sensor.hallway_light
