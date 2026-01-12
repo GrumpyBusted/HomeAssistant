@@ -119,7 +119,8 @@
           - light.living_room_light_dining_table_spot_sofa
           - light.living_room_light_strip_glass_cabinet
           - light.living_room_light_strip_receiver
-          - light.living_room_tv_light_strip
+          - light.living_room_light_strip_tv
+          - light.living_room_light_gradient_tube_tv
           - light.living_room_light_coffee_table_1
           - light.living_room_light_coffee_table_2
           - light.living_room_light_table_lamp_cabinet
@@ -172,7 +173,6 @@
         target:
           entity_id:
           - light.living_room_light_tv_left
-          - light.living_room_tv_light_strip
       - action: light.turn_on
         metadata: {}
         data: {}
@@ -193,6 +193,8 @@
           - light.living_room_light_strip_receiver
           - light.living_room_light_coffee_table_1
           - light.living_room_light_coffee_table_2
+          - light.living_room_light_strip_tv
+          - light.living_room_light_gradient_tube_tv
     - conditions:
       - condition: trigger
         id:
@@ -212,7 +214,8 @@
           - light.living_room_light_window_left
           - light.living_room_light_window_right
           - light.living_room_light_strip_receiver
-          - light.living_room_tv_light_strip
+          - light.living_room_light_strip_tv
+          - light.living_room_light_gradient_tube_tv
       - action: light.turn_on
         metadata: {}
         data:
@@ -281,7 +284,8 @@
           - light.living_room_light_strip_glass_cabinet
           - light.living_room_light_strip_receiver
           - light.living_room_light_strip_skylight
-          - light.living_room_tv_light_strip
+          - light.living_room_light_strip_tv
+          - light.living_room_light_gradient_tube_tv
           - light.living_room_light_coffee_table_1
           - light.living_room_light_coffee_table_2
           - light.living_room_light_table_lamp_cabinet
@@ -337,8 +341,8 @@
           - light.living_room_light_strip_glass_cabinet
           - light.living_room_light_strip_receiver
           - light.living_room_light_strip_skylight
-          - light.living_room_tv_light_strip
-          - light.living_room_light_extra
+          - light.living_room_light_strip_tv
+          - light.living_room_light_gradient_tube_tv
           - light.living_room_smart_plug_lamp
           - light.living_room_smart_plug_christmas_elf_house
           - light.living_room_light_coffee_table_1
@@ -1629,7 +1633,10 @@
         id:
         - someone_home
       - condition: state
-        entity_id: binary_sensor.everyone_sleeping
+        entity_id: binary_sensor.bedroom_door
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.bedroom_sleeping
         state: 'on'
       - condition: state
         entity_id: binary_sensor.hallway_light
@@ -5421,28 +5428,72 @@
   trace:
     stored_traces: 20
 - id: '1739615474729'
-  alias: Stue medieafspiller
-  description: Automatik til at styrer TV og receiver i stuen
+  alias: Stue medieafspiller sæt status
+  description: Automatik til at sætte status helper for medie i stuen
   triggers:
   - trigger: state
-    entity_id:
-    - event.living_room_switch_button_3_philips_hue
-    attribute: event_type
-    to: short_release
-    id: button_3_short
+    entity_id: media_player.living_room_apple_tv_media_player
+    to: playing
+    id: playing_started
   - trigger: state
-    entity_id:
-    - event.living_room_switch_button_3_philips_hue
-    attribute: event_type
-    to: short_release
-    id: button_4_short
+    entity_id: media_player.living_room_apple_tv_media_player
+    from: playing
+    id: playing_ended
   - trigger: state
-    entity_id:
-    - binary_sensor.living_room_light
-    id: light_out
+    entity_id: timer.living_room_media_timer
+    to: idle
+    id: timer_ended
+  - trigger: state
+    entity_id: binary_sensor.people_home
+    to: 'off'
+    id: no_one_home
   conditions: []
-  actions: []
-  mode: restart
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - playing_started
+      sequence:
+      - action: timer.pause
+        target:
+          entity_id: timer.living_room_media_timer
+      - action: input_boolean.turn_on
+        metadata: {}
+        target:
+          entity_id: input_boolean.living_room_media_status
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - playing_ended
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.living_room_media_timer
+      - action: input_boolean.turn_on
+        metadata: {}
+        target:
+          entity_id: input_boolean.living_room_media_status
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - no_one_home
+        - timer_ended
+      sequence:
+      - action: input_boolean.turn_off
+        metadata: {}
+        target:
+          entity_id: input_boolean.living_room_media_status
+        data: {}
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
 - id: '1739647490572'
   alias: Soveværelse blæser
   description: Tænder for Dyson Hot+Cool i soveværelset, for at varme hurtigere op
@@ -10247,7 +10298,6 @@
   triggers:
   - trigger: state
     entity_id: vacuum.living_room_robot_vacuum
-    to: docked
   - trigger: state
     entity_id: sensor.living_room_robot_vacuum_status
   - trigger: state
@@ -10258,10 +10308,8 @@
   actions:
   - choose:
     - conditions:
-      - condition: trigger
-        id: docked
       - condition: state
-        entity_id: sensor.living_room_robot_vacuum
+        entity_id: vacuum.living_room_robot_vacuum
         state: docked
       - condition: state
         entity_id: sensor.living_room_robot_vacuum_status
@@ -10282,11 +10330,6 @@
     - conditions:
       - condition: trigger
         id: timeout
-      - condition: not
-        conditions:
-        - condition: state
-          entity_id: vacuum.living_room_robot_vacuum
-          state: docked
       sequence:
       - action: script.living_room_robot_vacuum_dock
         metadata: {}
@@ -10297,7 +10340,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: sensor.living_room_robot_vacuum
+            entity_id: vacuum.living_room_robot_vacuum
             state: docked
           - condition: state
             entity_id: sensor.living_room_robot_vacuum_status
@@ -10395,6 +10438,9 @@
     entity_id: binary_sensor.bedroom_sleeping
     to: 'off'
   - trigger: state
+    entity_id: binary_sensor.utility_room_light
+    to: 'off'
+  - trigger: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
     to: none
   conditions:
@@ -10412,6 +10458,9 @@
         state: 'off'
       - condition: state
         entity_id: binary_sensor.bedroom_sleeping
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.utility_room_light
         state: 'off'
       sequence:
       - action: input_select.select_option
@@ -10697,6 +10746,10 @@
   - trigger: state
     entity_id:
     - sensor.home_current_humidity
+  - trigger: state
+    entity_id: binary_sensor.people_home
+  - trigger: state
+    entity_id: binary_sensor.everyone_sleeping
   conditions: []
   actions:
   - action: number.set_value
@@ -10710,6 +10763,12 @@
       - condition: numeric_state
         entity_id: sensor.home_current_humidity
         above: 48
+      - condition: state
+        entity_id: binary_sensor.people_home
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.everyone_sleeping
+        state: 'off'
       sequence:
       - action: climate.set_fan_mode
         data:
@@ -10725,6 +10784,12 @@
       - condition: numeric_state
         entity_id: sensor.home_current_humidity
         above: 42
+      - condition: state
+        entity_id: binary_sensor.people_home
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.everyone_sleeping
+        state: 'off'
       sequence:
       - action: climate.set_fan_mode
         data:
@@ -10740,6 +10805,12 @@
       - condition: numeric_state
         entity_id: sensor.home_current_humidity
         above: 36
+      - condition: state
+        entity_id: binary_sensor.people_home
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.everyone_sleeping
+        state: 'off'
       sequence:
       - action: climate.set_fan_mode
         data:

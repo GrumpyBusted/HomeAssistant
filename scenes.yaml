@@ -893,7 +893,7 @@
       friendly_name: Stue lys lampet
       supported_features: 0
       state: 'on'
-    light.living_room_tv_light_strip:
+    light.living_room_light_strip_tv:
       min_color_temp_kelvin: 2000
       max_color_temp_kelvin: 6535
       min_mireds: 153
@@ -934,6 +934,25 @@
       dynamics: none
       friendly_name: Stue lys TV
       supported_features: 44
+      state: 'on'
+    light.living_room_light_gradient_tube_tv:
+      effect: 'off'
+      color_mode: xy
+      brightness: 180
+      color_temp_kelvin:
+      color_temp:
+      hs_color:
+      - 117.065
+      - 72.157
+      rgb_color:
+      - 80
+      - 255
+      - 71
+      xy_color:
+      - 0.208
+      - 0.665
+      mode: normal
+      dynamics: none
       state: 'on'
   icon: mdi:christmas-lights
   metadata: {}

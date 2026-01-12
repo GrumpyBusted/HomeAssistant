@@ -29,7 +29,8 @@
                is_state('light.living_room_light_strip_glass_cabinet', 'off') and 
                is_state('light.living_room_light_strip_receiver', 'off') and 
                is_state('light.living_room_light_strip_skylight', 'off') and 
-               is_state('light.living_room_tv_light_strip', 'off') and 
+               is_state('light.living_room_light_strip_tv', 'off') and 
+               is_state('light.living_room_light_gradient_tube_tv', 'off') and 
                is_state('light.living_room_smart_plug_lamp', 'off') and
                is_state('light.living_room_light_coffee_table_1', 'off') and
                is_state('light.living_room_light_coffee_table_2', 'off')) }}
