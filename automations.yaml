@@ -10284,7 +10284,7 @@
         target:
           entity_id: input_datetime.kitchen_robot_vacuum_next_cleaning_time
         data:
-          datetime: '{{ (now() | as_local + timedelta(hours=12)).strftime(''%Y-%m-%d
+          datetime: '{{ (now() | as_local + timedelta(hours=18)).strftime(''%Y-%m-%d
             %H:%M:%S'') }}
 
             '
@@ -10536,7 +10536,7 @@
         target:
           entity_id: input_datetime.utility_room_robot_vacuum_next_cleaning_time
         data:
-          datetime: '{{ (now() | as_local + timedelta(hours=12)).strftime(''%Y-%m-%d
+          datetime: '{{ (now() | as_local + timedelta(hours=18)).strftime(''%Y-%m-%d
             %H:%M:%S'') }}
 
             '
@@ -10626,7 +10626,7 @@
         target:
           entity_id: input_datetime.hallway_robot_vacuum_next_cleaning_time
         data:
-          datetime: '{{ (now() | as_local + timedelta(hours=12)).strftime(''%Y-%m-%d
+          datetime: '{{ (now() | as_local + timedelta(hours=18)).strftime(''%Y-%m-%d
             %H:%M:%S'') }}
 
             '
@@ -10739,7 +10739,7 @@
         target:
           entity_id: input_datetime.living_room_robot_vacuum_next_wash_time
         data:
-          datetime: '{{ (now() | as_local + timedelta(hours=84)).strftime(''%Y-%m-%d
+          datetime: '{{ (now() | as_local + timedelta(hours=90)).strftime(''%Y-%m-%d
             %H:%M:%S'') }}
 
             '
@@ -10747,7 +10747,7 @@
         target:
           entity_id: input_datetime.living_room_robot_vacuum_next_vacuum_time
         data:
-          datetime: '{{ (now() | as_local + timedelta(hours=12)).strftime(''%Y-%m-%d
+          datetime: '{{ (now() | as_local + timedelta(hours=18)).strftime(''%Y-%m-%d
             %H:%M:%S'') }}
 
             '
@@ -10767,7 +10767,7 @@
         target:
           entity_id: input_datetime.living_room_robot_vacuum_next_vacuum_time
         data:
-          datetime: '{{ (now() | as_local + timedelta(hours=12)).strftime(''%Y-%m-%d
+          datetime: '{{ (now() | as_local + timedelta(hours=18)).strftime(''%Y-%m-%d
             %H:%M:%S'') }}
 
             '
