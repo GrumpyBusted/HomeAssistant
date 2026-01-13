@@ -10377,7 +10377,7 @@
     entity_id: binary_sensor.someone_sleeping
     to: 'off'
   - trigger: state
-    entity_id: binary_sensor.living_room_light
+    entity_id: binary_sensor.bedroom_sleeping
     to: 'off'
   - trigger: state
     entity_id: binary_sensor.living_room_media
@@ -10403,17 +10403,56 @@
         entity_id: timer.living_room_robot_vacuum_timer
         state: idle
       - condition: state
-        entity_id: binary_sensor.someone_sleeping
-        state: 'off'
+        entity_id: input_select.living_room_robot_vacuum_current_cleaning
+        state: none
       - condition: state
-        entity_id: binary_sensor.living_room_light
+        entity_id: binary_sensor.bedroom_sleeping
         state: 'off'
       - condition: state
         entity_id: binary_sensor.living_room_media
         state: 'off'
+      sequence:
+      - action: script.living_room_robot_vacuum_empty_dust_bin
+        metadata: {}
+        data: {}
+    - conditions:
+      - condition: template
+        value_template: "{{ states('sensor.living_room_robot_vacuum_total_cleaning_time')|int
+          >\n   states('input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin')|int
+          + 600 }}\n"
+      - condition: state
+        entity_id: vacuum.living_room_robot_vacuum
+        state: docked
+      - condition: state
+        entity_id: timer.living_room_robot_vacuum_timer
+        state: idle
+      - condition: state
+        entity_id: input_select.living_room_robot_vacuum_current_cleaning
+        state: none
+      - condition: state
+        entity_id: binary_sensor.someone_sleeping
+        state: 'off'
       - condition: state
         entity_id: binary_sensor.living_room_door_sensor_door
         state: 'off'
+      - condition: state
+        entity_id: binary_sensor.living_room_media
+        state: 'off'
+      sequence:
+      - action: script.living_room_robot_vacuum_empty_dust_bin
+        metadata: {}
+        data: {}
+    - conditions:
+      - condition: template
+        value_template: "{{ states('sensor.living_room_robot_vacuum_total_cleaning_time')|int
+          >\n   states('input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin')|int
+          + 1800 }}\n"
+      - condition: state
+        entity_id: vacuum.living_room_robot_vacuum
+        state: docked
+      - condition: state
+        entity_id: timer.living_room_robot_vacuum_timer
+        state: idle
       - condition: state
         entity_id: input_select.living_room_robot_vacuum_current_cleaning
         state: none
