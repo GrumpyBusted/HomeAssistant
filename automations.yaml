@@ -10236,6 +10236,9 @@
   - trigger: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
     to: none
+  - trigger: numeric_state
+    entity_id: sensor.living_room_robot_vacuum_battery
+    above: 30
   conditions:
   - condition: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -10255,6 +10258,9 @@
       - condition: state
         entity_id: binary_sensor.bedroom_sleeping
         state: 'off'
+      - condition: numeric_state
+        entity_id: sensor.living_room_robot_vacuum_battery
+        above: 30
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
@@ -10263,6 +10269,9 @@
       - condition: template
         value_template: "{{ now() >=\n   (states('input_datetime.kitchen_robot_vacuum_next_cleaning_time')
           | as_datetime | as_local + timedelta(hours=12)) }}"
+      - condition: numeric_state
+        entity_id: sensor.living_room_robot_vacuum_battery
+        above: 30
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
@@ -10479,6 +10488,9 @@
   - trigger: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
     to: none
+  - trigger: numeric_state
+    entity_id: sensor.living_room_robot_vacuum_battery
+    above: 30
   conditions:
   - condition: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -10498,6 +10510,12 @@
       - condition: state
         entity_id: binary_sensor.utility_room_light
         state: 'off'
+      - condition: state
+        entity_id: binary_sensor.utility_room_light
+        state: 'off'
+      - condition: numeric_state
+        entity_id: sensor.living_room_robot_vacuum_battery
+        above: 30
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
@@ -10506,6 +10524,9 @@
       - condition: template
         value_template: "{{ now() >=\n   (states('input_datetime.utility_room_robot_vacuum_next_cleaning_time')
           | as_datetime | as_local + timedelta(hours=12)) }}"
+      - condition: numeric_state
+        entity_id: sensor.living_room_robot_vacuum_battery
+        above: 30
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
@@ -10557,6 +10578,9 @@
   - trigger: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
     to: none
+  - trigger: numeric_state
+    entity_id: sensor.living_room_robot_vacuum_battery
+    above: 30
   conditions:
   - condition: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -10579,6 +10603,9 @@
       - condition: state
         entity_id: binary_sensor.someone_sleeping
         state: 'off'
+      - condition: numeric_state
+        entity_id: sensor.living_room_robot_vacuum_battery
+        above: 30
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
@@ -10590,6 +10617,9 @@
       - condition: state
         entity_id: binary_sensor.living_room_door_sensor_door
         state: 'on'
+      - condition: numeric_state
+        entity_id: sensor.living_room_robot_vacuum_battery
+        above: 30
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
@@ -10637,6 +10667,9 @@
   - trigger: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
     to: none
+  - trigger: numeric_state
+    entity_id: sensor.living_room_robot_vacuum_battery
+    above: 40
   conditions:
   - condition: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -10656,6 +10689,9 @@
       - condition: state
         entity_id: binary_sensor.bedroom_sleeping
         state: 'off'
+      - condition: numeric_state
+        entity_id: sensor.living_room_robot_vacuum_battery
+        above: 40
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
@@ -10664,6 +10700,9 @@
       - condition: template
         value_template: "{{ now() >=\n   (states('input_datetime.living_room_robot_vacuum_next_cleaning_time')
           | as_datetime | as_local + timedelta(hours=18)) }}"
+      - condition: numeric_state
+        entity_id: sensor.living_room_robot_vacuum_battery
+        above: 40
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
