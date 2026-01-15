@@ -636,6 +636,8 @@ living_room_robot_vacuum_start_cleaning:
   description: Start robotstøvsuger med at gøre rent i et bestemt rum
   mode: queued
   max: 10
+  trace:
+    stored_traces: 25
   fields:
     type:
       description: Rengøring type
@@ -943,3 +945,44 @@ push_notification:
                     name: default
                     critical: 1
                     volume: 1
+living_room_robot_vacuum_set_current:
+  alias: Stue robotstøvsuger sæt aktuel
+  description: Sæt aktuel rengøring for robotstøvsuger
+  mode: queued
+  max: 10
+  fields:
+    option:
+      description: Rengøring
+      required: true
+      selector:
+        select:
+          options:
+          - none
+          - kitchen_cleaning
+          - utility_room_cleaning
+          - hallway_cleaning
+          - living_room_cleaning
+      default: none
+  sequence:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_select.living_room_robot_vacuum_current_cleaning
+        state: none
+      sequence:
+      - action: input_select.select_option
+        metadata: {}
+        target:
+          entity_id: input_select.living_room_robot_vacuum_current_cleaning
+        data:
+          option: '{{ option }}'
+    - conditions:
+      - condition: template
+        value_template: '{{ option == ''none'' }}'
+      sequence:
+      - action: input_select.select_option
+        metadata: {}
+        target:
+          entity_id: input_select.living_room_robot_vacuum_current_cleaning
+        data:
+          option: none

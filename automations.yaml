@@ -10219,8 +10219,14 @@
   - trigger: time
     at: input_datetime.kitchen_robot_vacuum_next_cleaning_time
   - trigger: state
-    entity_id: binary_sensor.kitchen_occupancy
-    to: 'off'
+    entity_id:
+    - binary_sensor.kitchen_occupancy
+    to:
+    - 'off'
+    for:
+      hours: 0
+      minutes: 2
+      seconds: 0
   - trigger: state
     entity_id: binary_sensor.living_room_media
     to: 'off'
@@ -10250,10 +10256,7 @@
         entity_id: binary_sensor.bedroom_sleeping
         state: 'off'
       sequence:
-      - action: input_select.select_option
-        metadata: {}
-        target:
-          entity_id: input_select.living_room_robot_vacuum_current_cleaning
+      - action: script.living_room_robot_vacuum_set_current
         data:
           option: kitchen_cleaning
     - conditions:
@@ -10261,10 +10264,7 @@
         value_template: "{{ now() >=\n   (states('input_datetime.kitchen_robot_vacuum_next_cleaning_time')
           | as_datetime | as_local + timedelta(hours=12)) }}"
       sequence:
-      - action: input_select.select_option
-        metadata: {}
-        target:
-          entity_id: input_select.living_room_robot_vacuum_current_cleaning
+      - action: script.living_room_robot_vacuum_set_current
         data:
           option: kitchen_cleaning
   - choose:
@@ -10321,12 +10321,9 @@
       - action: timer.cancel
         target:
           entity_id: timer.living_room_robot_vacuum_timer
-      - action: input_select.select_option
-        metadata: {}
+      - action: script.living_room_robot_vacuum_set_current
         data:
           option: none
-        target:
-          entity_id: input_select.living_room_robot_vacuum_current_cleaning
     - conditions:
       - condition: trigger
         id: timeout
@@ -10502,10 +10499,7 @@
         entity_id: binary_sensor.utility_room_light
         state: 'off'
       sequence:
-      - action: input_select.select_option
-        metadata: {}
-        target:
-          entity_id: input_select.living_room_robot_vacuum_current_cleaning
+      - action: script.living_room_robot_vacuum_set_current
         data:
           option: utility_room_cleaning
     - conditions:
@@ -10513,10 +10507,7 @@
         value_template: "{{ now() >=\n   (states('input_datetime.utility_room_robot_vacuum_next_cleaning_time')
           | as_datetime | as_local + timedelta(hours=12)) }}"
       sequence:
-      - action: input_select.select_option
-        metadata: {}
-        target:
-          entity_id: input_select.living_room_robot_vacuum_current_cleaning
+      - action: script.living_room_robot_vacuum_set_current
         data:
           option: utility_room_cleaning
   - choose:
@@ -10589,10 +10580,7 @@
         entity_id: binary_sensor.someone_sleeping
         state: 'off'
       sequence:
-      - action: input_select.select_option
-        metadata: {}
-        target:
-          entity_id: input_select.living_room_robot_vacuum_current_cleaning
+      - action: script.living_room_robot_vacuum_set_current
         data:
           option: hallway_cleaning
     - conditions:
@@ -10603,10 +10591,7 @@
         entity_id: binary_sensor.living_room_door_sensor_door
         state: 'on'
       sequence:
-      - action: input_select.select_option
-        metadata: {}
-        target:
-          entity_id: input_select.living_room_robot_vacuum_current_cleaning
+      - action: script.living_room_robot_vacuum_set_current
         data:
           option: hallway_cleaning
   - choose:
@@ -10639,9 +10624,7 @@
   description: Styring af robotstøvsuger for at gør rent i stuen
   triggers:
   - trigger: time
-    at: input_datetime.living_room_robot_vacuum_next_wash_time
-  - trigger: time
-    at: input_datetime.living_room_robot_vacuum_next_vacuum_time
+    at: input_datetime.living_room_robot_vacuum_next_cleaning_time
   - trigger: state
     entity_id: binary_sensor.living_room_door_sensor_door
     to: 'off'
@@ -10662,7 +10645,7 @@
   - choose:
     - conditions:
       - condition: template
-        value_template: "{{ now().timestamp() >=\n   states('input_datetime.living_room_robot_vacuum_next_wash_time')
+        value_template: "{{ now().timestamp() >=\n   states('input_datetime.living_room_robot_vacuum_next_cleaning_time')
           | as_timestamp }}"
       - condition: state
         entity_id: binary_sensor.living_room_door_sensor_door
@@ -10674,59 +10657,25 @@
         entity_id: binary_sensor.bedroom_sleeping
         state: 'off'
       sequence:
-      - action: input_select.select_option
-        metadata: {}
-        target:
-          entity_id: input_select.living_room_robot_vacuum_current_cleaning
+      - action: script.living_room_robot_vacuum_set_current
         data:
-          option: living_room_washing
+          option: living_room_cleaning
     - conditions:
       - condition: template
-        value_template: "{{ now().timestamp() >=\n   states('input_datetime.living_room_robot_vacuum_next_vacuum_time')
-          | as_timestamp }}"
-      - condition: state
-        entity_id: binary_sensor.living_room_door_sensor_door
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.living_room_media
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'off'
+        value_template: "{{ now() >=\n   (states('input_datetime.living_room_robot_vacuum_next_cleaning_time')
+          | as_datetime | as_local + timedelta(hours=18)) }}"
       sequence:
-      - action: input_select.select_option
-        metadata: {}
-        target:
-          entity_id: input_select.living_room_robot_vacuum_current_cleaning
+      - action: script.living_room_robot_vacuum_set_current
         data:
-          option: living_room_vacuuming
-    - conditions:
-      - condition: template
-        value_template: "{{ now() >=\n   (states('input_datetime.living_room_robot_vacuum_next_wash_time')
-          | as_datetime | as_local + timedelta(hours=24)) }}"
-      sequence:
-      - action: input_select.select_option
-        metadata: {}
-        target:
-          entity_id: input_select.living_room_robot_vacuum_current_cleaning
-        data:
-          option: living_room_washing
-    - conditions:
-      - condition: template
-        value_template: "{{ now() >=\n   (states('input_datetime.living_room_robot_vacuum_next_vacuum_time')
-          | as_datetime | as_local + timedelta(hours=24)) }}"
-      sequence:
-      - action: input_select.select_option
-        metadata: {}
-        target:
-          entity_id: input_select.living_room_robot_vacuum_current_cleaning
-        data:
-          option: living_room_vacuuming
+          option: living_room_cleaning
   - choose:
     - conditions:
       - condition: state
         entity_id: input_select.living_room_robot_vacuum_current_cleaning
-        state: living_room_washing
+        state: living_room_cleaning
+      - condition: template
+        value_template: "{{ now() >=\n   (states('input_datetime.living_room_robot_vacuum_last_washing_time')
+          | as_datetime | as_local + timedelta(hours=82)) }}"
       sequence:
       - action: script.living_room_robot_vacuum_start_cleaning
         metadata: {}
@@ -10737,24 +10686,23 @@
           - Stue
       - action: input_datetime.set_datetime
         target:
-          entity_id: input_datetime.living_room_robot_vacuum_next_wash_time
-        data:
-          datetime: '{{ (now() | as_local + timedelta(hours=90)).strftime(''%Y-%m-%d
-            %H:%M:%S'') }}
-
-            '
-      - action: input_datetime.set_datetime
-        target:
-          entity_id: input_datetime.living_room_robot_vacuum_next_vacuum_time
+          entity_id: input_datetime.living_room_robot_vacuum_next_cleaning_time
         data:
           datetime: '{{ (now() | as_local + timedelta(hours=18)).strftime(''%Y-%m-%d
             %H:%M:%S'') }}
 
             '
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.living_room_robot_vacuum_last_washing_time
+        data:
+          datetime: '{{ (now() | as_local).strftime(''%Y-%m-%d %H:%M:%S'') }}
+
+            '
     - conditions:
       - condition: state
         entity_id: input_select.living_room_robot_vacuum_current_cleaning
-        state: living_room_vacuuming
+        state: living_room_cleaning
       sequence:
       - action: script.living_room_robot_vacuum_start_cleaning
         metadata: {}
@@ -10765,7 +10713,7 @@
           - Stue
       - action: input_datetime.set_datetime
         target:
-          entity_id: input_datetime.living_room_robot_vacuum_next_vacuum_time
+          entity_id: input_datetime.living_room_robot_vacuum_next_cleaning_time
         data:
           datetime: '{{ (now() | as_local + timedelta(hours=18)).strftime(''%Y-%m-%d
             %H:%M:%S'') }}
