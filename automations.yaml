@@ -4128,23 +4128,89 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.family_home
+    - binary_sensor.people_home
+    from: 'off'
+    to: 'on'
+    id: someone_home
   - trigger: state
     entity_id:
-    - binary_sensor.parent_sleeping
+    - binary_sensor.people_home
+    from: 'on'
+    to: of
+    id: no_one_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.everyone_sleeping
+    from: 'off'
+    to: 'on'
+    id: everyone_sleeping
+  - trigger: state
+    entity_id:
+    - binary_sensor.everyone_sleeping
+    from: 'on'
+    to: of
+    id: someone_waking
   - trigger: state
     entity_id:
     - sensor.utility_room_target_temperature
-  - trigger: state
-    entity_id: input_boolean.house_sitter
-  - trigger: state
-    entity_id:
-    - automation.utility_room_heating
-    from: 'off'
-    to: 'on'
+    id: target_changed
   conditions: []
   actions:
   - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - target_changed
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: '{{ states(''sensor.utility_room_target_temperature'') | float(21)
+            }}'
+        target:
+          entity_id:
+          - climate.utility_room_radiator_thermostat_floor_tado
+          - climate.utility_room_radiator_thermostat_wall_tado
+    - conditions:
+      - condition: trigger
+        id:
+        - someone_home
+        - someone_waking
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 20
+        target:
+          entity_id:
+          - climate.utility_room_radiator_thermostat_floor_tado
+          - climate.utility_room_radiator_thermostat_wall_tado
+    - conditions:
+      - condition: trigger
+        id:
+        - everyone_sleeping
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 19
+        target:
+          entity_id:
+          - climate.utility_room_radiator_thermostat_floor_tado
+          - climate.utility_room_radiator_thermostat_wall_tado
+    - conditions:
+      - condition: trigger
+        id:
+        - no_one_home
+      sequence:
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: 17
+        target:
+          entity_id:
+          - climate.utility_room_radiator_thermostat_floor_tado
+          - climate.utility_room_radiator_thermostat_wall_tado
     - conditions:
       - condition: state
         entity_id: climate.home_heat_pump_panasonic
@@ -4158,55 +4224,10 @@
           entity_id:
           - climate.utility_room_radiator_thermostat_floor_tado
           - climate.utility_room_radiator_thermostat_wall_tado
-    - conditions:
-      - condition: state
-        entity_id: input_boolean.house_sitter
-        state: 'on'
-      sequence:
-      - action: climate.set_temperature
-        metadata: {}
-        data:
-          temperature: 20
-        target:
-          entity_id:
-          - climate.utility_room_radiator_thermostat_floor_tado
-          - climate.utility_room_radiator_thermostat_wall_tado
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.family_home
-        state: 'off'
-      sequence:
-      - action: climate.set_temperature
-        metadata: {}
-        data:
-          temperature: 17
-        target:
-          entity_id:
-          - climate.utility_room_radiator_thermostat_floor_tado
-          - climate.utility_room_radiator_thermostat_wall_tado
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.parent_sleeping
-        state: 'on'
-      sequence:
-      - action: climate.set_temperature
-        metadata: {}
-        data:
-          temperature: 19
-        target:
-          entity_id:
-          - climate.utility_room_radiator_thermostat_floor_tado
-          - climate.utility_room_radiator_thermostat_wall_tado
-    default:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: 20
-      target:
-        entity_id:
-        - climate.utility_room_radiator_thermostat_floor_tado
-        - climate.utility_room_radiator_thermostat_wall_tado
-  mode: restart
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 50
 - id: '1737312016227'
   alias: Stue - Varme
   description: Automatik til at styre varmen i stuen
@@ -5265,171 +5286,189 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.emil_home
-  - trigger: state
-    entity_id:
-    - binary_sensor.emils_room_light
-  - trigger: state
-    entity_id:
     - sensor.emils_room_target_temperature
   - trigger: state
-    entity_id:
-    - sensor.emils_room_current_temperature
+    entity_id: sensor.emils_room_current_temperature
+    for:
+      minutes: 1
   - trigger: state
     entity_id:
-    - binary_sensor.emils_room_window_sensor_open_aqara
+    - binary_sensor.emil_home
+  - trigger: numeric_state
+    entity_id: sensor.emils_room_air_quality_score
+    above: 50
+  - trigger: numeric_state
+    entity_id: sensor.emils_room_air_quality_score
+    below: 50
   - trigger: state
-    entity_id:
-    - timer.emils_room_window_open_timer
+    entity_id: binary_sensor.emils_room_light
   - trigger: state
-    entity_id:
-    - binary_sensor.emils_room_window_sensor_open_aqara
+    entity_id: binary_sensor.emils_room_window_sensor_door
     from: 'off'
     to: 'on'
-    id: window_open
+    id: window_opened
+  - trigger: state
+    entity_id: binary_sensor.emils_room_window_sensor_door
+    from: 'on'
+    to: 'off'
+    id: window_closed
+  - trigger: state
+    entity_id: timer.emils_room_air_purifier_timer
+    to: idle
+    id: timeout
   conditions: []
   actions:
-  - if:
-    - condition: state
-      entity_id: binary_sensor.emils_room_light
-      state: 'on'
-    then:
-    - action: switch.turn_off
-      metadata: {}
-      data: {}
-      target:
-        entity_id: switch.emils_room_pure_hot_cool_night_mode_dyson
-    else:
-    - action: switch.turn_on
-      metadata: {}
-      data: {}
-      target:
-        entity_id: switch.emils_room_pure_hot_cool_night_mode_dyson
-  - if:
-    - condition: trigger
-      id:
-      - window_open
-    then:
-    - action: timer.start
-      metadata: {}
-      data:
-        duration: 00:10:00
-      target:
-        entity_id: timer.emils_room_window_open_timer
-  - if:
-    - condition: state
-      entity_id: binary_sensor.emils_room_window_sensor_open_aqara
-      state: 'off'
-    - condition: state
-      entity_id: timer.emils_room_window_open_timer
-      state: active
-    then:
-    - action: timer.finish
-      metadata: {}
-      data: {}
-      target:
-        entity_id: timer.emils_room_window_open_timer
+  - variables:
+      mode: 'off'
   - choose:
     - conditions:
       - condition: state
         entity_id: binary_sensor.emil_home
         state: 'off'
+      sequence: []
+    - conditions:
+      - condition: trigger
+        id: timeout
+      sequence: []
+    - conditions:
+      - condition: trigger
+        id: window_opened
+      sequence:
+      - variables:
+          mode: fan
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:10:00
+        target:
+          entity_id: timer.emils_room_air_purifier_timer
+    - conditions:
+      - condition: trigger
+        id: window_closed
+      - condition: state
+        entity_id: timer.emils_room_air_purifier_timer
+        state: active
+      sequence:
+      - variables:
+          mode: 'off'
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.emils_room_air_purifier_timer
+    - conditions:
+      - condition: template
+        value_template: '{{ states("sensor.emils_room_current_temperature")|float(21)
+          < states("sensor.emils_room_target_temperature")|float(21) - 1 }}'
+      - condition: state
+        entity_id: binary_sensor.emils_room_window_sensor_door
+        state: 'off'
+      sequence:
+      - variables:
+          mode: heat
+    - conditions:
+      - condition: template
+        value_template: '{{ states("sensor.emils_room_current_temperature")|float(21)
+          > max(25, states("sensor.emils_room_target_temperature")|float(21) + 3)
+          }}'
+      sequence:
+      - variables:
+          mode: cool
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.emils_room_air_quality_score
+        below: 50
+      - condition: state
+        entity_id: binary_sensor.emils_room_window_sensor_door
+        state: 'off'
+      sequence:
+      - variables:
+          mode: filter
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ mode == ''off'' }}'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.emils_room_light
+        state: 'on'
+      sequence:
+      - action: switch.turn_off
+        target:
+          entity_id: switch.emils_room_air_purifier_night_mode
+    default:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.emils_room_air_purifier_night_mode
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ mode == ''off'' }}'
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: climate.emils_room_air_purifier
+          state: 'off'
       sequence:
       - action: climate.turn_off
         metadata: {}
         data: {}
         target:
-          entity_id: climate.emils_room_pure_hot_cool_dyson
-    - conditions:
-      - condition: state
-        entity_id: timer.emils_room_window_open_timer
-        state: active
-      sequence:
-      - action: fan.turn_on
+          entity_id: climate.emils_room_air_purifier
+      - action: fan.turn_off
         metadata: {}
         data: {}
         target:
-          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
-      - action: fan.set_percentage
-        metadata: {}
-        data:
-          percentage: 100
-        target:
-          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
-      - action: fan.oscillate
-        metadata: {}
-        data:
-          oscillating: true
-        target:
-          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
-      - action: fan.set_preset_mode
-        metadata: {}
-        data:
-          preset_mode: Normal
-        target:
-          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
-      - action: switch.turn_on
-        metadata: {}
-        data: {}
-        target:
-          entity_id: switch.emils_room_pure_hot_cool_focus_mode_dyson
-      - action: climate.set_hvac_mode
-        metadata: {}
-        data:
-          hvac_mode: cool
-        target:
-          entity_id: climate.emils_room_pure_hot_cool_dyson
+          entity_id: fan.emils_room_air_purifier_fan
     - conditions:
-      - condition: state
-        entity_id: binary_sensor.emils_room_window_sensor_open_aqara
-        state: 'off'
       - condition: template
-        value_template: '{{ states("sensor.emils_room_current_temperature")|float
-          < states("sensor.emils_room_target_temperature")|float - 1 }}'
+        value_template: '{{ mode == ''heat'' }}'
       sequence:
       - action: climate.turn_on
         metadata: {}
         data: {}
         target:
-          entity_id: climate.emils_room_pure_hot_cool_dyson
+          entity_id: climate.emils_room_air_purifier
       - action: climate.set_temperature
         metadata: {}
         data:
-          temperature: '{{ min(37, states(''sensor.emils_room_target_temperature'')|float(0)
-            + 3) }}'
+          temperature: '{{ min(states(''sensor.emils_room_target_temperature'')|float(0)
+            + 3, 37) }}'
           hvac_mode: heat
         target:
-          entity_id: climate.emils_room_pure_hot_cool_dyson
-      - action: fan.oscillate
+          entity_id: climate.emils_room_air_purifier
+      - action: fan.turn_on
         metadata: {}
-        data:
-          oscillating: true
+        data: {}
         target:
-          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
+          entity_id: fan.emils_room_air_purifier_fan
       - action: fan.set_preset_mode
         metadata: {}
         data:
           preset_mode: Auto
         target:
-          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
+          entity_id: fan.emils_room_air_purifier_fan
+      - action: fan.oscillate
+        metadata: {}
+        data:
+          oscillating: 'true'
+        target:
+          entity_id: fan.emils_room_air_purifier_fan
       - action: switch.turn_off
         metadata: {}
         data: {}
         target:
-          entity_id: switch.emils_room_pure_hot_cool_focus_mode_dyson
+          entity_id: switch.emils_room_air_purifier_focus_mode
     - conditions:
       - condition: template
-        value_template: '{{ states("sensor.emils_room_current_temperature")|float
-          > states("sensor.emils_room_target_temperature")|float }}'
-      - condition: numeric_state
-        entity_id: sensor.emils_room_current_temperature
-        above: 23
+        value_template: '{{ mode == ''cool'' }}'
       sequence:
       - action: climate.turn_on
         metadata: {}
         data: {}
         target:
-          entity_id: climate.emils_room_pure_hot_cool_dyson
+          entity_id: climate.emils_room_air_purifier
       - action: climate.set_temperature
         metadata: {}
         data:
@@ -5437,64 +5476,115 @@
             - 3) }}'
           hvac_mode: cool
         target:
-          entity_id: climate.emils_room_pure_hot_cool_dyson
-      - action: fan.oscillate
-        metadata: {}
-        data:
-          oscillating: true
-        target:
-          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
-      - action: fan.set_preset_mode
-        metadata: {}
-        data:
-          preset_mode: Auto
-        target:
-          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
-      - action: switch.turn_on
-        metadata: {}
-        data: {}
-        target:
-          entity_id: switch.emils_room_pure_hot_cool_focus_mode_dyson
-    - conditions:
-      - condition: numeric_state
-        entity_id: sensor.emils_room_pure_hot_cool_air_quality_index_dyson
-        above: 5
-      sequence:
+          entity_id: climate.emils_room_air_purifier
       - action: fan.turn_on
         metadata: {}
         data: {}
         target:
-          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
-      - action: fan.oscillate
-        metadata: {}
-        data:
-          oscillating: true
-        target:
-          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
+          entity_id: fan.emils_room_air_purifier_fan
       - action: fan.set_preset_mode
         metadata: {}
         data:
           preset_mode: Auto
         target:
-          entity_id: fan.emils_room_pure_hot_cool_fan_dyson
-      - action: switch.turn_off
+          entity_id: fan.emils_room_air_purifier_fan
+      - action: fan.oscillate
+        metadata: {}
+        data:
+          oscillating: 'true'
+        target:
+          entity_id: fan.emils_room_air_purifier_fan
+      - action: switch.turn_on
         metadata: {}
         data: {}
         target:
-          entity_id: switch.emils_room_pure_hot_cool_focus_mode_dyson
+          entity_id: switch.emils_room_air_purifier_focus_mode
+    - conditions:
+      - condition: template
+        value_template: '{{ mode == ''fan'' }}'
+      sequence:
+      - action: climate.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: climate.emils_room_air_purifier
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: '{{ states(''sensor.emils_room_current_temperature'')|float(21)
+            }}'
+          hvac_mode: cool
+        target:
+          entity_id: climate.emils_room_air_purifier
+      - action: fan.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: fan.emils_room_air_purifier_fan
+      - action: fan.set_percentage
+        metadata: {}
+        data:
+          percentage: 100
+        target:
+          entity_id: fan.emils_room_air_purifier_fan
+      - action: fan.set_preset_mode
+        metadata: {}
+        data:
+          preset_mode: Normal
+        target:
+          entity_id: fan.emils_room_air_purifier_fan
+      - action: fan.oscillate
+        metadata: {}
+        data:
+          oscillating: 'true'
+        target:
+          entity_id: fan.emils_room_air_purifier_fan
+      - action: switch.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.emils_room_air_purifier_focus_mode
+    - conditions:
+      - condition: template
+        value_template: '{{ mode == ''filter'' }}'
+      sequence:
+      - action: climate.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: climate.emils_room_air_purifier
       - action: climate.set_hvac_mode
         metadata: {}
         data:
           hvac_mode: cool
         target:
-          entity_id: climate.emils_room_pure_hot_cool_dyson
-    default:
-    - action: climate.turn_off
-      metadata: {}
-      data: {}
-      target:
-        entity_id: climate.emils_room_pure_hot_cool_dyson
-  mode: restart
+          entity_id: climate.emils_room_air_purifier
+      - action: fan.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: fan.emils_room_air_purifier_fan
+      - action: fan.set_preset_mode
+        metadata: {}
+        data:
+          preset_mode: Auto
+        target:
+          entity_id: fan.emils_room_air_purifier_fan
+      - action: fan.oscillate
+        metadata: {}
+        data:
+          oscillating: 'true'
+        target:
+          entity_id: fan.emils_room_air_purifier_fan
+      - action: switch.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.emils_room_air_purifier_focus_mode
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 50
 - id: '1739480121158'
   alias: Push configuration filer til GitHub
   description: Automatik til at sende configuration filer etc til GitHub repository
@@ -5588,86 +5678,157 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.parent_home_home
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_light
-  - trigger: numeric_state
-    entity_id:
-    - cover.bedroom_blind
-    attribute: current
-    below: 60
-  - trigger: numeric_state
-    entity_id:
-    - cover.bedroom_blind
-    attribute: current
-    above: 60
-  - trigger: state
-    entity_id:
     - sensor.bedroom_target_temperature
   - trigger: state
-    entity_id:
-    - sensor.bedroom_current_temperature
+    entity_id: sensor.bedroom_current_temperature
+    for:
+      minutes: 1
+  - trigger: state
+    entity_id: binary_sensor.parent_home
+  - trigger: state
+    entity_id: input_boolean.house_sitter
+  - trigger: numeric_state
+    entity_id: sensor.bedroom_air_quality_score
+    above: 50
+  - trigger: numeric_state
+    entity_id: sensor.bedroom_air_quality_score
+    below: 50
+  - trigger: state
+    entity_id: binary_sensor.bedroom_window_sensor_door
+    from: 'off'
+    to: 'on'
+    id: window_opened
+  - trigger: state
+    entity_id: binary_sensor.bedroom_window_sensor_door
+    from: 'on'
+    to: 'off'
+    id: window_closed
+  - trigger: state
+    entity_id: timer.bedroom_air_purifier_timer
+    to: idle
+    id: timeout
   conditions: []
   actions:
-  - if:
-    - condition: state
-      entity_id: binary_sensor.bedroom_blind
-      state: 'on'
-    then:
-    - action: switch.turn_off
-      metadata: {}
-      data: {}
-      target:
-        entity_id: switch.bedroom_purifier_hot_cool_night_mode_dyson
-    else:
-    - action: switch.turn_on
-      metadata: {}
-      data: {}
-      target:
-        entity_id: switch.bedroom_purifier_hot_cool_night_mode_dyson
+  - variables:
+      mode: 'off'
   - choose:
     - conditions:
       - condition: state
         entity_id: binary_sensor.parent_home
         state: 'off'
-      sequence:
-      - action: dyson_local.set_angle
-        data:
-          entity_id: fan.bedroom_purifier_hot_cool_fan_dyson
-          angle_low: 225
-          angle_high: 225
-      - action: climate.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id: climate.bedroom_purifier_hot_cool_dyson
+      - condition: state
+        entity_id: input_boolean.house_sitter
+        state: 'off'
+      sequence: []
     - conditions:
-      - condition: numeric_state
-        entity_id: cover.bedroom_blind
-        attribute: current
-        below: 60
+      - condition: trigger
+        id: timeout
+      sequence: []
+    - conditions:
+      - condition: trigger
+        id: window_opened
       sequence:
-      - action: dyson_local.set_angle
+      - variables:
+          mode: fan
+      - action: timer.start
+        metadata: {}
         data:
-          entity_id: fan.bedroom_purifier_hot_cool_fan_dyson
-          angle_low: 225
-          angle_high: 225
-      - action: climate.turn_off
+          duration: 00:10:00
+        target:
+          entity_id: timer.bedroom_air_purifier_timer
+    - conditions:
+      - condition: trigger
+        id: window_closed
+      - condition: state
+        entity_id: timer.bedroom_air_purifier_timer
+        state: active
+      sequence:
+      - variables:
+          mode: 'off'
+      - action: timer.cancel
         metadata: {}
         data: {}
         target:
-          entity_id: climate.bedroom_purifier_hot_cool_dyson
+          entity_id: timer.bedroom_air_purifier_timer
     - conditions:
       - condition: template
-        value_template: '{{ states("sensor.bedroom_current_temperature")|float < states("sensor.bedroom_target_temperature")|float
-          - 1 }}'
+        value_template: '{{ states("sensor.bedroom_current_temperature")|float(21)
+          < states("sensor.bedroom_target_temperature")|float(21) - 1 }}'
+      - condition: state
+        entity_id: binary_sensor.bedroom_window_sensor_door
+        state: 'off'
+      sequence:
+      - variables:
+          mode: heat
+    - conditions:
+      - condition: template
+        value_template: '{{ states("sensor.bedroom_current_temperature")|float(21)
+          > max(25, states("sensor.bedroom_target_temperature")|float(21) + 3) }}'
+      sequence:
+      - variables:
+          mode: cool
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.bedroom_air_quality_score
+        below: 50
+      - condition: state
+        entity_id: binary_sensor.bedroom_window_sensor_door
+        state: 'off'
+      sequence:
+      - variables:
+          mode: filter
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ mode == ''off'' }}'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.bedroom_light
+        state: 'on'
+      sequence:
+      - action: switch.turn_off
+        target:
+          entity_id: switch.bedroom_air_purifier_night_mode
+    default:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.bedroom_air_purifier_night_mode
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ mode == ''off'' }}'
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: climate.bedroom_air_purifier
+          state:
+          - 'off'
+      sequence:
+      - action: dyson_local.set_angle
+        data:
+          entity_id: fan.bedroom_air_purifier_fan
+          angle_low: 225
+          angle_high: 225
+      - action: climate.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: climate.bedroom_air_purifier
+      - action: fan.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: fan.bedroom_air_purifier_fan
+    - conditions:
+      - condition: template
+        value_template: '{{ mode == ''heat'' }}'
       sequence:
       - action: climate.turn_on
         metadata: {}
         data: {}
         target:
-          entity_id: climate.bedroom_purifier_hot_cool_dyson
+          entity_id: climate.bedroom_air_purifier
       - action: climate.set_temperature
         metadata: {}
         data:
@@ -5675,43 +5836,44 @@
             + 3, 37) }}'
           hvac_mode: heat
         target:
-          entity_id: climate.bedroom_purifier_hot_cool_dyson
-      - action: fan.oscillate
+          entity_id: climate.bedroom_air_purifier
+      - action: fan.turn_on
         metadata: {}
-        data:
-          oscillating: true
+        data: {}
         target:
-          entity_id: fan.bedroom_purifier_hot_cool_fan_dyson
-      - action: dyson_local.set_angle
-        data:
-          entity_id: fan.bedroom_purifier_hot_cool_fan_dyson
-          angle_low: 155
-          angle_high: 225
+          entity_id: fan.bedroom_air_purifier_fan
       - action: fan.set_preset_mode
         metadata: {}
         data:
           preset_mode: Auto
         target:
-          entity_id: fan.bedroom_purifier_hot_cool_fan_dyson
+          entity_id: fan.bedroom_air_purifier_fan
+      - action: dyson_local.set_angle
+        data:
+          entity_id: fan.bedroom_air_purifier_fan
+          angle_low: 155
+          angle_high: 225
+      - action: fan.oscillate
+        metadata: {}
+        data:
+          oscillating: 'true'
+        target:
+          entity_id: fan.bedroom_air_purifier_fan
       - action: fan.set_direction
         metadata: {}
         data:
           direction: forward
         target:
-          entity_id: fan.bedroom_purifier_hot_cool_fan_dyson
+          entity_id: fan.bedroom_air_purifier_fan
     - conditions:
       - condition: template
-        value_template: '{{ states("sensor.bedroom_current_temperature")|float > states("sensor.bedroom_target_temperature")|float
-          }}'
-      - condition: numeric_state
-        entity_id: sensor.bedroom_current_temperature
-        above: 23
+        value_template: '{{ mode == ''cool'' }}'
       sequence:
       - action: climate.turn_on
         metadata: {}
         data: {}
         target:
-          entity_id: climate.bedroom_purifier_hot_cool_dyson
+          entity_id: climate.bedroom_air_purifier
       - action: climate.set_temperature
         metadata: {}
         data:
@@ -5719,95 +5881,133 @@
             - 3) }}'
           hvac_mode: cool
         target:
-          entity_id: climate.bedroom_purifier_hot_cool_dyson
-      - action: fan.oscillate
+          entity_id: climate.bedroom_air_purifier
+      - action: fan.turn_on
         metadata: {}
-        data:
-          oscillating: true
+        data: {}
         target:
-          entity_id: fan.bedroom_purifier_hot_cool_dyson
-      - action: dyson_local.set_angle
-        data:
-          entity_id: fan.bedroom_purifier_hot_cool_fan_dyson
-          angle_low: 155
-          angle_high: 225
+          entity_id: fan.bedroom_air_purifier_fan
       - action: fan.set_preset_mode
         metadata: {}
         data:
           preset_mode: Auto
         target:
-          entity_id: fan.bedroom_purifier_hot_cool_fan_dyson
+          entity_id: fan.bedroom_air_purifier_fan
       - action: fan.set_direction
         metadata: {}
         data:
           direction: forward
         target:
-          entity_id: fan.bedroom_purifier_hot_cool_fan_dyson
+          entity_id: fan.bedroom_air_purifier_fan
+      - action: fan.oscillate
+        metadata: {}
+        data:
+          oscillating: 'true'
+        target:
+          entity_id: fan.bedroom_air_purifier_fan
+      - action: dyson_local.set_angle
+        data:
+          entity_id: fan.bedroom_air_purifier_fan
+          angle_low: 155
+          angle_high: 225
     - conditions:
-      - condition: or
-        conditions:
-        - condition: numeric_state
-          entity_id: sensor.bedroom_purifier_hot_cool_hcho_dyson
-          above: 0.06
-        - condition: numeric_state
-          entity_id: sensor.bedroom_purifier_hot_cool_nitrogen_dioxide_index_dyson
-          above: 6
-        - condition: numeric_state
-          entity_id: sensor.bedroom_purifier_hot_cool_pm_10_dyson
-          above: 100
-        - condition: numeric_state
-          entity_id: sensor.bedroom_purifier_hot_cool_pm_2_5_dyson
-          above: 35
-        - condition: numeric_state
-          entity_id: sensor.bedroom_purifier_hot_cool_volatile_organic_compounds_index_dyson
-          above: 6
+      - condition: template
+        value_template: '{{ mode == ''fan'' }}'
       sequence:
+      - action: climate.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: climate.bedroom_air_purifier
+      - action: climate.set_temperature
+        metadata: {}
+        data:
+          temperature: '{{ states(''sensor.bedroom_current_temperature'')|float(21)
+            }}'
+          hvac_mode: cool
+        target:
+          entity_id: climate.bedroom_air_purifier
       - action: fan.turn_on
         metadata: {}
         data: {}
         target:
-          entity_id: fan.bedroom_purifier_hot_cool_fan_dyson
-      - action: fan.oscillate
+          entity_id: fan.bedroom_air_purifier_fan
+      - action: fan.set_percentage
         metadata: {}
         data:
-          oscillating: true
+          percentage: 100
         target:
-          entity_id: fan.bedroom_purifier_hot_cool_fan_dyson
-      - action: dyson_local.set_angle
-        data:
-          entity_id: fan.bedroom_purifier_hot_cool_fan_dyson
-          angle_low: 155
-          angle_high: 225
+          entity_id: fan.bedroom_air_purifier_fan
       - action: fan.set_preset_mode
         metadata: {}
         data:
-          preset_mode: Auto
+          preset_mode: Normal
         target:
-          entity_id: fan.bedroom_purifier_hot_cool_fan_dyson
+          entity_id: fan.bedroom_air_purifier_fan
+      - action: fan.set_direction
+        metadata: {}
+        data:
+          direction: forward
+        target:
+          entity_id: fan.bedroom_air_purifier_fan
+      - action: fan.oscillate
+        metadata: {}
+        data:
+          oscillating: 'true'
+        target:
+          entity_id: fan.bedroom_air_purifier_fan
+      - action: dyson_local.set_angle
+        data:
+          entity_id: fan.bedroom_air_purifier_fan
+          angle_low: 155
+          angle_high: 225
+    - conditions:
+      - condition: template
+        value_template: '{{ mode == ''filter'' }}'
+      sequence:
+      - action: climate.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: climate.bedroom_air_purifier
       - action: climate.set_hvac_mode
         metadata: {}
         data:
           hvac_mode: cool
         target:
-          entity_id: climate.bedroom_purifier_hot_cool_dyson
+          entity_id: climate.bedroom_air_purifier
+      - action: fan.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: fan.bedroom_air_purifier_fan
+      - action: fan.set_preset_mode
+        metadata: {}
+        data:
+          preset_mode: Auto
+        target:
+          entity_id: fan.bedroom_air_purifier_fan
       - action: fan.set_direction
         metadata: {}
         data:
           direction: reverse
         target:
-          entity_id: fan.bedroom_purifier_hot_cool_fan_dyson
-    default:
-    - action: dyson_local.set_angle
-      data:
-        entity_id: fan.bedroom_purifier_hot_cool_fan_dyson
-        angle_low: 225
-        angle_high: 225
-    - action: climate.turn_off
-      metadata: {}
-      data: {}
-      target:
-        entity_id: climate.bedroom_purifier_hot_cool_dyson
+          entity_id: fan.bedroom_air_purifier_fan
+      - action: fan.oscillate
+        metadata: {}
+        data:
+          oscillating: 'true'
+        target:
+          entity_id: fan.bedroom_air_purifier_fan
+      - action: dyson_local.set_angle
+        data:
+          entity_id: fan.bedroom_air_purifier_fan
+          angle_low: 155
+          angle_high: 225
   mode: queued
+  max: 10
+  trace:
+    stored_traces: 50
 - id: '1739712804347'
   alias: Hjem smart todo postkasse
   description: Opret ToDo opgaver vedrørende postkasse

@@ -95,7 +95,25 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {{ states('sensor.emils_room_temperature_sensor_temperature')|float(0)|round(1) }}
+        {% set sensors = [
+          {'id': 'sensor.emils_room_air_purifier_temperature', 'weight': 1.0},
+          {'id': 'sensor.emils_room_smoke_alarm_temperature', 'weight': 1.0},
+          {'id': 'sensor.emils_room_temperature_sensor_temperature', 'weight': 1.0},
+          {'id': 'sensor.emils_room_radiator_thermostat_temperature', 'weight': 0.1}
+        ] %}
+        {% set total = namespace(value=0, weight=0) %}
+        {% for s in sensors %}
+          {% if states(s.id) not in ['unknown', 'unavailable', 'none', ''] %}
+            {% set temp = states(s.id) | float %}
+            {% set total.value = total.value + (temp * s.weight) %}
+            {% set total.weight = total.weight + s.weight %}
+          {% endif %}
+        {% endfor %}
+        {% if total.weight > 0 %}
+          {{ (total.value / total.weight) | round(1) }}
+        {% else %}
+          unavailable
+        {% endif %}
 - sensor:
     - name: emils_room_target_temperature
       unique_id: 90C81B40-9757-4BBF-892D-2EDA13331287
@@ -139,7 +157,15 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {{ states('sensor.bedroom_weather_station_temperature')|float(0)|round(1) }}
+          {% set temps = [
+            states('sensor.bedroom_smoke_alarm_temperature'),
+            states('sensor.bedroom_radiator_thermostat_temperature'),
+            states('sensor.bedroom_weather_station_temperature')
+          ]
+          | reject('in', ['unknown', 'unavailable', 'none', ''])
+          | map('float')
+          | list %}
+          {{ (temps | average) | round(1) if temps | length > 0 else 'unavailable' }}
 - sensor:
     - name: bedroom_target_temperature
       unique_id: C5EE6CD6-C042-48D3-9F08-56ECE1D1EB43
