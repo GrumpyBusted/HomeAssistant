@@ -1510,8 +1510,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.hallway_occupancy
-    to: 'off'
+    to:
+    - 'off'
     id: person_cleared
+    for:
+      hours: 0
+      minutes: 2
+      seconds: 0
   - trigger: state
     entity_id:
     - binary_sensor.hallway_occupancy
@@ -1722,27 +1727,6 @@
         entity_id: binary_sensor.bedroom_sleeping
         state: 'on'
       sequence: []
-    - conditions:
-      - condition: trigger
-        id:
-        - person_detected
-      - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'off'
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          transition: 1
-          color_temp_kelvin: 2700
-          brightness_pct: 25
-        target:
-          entity_id:
-          - light.hallway_light_bathroom
-          - light.hallway_light_toilet
     - conditions:
       - condition: trigger
         id:
@@ -2570,14 +2554,6 @@
     from: 'off'
     to: 'on'
     id: window_opened
-  - trigger: state
-    entity_id: climate.emils_room_air_purifier
-    to: 'off'
-    id: air_purifier_off
-  - trigger: state
-    entity_id: climate.emils_room_air_purifier
-    from: 'off'
-    id: air_purifier_on
   conditions:
   - condition: state
     entity_id: input_boolean.house_sitter
@@ -2632,17 +2608,6 @@
         entity_id: cover.emils_room_blind
         attribute: current_position
         below: 21
-      sequence:
-      - variables:
-          position: 0
-    - conditions:
-      - condition: trigger
-        id:
-        - air_purifier_off
-      - condition: numeric_state
-        entity_id: cover.emils_room_blind
-        attribute: current_position
-        below: 61
       sequence:
       - variables:
           position: 0
@@ -2715,13 +2680,6 @@
     then:
     - variables:
         position: '{{ [position | int, 20] | max }}'
-  - if:
-    - condition: state
-      entity_id: climate.emils_room_air_purifier
-      state: 'on'
-    then:
-    - variables:
-        position: '{{ [position | int, 60] | max }}'
   - choose:
     - conditions:
       - condition: template
@@ -3935,6 +3893,20 @@
       sequence:
       - variables:
           target: 17
+  - if:
+    - condition: template
+      value_template: '{{ not(is_state_attr(''climate.bedroom_radiator_thermostat'',
+        ''temperature'', target)) }}
+
+        '
+    then:
+    - action: climate.set_temperature
+      metadata: {}
+      data:
+        temperature: '{{ target }}'
+      target:
+        entity_id:
+        - climate.bedroom_radiator_thermostat
   mode: restart
   trace:
     stored_traces: 50
@@ -4422,11 +4394,7 @@
     id: timeout
   - trigger: state
     entity_id:
-    - binary_sensor.family_home
-    from: 'on'
-    to: 'off'
-  - trigger: state
-    entity_id: input_boolean.house_sitter
+    - binary_sensor.people_home
     from: 'on'
     to: 'off'
   conditions: []
@@ -4434,10 +4402,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.family_home
-        state: 'off'
-      - condition: state
-        entity_id: input_boolean.house_sitter
+        entity_id: binary_sensor.people_home
         state: 'off'
       - condition: state
         entity_id: automation.living_room_heating
@@ -5242,9 +5207,11 @@
       - condition: template
         value_template: '{{ states("sensor.emils_room_current_temperature")|float(21)
           < states("sensor.emils_room_target_temperature")|float(21) - 1 }}'
-      - condition: state
-        entity_id: binary_sensor.emils_room_window_sensor_door
-        state: 'off'
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.emils_room_window_sensor_door
+          state: 'on'
       sequence:
       - variables:
           mode: heat
@@ -5260,9 +5227,11 @@
       - condition: numeric_state
         entity_id: sensor.emils_room_air_quality_score
         below: 50
-      - condition: state
-        entity_id: binary_sensor.emils_room_window_sensor_door
-        state: 'off'
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.emils_room_window_sensor_door
+          state: 'on'
       sequence:
       - variables:
           mode: filter
@@ -10385,17 +10354,12 @@
   alias: Køkken robotstøvsuger rengøring
   description: Styring af robotstøvsuger for at gør rent i køkkenet
   triggers:
-  - trigger: time
-    at: input_datetime.kitchen_robot_vacuum_next_cleaning_time
   - trigger: state
-    entity_id:
-    - binary_sensor.kitchen_occupancy
-    to:
-    - 'off'
-    for:
-      hours: 0
-      minutes: 2
-      seconds: 0
+    entity_id: input_select.living_room_robot_vacuum_current_cleaning
+    to: none
+  - trigger: numeric_state
+    entity_id: sensor.living_room_robot_vacuum_battery
+    above: 30
   - trigger: state
     entity_id: binary_sensor.living_room_media
     to: 'off'
@@ -10403,11 +10367,14 @@
     entity_id: binary_sensor.bedroom_sleeping
     to: 'off'
   - trigger: state
-    entity_id: input_select.living_room_robot_vacuum_current_cleaning
-    to: none
-  - trigger: numeric_state
-    entity_id: sensor.living_room_robot_vacuum_battery
-    above: 30
+    entity_id: binary_sensor.monique_sleep_window
+    to: 'off'
+  - trigger: state
+    entity_id: binary_sensor.kitchen_occupancy
+    to: 'off'
+    for: 00:02:00
+  - trigger: time
+    at: '11:30:00'
   conditions:
   - condition: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -10416,28 +10383,35 @@
   - choose:
     - conditions:
       - condition: template
-        value_template: "{{ now().timestamp() >=\n   states('input_datetime.kitchen_robot_vacuum_next_cleaning_time')
-          | as_timestamp }}"
-      - condition: state
-        entity_id: binary_sensor.kitchen_occupancy
-        state: 'off'
+        value_template: '{{ (states(''input_datetime.kitchen_robot_vacuum_last_cleaning_time'')
+          | as_datetime).date() != now().date() }}
+
+          '
+      - condition: numeric_state
+        entity_id: sensor.living_room_robot_vacuum_battery
+        above: 30
       - condition: state
         entity_id: binary_sensor.living_room_media
         state: 'off'
       - condition: state
         entity_id: binary_sensor.bedroom_sleeping
         state: 'off'
-      - condition: numeric_state
-        entity_id: sensor.living_room_robot_vacuum_battery
-        above: 30
+      - condition: state
+        entity_id: binary_sensor.monique_sleep_window
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.kitchen_occupancy
+        state: 'off'
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
           option: kitchen_cleaning
     - conditions:
       - condition: template
-        value_template: "{{ now() >=\n   (states('input_datetime.kitchen_robot_vacuum_next_cleaning_time')
-          | as_datetime | as_local + timedelta(hours=12)) }}"
+        value_template: '{{ (states(''input_datetime.kitchen_robot_vacuum_last_cleaning_time'')
+          | as_datetime | as_local).date() < (now().date() - timedelta(days=1)) }}
+
+          '
       - condition: numeric_state
         entity_id: sensor.living_room_robot_vacuum_battery
         above: 30
@@ -10643,8 +10617,12 @@
   alias: Bryggers robotstøvsuger rengøring
   description: Styring af robotstøvsuger for at gør rent i bryggerset
   triggers:
-  - trigger: time
-    at: input_datetime.utility_room_robot_vacuum_next_cleaning_time
+  - trigger: state
+    entity_id: input_select.living_room_robot_vacuum_current_cleaning
+    to: none
+  - trigger: numeric_state
+    entity_id: sensor.living_room_robot_vacuum_battery
+    above: 30
   - trigger: state
     entity_id: binary_sensor.living_room_media
     to: 'off'
@@ -10652,14 +10630,13 @@
     entity_id: binary_sensor.bedroom_sleeping
     to: 'off'
   - trigger: state
-    entity_id: binary_sensor.utility_room_light
+    entity_id: binary_sensor.monique_sleep_window
     to: 'off'
   - trigger: state
-    entity_id: input_select.living_room_robot_vacuum_current_cleaning
-    to: none
-  - trigger: numeric_state
-    entity_id: sensor.living_room_robot_vacuum_battery
-    above: 30
+    entity_id: binary_sensor.utility_room_light
+    to: 'off'
+  - trigger: time
+    at: '11:00:00'
   conditions:
   - condition: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -10668,8 +10645,13 @@
   - choose:
     - conditions:
       - condition: template
-        value_template: "{{ now().timestamp() >=\n   states('input_datetime.utility_room_robot_vacuum_next_cleaning_time')
-          | as_timestamp }}"
+        value_template: '{{ (states(''input_datetime.utility_room_robot_vacuum_last_cleaning_time'')
+          | as_datetime).date() != now().date() }}
+
+          '
+      - condition: numeric_state
+        entity_id: sensor.living_room_robot_vacuum_battery
+        above: 30
       - condition: state
         entity_id: binary_sensor.living_room_media
         state: 'off'
@@ -10677,22 +10659,21 @@
         entity_id: binary_sensor.bedroom_sleeping
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.utility_room_light
+        entity_id: binary_sensor.monique_sleep_window
         state: 'off'
       - condition: state
         entity_id: binary_sensor.utility_room_light
         state: 'off'
-      - condition: numeric_state
-        entity_id: sensor.living_room_robot_vacuum_battery
-        above: 30
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
           option: utility_room_cleaning
     - conditions:
       - condition: template
-        value_template: "{{ now() >=\n   (states('input_datetime.utility_room_robot_vacuum_next_cleaning_time')
-          | as_datetime | as_local + timedelta(hours=12)) }}"
+        value_template: '{{ (states(''input_datetime.utility_room_robot_vacuum_last_cleaning_time'')
+          | as_datetime | as_local).date() < (now().date() - timedelta(days=1)) }}
+
+          '
       - condition: numeric_state
         entity_id: sensor.living_room_robot_vacuum_battery
         above: 30
@@ -10729,15 +10710,12 @@
   alias: Gang robotstøvsuger rengøring
   description: Styring af robotstøvsuger for at gør rent i gangen
   triggers:
-  - trigger: time
-    at: input_datetime.hallway_robot_vacuum_next_cleaning_time
   - trigger: state
-    entity_id: binary_sensor.hallway_occupancy
-    to: 'off'
-  - trigger: state
-    entity_id: binary_sensor.living_room_door_sensor_door
-    to: 'on'
-    for: 00:02:00
+    entity_id: input_select.living_room_robot_vacuum_current_cleaning
+    to: none
+  - trigger: numeric_state
+    entity_id: sensor.living_room_robot_vacuum_battery
+    above: 30
   - trigger: state
     entity_id: binary_sensor.living_room_media
     to: 'off'
@@ -10745,11 +10723,17 @@
     entity_id: binary_sensor.someone_sleeping
     to: 'off'
   - trigger: state
-    entity_id: input_select.living_room_robot_vacuum_current_cleaning
-    to: none
-  - trigger: numeric_state
-    entity_id: sensor.living_room_robot_vacuum_battery
-    above: 30
+    entity_id: binary_sensor.monique_sleep_window
+    to: 'off'
+  - trigger: state
+    entity_id: binary_sensor.hallway_occupancy
+    to: 'off'
+  - trigger: state
+    entity_id: binary_sensor.living_room_door_sensor_door
+    to: 'on'
+    for: 00:02:00
+  - trigger: time
+    at: '12:00:00'
   conditions:
   - condition: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -10758,31 +10742,38 @@
   - choose:
     - conditions:
       - condition: template
-        value_template: "{{ now().timestamp() >=\n   states('input_datetime.hallway_robot_vacuum_next_cleaning_time')
-          | as_timestamp }}"
-      - condition: state
-        entity_id: binary_sensor.living_room_door_sensor_door
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.hallway_occupancy
-        state: 'off'
+        value_template: '{{ (states(''input_datetime.hallway_robot_vacuum_last_cleaning_time'')
+          | as_datetime).date() != now().date() }}
+
+          '
+      - condition: numeric_state
+        entity_id: sensor.living_room_robot_vacuum_battery
+        above: 30
       - condition: state
         entity_id: binary_sensor.living_room_media
         state: 'off'
       - condition: state
         entity_id: binary_sensor.someone_sleeping
         state: 'off'
-      - condition: numeric_state
-        entity_id: sensor.living_room_robot_vacuum_battery
-        above: 30
+      - condition: state
+        entity_id: binary_sensor.monique_sleep_window
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.hallway_occupancy
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.living_room_door_sensor_door
+        state: 'on'
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
           option: hallway_cleaning
     - conditions:
       - condition: template
-        value_template: "{{ now() >=\n   (states('input_datetime.hallway_robot_vacuum_next_cleaning_time')
-          | as_datetime | as_local + timedelta(hours=12)) }}"
+        value_template: '{{ (states(''input_datetime.hallway_robot_vacuum_last_cleaning_time'')
+          | as_datetime | as_local).date() < (now().date() - timedelta(days=1)) }}
+
+          '
       - condition: state
         entity_id: binary_sensor.living_room_door_sensor_door
         state: 'on'
@@ -10822,11 +10813,12 @@
   alias: Stue robotstøvsuger rengøring
   description: Styring af robotstøvsuger for at gør rent i stuen
   triggers:
-  - trigger: time
-    at: input_datetime.living_room_robot_vacuum_next_cleaning_time
   - trigger: state
-    entity_id: binary_sensor.living_room_door_sensor_door
-    to: 'off'
+    entity_id: input_select.living_room_robot_vacuum_current_cleaning
+    to: none
+  - trigger: numeric_state
+    entity_id: sensor.living_room_robot_vacuum_battery
+    above: 40
   - trigger: state
     entity_id: binary_sensor.living_room_media
     to: 'off'
@@ -10834,11 +10826,13 @@
     entity_id: binary_sensor.bedroom_sleeping
     to: 'off'
   - trigger: state
-    entity_id: input_select.living_room_robot_vacuum_current_cleaning
-    to: none
-  - trigger: numeric_state
-    entity_id: sensor.living_room_robot_vacuum_battery
-    above: 40
+    entity_id: binary_sensor.monique_sleep_window
+    to: 'off'
+  - trigger: state
+    entity_id: binary_sensor.living_room_door_sensor_door
+    to: 'off'
+  - trigger: time
+    at: '14:00:00'
   conditions:
   - condition: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -10847,28 +10841,35 @@
   - choose:
     - conditions:
       - condition: template
-        value_template: "{{ now().timestamp() >=\n   states('input_datetime.living_room_robot_vacuum_next_cleaning_time')
-          | as_timestamp }}"
-      - condition: state
-        entity_id: binary_sensor.living_room_door_sensor_door
-        state: 'off'
+        value_template: '{{ (states(''input_datetime.living_room_robot_vacuum_last_cleaning_time'')
+          | as_datetime).date() != now().date() }}
+
+          '
+      - condition: numeric_state
+        entity_id: sensor.living_room_robot_vacuum_battery
+        above: 40
       - condition: state
         entity_id: binary_sensor.living_room_media
         state: 'off'
       - condition: state
         entity_id: binary_sensor.bedroom_sleeping
         state: 'off'
-      - condition: numeric_state
-        entity_id: sensor.living_room_robot_vacuum_battery
-        above: 40
+      - condition: state
+        entity_id: binary_sensor.monique_sleep_window
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.living_room_door_sensor_door
+        state: 'off'
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
           option: living_room_cleaning
     - conditions:
       - condition: template
-        value_template: "{{ now() >=\n   (states('input_datetime.living_room_robot_vacuum_next_cleaning_time')
-          | as_datetime | as_local + timedelta(hours=18)) }}"
+        value_template: '{{ (states(''input_datetime.living_room_robot_vacuum_last_cleaning_time'')
+          | as_datetime | as_local).date() < (now().date() - timedelta(days=1)) }}
+
+          '
       - condition: numeric_state
         entity_id: sensor.living_room_robot_vacuum_battery
         above: 40
@@ -10894,10 +10895,9 @@
           - Stue
       - action: input_datetime.set_datetime
         target:
-          entity_id: input_datetime.living_room_robot_vacuum_next_cleaning_time
+          entity_id: input_datetime.living_room_robot_vacuum_last_cleaning_time
         data:
-          datetime: '{{ (now() | as_local + timedelta(hours=18)).strftime(''%Y-%m-%d
-            %H:%M:%S'') }}
+          datetime: '{{ (now() | as_local).strftime(''%Y-%m-%d %H:%M:%S'') }}
 
             '
       - action: input_datetime.set_datetime
@@ -10921,10 +10921,9 @@
           - Stue
       - action: input_datetime.set_datetime
         target:
-          entity_id: input_datetime.living_room_robot_vacuum_next_cleaning_time
+          entity_id: input_datetime.living_room_robot_vacuum_last_cleaning_time
         data:
-          datetime: '{{ (now() | as_local + timedelta(hours=18)).strftime(''%Y-%m-%d
-            %H:%M:%S'') }}
+          datetime: '{{ (now() | as_local).strftime(''%Y-%m-%d %H:%M:%S'') }}
 
             '
   mode: queued
