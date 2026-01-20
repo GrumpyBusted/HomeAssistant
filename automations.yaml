@@ -3062,7 +3062,7 @@
     id: air_purifier_off
   - trigger: state
     entity_id: climate.bedroom_air_purifier
-    from: 'off'
+    from: 'on'
     id: air_purifier_on
   conditions: []
   actions:
@@ -10434,7 +10434,7 @@
           - Køkken
       - action: input_datetime.set_datetime
         target:
-          entity_id: input_datetime.kitchen_robot_vacuum_next_cleaning_time
+          entity_id: input_datetime.kitchen_robot_vacuum_last_cleaning_time
         data:
           datetime: '{{ (now() | as_local + timedelta(hours=18)).strftime(''%Y-%m-%d
             %H:%M:%S'') }}
@@ -10696,7 +10696,7 @@
           - Bryggers
       - action: input_datetime.set_datetime
         target:
-          entity_id: input_datetime.utility_room_robot_vacuum_next_cleaning_time
+          entity_id: input_datetime.utility_room_robot_vacuum_last_cleaning_time
         data:
           datetime: '{{ (now() | as_local + timedelta(hours=18)).strftime(''%Y-%m-%d
             %H:%M:%S'') }}
@@ -10799,7 +10799,7 @@
           - Gang
       - action: input_datetime.set_datetime
         target:
-          entity_id: input_datetime.hallway_robot_vacuum_next_cleaning_time
+          entity_id: input_datetime.hallway_robot_vacuum_last_cleaning_time
         data:
           datetime: '{{ (now() | as_local + timedelta(hours=18)).strftime(''%Y-%m-%d
             %H:%M:%S'') }}
