@@ -822,7 +822,7 @@
             entity_id: climate.living_room_heat_pump
   mode: restart
   trace:
-    stored_traces: 30
+    stored_traces: 100
 - id: '1735743298155'
   alias: Hjem varmepumpe
   description: Automatik til styring af central luft-til-vand varmepumpe
@@ -2230,7 +2230,7 @@
     id: parents_left_home
   - trigger: state
     entity_id:
-    - binary_sensor.bedroom_occupancy
+    - binary_sensor.bedroom_presence_sensor_occupancy
     from: 'on'
     to: 'off'
     id: bedroom_empty
@@ -2388,7 +2388,7 @@
         id:
         - lights_on
       - condition: state
-        entity_id: binary_sensor.bedroom_occupancy
+        entity_id: binary_sensor.bedroom_presence_sensor_occupancy
         state: 'off'
       sequence:
       - action: timer.cancel
@@ -3747,7 +3747,7 @@
         state: 'off'
       sequence:
       - variables:
-          target: 17
+          target: 19
     - conditions:
       - condition: state
         entity_id: binary_sensor.charlie_sleeping
@@ -3813,6 +3813,8 @@
     entity_id: binary_sensor.parent_home
   - trigger: state
     entity_id: input_boolean.house_sitter
+  - trigger: state
+    entity_id: timer.bedroom_door_timer
   - trigger: time
     at:
       entity_id: input_datetime.monique_wake_up_alarm
@@ -3857,9 +3859,14 @@
       - variables:
           target: 17
     - conditions:
-      - condition: state
-        entity_id: binary_sensor.bedroom_door
-        state: 'off'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.bedroom_door
+          state: 'off'
+        - condition: state
+          entity_id: timer.bedroom_door_timer
+          state: active
       - condition: state
         entity_id: binary_sensor.bedroom_occupancy
         state: 'off'
@@ -10248,15 +10255,21 @@
   - trigger: state
     entity_id: binary_sensor.bedroom_sleeping
     to: 'off'
+    for: 00:02:00
   - trigger: state
     entity_id: binary_sensor.monique_sleep_window
     to: 'off'
+    for: 00:02:00
   - trigger: state
     entity_id: binary_sensor.kitchen_occupancy
     to: 'off'
     for: 00:02:00
   - trigger: time
     at: '11:30:00'
+  - trigger: state
+    entity_id: sensor.living_room_robot_vacuum_time_since_empty_dust_bin
+    to: '0'
+    for: 00:02:00
   conditions:
   - condition: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -10284,6 +10297,11 @@
       - condition: state
         entity_id: binary_sensor.kitchen_occupancy
         state: 'off'
+      - condition: template
+        value_template: '{{ states(''sensor.living_room_robot_vacuum_time_since_empty_dust_bin'')|int
+          < 20 }}
+
+          '
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
@@ -10425,9 +10443,10 @@
   - choose:
     - conditions:
       - condition: template
-        value_template: "{{ states('sensor.living_room_robot_vacuum_total_cleaning_time')|int
-          >\n   states('input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin')|int
-          + 600 }}\n"
+        value_template: '{{ states(''sensor.living_room_robot_vacuum_time_since_empty_dust_bin'')|int
+          > 10 }}
+
+          '
       - condition: state
         entity_id: vacuum.living_room_robot_vacuum
         state: docked
@@ -10449,9 +10468,10 @@
         data: {}
     - conditions:
       - condition: template
-        value_template: "{{ states('sensor.living_room_robot_vacuum_total_cleaning_time')|int
-          >\n   states('input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin')|int
-          + 600 }}\n"
+        value_template: '{{ states(''sensor.living_room_robot_vacuum_time_since_empty_dust_bin'')|int
+          > 10 }}
+
+          '
       - condition: state
         entity_id: vacuum.living_room_robot_vacuum
         state: docked
@@ -10466,7 +10486,7 @@
         state: 'off'
       - condition: state
         entity_id: binary_sensor.living_room_door_sensor_door
-        state: 'off'
+        state: 'on'
       - condition: state
         entity_id: binary_sensor.living_room_media
         state: 'off'
@@ -10476,9 +10496,10 @@
         data: {}
     - conditions:
       - condition: template
-        value_template: "{{ states('sensor.living_room_robot_vacuum_total_cleaning_time')|int
-          >\n   states('input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin')|int
-          + 1800 }}\n"
+        value_template: '{{ states(''sensor.living_room_robot_vacuum_time_since_empty_dust_bin'')|int
+          > 30 }}
+
+          '
       - condition: state
         entity_id: vacuum.living_room_robot_vacuum
         state: docked
@@ -10512,14 +10533,20 @@
   - trigger: state
     entity_id: binary_sensor.bedroom_sleeping
     to: 'off'
+    for: 00:04:00
   - trigger: state
     entity_id: binary_sensor.monique_sleep_window
     to: 'off'
+    for: 00:04:00
   - trigger: state
     entity_id: binary_sensor.utility_room_light
     to: 'off'
   - trigger: time
     at: '11:00:00'
+  - trigger: state
+    entity_id: sensor.living_room_robot_vacuum_time_since_empty_dust_bin
+    to: '0'
+    for: 00:02:00
   conditions:
   - condition: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -10547,6 +10574,11 @@
       - condition: state
         entity_id: binary_sensor.utility_room_light
         state: 'off'
+      - condition: template
+        value_template: '{{ states(''sensor.living_room_robot_vacuum_time_since_empty_dust_bin'')|int
+          < 20 }}
+
+          '
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
@@ -10618,6 +10650,10 @@
     for: 00:02:00
   - trigger: time
     at: '12:00:00'
+  - trigger: state
+    entity_id: sensor.living_room_robot_vacuum_time_since_empty_dust_bin
+    to: '0'
+    for: 00:02:00
   conditions:
   - condition: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -10648,6 +10684,11 @@
       - condition: state
         entity_id: binary_sensor.living_room_door_sensor_door
         state: 'on'
+      - condition: template
+        value_template: '{{ states(''sensor.living_room_robot_vacuum_time_since_empty_dust_bin'')|int
+          < 20 }}
+
+          '
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
@@ -10718,6 +10759,10 @@
     to: 'off'
   - trigger: time
     at: '12:30:00'
+  - trigger: state
+    entity_id: sensor.living_room_robot_vacuum_time_since_empty_dust_bin
+    to: '0'
+    for: 00:02:00
   conditions:
   - condition: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -10745,6 +10790,11 @@
       - condition: state
         entity_id: binary_sensor.living_room_door_sensor_door
         state: 'off'
+      - condition: template
+        value_template: '{{ states(''sensor.living_room_robot_vacuum_time_since_empty_dust_bin'')|int
+          < 10 }}
+
+          '
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
@@ -10930,3 +10980,37 @@
   max: 10
   trace:
     stored_traces: 100
+- id: '1769101770558'
+  alias: Soveværelse dør
+  description: Automatik til at styre timer til soveværelse dør
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.bedroom_door_sensor_opening
+    to: 'off'
+    id: closed
+  - trigger: state
+    entity_id: binary_sensor.bedroom_door_sensor_opening
+    to: 'on'
+    id: opened
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: closed
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.bedroom_door_timer
+    - conditions:
+      - condition: trigger
+        id: opened
+      sequence:
+      - action: timer.start
+        target:
+          entity_id: timer.bedroom_door_timer
+        data:
+          duration: 00:02:00
+  mode: restart
+  trace:
+    stored_traces: 50
