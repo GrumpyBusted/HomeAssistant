@@ -3057,12 +3057,12 @@
     to: 'on'
     id: window_opened
   - trigger: state
-    entity_id: climate.bedroom_air_purifier
+    entity_id: fan.bedroom_air_purifier_fan
     to: 'off'
     id: air_purifier_off
   - trigger: state
-    entity_id: climate.bedroom_air_purifier
-    from: 'on'
+    entity_id: fan.bedroom_air_purifier_fan
+    to: 'on'
     id: air_purifier_on
   conditions: []
   actions:
@@ -10853,7 +10853,7 @@
         metadata: {}
         data:
           type: vac
-          timeout: 30
+          timeout: 35
           rooms:
           - Stue
       - action: input_datetime.set_datetime
