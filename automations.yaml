@@ -8093,6 +8093,8 @@
     id: person_outside_cleared
   conditions: []
   actions:
+  - variables:
+      light: ''
   - choose:
     - conditions:
       - condition: trigger
@@ -8101,42 +8103,12 @@
       - condition: numeric_state
         entity_id: sensor.entrance_motion_sensor_illuminance
         below: 200
-      - condition: state
-        entity_id: binary_sensor.everyone_sleeping
-        state: 'on'
       sequence:
       - action: timer.pause
         target:
           entity_id: timer.entrance_light_timer
-      - action: light.turn_on
-        metadata: {}
-        data:
-          color_temp_kelvin: 2700
-          brightness_pct: 30
-          transition: 1
-        target:
-          entity_id:
-          - light.entrance_lights
-    - conditions:
-      - condition: trigger
-        id:
-        - motion_started
-      - condition: numeric_state
-        entity_id: sensor.entrance_motion_sensor_illuminance
-        below: 200
-      sequence:
-      - action: timer.pause
-        target:
-          entity_id: timer.entrance_light_timer
-      - action: light.turn_on
-        metadata: {}
-        data:
-          color_temp_kelvin: 2700
-          brightness_pct: 80
-          transition: 1
-        target:
-          entity_id:
-          - light.entrance_lights
+      - variables:
+          light: 'on'
     - conditions:
       - condition: trigger
         id:
@@ -8148,28 +8120,19 @@
       - action: timer.pause
         target:
           entity_id: timer.entrance_light_timer
-      - action: light.turn_on
-        metadata: {}
-        data:
-          color_temp_kelvin: 2700
-          brightness_pct: 80
-          transition: 1
-        target:
-          entity_id:
-          - light.entrance_lights
+      - variables:
+          light: 'on'
     - conditions:
-      - condition: and
-        conditions:
-        - condition: trigger
-          id:
-          - motion_ended
-          - person_outside_cleard
-        - condition: state
-          entity_id: binary_sensor.entrance_motion_sensor_motion
-          state: 'off'
-        - condition: state
-          entity_id: binary_sensor.driveway_motion_sensor_entrance_occupancy
-          state: 'off'
+      - condition: trigger
+        id:
+        - motion_ended
+        - person_outside_cleard
+      - condition: state
+        entity_id: binary_sensor.entrance_motion_sensor_motion
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.driveway_motion_sensor_entrance_occupancy
+        state: 'off'
       sequence:
       - action: timer.start
         metadata: {}
@@ -8182,6 +8145,48 @@
         id:
         - timer_ended
         - no_one_home
+      sequence:
+      - variables:
+          light: 'off'
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ light == "on" }}
+
+          '
+      - condition: state
+        entity_id: binary_sensor.someone_sleeping
+        state: 'on'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          color_temp_kelvin: 2700
+          brightness_pct: 30
+          transition: 1
+        target:
+          entity_id:
+          - light.entrance_lights
+    - conditions:
+      - condition: template
+        value_template: '{{ light == "on" }}
+
+          '
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          color_temp_kelvin: 2700
+          brightness_pct: 80
+          transition: 1
+        target:
+          entity_id:
+          - light.entrance_lights
+    - conditions:
+      - condition: template
+        value_template: '{{ light == "off" }}
+
+          '
       sequence:
       - action: light.turn_off
         metadata: {}
