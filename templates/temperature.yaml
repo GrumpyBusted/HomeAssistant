@@ -15,7 +15,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {%- if is_state('script.home_exercising_radiator_valves', 'off') %}
+        {%- if is_state('script.exercising_radiator_valves', 'off') %}
           {{ state_attr('climate.utility_room_temperature_sensor', 'temperature')|float(0)|round(1) }}
         {%- else %}
           23
@@ -37,7 +37,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {%- if is_state('script.home_exercising_radiator_valves', 'off') %}
+        {%- if is_state('script.exercising_radiator_valves', 'off') %}
           {{ state_attr('climate.hallway_radiator_thermostat', 'temperature')|float(0)|round(1) }}
         {%- else %}
           23
@@ -59,7 +59,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {%- if is_state('script.home_exercising_radiator_valves', 'off') %}
+        {%- if is_state('script.exercising_radiator_valves', 'off') %}
           {{ state_attr('climate.toilet_radiator_thermostat', 'temperature')|float(0)|round(1) }}
         {%- else %}
           23
@@ -82,7 +82,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {%- if is_state('script.home_exercising_radiator_valves', 'off') %}
+        {%- if is_state('script.exercising_radiator_valves', 'off') %}
           {{ state_attr('climate.bathroom_radiator_thermostat_wall', 'temperature')|float(0)|round(1) }}
         {%- else %}
           23
@@ -122,7 +122,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {%- if is_state('script.home_exercising_radiator_valves', 'off') %}
+        {%- if is_state('script.exercising_radiator_valves', 'off') %}
           {{ state_attr('climate.emils_room_radiator_thermostat', 'temperature')|float(0)|round(1) }}
         {%- else %}
           23
@@ -161,7 +161,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {%- if is_state('script.home_exercising_radiator_valves', 'off') %}
+        {%- if is_state('script.exercising_radiator_valves', 'off') %}
           {{ state_attr('climate.charlies_room_radiator_thermostat', 'temperature')|float(0)|round(1) }}
         {%- else %}
           23
@@ -200,7 +200,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {%- if is_state('script.home_exercising_radiator_valves', 'off') %}
+        {%- if is_state('script.exercising_radiator_valves', 'off') %}
           {{ state_attr('climate.bedroom_radiator_thermostat', 'temperature')|float(0)|round(1) }}
         {%- else %}
           23
@@ -222,7 +222,7 @@
       unit_of_measurement: "°C"
       icon: "mdi:thermometer"
       state: >-
-        {%- if is_state('script.home_exercising_radiator_valves', 'off') %}
+        {%- if is_state('script.exercising_radiator_valves', 'off') %}
           {{ state_attr('climate.living_room_radiator_thermostat_dining_table', 'temperature')|float(0)|round(1) }}
         {%- else %}
           23

@@ -3674,20 +3674,11 @@
       sequence:
       - variables:
           target: 19
-  - if:
-    - condition: template
-      value_template: '{{ not(is_state_attr(''climate.emils_room_radiator_thermostat'',
-        ''temperature'', target)) }}
-
-        '
-    then:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: '{{ target }}'
-      target:
-        entity_id:
-        - climate.emils_room_radiator_thermostat
+  - action: script.set_climate_temperature
+    data:
+      temperature: '{{ target }}'
+      entities:
+      - climate.emils_room_radiator_thermostat
   mode: restart
   trace:
     stored_traces: 50
@@ -3766,32 +3757,12 @@
       sequence:
       - variables:
           target: 19
-  - if:
-    - condition: template
-      value_template: '{{ not(is_state_attr(''climate.charlies_room_radiator_thermostat'',
-        ''temperature'', target)) }}
-
-        '
-    then:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: '{{ target }}'
-      target:
-        entity_id: climate.charlies_room_radiator_thermostat
-  - if:
-    - condition: template
-      value_template: '{{ not(is_state_attr(''climate.charlies_room_temperature_sensor'',
-        ''temperature'', target)) }}
-
-        '
-    then:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: '{{ target }}'
-      target:
-        entity_id: climate.charlies_room_temperature_sensor
+  - action: script.set_climate_temperature
+    data:
+      temperature: '{{ target }}'
+      entities:
+      - climate.charlies_room_radiator_thermostat
+      - climate.charlies_room_temperature_sensor
   mode: restart
   trace:
     stored_traces: 50
@@ -3903,20 +3874,11 @@
       sequence:
       - variables:
           target: 19
-  - if:
-    - condition: template
-      value_template: '{{ not(is_state_attr(''climate.bedroom_radiator_thermostat'',
-        ''temperature'', target)) }}
-
-        '
-    then:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: '{{ target }}'
-      target:
-        entity_id:
-        - climate.bedroom_radiator_thermostat
+  - action: script.set_climate_temperature
+    data:
+      temperature: '{{ target }}'
+      entities:
+      - climate.bedroom_radiator_thermostat
   mode: restart
   trace:
     stored_traces: 50
@@ -3969,20 +3931,11 @@
       sequence:
       - variables:
           target: 22
-  - if:
-    - condition: template
-      value_template: '{{ not(is_state_attr(''climate.toilet_radiator_thermostat'',
-        ''temperature'', target)) }}
-
-        '
-    then:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: '{{ target }}'
-      target:
-        entity_id:
-        - climate.toilet_radiator_thermostat
+  - action: script.set_climate_temperature
+    data:
+      temperature: '{{ target }}'
+      entities:
+      - climate.toilet_radiator_thermostat
   mode: restart
   trace:
     stored_traces: 50
@@ -4025,34 +3978,12 @@
       sequence:
       - variables:
           target: 20
-  - if:
-    - condition: template
-      value_template: '{{ not(is_state_attr(''climate.bathroom_radiator_thermostat_floor'',
-        ''temperature'', target)) }}
-
-        '
-    then:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: '{{ target }}'
-      target:
-        entity_id:
-        - climate.bathroom_radiator_thermostat_floor
-  - if:
-    - condition: template
-      value_template: '{{ not(is_state_attr(''climate.bathroom_radiator_thermostat_wall'',
-        ''temperature'', target)) }}
-
-        '
-    then:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: '{{ target }}'
-      target:
-        entity_id:
-        - climate.bathroom_radiator_thermostat_wall
+  - action: script.set_climate_temperature
+    data:
+      temperature: '{{ target }}'
+      entities:
+      - climate.bathroom_radiator_thermostat_floor
+      - climate.bathroom_radiator_thermostat_wall
   mode: restart
   trace:
     stored_traces: 50
@@ -4115,48 +4046,13 @@
       sequence:
       - variables:
           target: 22
-  - if:
-    - condition: template
-      value_template: '{{ not(is_state_attr(''climate.utility_room_radiator_thermostat_wall'',
-        ''temperature'', target)) }}
-
-        '
-    then:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: '{{ target }}'
-      target:
-        entity_id:
-        - climate.utility_room_radiator_thermostat_wall
-  - if:
-    - condition: template
-      value_template: '{{ not(is_state_attr(''climate.utility_room_radiator_thermostat_floor'',
-        ''temperature'', target)) }}
-
-        '
-    then:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: '{{ target }}'
-      target:
-        entity_id:
-        - climate.utility_room_radiator_thermostat_floor
-  - if:
-    - condition: template
-      value_template: '{{ not(is_state_attr(''climate.utility_room_temperature_sensor'',
-        ''temperature'', target)) }}
-
-        '
-    then:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: '{{ target }}'
-      target:
-        entity_id:
-        - climate.utility_room_temperature_sensor
+  - action: script.set_climate_temperature
+    data:
+      temperature: '{{ target }}'
+      entities:
+      - climate.utility_room_radiator_thermostat_wall
+      - climate.utility_room_radiator_thermostat_floor
+      - climate.utility_room_temperature_sensor
   mode: restart
   trace:
     stored_traces: 50
@@ -4252,62 +4148,13 @@
       sequence:
       - variables:
           target: 19
-  - if:
-    - condition: template
-      value_template: '{{ not(is_state_attr(''climate.living_room_radiator_thermostat_bookcase'',
-        ''temperature'', target)) }}
-
-        '
-    then:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: '{{ target }}'
-      target:
-        entity_id:
-        - climate.living_room_radiator_thermostat_bookcase
-  - if:
-    - condition: template
-      value_template: '{{ not(is_state_attr(''climate.living_room_radiator_thermostat_dining_table'',
-        ''temperature'', target)) }}
-
-        '
-    then:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: '{{ target }}'
-      target:
-        entity_id:
-        - climate.living_room_radiator_thermostat_dining_table
-  - if:
-    - condition: template
-      value_template: '{{ not(is_state_attr(''climate.living_room_radiator_thermostat_sofa'',
-        ''temperature'', target)) }}
-
-        '
-    then:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: '{{ target }}'
-      target:
-        entity_id:
-        - climate.living_room_radiator_thermostat_sofa
-  - if:
-    - condition: template
-      value_template: '{{ not(is_state_attr(''climate.kitchen_radiator_thermostat'',
-        ''temperature'', target)) }}
-
-        '
-    then:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: '{{ target }}'
-      target:
-        entity_id:
-        - climate.kitchen_radiator_thermostat
+  - action: script.set_climate_temperature
+    data:
+      temperature: '{{ target }}'
+      entities:
+      - climate.living_room_radiator_thermostat_bookcase
+      - climate.living_room_radiator_thermostat_dining_table
+      - climate.living_room_radiator_thermostat_sofa
   mode: restart
   trace:
     stored_traces: 50
@@ -4363,20 +4210,11 @@
       sequence:
       - variables:
           target: 18
-  - if:
-    - condition: template
-      value_template: '{{ not(is_state_attr(''climate.hallway_radiator_thermostat'',
-        ''temperature'', target)) }}
-
-        '
-    then:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: '{{ target }}'
-      target:
-        entity_id:
-        - climate.hallway_radiator_thermostat
+  - action: script.set_climate_temperature
+    data:
+      temperature: '{{ target }}'
+      entities:
+      - climate.hallway_radiator_thermostat
   mode: restart
   trace:
     stored_traces: 50
@@ -4601,7 +4439,7 @@
     metadata: {}
     data: {}
     target:
-      entity_id: script.home_exercising_radiator_valves
+      entity_id: script.exercising_radiator_valves
   mode: single
 - id: '1737796089950'
   alias: Solcast PV Forecast opdater
@@ -11016,6 +10854,108 @@
           entity_id: timer.bedroom_door_timer
         data:
           duration: 00:02:00
+  mode: restart
+  trace:
+    stored_traces: 50
+- id: '1769208997346'
+  alias: Gang fotorammer
+  description: Automatik for at styre fotorammer i gangen
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.people_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_sleeping
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_door
+  actions:
+  - if:
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.people_home
+        state: 'off'
+      - condition: and
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.bedroom_sleeping
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.bedroom_door
+          state: 'on'
+    then:
+    - action: media_player.turn_off
+      target:
+        entity_id:
+        - media_player.hallway_photo_frame_charlie
+        - media_player.hallway_photo_frame_emil
+        - media_player.hallway_photo_frame_joakim
+    else:
+    - action: media_player.turn_on
+      target:
+        entity_id:
+        - media_player.hallway_photo_frame_charlie
+        - media_player.hallway_photo_frame_emil
+        - media_player.hallway_photo_frame_joakim
+  mode: restart
+  trace:
+    stored_traces: 20
+- id: '1769243684320'
+  alias: Køkken varme
+  description: Automatik til at styre varmen i køkkenet
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.home_central_heating
+  - trigger: state
+    entity_id:
+    - binary_sensor.people_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.everyone_sleeping
+  - trigger: state
+    entity_id:
+    - sensor.living_room_target_temperature
+  conditions: []
+  actions:
+  - variables:
+      target: '{{ states(''sensor.living_room_target_temperature'') | float }}'
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.home_central_heating
+        state: 'off'
+      sequence:
+      - variables:
+          target: 23
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.people_home
+        state: 'off'
+      sequence:
+      - variables:
+          target: 17
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.everyone_sleeping
+        state: 'on'
+      sequence:
+      - variables:
+          target: 19
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.toilet_light
+        state: 'on'
+      sequence:
+      - variables:
+          target: 22
+  - action: script.set_climate_temperature
+    data:
+      temperature: '{{ target }}'
+      entities:
+      - climate.kitchen_radiator_thermostat
   mode: restart
   trace:
     stored_traces: 50

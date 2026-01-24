@@ -357,69 +357,6 @@ stue_tv_sluk:
     data: {}
     target:
       entity_id: media_player.living_room_apple_tv_media_player
-hjem_motionering_af_radiatorventiler:
-  alias: Hjem motionering af radiatorventiler
-  description: Skru op og ned op thermostater på alle radiator for at motionere radiatorventiler
-  sequence:
-  - variables:
-      tado_entities:
-      - climate.bathroom_radiator_thermostat_floor_tado
-      - climate.bathroom_radiator_thermostat_wall_tado
-      - climate.bedroom_radiator_thermostat_tado
-      - climate.charlies_room_radiator_thermostat_tado
-      - climate.emils_room_radiator_thermostat_tado
-      - climate.hallway_radiator_thermostat_tado
-      - climate.kitchen_radiator_thermostat_tado
-      - climate.living_room_radiator_thermostat_bookcase_tado
-      - climate.living_room_radiator_thermostat_dining_table_tado
-      - climate.living_room_radiator_thermostat_sofa_tado
-      - climate.utility_room_radiator_thermostat_wall_tado
-      - climate.utility_room_radiator_thermostat_floor_tado
-      - climate.toilet_radiator_thermostat_tado
-  - action: automation.turn_off
-    metadata: {}
-    data: {}
-    target:
-      entity_id:
-      - automation.bathroom_heating
-      - automation.bedroom_heating
-      - automation.charlies_room_heating
-      - automation.emils_room_heating
-      - automation.hallway_heating
-      - automation.living_room_heating
-      - automation.utility_room_heating
-      - automation.toilet_heating
-  - repeat:
-      count: '{{ tado_entities | length }}'
-      sequence:
-      - variables:
-          tado_index: '{{ repeat.index - 1 }}'
-      - repeat:
-          count: 3
-          sequence:
-          - action: climate.set_temperature
-            data:
-              entity_id: '{{ tado_entities[tado_index] }}'
-              temperature: 30
-          - delay: 00:01:00
-          - action: climate.set_temperature
-            data:
-              entity_id: '{{ tado_entities[tado_index] }}'
-              temperature: 5
-          - delay: 00:01:00
-  - action: automation.turn_on
-    metadata: {}
-    data: {}
-    target:
-      entity_id:
-      - automation.bathroom_heating
-      - automation.bedroom_heating
-      - automation.charlies_room_heating
-      - automation.emils_room_heating
-      - automation.hallway_heating
-      - automation.living_room_heating
-      - automation.utility_room_heating
-      - automation.toilet_heating
 living_room_robot_vacuum_dock:
   alias: Stue robotstøvsuger dock
   description: Returner robotstøvsuger til docking station
@@ -456,158 +393,6 @@ living_room_robot_vacuum_dock:
       data: {}
       target:
         entity_id: vacuum.living_room_robot_vacuum
-home_create_todo_task:
-  alias: Hjem opret todo opgave
-  description: Kontroller om samme opgave allerede findes hvis ikke opret den i smart
-    todo
-  icon: mdi:clipboard-list
-  fields:
-    subject:
-      description: Emne for opgaven
-      example: Hent post
-      required: true
-      selector:
-        text:
-    description:
-      description: Beskrivelse af opgaven
-      example: Der er ny post i postkassen ved vejen
-      required: true
-      selector:
-        text:
-          multiline: true
-          multiple: false
-    related_entity_id:
-      description: Enhed opgaven opstår udfra
-      example: light.home_light_a
-      required: false
-      selector:
-        entity:
-          domain:
-    entity_id:
-      description: ToDo listen
-      example: todo.my_todo_list
-      required: true
-      selector:
-        entity:
-          domain: ms365_todo
-    is_active:
-      description: Skal opgaven være aktiv?
-      example: true/false
-      required: true
-      selector:
-        boolean:
-    must_replace:
-      description: Skal opgaven erstattes, hvis den findes?
-      example: true/false
-      required: false
-      selector:
-        boolean:
-      default: false
-  sequence:
-  - variables:
-      todo_entity_id: '[{{ related_entity_id | default(''none'') }}]'
-      todo_desciption: "<htrml> {{ description }} {% if todo_entity_id != '[none]'
-        %}\n  <br><br>Relateret: {{ todo_entity_id }}\n{% endif %}  </html>"
-  - if:
-    - condition: template
-      value_template: '{{ is_active }}'
-    then:
-    - variables:
-        existing: '{{ state_attr(entity_id, ''all_todos'') | selectattr(''subject'',
-          ''equalto'', subject) | rejectattr(''status'', ''equalto'', ''completed'')
-          | map(attribute=''todo_id'') | list }}'
-    - if:
-      - condition: template
-        value_template: '{{ existing | length > 0 and must_replace }}'
-      then:
-      - repeat:
-          count: '{{ existing | length }}'
-          sequence:
-          - action: ms365_todo.complete_todo
-            metadata: {}
-            data:
-              entity_id: '{{ entity_id }}'
-              todo_id: '{{ existing[repeat.index - 1] }}'
-              completed: true
-    - if:
-      - condition: template
-        value_template: '{{ existing | length == 0 or must_replace }}'
-      then:
-      - action: ms365_todo.new_todo
-        metadata: {}
-        data:
-          entity_id: '{{ entity_id }}'
-          subject: '{{ subject }}'
-          description: '{{ todo_desciption }}'
-          due: '{{ utcnow().strftime(''%Y-%m-%d'') }}'
-          reminder: '{{ utcnow() + timedelta(minutes=1) }}'
-    else:
-    - if:
-      - condition: template
-        value_template: '{{ todo_entity != ''[none]'' }}'
-      then:
-      - variables:
-          todo_ids: '{{ state_attr(entity_id, ''all_todos'') |  selectattr(''description'',
-            ''contains'', todo_entity_id) |  rejectattr(''status'', ''equalto'', ''completed'')
-            |  map(attribute=''todo_id'') |  list }}'
-      - repeat:
-          count: '{{ todo_ids | length }}'
-          sequence:
-          - action: ms365_todo.complete_todo
-            metadata: {}
-            data:
-              entity_id: '{{ entity_id }}'
-              todo_id: '{{ todo_ids[repeat.index - 1] }}'
-              completed: true
-home_set_radiator_temperature:
-  alias: Hjem sæt radiator temperatur
-  description: Sæt temperaturen på flere radiator termostater, men kontroller nuværende
-    temperatur først for at undgå unødige kald
-  fields:
-    entities:
-      description: Liste over climate entities der skal opdateres
-      example: '"- climate.living_room_thermostat" "- climate.living_room_thermostat"'
-      required: true
-      selector:
-        entity:
-          domain: climate
-          multiple: true
-    temperature:
-      description: Ønsket temperatur
-      example: 21
-      required: true
-      selector:
-        number:
-          min: -10
-          max: 30
-          unit_of_measurement: °C
-  sequence:
-  - action: system_log.write
-    metadata: {}
-    data:
-      level: debug
-      message: '{{ entities }}'
-  - action: system_log.write
-    metadata: {}
-    data:
-      level: debug
-      message: '{{ temperature }}'
-  - variables:
-      entities_to_update: "{% set result = [] %}\n{% for entity in entities %}\n  {%
-        if state_attr(entity, 'temperature')|float(default=-100) != temperature %}\n
-        \   {% set result = result + [entity] %}\n  {% endif %}\n{% endfor %}\n{{
-        result }}"
-  - action: system_log.write
-    metadata: {}
-    data:
-      level: debug
-      message: '{{ entities_to_update }}'
-  - data:
-      temperature: '{{ temperature }}'
-    target:
-      entity_id: '{{ entities_to_update }}'
-    action: climate.set_temperature
-  mode: parallel
 living_room_robot_vacuum_empty_dust_bin:
   alias: Stue robotstøvsuger tøm støvbeholder
   description: Tøm støvbeholder i robotstøvsuger over i docking station
@@ -986,3 +771,216 @@ living_room_robot_vacuum_set_current:
           entity_id: input_select.living_room_robot_vacuum_current_cleaning
         data:
           option: none
+set_climate_temperature:
+  alias: Sæt radiator temperatur
+  description: 'Sæt temperaturen på flere Tado radiator-termostater, men kun hvis
+    setpunktet er anderledes for at undgå unødige kald
+
+    '
+  mode: parallel
+  fields:
+    entities:
+      description: Liste over Tado climate entities der skal opdateres
+      required: true
+      selector:
+        entity:
+          domain: climate
+          multiple: true
+    temperature:
+      description: Ønsket temperatur
+      required: true
+      selector:
+        number:
+          min: 5
+          max: 30
+          step: 0.1
+          unit_of_measurement: °C
+  sequence:
+  - variables:
+      entities_to_update: "{% set ns = namespace(result=[]) %} {% for entity in entities
+        %}\n  {% set current =\n    state_attr(entity, 'temperature') | float(-100)\n
+        \ %}\n  {% if (current | round(1)) != (temperature | round(1)) %}\n    {%
+        set ns.result = ns.result + [entity] %}\n  {% endif %}\n{% endfor %} {{ ns.result
+        }}\n"
+  - action: system_log.write
+    data:
+      level: info
+      message: 'Entities: {{ entities_to_update }}
+
+        Temperature: {{ temperature }}
+
+        '
+  - if:
+    - condition: template
+      value_template: '{{ entities_to_update | count > 0 }}'
+    then:
+    - action: climate.set_temperature
+      target:
+        entity_id: '{{ entities_to_update }}'
+      data:
+        temperature: '{{ temperature }}'
+exercising_radiator_valves:
+  alias: Motionering af radiatorventiler
+  description: Skru op og ned op thermostater på alle radiator for at motionere radiatorventiler
+  sequence:
+  - variables:
+      tado_entities:
+      - climate.bathroom_radiator_thermostat_floor_tado
+      - climate.bathroom_radiator_thermostat_wall_tado
+      - climate.bedroom_radiator_thermostat_tado
+      - climate.charlies_room_radiator_thermostat_tado
+      - climate.emils_room_radiator_thermostat_tado
+      - climate.hallway_radiator_thermostat_tado
+      - climate.kitchen_radiator_thermostat_tado
+      - climate.living_room_radiator_thermostat_bookcase_tado
+      - climate.living_room_radiator_thermostat_dining_table_tado
+      - climate.living_room_radiator_thermostat_sofa_tado
+      - climate.utility_room_radiator_thermostat_wall_tado
+      - climate.utility_room_radiator_thermostat_floor_tado
+      - climate.toilet_radiator_thermostat_tado
+  - action: automation.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - automation.bathroom_heating
+      - automation.bedroom_heating
+      - automation.charlies_room_heating
+      - automation.emils_room_heating
+      - automation.hallway_heating
+      - automation.living_room_heating
+      - automation.utility_room_heating
+      - automation.toilet_heating
+  - repeat:
+      count: '{{ tado_entities | length }}'
+      sequence:
+      - variables:
+          tado_index: '{{ repeat.index - 1 }}'
+      - repeat:
+          count: 3
+          sequence:
+          - action: climate.set_temperature
+            data:
+              entity_id: '{{ tado_entities[tado_index] }}'
+              temperature: 30
+          - delay: 00:01:00
+          - action: climate.set_temperature
+            data:
+              entity_id: '{{ tado_entities[tado_index] }}'
+              temperature: 5
+          - delay: 00:01:00
+  - action: automation.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - automation.bathroom_heating
+      - automation.bedroom_heating
+      - automation.charlies_room_heating
+      - automation.emils_room_heating
+      - automation.hallway_heating
+      - automation.living_room_heating
+      - automation.utility_room_heating
+      - automation.toilet_heating
+create_todo_task:
+  alias: Opret todo opgave
+  description: Kontroller om samme opgave allerede findes hvis ikke opret den i smart
+    todo
+  fields:
+    subject:
+      description: Emne for opgaven
+      example: Hent post
+      required: true
+      selector:
+        text:
+    description:
+      description: Beskrivelse af opgaven
+      example: Der er ny post i postkassen ved vejen
+      required: true
+      selector:
+        text:
+          multiline: true
+          multiple: false
+    related_entity_id:
+      description: Enhed opgaven opstår udfra
+      example: light.home_light_a
+      required: false
+      selector:
+        entity:
+          domain:
+    entity_id:
+      description: ToDo listen
+      example: todo.my_todo_list
+      required: true
+      selector:
+        entity:
+          domain: ms365_todo
+    is_active:
+      description: Skal opgaven være aktiv?
+      example: true/false
+      required: true
+      selector:
+        boolean:
+    must_replace:
+      description: Skal opgaven erstattes, hvis den findes?
+      example: true/false
+      required: false
+      selector:
+        boolean:
+      default: false
+  sequence:
+  - variables:
+      todo_entity_id: '[{{ related_entity_id | default(''none'') }}]'
+      todo_desciption: "<htrml> {{ description }} {% if todo_entity_id != '[none]'
+        %}\n  <br><br>Relateret: {{ todo_entity_id }}\n{% endif %}  </html>"
+  - if:
+    - condition: template
+      value_template: '{{ is_active }}'
+    then:
+    - variables:
+        existing: '{{ state_attr(entity_id, ''all_todos'') | selectattr(''subject'',
+          ''equalto'', subject) | rejectattr(''status'', ''equalto'', ''completed'')
+          | map(attribute=''todo_id'') | list }}'
+    - if:
+      - condition: template
+        value_template: '{{ existing | length > 0 and must_replace }}'
+      then:
+      - repeat:
+          count: '{{ existing | length }}'
+          sequence:
+          - action: ms365_todo.complete_todo
+            metadata: {}
+            data:
+              entity_id: '{{ entity_id }}'
+              todo_id: '{{ existing[repeat.index - 1] }}'
+              completed: true
+    - if:
+      - condition: template
+        value_template: '{{ existing | length == 0 or must_replace }}'
+      then:
+      - action: ms365_todo.new_todo
+        metadata: {}
+        data:
+          entity_id: '{{ entity_id }}'
+          subject: '{{ subject }}'
+          description: '{{ todo_desciption }}'
+          due: '{{ utcnow().strftime(''%Y-%m-%d'') }}'
+          reminder: '{{ utcnow() + timedelta(minutes=1) }}'
+    else:
+    - if:
+      - condition: template
+        value_template: '{{ todo_entity != ''[none]'' }}'
+      then:
+      - variables:
+          todo_ids: '{{ state_attr(entity_id, ''all_todos'') |  selectattr(''description'',
+            ''contains'', todo_entity_id) |  rejectattr(''status'', ''equalto'', ''completed'')
+            |  map(attribute=''todo_id'') |  list }}'
+      - repeat:
+          count: '{{ todo_ids | length }}'
+          sequence:
+          - action: ms365_todo.complete_todo
+            metadata: {}
+            data:
+              entity_id: '{{ entity_id }}'
+              todo_id: '{{ todo_ids[repeat.index - 1] }}'
+              completed: true
