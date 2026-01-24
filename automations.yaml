@@ -118,7 +118,6 @@
           - light.living_room_light_dining_table_spot_cabinet
           - light.living_room_light_dining_table_spot_sofa
           - light.living_room_light_strip_glass_cabinet
-          - light.living_room_light_strip_receiver
           - light.living_room_light_strip_tv
           - light.living_room_light_gradient_tube_tv
           - light.living_room_light_coffee_table_1
@@ -190,7 +189,6 @@
           - light.living_room_light_escher
           - light.living_room_light_window_left
           - light.living_room_light_window_right
-          - light.living_room_light_strip_receiver
           - light.living_room_light_coffee_table_1
           - light.living_room_light_coffee_table_2
           - light.living_room_light_strip_tv
@@ -213,7 +211,6 @@
           - light.living_room_light_escher
           - light.living_room_light_window_left
           - light.living_room_light_window_right
-          - light.living_room_light_strip_receiver
           - light.living_room_light_strip_tv
           - light.living_room_light_gradient_tube_tv
       - action: light.turn_on
@@ -282,7 +279,6 @@
           - light.living_room_light_dining_table_spot_cabinet
           - light.living_room_light_dining_table_spot_sofa
           - light.living_room_light_strip_glass_cabinet
-          - light.living_room_light_strip_receiver
           - light.living_room_light_strip_skylight
           - light.living_room_light_strip_tv
           - light.living_room_light_gradient_tube_tv
@@ -339,7 +335,6 @@
           - light.living_room_light_dining_table_spot_cabinet
           - light.living_room_light_dining_table_spot_sofa
           - light.living_room_light_strip_glass_cabinet
-          - light.living_room_light_strip_receiver
           - light.living_room_light_strip_skylight
           - light.living_room_light_strip_tv
           - light.living_room_light_gradient_tube_tv
@@ -386,12 +381,15 @@
               brightness_step_pct: '{{ (state_attr(''event.living_room_switch_rotary'',
                 ''steps'')|float / 3.60)|round(0) }}'
             target:
-              entity_id: "{% set lights = state_attr('light.living_room_lights', 'entity_id')
-                | expand() | selectattr('state', 'eq', 'on') | map(attribute='entity_id')
-                | list %} {% if is_state('light.living_room_light_coffee_table_1',
-                'on') %}\n  {% set lights = lights + ['light.living_room_light_coffee_table_1']
-                %}\n{% endif %} {% if is_state('light.living_room_light_coffee_table_2',
-                'on') %}\n  {% set lights = lights + ['light.living_room_light_coffee_table_2']
+              entity_id: "{% set exclude = [\n  'light.living_room_smart_plug_christmas_elf_house',\n
+                \ 'light.living_room_smart_plug_receiver_accessories',\n  'light.living_room_light_strip_receiver'\n]
+                %}\n{% set lights =\n  state_attr('light.living_room_lights', 'entity_id')\n
+                \ | expand()\n  | selectattr('state', 'eq', 'on')\n  | rejectattr('entity_id',
+                'in', exclude)\n  | map(attribute='entity_id')\n  | list\n%} \n{%
+                if\nis_state('light.living_room_light_coffee_table_1', 'on')\n%}\n
+                \ {% set lights = lights + ['light.living_room_light_coffee_table_1']
+                %}\n{% endif %} {% if\nis_state('light.living_room_light_coffee_table_2',
+                'on')\n%}\n  {% set lights = lights + ['light.living_room_light_coffee_table_2']
                 %}\n{% endif %} {% if lights | length > 0 -%}\n  {{ lights }}      \n{%-
                 else -%}\n  {{ ['light.living_room_lights', 'light.living_room_light_coffee_table_1',
                 'light.living_room_light_coffee_table_2'] }}      \n{%- endif %}"
@@ -402,10 +400,15 @@
             brightness_step_pct: '{{ (state_attr(''event.living_room_switch_rotary'',
               ''steps'')|float / -3.60)|round(0) }}'
           target:
-            entity_id: "{% set lights = state_attr('light.living_room_lights', 'entity_id')
-              | expand() | selectattr('state', 'eq', 'on') | map(attribute='entity_id')
-              | list %}       {% if is_state('light.living_room_light_coffee_table_1',
-              'on') %}\n  {% set lights = lights + ['light.living_room_light_coffee_table_1']
+            entity_id: "{% set exclude = [\n  'light.living_room_smart_plug_christmas_elf_house',\n
+              \ 'light.living_room_smart_plug_receiver_accessories',\n  'light.living_room_light_strip_receiver'\n]
+              %} {% set lights =\n  state_attr('light.living_room_lights', 'entity_id')\n
+              \ | expand()\n  | selectattr('state', 'eq', 'on')\n  | rejectattr('entity_id',
+              'in', exclude)\n  | map(attribute='entity_id')\n  | list\n%} {% set
+              lights = state_attr('light.living_room_lights', 'entity_id') | expand()
+              | selectattr('state', 'eq', 'on') | map(attribute='entity_id') | list
+              %}       {% if is_state('light.living_room_light_coffee_table_1', 'on')
+              %}\n  {% set lights = lights + ['light.living_room_light_coffee_table_1']
               %}\n{% endif %} {% if is_state('light.living_room_light_coffee_table_2',
               'on') %}\n  {% set lights = lights + ['light.living_room_light_coffee_table_2']
               %}\n{% endif %} {{ lights }}      "
@@ -10957,5 +10960,177 @@
       entities:
       - climate.kitchen_radiator_thermostat
   mode: restart
+  trace:
+    stored_traces: 50
+- id: '1769257682123'
+  alias: Stue medieafspiller
+  description: Styring af tilbehør til medie afspilning i Stuen
+  triggers:
+  - trigger: state
+    entity_id: media_player.living_room_apple_tv_media_player
+    to: 'off'
+    id: 'off'
+  - trigger: state
+    entity_id: media_player.living_room_apple_tv_media_player
+    to: idle
+    id: waiting
+  - trigger: state
+    entity_id: media_player.living_room_apple_tv_media_player
+    to:
+    - playing
+    - buffering
+    id: playing
+  - trigger: state
+    entity_id: media_player.living_room_apple_tv_media_player
+    to: paused
+    id: paused
+  - trigger: state
+    entity_id: binary_sensor.someone_home
+    to: 'off'
+    id: no_one_home
+  conditions: []
+  actions:
+  - variables:
+      command: pause
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - 'off'
+        - no_one_home
+      sequence:
+      - variables:
+          command: 'off'
+    - conditions:
+      - condition: trigger
+        id:
+        - waiting
+        - paused
+      sequence:
+      - variables:
+          command: pause
+    - conditions:
+      - condition: trigger
+        id: playing
+      sequence:
+      - variables:
+          command: playing
+  - if:
+    - condition: template
+      value_template: '{{ command == ''off'' }}'
+    then:
+    - parallel:
+      - if:
+        - condition: state
+          entity_id: light.living_room_light_strip_receiver
+          state: 'on'
+        then:
+        - action: light.turn_off
+          data:
+            transition: 1
+          target:
+            entity_id:
+            - light.living_room_light_strip_receiver
+      - if:
+        - condition: state
+          entity_id: light.living_room_smart_plug_receiver_accessories
+          state: 'on'
+        then:
+        - action: light.turn_off
+          target:
+            entity_id: light.living_room_smart_plug_receiver_accessories
+      - if:
+        - condition: state
+          entity_id: media_player.living_room_receiver
+          state: 'on'
+        then:
+        - action: media_player.turn_off
+          target:
+            entity_id: media_player.living_room_receiver
+      - if:
+        - condition: state
+          entity_id: switch.living_room_tv_sync_box_power
+          state: 'on'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.living_room_tv_sync_box_power
+    else:
+    - parallel:
+      - if:
+        - condition: state
+          entity_id: light.living_room_light_strip_receiver
+          state: 'off'
+        then:
+        - action: light.turn_on
+          metadata: {}
+          data:
+            transition: 1
+            color_temp_kelvin: 2700
+            brightness_pct: 100
+          target:
+            entity_id:
+            - light.living_room_light_strip_receiver
+      - if:
+        - condition: state
+          entity_id: light.living_room_smart_plug_receiver_accessories
+          state: 'off'
+        then:
+        - action: light.turn_on
+          target:
+            entity_id: light.living_room_smart_plug_receiver_accessories
+      - if:
+        - condition: state
+          entity_id: media_player.living_room_receiver
+          state: 'off'
+        then:
+        - action: media_player.turn_on
+          target:
+            entity_id: media_player.living_room_receiver
+        - action: media_player.select_source
+          target:
+            entity_id:
+            - media_player.living_room_receiver
+          data:
+            source: Apple TV
+      - if:
+        - condition: state
+          entity_id: switch.living_room_tv_sync_box_power
+          state: 'off'
+        then:
+        - action: switch.turn_on
+          target:
+            entity_id: switch.living_room_tv_sync_box_power
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ command == ''playing'' }}'
+      sequence:
+      - action: huesyncbox.set_sync_state
+        data:
+          device_id: 1cf95a14183d127c38d2f6af89ed61c5
+          power: true
+          sync: true
+          brightness: 100
+          input: input1
+          entertainment_area: TV-område
+          mode: video
+          intensity: moderate
+      - action: switch.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - switch.living_room_tv_sync_box_light_sync
+    - conditions:
+      - condition: template
+        value_template: '{{ command == ''pause'' }}'
+      sequence:
+      - action: huesyncbox.set_sync_state
+        data:
+          device_id: 1cf95a14183d127c38d2f6af89ed61c5
+          sync: false
+  mode: queued
+  max: 10
   trace:
     stored_traces: 50
