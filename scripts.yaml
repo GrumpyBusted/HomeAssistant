@@ -287,76 +287,6 @@ bedroom_light_sunset:
       target:
         entity_id:
         - light.bedroom_light_window
-stue_tand_tv:
-  alias: Stue TV tænd
-  description: Automatik til at tænde TV i stuen
-  icon: mdi:television
-  sequence:
-  - action: media_player.turn_on
-    metadata: {}
-    data: {}
-    target:
-      entity_id: media_player.living_room_receiver_denon
-  - action: media_player.select_source
-    metadata: {}
-    data:
-      source: Apple TV
-    target:
-      entity_id: media_player.living_room_receiver_denon
-  - action: media_player.select_sound_mode
-    metadata: {}
-    data:
-      sound_mode: DOLBY DIGITAL
-    target:
-      entity_id: media_player.living_room_receiver_denon
-  - action: media_player.volume_set
-    metadata: {}
-    data:
-      volume_level: 0.25
-    target:
-      entity_id: media_player.living_room_receiver_denon
-  - action: media_player.turn_on
-    metadata: {}
-    data: {}
-    target:
-      entity_id: media_player.living_room_tv_media_player_sony_bravia
-  - action: media_player.volume_mute
-    metadata: {}
-    data:
-      is_volume_muted: true
-    target:
-      entity_id: media_player.living_room_tv_media_player_sony_bravia
-  - action: media_player.select_source
-    metadata: {}
-    data:
-      source: HDMI 3 (eARC/ARC)
-    target:
-      entity_id: media_player.living_room_tv_media_player_sony_bravia
-  - action: media_player.turn_on
-    metadata: {}
-    data: {}
-    target:
-      entity_id: media_player.living_room_apple_tv_media_player
-stue_tv_sluk:
-  alias: Stue TV sluk
-  description: Automatik til at slukke TV i stuen
-  icon: mdi:television-off
-  sequence:
-  - action: media_player.turn_off
-    metadata: {}
-    data: {}
-    target:
-      entity_id: media_player.living_room_receiver_denon
-  - action: media_player.turn_off
-    metadata: {}
-    data: {}
-    target:
-      entity_id: media_player.living_room_tv_media_player_sony_bravia
-  - action: media_player.turn_off
-    metadata: {}
-    data: {}
-    target:
-      entity_id: media_player.living_room_apple_tv_media_player
 living_room_robot_vacuum_dock:
   alias: Stue robotstøvsuger dock
   description: Returner robotstøvsuger til docking station
@@ -419,8 +349,7 @@ living_room_robot_vacuum_empty_dust_bin:
 living_room_robot_vacuum_start_cleaning:
   alias: Stue robotstøvsuger start rengøring
   description: Start robotstøvsuger med at gøre rent i et bestemt rum
-  mode: queued
-  max: 10
+  mode: single
   trace:
     stored_traces: 25
   fields:
@@ -733,8 +662,9 @@ push_notification:
 living_room_robot_vacuum_set_current:
   alias: Stue robotstøvsuger sæt aktuel
   description: Sæt aktuel rengøring for robotstøvsuger
-  mode: queued
-  max: 10
+  mode: single
+  trace:
+    stored_traces: 50
   fields:
     option:
       description: Rengøring
@@ -984,3 +914,51 @@ create_todo_task:
               entity_id: '{{ entity_id }}'
               todo_id: '{{ todo_ids[repeat.index - 1] }}'
               completed: true
+living_room_light_rotary:
+  alias: Stue lys skru op og ned
+  description: Håndting af styr op og ned for lys i stuen
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 25
+  fields:
+    step:
+      name: Lysstyrketrin
+      description: Ændring af lysstyrke i procent (0–100)
+      required: true
+      selector:
+        number:
+          min: -100
+          max: 100
+          step: 1
+          unit_of_measurement: '%'
+          mode: slider
+      default: 5
+  sequence:
+  - action: system_log.write
+    data:
+      message: 'Step: {{ step }}'
+      level: debug
+  - variables:
+      include:
+      - light.living_room_light_coffee_table_1
+      - light.living_room_light_coffee_table_2
+      exclude:
+      - light.living_room_smart_plug_christmas_elf_house
+      - light.living_room_smart_plug_receiver_accessories
+      - light.living_room_light_strip_receiver
+      lights: "{% \n  set lights = \n    state_attr('light.living_room_lights', 'entity_id')
+        | list\n%} \n{% \n  set a = (lights + include) \n    | reject('in', exclude)
+        \n    | unique \n    | list \n    | expand() \n%} \n{% set o = a | selectattr('state',
+        'eq', 'on') | list %} \n{% if not o %}\n  {{ a | map(attribute='entity_id')
+        | list }}\n{% else %}\n  {{ o | map(attribute='entity_id') | list }}\n{% endif
+        %}"
+  - action: system_log.write
+    data:
+      message: 'Lights: {{ lights }}'
+      level: debug
+  - action: light.turn_on
+    data:
+      brightness_step_pct: '{{ step }}'
+    target:
+      entity_id: '{{ lights }}'

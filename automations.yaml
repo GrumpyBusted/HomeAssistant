@@ -56,7 +56,7 @@
     id: rotary
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
     from: 'on'
     to: 'off'
     id: no_one_home
@@ -309,7 +309,7 @@
             id:
             - lights_on
           - condition: state
-            entity_id: binary_sensor.people_home
+            entity_id: binary_sensor.someone_home
             state: 'off'
         - condition: and
           conditions:
@@ -355,63 +355,16 @@
             entity_id: event.living_room_switch_rotary
             attribute: event_type
             state: clock_wise
-          - condition: state
-            entity_id: binary_sensor.living_room_light
-            state: 'off'
           sequence:
-          - action: light.turn_on
-            metadata: {}
+          - action: script.living_room_light_rotary
             data:
-              brightness_pct: '{{ (state_attr(''event.living_room_switch_rotary'',
-                ''steps'')|float / 3.60)|round(0) }}'
-            target:
-              entity_id:
-              - light.living_room_lights
-              - light.living_room_light_coffee_table_1
-              - light.living_room_light_coffee_table_2
-        - conditions:
-          - condition: state
-            entity_id: event.living_room_switch_rotary
-            attribute: event_type
-            state: clock_wise
-          sequence:
-          - action: light.turn_on
-            metadata: {}
-            data:
-              brightness_step_pct: '{{ (state_attr(''event.living_room_switch_rotary'',
-                ''steps'')|float / 3.60)|round(0) }}'
-            target:
-              entity_id: "{% set exclude = [\n  'light.living_room_smart_plug_christmas_elf_house',\n
-                \ 'light.living_room_smart_plug_receiver_accessories',\n  'light.living_room_light_strip_receiver'\n]
-                %}\n{% set lights =\n  state_attr('light.living_room_lights', 'entity_id')\n
-                \ | expand()\n  | selectattr('state', 'eq', 'on')\n  | rejectattr('entity_id',
-                'in', exclude)\n  | map(attribute='entity_id')\n  | list\n%} \n{%
-                if\nis_state('light.living_room_light_coffee_table_1', 'on')\n%}\n
-                \ {% set lights = lights + ['light.living_room_light_coffee_table_1']
-                %}\n{% endif %} {% if\nis_state('light.living_room_light_coffee_table_2',
-                'on')\n%}\n  {% set lights = lights + ['light.living_room_light_coffee_table_2']
-                %}\n{% endif %} {% if lights | length > 0 -%}\n  {{ lights }}      \n{%-
-                else -%}\n  {{ ['light.living_room_lights', 'light.living_room_light_coffee_table_1',
-                'light.living_room_light_coffee_table_2'] }}      \n{%- endif %}"
+              step: '{{ (state_attr(''event.living_room_switch_rotary'', ''steps'')|float
+                / 3.60)|round(0) }}'
         default:
-        - action: light.turn_on
-          metadata: {}
+        - action: script.living_room_light_rotary
           data:
-            brightness_step_pct: '{{ (state_attr(''event.living_room_switch_rotary'',
-              ''steps'')|float / -3.60)|round(0) }}'
-          target:
-            entity_id: "{% set exclude = [\n  'light.living_room_smart_plug_christmas_elf_house',\n
-              \ 'light.living_room_smart_plug_receiver_accessories',\n  'light.living_room_light_strip_receiver'\n]
-              %} {% set lights =\n  state_attr('light.living_room_lights', 'entity_id')\n
-              \ | expand()\n  | selectattr('state', 'eq', 'on')\n  | rejectattr('entity_id',
-              'in', exclude)\n  | map(attribute='entity_id')\n  | list\n%} {% set
-              lights = state_attr('light.living_room_lights', 'entity_id') | expand()
-              | selectattr('state', 'eq', 'on') | map(attribute='entity_id') | list
-              %}       {% if is_state('light.living_room_light_coffee_table_1', 'on')
-              %}\n  {% set lights = lights + ['light.living_room_light_coffee_table_1']
-              %}\n{% endif %} {% if is_state('light.living_room_light_coffee_table_2',
-              'on') %}\n  {% set lights = lights + ['light.living_room_light_coffee_table_2']
-              %}\n{% endif %} {{ lights }}      "
+            step: '{{ (state_attr(''event.living_room_switch_rotary'', ''steps'')|float
+              / -3.60)|round(0) }}'
   mode: queued
   max: 10
   trace:
@@ -498,7 +451,7 @@
     id: button_4
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
     from: 'on'
     to: 'off'
     id: no_one_home
@@ -526,7 +479,7 @@
     id: door_closed
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
     from: 'on'
     to: 'off'
     id: no_one_home
@@ -712,7 +665,7 @@
       minutes: 1
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
   - trigger: state
     entity_id:
     - binary_sensor.everyone_sleeping
@@ -723,7 +676,7 @@
         value_template: '{{ states("sensor.living_room_current_temperature")|float(21)
           < states("sensor.living_room_target_temperature")|float(21) - 1 }}'
       - condition: state
-        entity_id: binary_sensor.people_home
+        entity_id: binary_sensor.someone_home
         state: 'on'
       - condition: state
         entity_id: binary_sensor.everyone_sleeping
@@ -764,7 +717,7 @@
           value_template: '{{ states("sensor.living_room_current_temperature")|float(21)
             > states("sensor.living_room_target_temperature")|float(21) - 0.5 }}'
         - condition: state
-          entity_id: binary_sensor.people_home
+          entity_id: binary_sensor.someone_home
           state: 'off'
         - condition: state
           entity_id: binary_sensor.everyone_sleeping
@@ -1077,7 +1030,7 @@
     id: charlie_home
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
     from: 'on'
     to: 'off'
     id: no_one_home
@@ -1271,7 +1224,7 @@
     id: sleeping
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
     from: 'on'
     to: 'off'
     id: no_one_home
@@ -1441,7 +1394,7 @@
           entity_id: sensor.home_outside_current_temperature
           below: 15
         - condition: state
-          entity_id: binary_sensor.people_home
+          entity_id: binary_sensor.someone_home
           state: 'off'
       sequence:
       - action: light.turn_off
@@ -1496,7 +1449,7 @@
     to: initial_press
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
     from: 'on'
     to: 'off'
     id: no_one_home
@@ -1626,7 +1579,7 @@
         id:
         - lights_on
       - condition: state
-        entity_id: binary_sensor.people_home
+        entity_id: binary_sensor.someone_home
         state: 'off'
       sequence:
       - action: light.turn_off
@@ -1738,7 +1691,7 @@
         entity_id: binary_sensor.hallway_light
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.people_home
+        entity_id: binary_sensor.someone_home
         state: 'on'
       sequence:
       - action: light.turn_on
@@ -2840,6 +2793,11 @@
       sequence:
       - variables:
           position: 100
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.charlies_room_blind_position
+        data:
+          value: 100
     - conditions:
       - condition: trigger
         id:
@@ -2847,9 +2805,15 @@
       sequence:
       - variables:
           position: 0
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.charlies_room_blind_position
+        data:
+          value: 0
     - conditions:
       - condition: trigger
         id:
+        - light_outside
         - charlie_leaving
         - charlie_home
         - noon
@@ -2860,25 +2824,26 @@
       sequence:
       - variables:
           position: 100
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.charlies_room_blind_position
+        data:
+          value: 100
     - conditions:
       - condition: trigger
         id:
-        - light_outside
-      - condition: state
-        entity_id: binary_sensor.charlie_home
-        state: 'off'
-      sequence:
-      - variables:
-          position: 100
-    - conditions:
-      - condition: trigger
-        id:
-        - charlie_home
         - dark_outside
+        - charlie_leaving
+        - charlie_home
         - bedtime
       sequence:
       - variables:
           position: 0
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.charlies_room_blind_position
+        data:
+          value: 0
   - if:
     - condition: state
       entity_id: binary_sensor.charlies_room_window_sensor_door
@@ -3894,7 +3859,7 @@
     - binary_sensor.home_central_heating
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
   - trigger: state
     entity_id:
     - binary_sensor.everyone_sleeping
@@ -3915,7 +3880,7 @@
           target: 23
     - conditions:
       - condition: state
-        entity_id: binary_sensor.people_home
+        entity_id: binary_sensor.someone_home
         state: 'off'
       sequence:
       - variables:
@@ -3951,7 +3916,7 @@
     - binary_sensor.home_central_heating
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
   - trigger: state
     entity_id:
     - binary_sensor.everyone_sleeping
@@ -3969,7 +3934,7 @@
           target: 23
     - conditions:
       - condition: state
-        entity_id: binary_sensor.people_home
+        entity_id: binary_sensor.someone_home
         state: 'off'
       sequence:
       - variables:
@@ -4002,7 +3967,7 @@
     - binary_sensor.utility_room_door
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
   - trigger: state
     entity_id:
     - binary_sensor.everyone_sleeping
@@ -4030,7 +3995,7 @@
           target: 10
     - conditions:
       - condition: state
-        entity_id: binary_sensor.people_home
+        entity_id: binary_sensor.someone_home
         state: 'off'
       sequence:
       - variables:
@@ -4076,7 +4041,7 @@
   - trigger: state
     entity_id: binary_sensor.living_room_door_sensor_door
   - trigger: state
-    entity_id: binary_sensor.people_home
+    entity_id: binary_sensor.someone_home
   - trigger: state
     entity_id: binary_sensor.living_room_light
   - trigger: state
@@ -4123,7 +4088,7 @@
           target: 10
     - conditions:
       - condition: state
-        entity_id: binary_sensor.people_home
+        entity_id: binary_sensor.someone_home
         state: 'off'
       sequence:
       - variables:
@@ -4173,7 +4138,7 @@
     - binary_sensor.bedroom_door
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
   - trigger: state
     entity_id:
     - binary_sensor.everyone_sleeping
@@ -4201,7 +4166,7 @@
           target: '{{ states(''sensor.bedroom_target_temperature'') }}'
     - conditions:
       - condition: state
-        entity_id: binary_sensor.people_home
+        entity_id: binary_sensor.someone_home
         state: 'off'
       sequence:
       - variables:
@@ -4229,7 +4194,7 @@
     entity_id: sensor.living_room_target_temperature
     id: target_changed
   - trigger: state
-    entity_id: binary_sensor.people_home
+    entity_id: binary_sensor.someone_home
     from: 'on'
     to: 'off'
   conditions: []
@@ -4237,7 +4202,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.people_home
+        entity_id: binary_sensor.someone_home
         state: 'off'
       sequence:
       - action: timer.cancel
@@ -5198,7 +5163,7 @@
     to: idle
     id: timer_ended
   - trigger: state
-    entity_id: binary_sensor.people_home
+    entity_id: binary_sensor.someone_home
     to: 'off'
     id: no_one_home
   conditions: []
@@ -7916,7 +7881,7 @@
     id: timer_ended
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
     from: 'on'
     to: 'off'
     id: no_one_home
@@ -8063,7 +8028,7 @@
     id: timer_ended
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
     from: 'on'
     to: 'off'
     id: no_one_home
@@ -8156,7 +8121,7 @@
     id: timer_ended
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
     from: 'on'
     to: 'off'
     id: no_one_home
@@ -8292,7 +8257,7 @@
     id: rotary
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
     from: 'on'
     to: 'off'
     id: no_one_home
@@ -8318,6 +8283,10 @@
     to:
     - 'on'
     id: person_detected
+  - trigger: state
+    entity_id: binary_sensor.living_room_light
+    to: 'off'
+    id: living_room_light_off
   conditions: []
   actions:
   - choose:
@@ -8462,6 +8431,9 @@
       - condition: state
         entity_id: binary_sensor.kitchen_light
         state: 'off'
+      - condition: state
+        entity_id: binary_sensor.living_room_light
+        state: 'off'
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -8479,6 +8451,9 @@
       - condition: state
         entity_id: binary_sensor.bedroom_sleeping
         state: 'on'
+      - condition: state
+        entity_id: binary_sensor.living_room_light
+        state: 'off'
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -8563,7 +8538,7 @@
         id:
         - light_on
       - condition: state
-        entity_id: binary_sensor.people_home
+        entity_id: binary_sensor.someone_home
         state: 'off'
       sequence:
       - action: light.turn_off
@@ -8607,10 +8582,9 @@
               brightness_step_pct: '{{ (state_attr(''event.kitchen_switch_rotary'',
                 ''steps'')|float / 3.60)|round(0) }}'
             target:
-              entity_id: "{% set lights = state_attr('light.kitchen_lights', 'entity_id')
-                | expand() | selectattr('state', 'eq', 'on') | map(attribute='entity_id')
-                | list %} {% if lights | length > 0 -%}\n  {{ lights }}      \n{%-
-                else -%}\n  {{ 'light.kitchen_lights' }}      \n{%- endif %}"
+              entity_id: '{{ state_attr(''light.kitchen_lights'', ''entity_id'') |  expand()
+                | selectattr(''state'', ''eq'', ''on'') |  map(attribute=''entity_id'')
+                | list }}'
         default:
         - action: light.turn_on
           metadata: {}
@@ -8624,7 +8598,7 @@
   mode: queued
   max: 10
   trace:
-    stored_traces: 20
+    stored_traces: 50
 - id: '1760825733513'
   alias: Have lys hus nord
   description: Automatik til at styre lys i haven på nord siden af huset
@@ -9359,7 +9333,7 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
     from: 'on'
     to: 'off'
     id: no_one_home
@@ -9469,7 +9443,7 @@
   - trigger: state
     entity_id: binary_sensor.everyone_sleeping
   - trigger: state
-    entity_id: binary_sensor.people_home
+    entity_id: binary_sensor.someone_home
   - trigger: numeric_state
     entity_id: sensor.home_outside_current_temperature
     below: 1
@@ -9483,7 +9457,7 @@
         entity_id: sensor.home_outside_current_temperature
         below: 1
       - condition: state
-        entity_id: binary_sensor.people_home
+        entity_id: binary_sensor.someone_home
         state: 'on'
       - condition: state
         entity_id: binary_sensor.everyone_sleeping
@@ -9499,7 +9473,7 @@
           entity_id: sensor.home_outside_current_temperature
           above: 3
         - condition: state
-          entity_id: binary_sensor.people_home
+          entity_id: binary_sensor.someone_home
           state: 'off'
         - condition: state
           entity_id: binary_sensor.everyone_sleeping
@@ -9581,7 +9555,7 @@
             id:
             - door_unlocked
           - condition: state
-            entity_id: binary_sensor.people_home
+            entity_id: binary_sensor.someone_home
             state: 'off'
         - condition: and
           conditions:
@@ -9692,7 +9666,7 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
     from: 'on'
     to: 'off'
     id: no_one_home
@@ -9787,7 +9761,7 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
     from: 'on'
     to: 'off'
     id: no_one_home
@@ -10724,7 +10698,7 @@
     entity_id:
     - sensor.home_current_humidity
   - trigger: state
-    entity_id: binary_sensor.people_home
+    entity_id: binary_sensor.someone_home
   - trigger: state
     entity_id: binary_sensor.everyone_sleeping
   - trigger: state
@@ -10740,7 +10714,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.people_home
+        entity_id: binary_sensor.someone_home
         state: 'on'
       - condition: state
         entity_id: binary_sensor.everyone_sleeping
@@ -10764,7 +10738,7 @@
           entity_id: select.storage_ventilation_system_fan_level
     - conditions:
       - condition: state
-        entity_id: binary_sensor.people_home
+        entity_id: binary_sensor.someone_home
         state: 'on'
       - condition: state
         entity_id: binary_sensor.everyone_sleeping
@@ -10789,7 +10763,7 @@
           entity_id: select.storage_ventilation_system_fan_level
     - conditions:
       - condition: state
-        entity_id: binary_sensor.people_home
+        entity_id: binary_sensor.someone_home
         state: 'on'
       - condition: state
         entity_id: binary_sensor.everyone_sleeping
@@ -10866,7 +10840,7 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
   - trigger: state
     entity_id:
     - binary_sensor.bedroom_sleeping
@@ -10878,7 +10852,7 @@
     - condition: or
       conditions:
       - condition: state
-        entity_id: binary_sensor.people_home
+        entity_id: binary_sensor.someone_home
         state: 'off'
       - condition: and
         conditions:
@@ -10914,7 +10888,7 @@
     - binary_sensor.home_central_heating
   - trigger: state
     entity_id:
-    - binary_sensor.people_home
+    - binary_sensor.someone_home
   - trigger: state
     entity_id:
     - binary_sensor.everyone_sleeping
@@ -10935,7 +10909,7 @@
           target: 23
     - conditions:
       - condition: state
-        entity_id: binary_sensor.people_home
+        entity_id: binary_sensor.someone_home
         state: 'off'
       sequence:
       - variables:
