@@ -818,12 +818,14 @@ create_todo_task:
     todo
   fields:
     subject:
+      name: Emne
       description: Emne for opgaven
       example: Hent post
       required: true
       selector:
         text:
     description:
+      name: Beskrivelse
       description: Beskrivelse af opgaven
       example: Der er ny post i postkassen ved vejen
       required: true
@@ -832,27 +834,39 @@ create_todo_task:
           multiline: true
           multiple: false
     related_entity_id:
+      name: Relateret enhed
       description: Enhed opgaven opstår udfra
       example: light.home_light_a
       required: false
       selector:
         entity:
           domain:
+          - sensor
+          - binary_sensor
+          - light
+          - switch
+          - rest_command
+          - device_tracker
+          - automation
     entity_id:
+      name: ToDo liste
       description: ToDo listen
       example: todo.my_todo_list
       required: true
       selector:
         entity:
-          domain: ms365_todo
+          domain: todo
     is_active:
+      name: Aktiv
       description: Skal opgaven være aktiv?
       example: true/false
       required: true
       selector:
         boolean:
+      default: true
     must_replace:
-      description: Skal opgaven erstattes, hvis den findes?
+      name: Erstat
+      description: Erstat eksisterende opgave hvis den findes
       example: true/false
       required: false
       selector:
@@ -860,23 +874,27 @@ create_todo_task:
       default: false
   sequence:
   - variables:
-      todo_entity_id: '[{{ related_entity_id | default(''none'') }}]'
-      todo_desciption: "<htrml> {{ description }} {% if todo_entity_id != '[none]'
-        %}\n  <br><br>Relateret: {{ todo_entity_id }}\n{% endif %}  </html>"
+      todo_entity_id: '{{ related_entity_id | default(''none'') }}'
+      todo_description: "<html> {{ description }} {% if todo_entity_id != 'none' %}\n
+        \ <br><br><i>Relateret:</i> {{ todo_entity_id }}\n{% endif %}  </html>"
   - if:
     - condition: template
-      value_template: '{{ is_active }}'
+      value_template: '{{ is_active | bool }}'
     then:
     - variables:
-        existing: '{{ state_attr(entity_id, ''all_todos'') | selectattr(''subject'',
-          ''equalto'', subject) | rejectattr(''status'', ''equalto'', ''completed'')
-          | map(attribute=''todo_id'') | list }}'
+        existing: "{% set todos = state_attr(entity_id, 'all_todos') | rejectattr('status',
+          'equalto', 'completed') | list %} {% if todo_entity_id != 'none' %}\n  {{
+          todos\n     | selectattr('description', 'contains', '<i>Relateret:</i> '
+          ~ todo_entity_id)\n     | map(attribute='todo_id')\n     | list }}\n{% else
+          %}\n  {{ todos\n     | selectattr('subject', 'equalto', subject)\n     |
+          map(attribute='todo_id')\n     | list }}\n{% endif %}"
+        existing_count: '{{ existing | length }}'
     - if:
       - condition: template
-        value_template: '{{ existing | length > 0 and must_replace }}'
+        value_template: '{{ existing_count > 0 and must_replace }}'
       then:
       - repeat:
-          count: '{{ existing | length }}'
+          count: '{{ existing_count }}'
           sequence:
           - action: ms365_todo.complete_todo
             metadata: {}
@@ -886,20 +904,20 @@ create_todo_task:
               completed: true
     - if:
       - condition: template
-        value_template: '{{ existing | length == 0 or must_replace }}'
+        value_template: '{{ existing_count == 0 or must_replace }}'
       then:
       - action: ms365_todo.new_todo
         metadata: {}
         data:
           entity_id: '{{ entity_id }}'
           subject: '{{ subject }}'
-          description: '{{ todo_desciption }}'
-          due: '{{ utcnow().strftime(''%Y-%m-%d'') }}'
-          reminder: '{{ utcnow() + timedelta(minutes=1) }}'
+          description: '{{ todo_description  }}'
+          due: '{{ utcnow().date().isoformat() }}'
+          reminder: '{{ (utcnow() + timedelta(minutes=1)).isoformat() }}'
     else:
     - if:
       - condition: template
-        value_template: '{{ todo_entity != ''[none]'' }}'
+        value_template: '{{ todo_entity_id != ''none'' }}'
       then:
       - variables:
           todo_ids: '{{ state_attr(entity_id, ''all_todos'') |  selectattr(''description'',
@@ -962,3 +980,49 @@ living_room_light_rotary:
       brightness_step_pct: '{{ step }}'
     target:
       entity_id: '{{ lights }}'
+cleanup_todo_tasks:
+  alias: Opryd todo opgaver
+  description: Sletter færdiggjorte todo-opgaver, evt. før et givent tidspunkt
+  mode: parallel
+  fields:
+    entity_id:
+      name: ToDo liste
+      description: ToDo listen
+      example: todo.my_todo_list
+      required: true
+      selector:
+        entity:
+          domain: todo
+    date:
+      name: Afsluttet dato
+      description: 'Slet kun opgaver færdiggjort før eller på denne dag, udelad for
+        at slette alle færdiggjorte.
+
+        '
+      example: '2025-01-20'
+      required: false
+      selector:
+        date: {}
+  sequence:
+  - variables:
+      cutoff: "{% if date is defined %}\n  {{ (date | as_datetime).strftime('%Y-%m-%dT%H:%M:%S+0000')
+        }}\n{% else %}\n  none\n{% endif %}"
+      delete: "{% set ns = namespace(ids=[]) %} \n{% for todo in state_attr(entity_id,
+        'all_todos') | default([]) %}\n  {% if todo.status == 'completed' and (cutoff
+        == 'none' or todo.completed <= cutoff) %}\n    {% set ns.ids = ns.ids + [todo.todo_id]
+        %}\n  {% endif %}\n{% endfor %} {{ ns.ids }}"
+      output: '{{ {''deleted'': delete | length} }}    '
+  - action: system_log.write
+    data:
+      level: info
+      message: "List: {{ entity_id }} \nCutoff: {{ cutoff }} \nDelete: {{ delete |
+        length }}"
+  - repeat:
+      count: '{{ delete | length }}'
+      sequence:
+      - action: ms365_todo.delete_todo
+        data:
+          entity_id: '{{ entity_id }}'
+          todo_id: '{{ delete[repeat.index - 1] }}'
+  - stop: All Done
+    response_variable: output

@@ -5159,6 +5159,10 @@
     from: playing
     id: playing_ended
   - trigger: state
+    entity_id: media_player.living_room_apple_tv_media_player
+    to: 'off'
+    id: 'off'
+  - trigger: state
     entity_id: timer.living_room_media_timer
     to: idle
     id: timer_ended
@@ -5174,7 +5178,7 @@
         id:
         - playing_started
       sequence:
-      - action: timer.pause
+      - action: timer.cancel
         target:
           entity_id: timer.living_room_media_timer
       - action: input_boolean.turn_on
@@ -5203,6 +5207,7 @@
         id:
         - no_one_home
         - timer_ended
+        - 'off'
       sequence:
       - action: input_boolean.turn_off
         metadata: {}
@@ -5555,12 +5560,12 @@
   trace:
     stored_traces: 50
 - id: '1739712804347'
-  alias: Hjem smart todo postkasse
-  description: Opret ToDo opgaver vedrørende postkasse
+  alias: Todo postkasse
+  description: Opret todo opgaver vedrørende postkasse
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_vibration_sensor_mailbox_vibration_aqara
+    - binary_sensor.driveway_vibration_sensor_mailbox_vibration
     from: 'off'
     to: 'on'
     id: new_post
@@ -5571,43 +5576,41 @@
       id:
       - new_post
     then:
-    - action: script.home_create_todo_task
+    - action: script.create_todo_task
       data:
         subject: Tøm postkasse
         description: Der er nye breve i postkassen ved vejen
-        related_entity_id: sensor.driveway_vibration_sensor_mailbox_vibration_aqara
-        entity_id: todo.home_smart_todo
-        is_active: true
+        related_entity_id: binary_sensor.driveway_vibration_sensor_mailbox_vibration
+        entity_id: todo.todo_smart_todo
   mode: restart
+  trace:
+    stored_traces: 30
 - id: '1739714838791'
-  alias: Hjem smart todo slet afsluttede opgaver
-  description: Automatik der sletter afsluttede opgaver
+  alias: Todo smart todo oprydning
+  description: Automatik der sletter afsluttede opgaver fra smart todo listen
   triggers:
   - trigger: time
-    at: 03:00:00
+    at: 03:05:00
   conditions: []
   actions:
-  - variables:
-      todos: "{% set completed_tasks = namespace(tasks=[]) %} {% for todo in state_attr('todo.home_smart_todo',
-        'all_todos') %}\n  {% if todo.status == 'completed' and todo.completed | as_datetime
-        < utcnow() - timedelta(days=1) %}\n    {% set completed_tasks.tasks = completed_tasks.tasks
-        + [todo.todo_id] %}\n  {% endif %}\n{% endfor %} {{ completed_tasks.tasks
-        }}"
-  - repeat:
-      count: '{{ todos | length }}'
-      sequence:
-      - action: ms365_todo.delete_todo
-        metadata: {}
-        data:
-          todo_id: '{{ todos[repeat.index - 1] }}'
-          entity_id: todo.home_smart_todo
+  - action: script.cleanup_todo_tasks
+    data:
+      entity_id: todo.todo_smart_todo
+      date: '{{ (now() - timedelta(days=2)).date() }}'
+    response_variable: response
+  - action: system_log.write
+    data:
+      level: info
+      message: 'Deleted: {{ response.deleted }} '
   mode: restart
+  trace:
+    stored_traces: 30
 - id: '1739742119703'
   alias: Hjem smart todo Tabo
   description: Kontroller batteri status på Tado enheder
   triggers:
   - trigger: time
-    at: 03:05:00
+    at: 03:20:00
   conditions: []
   actions:
   - action: rest_command.tado_get_auth_token
@@ -5697,8 +5700,8 @@
         }}'
   mode: restart
 - id: '1739744093398'
-  alias: Hjem smart todo Ikea
-  description: Kontroller batteri status på Ikea enheder
+  alias: Todo IKEA rullegardiner
+  description: Kontroller batteri status på IKEA rullegardiner
   triggers:
   - trigger: state
     entity_id:
@@ -5712,97 +5715,89 @@
     at: 03:12:00
   conditions: []
   actions:
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri i gardinet i soveværelset
-      description: 'Batteri niveau er {{ states(''sensor.bedroom_blind_battery'')
-        }}% på IKEA rullegardin i soveværelset. Batteri: Genopladelig batteripakke'
-      related_entity_id: sensor.bedroom_blind_battery
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.bedroom_blind_battery'')|int < 5 }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri i gardinet på Emils værelse
-      description: 'Batteri niveau er {{ states(''sensor.emils_room_blind_battery'')
-        }}% på IKEA rullegardin på Emils værelse. Batteri: Genopladelig batteripakke'
-      related_entity_id: sensor.emils_room_blind_battery
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.emils_room_blind_battery'')|int < 5 }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri i gardinet på Charlies værelse
-      description: 'Batteri niveau er {{ states(''sensor.charlies_room_blind_battery'')
-        }}% på IKEA rullegardin på Charlies værelse. Batteri: Genopladelig batteripakke'
-      related_entity_id: sensor.charlies_room_blind_battery
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.charlies_room_blind_battery'')|int < 5 }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri i kontakt til gardinet i soveværelset
-      description: 'Batteri niveau er {{ states(''sensor.bedroom_blind_open_close_remote_battery'')
-        }}% på kontaken til IKEA rullegardin i soveværelset. Batteri: 1 * CR2032'
-      related_entity_id: sensor.bedroom_blind_open_close_remote_battery
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.bedroom_blind_open_close_remote_battery'')|int
-        < 5 }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri i kontakt til gardinet på Emils værelset
-      description: 'Batteri niveau er {{ states(''sensor.emils_room_blind_open_close_remote_battery'')
-        }}% på kontaken til IKEA rullegardin på Emils værelset. Batteri: 1 * CR2032 '
-      related_entity_id: sensor.emils_room_blind_open_close_remote_battery
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.emils_room_blind_open_close_remote_battery'')|int
-        < 5 }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri i kontakt til gardinet på Charlies værelset
-      description: 'Batteri niveau er {{ states(''sensor.charlies_room_blind_open_close_remote_battery'')
-        }}% på kontaken til IKEA rullegardin på Charlies værelset. Batteri: 1 * CR2032'
-      related_entity_id: sensor.charlies_room_blind_open_close_remote_battery
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.charlies_room_blind_open_close_remote_battery'')|int
-        < 5 }}'
-  mode: queued
-  max: 10
+  - variables:
+      sensors:
+      - entity_id: sensor.bedroom_blind_battery
+        battery_type: Genopladelig batteripakke
+      - entity_id: sensor.emils_room_blind_battery
+        battery_type: Genopladelig batteripakke
+      - entity_id: sensor.charlies_room_blind_battery
+        battery_type: Genopladelig batteripakke
+      - entity_id: sensor.bedroom_blind_open_close_remote_battery
+      - entity_id: sensor.emils_room_blind_open_close_remote_battery
+      - entity_id: sensor.charlies_room_blind_open_close_remote_battery
+  - repeat:
+      for_each: '{{ sensors }}'
+      sequence:
+      - variables:
+          i: '{{ repeat.item.entity_id }}'
+          d: '{{ device_attr(device_id(repeat.item.entity_id), ''name_by_user'') }}'
+          a: '{{ area_name(repeat.item.entity_id) or ''ukendt rum'' }}'
+          b: "{% if repeat.item.battery_type is defined %}\n  {{ repeat.item.battery_type
+            }}\n{% else %}\n  {{ state_attr(repeat.item.entity_id, 'battery_quantity')
+            ~ ' * ' ~ state_attr(repeat.item.entity_id, 'battery_size') }}\n{% endif
+            %}"
+          l: '{{ states(repeat.item.entity_id) | int(default=-1) }}'
+      - action: system_log.write
+        data:
+          level: debug
+          message: 'Entity Id: {{ i }}
+
+            Area: {{ a }}
+
+            Battery type: {{ b }}
+
+            Level: {{ l }}'
+      - if:
+        - condition: template
+          value_template: '{{ l >= 0 }}'
+        then:
+        - action: script.create_todo_task
+          data:
+            subject: Skift batteri på {{ d }}
+            description: 'Batteri niveau er {{ l }}% på {{ d }}, placeret i {{ a }}.
+              Batteritype: {{ b }}'
+            related_entity_id: '{{ i }}'
+            entity_id: todo.todo_smart_todo
+            is_active: '{{ l < 5 }}'
+  mode: restart
+  trace:
+    stored_traces: 30
 - id: '1739816800938'
-  alias: Hjem smart todo Roborock
-  description: Kontroller status på Roborock robostøvsuger
+  alias: Todo Roborock
+  description: Kontroller status på robostøvsuger
   triggers:
   - trigger: state
     entity_id:
-    - sensor.living_room_robot_vacuum_dock_error_roborock
-    - sensor.living_room_robot_vacuum_error_roborock
+    - sensor.living_room_robot_vacuum_dock_error
+    - sensor.living_room_robot_vacuum_error
   - trigger: time
     at: 04:01:00
-  conditions:
-  - condition: not
-    conditions:
-    - condition: time
-      after: 03:00:00
-      before: 04:00:00
+  conditions: []
   actions:
-  - action: script.home_create_todo_task
+  - action: script.create_todo_task
     data:
-      subject: Løs problem med Dobbys hus ({{ states('sensor.living_room_robot_vacuum_dock_error_roborock')
+      subject: Løs problem med Dobbys hus ({{ states('sensor.living_room_robot_vacuum_dock_error')
         }})
-      description: Advarsel på Roborock docking station. Kode {{ states('sensor.living_room_robot_vacuum_dock_error_roborock')
+      description: Advarsel på Roborock docking station. Kode {{ states('sensor.living_room_robot_vacuum_dock_error')
         }}
-      related_entity_id: sensor.living_room_robot_vacuum_dock_error_roborock
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.living_room_robot_vacuum_dock_error_roborock'')
-        != ''ok'' }}'
-  - action: script.home_create_todo_task
+      related_entity_id: sensor.living_room_robot_vacuum_dock_error
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ states(''sensor.living_room_robot_vacuum_dock_error'') != ''ok''
+        }}'
+  - action: script.create_todo_task
     data:
-      subject: Løs problem med Dobby ({{ states('sensor.living_room_robot_vacuum_error_roborock')
+      subject: Løs problem med Dobby ({{ states('sensor.living_room_robot_vacuum_error')
         }})
-      description: Advarsel på Roborock robot støvsuger. Kode {{ states('sensor.living_room_robot_vacuum_error_roborock')
+      description: Advarsel på Roborock robot støvsuger. Kode {{ states('sensor.living_room_robot_vacuum_error')
         }}
-      related_entity_id: sensor.living_room_robot_vacuum_error_roborock
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.living_room_robot_vacuum_error_roborock'') !=
-        ''none'' }}'
+      related_entity_id: sensor.living_room_robot_vacuum_error
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ states(''sensor.living_room_robot_vacuum_error'') != ''none''
+        }}'
   mode: restart
+  trace:
+    stored_traces: 30
 - id: '1739904709484'
   alias: Hjem smart todo Netatmo
   description: Kontroller batteri status på Netatmo enheder
@@ -5878,280 +5873,347 @@
         < 5 }}'
   mode: restart
 - id: '1739906369450'
-  alias: Hjem smart todo Philips hue kontakter
-  description: Kontroller batteri status på Philips hue kontakter
+  alias: Todo Philips Hue kontakter
+  description: Kontroller batteri status på Philips Hue kontakter
   triggers:
   - trigger: state
     entity_id:
-    - sensor.bedroom_switch_battery_philips_hue
-    - sensor.hallway_switch_battery_philips_hue
-    - sensor.living_room_switch_battery_philips_hue
-    - sensor.patio_switch_battery_philips_hue
-    - sensor.emils_room_switch_battery_philips_hue
-    - sensor.charlies_room_switch_battery_philips_hue
+    - sensor.living_room_switch_battery
+    - sensor.kitchen_switch_battery
+    - sensor.bedroom_switch_battery
+    - sensor.hallway_switch_battery
+    - sensor.patio_switch_battery
+    - sensor.emils_room_switch_battery
+    - sensor.charlies_room_switch_battery
   - trigger: time
     at: 03:15:00
   conditions: []
   actions:
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på lyskontakt i stuen
-      description: 'Batteri niveau er {{ states(''sensor.living_room_switch_battery_philips_hue'')
-        }}% på Philips hue lys roter switch i stuen. Batteri: 1 * CR2032'
-      related_entity_id: sensor.living_room_switch_battery_philips_hue
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.living_room_switch_battery_philips_hue'')|int
-        < 5 }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på lyskontakt i soveværelset
-      description: 'Batteri niveau er {{ states(''sensor.bedroom_switch_battery_philips_hue'')
-        }}% på Philips hue lys dimmer switch i soveværelset. Batteri: 1 * CR2450'
-      related_entity_id: sensor.bedroom_switch_battery_philips_hue
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.bedroom_switch_battery_philips_hue'')|int < 2
-        }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på lyskontakt i gangen
-      description: 'Batteri niveau er {{ states(''sensor.hallway_switch_battery_philips_hue'')
-        }}% på Philips hue lys dimmer switch i gangen. Batteri: 1 * CR2450'
-      related_entity_id: sensor.hallway_switch_battery_philips_hue
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.hallway_switch_battery_philips_hue'')|int < 2
-        }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på lyskontakt til terrassen
-      description: 'Batteri niveau er {{ states(''sensor.patio_switch_battery_philips_hue'')
-        }}% på Philips hue lys dimmer switch til terrassen. Batteri: 1 * CR2450'
-      related_entity_id: sensor.patio_switch_battery_philips_hue
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.patio_switch_battery_philips_hue'')|int < 2 }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på lyskontakt på emils værelse
-      description: 'Batteri niveau er {{ states(''sensor.emils_room_switch_battery_philips_hue'')
-        }}% på Philips hue lys dimmer switch på emils værelse. Batteri: 1 * CR2450'
-      related_entity_id: sensor.emils_room_switch_battery_philips_hue
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.emils_room_switch_battery_philips_hue'')|int
-        < 2 }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på lyskontakt på charlies værelse
-      description: 'Batteri niveau er {{ states(''sensor.charlies_room_switch_battery_philips_hue'')
-        }}% på Philips hue lys dimmer switch på charlies værelse. Batteri: 1 * CR2450'
-      related_entity_id: sensor.charlies_room_switch_battery_philips_hue
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.charlies_room_switch_battery_philips_hue'')|int
-        < 2 }}'
+  - variables:
+      sensors:
+      - entity_id: sensor.living_room_switch_battery
+        battery_type: 1 * CR2032
+      - entity_id: sensor.kitchen_switch_battery
+        battery_type: 1 * CR2032
+      - entity_id: sensor.bedroom_switch_battery
+        battery_type: 1 * CR2450
+      - entity_id: sensor.hallway_switch_battery
+        battery_type: 1 * CR2450
+      - entity_id: sensor.kitchen_switch_battery
+        battery_type: 1 * CR2450
+      - entity_id: sensor.patio_switch_battery
+        battery_type: 1 * CR2450
+      - entity_id: sensor.emils_room_switch_battery
+        battery_type: 1 * CR2450
+      - entity_id: sensor.charlies_room_switch_battery
+        battery_type: 1 * CR2450
+  - repeat:
+      for_each: '{{ sensors }}'
+      sequence:
+      - variables:
+          i: '{{ repeat.item.entity_id }}'
+          a: '{{ area_name(repeat.item.entity_id) or ''ukendt rum'' }}'
+          b: '{{ repeat.item.battery_type }}'
+          l: '{{ states(repeat.item.entity_id) | int(default=-1) }}'
+      - action: system_log.write
+        data:
+          level: debug
+          message: 'Entity Id: {{ i }}
+
+            Area: {{ a }}
+
+            Battery type: {{ b }}
+
+            Level: {{ l }}'
+      - if:
+        - condition: template
+          value_template: '{{ l >= 0 }}'
+        then:
+        - action: script.create_todo_task
+          data:
+            subject: Skift batteri på lyskontakt i {{ a }}
+            description: 'Batteri niveau er {{ l }}% på Philips Hue lyskontakt, placeret
+              i {{ a }}. Batteritype: {{ b }}'
+            related_entity_id: '{{ i }}'
+            entity_id: todo.todo_smart_todo
+            is_active: '{{ l < 5 }}'
   mode: restart
+  trace:
+    stored_traces: 30
 - id: '1739907378753'
-  alias: Hjem smart todo Philips hue bevægelsessensor
-  description: Kontroller batteri status på Philips hue bevægelsessensor
+  alias: Todo Philips Hue bevægelsessensor
+  description: Kontroller batteri status på Philips Hue bevægelsessensorer
   triggers:
   - trigger: state
     entity_id:
-    - sensor.driveway_motion_sensor_entrance_battery_signify
-    - sensor.driveway_motion_sensor_house_east_battery_signify
-    - sensor.driveway_motion_sensor_house_south_battery_signify
-    - sensor.driveway_motion_sensor_street_battery_signify
-    - sensor.entrance_motion_sensor_battery_hue
-    - sensor.utility_room_motion_sensor_battery_hue
-    - sensor.toilet_motion_sensor_battery
+    - sensor.driveway_motion_sensor_entrance_battery
+    - sensor.driveway_motion_sensor_house_east_battery
+    - sensor.driveway_motion_sensor_house_south_battery
+    - sensor.driveway_motion_sensor_street_battery
+    - sensor.garden_motion_sensor_house_east_battery
+    - sensor.garden_motion_sensor_house_west_battery
     - sensor.garden_motion_sensor_house_north_battery
+    - sensor.entrance_motion_sensor_battery
+    - sensor.utility_room_motion_sensor_battery
+    - sensor.toilet_motion_sensor_battery
   - trigger: time
-    at: 03:13:00
+    at: 03:20:00
   conditions: []
   actions:
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på udendørs bevægelsessonsor ved hoveddøren
-      description: 'Batteri niveau er {{ states(''sensor.driveway_motion_sensor_entrance_battery_signify'')
-        }}% på Philips hue udendørs bevægelsessensor ved hoveddøren. Batteri: 2 *
-        AA'
-      related_entity_id: sensor.driveway_motion_sensor_entrance_battery_signify
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.driveway_motion_sensor_entrance_battery_signify'')|int
-        < 5 }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på udendørs bevægelsessonsor ved bryggersdøren
-      description: 'Batteri niveau er {{ states(''sensor.driveway_motion_sensor_house_east_battery_signify'')
-        }}% på Philips hue udendørs bevægelsessensor ved bryggersdøren. Batteri: 2
-        * AA'
-      related_entity_id: sensor.driveway_motion_sensor_house_east_battery_signify
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.driveway_motion_sensor_house_east_battery_signify'')|int
-        < 5 }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på udendørs bevægelsessonsor på syd gavlen
-      description: 'Batteri niveau er {{ states(''sensor.driveway_motion_sensor_house_south_battery_signify'')
-        }}% på Philips hue udendørs bevægelsessensor på galven med syd. Batteri: 2
-        * AA'
-      related_entity_id: sensor.driveway_motion_sensor_house_south_battery_signify
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.driveway_motion_sensor_house_south_battery_signify'')|int
-        < 5 }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på udendørs bevægelsessonsor ved vejen
-      description: 'Batteri niveau er {{ states(''sensor.driveway_motion_sensor_street_battery_signify'')
-        }}% på Philips hue udendørs bevægelsessensor ved vejen. Batteri: 2 * AA'
-      related_entity_id: sensor.driveway_motion_sensor_street_battery_signify
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.driveway_motion_sensor_street_battery_signify'')|int
-        < 5 }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på udendørs bevægelsessonsor på nord gavlen
-      description: 'Batteri niveau er {{ states(''sensor.garden_motion_sensor_house_north_battery'')
-        }}% på Philips hue udendørs bevægelsessensor på nord gavlen. Batteri: 2 *
-        AA'
-      related_entity_id: sensor.garden_motion_sensor_house_north_battery
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.garden_motion_sensor_house_north_battery'')|int
-        < 5 }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på entre bevægelsessonsor
-      description: 'Batteri niveau er {{ states(''sensor.entrance_motion_sensor_battery_hue'')
-        }}% på Philips hue indendørs bevægelsessensor i entreen. Batteri: 2 * AAA'
-      related_entity_id: sensor.entrance_motion_sensor_battery_hue
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.entrance_motion_sensor_battery_hue'')|int < 5
-        }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på bryggers bevægelsessonsor
-      description: 'Batteri niveau er {{ states(''sensor.utility_room_motion_sensor_battery'')
-        }}% på Philips hue utility_room_motion_sensor_battery bevægelsessensor i bryggerset.
-        Batteri: 2 * AAA'
-      related_entity_id: sensor.utility_room_motion_sensor_battery
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.entrance_motion_sensor_battery_hue'')|int < 5
-        }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på toilet bevægelsessonsor
-      description: 'Batteri niveau er {{ states(''sensor.toilet_motion_sensor_battery'')
-        }}% på Philips hue utility_room_motion_sensor_battery bevægelsessensor på
-        toilettet. Batteri: 2 * AAA'
-      related_entity_id: sensor.toilet_motion_sensor_battery
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.toilet_motion_sensor_battery'')|int < 5 }}'
+  - variables:
+      sensors:
+      - entity_id: sensor.driveway_motion_sensor_entrance_battery
+        battery_type: 2 * AA
+        location: ved hoveddøren
+      - entity_id: sensor.driveway_motion_sensor_house_south_battery
+        battery_type: 2 * AA
+        location: på syd gavlen
+      - entity_id: sensor.driveway_motion_sensor_street_battery
+        battery_type: 2 * AA
+        location: ved vejen
+      - entity_id: sensor.garden_motion_sensor_house_north_battery
+        battery_type: 2 * AA
+        location: på nord gavlen
+      - entity_id: sensor.garden_motion_sensor_house_west_battery
+        battery_type: 2 * AA
+        location: ved soveværelset
+      - entity_id: sensor.garden_motion_sensor_house_east_battery
+        battery_type: 2 * AA
+        location: ved bryggersdøren
+      - entity_id: sensor.entrance_motion_sensor_battery
+        battery_type: 2 * AAA
+      - entity_id: sensor.utility_room_motion_sensor_battery
+        battery_type: 2 * AAA
+      - entity_id: sensor.toilet_motion_sensor_battery
+        battery_type: 2 * AAA
+  - repeat:
+      for_each: '{{ sensors }}'
+      sequence:
+      - variables:
+          i: '{{ repeat.item.entity_id }}'
+          a: '{{ area_name(repeat.item.entity_id) or ''ukendt område'' }}'
+          b: '{{ repeat.item.battery_type }}'
+          l: '{{ states(repeat.item.entity_id) | int(default=-1) }}'
+          p: '{{ repeat.item.location or '''' }}'
+      - action: system_log.write
+        data:
+          level: debug
+          message: 'Entity Id: {{ i }}
+
+            Area: {{ a }}
+
+            Battery type: {{ b }}
+
+            Level: {{ l }}
+
+            Location: {{ p }}'
+      - if:
+        - condition: template
+          value_template: '{{ l >= 0 }}'
+        then:
+        - action: script.create_todo_task
+          data:
+            subject: Skift batteri på bevægelsessensor i {{ a }}{{ ', ' ~ p if p else
+              '' }}
+            description: 'Batteri niveau er {{ l }}% på Philips Hue bevægelsessensor,
+              placeret i {{ a }}{{ '', '' ~ p if p else '''' }}. Batteritype: {{ b
+              }}'
+            related_entity_id: '{{ i }}'
+            entity_id: todo.todo_smart_todo
+            is_active: '{{ l < 20 }}'
   mode: restart
+  trace:
+    stored_traces: 30
 - id: '1739915975801'
-  alias: Hjem smart todo Philips hue dør sensor
-  description: Kontroller batteri status på Philips hue dør og vindue sensor
+  alias: Todo Philips Hue dørsensor
+  description: Kontroller batteri status på Philips Hue dør og vindue sensorer
   triggers:
   - trigger: state
     entity_id:
-    - sensor.bedroom_door_sensor_battery_philips_hue
-    - sensor.garage_door_sensor_battery_philips_hue
+    - sensor.bedroom_door_sensor_battery
+    - sensor.garage_door_sensor_battery
   - trigger: time
     at: 03:14:00
   conditions: []
   actions:
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på dør sensor til soveværelset
-      description: 'Batteri niveau er {{ states(''sensor.bedroom_door_sensor_battery_philips_hue'')
-        }}% på Philips hue dør/vindues sensor på døren til soveværelset. Batteri:
-        1 * CR2'
-      related_entity_id: sensor.bedroom_door_sensor_battery_philips_hue
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.bedroom_door_sensor_battery_philips_hue'')|int
-        < 5 }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på dør sensor i garagen
-      description: 'Batteri niveau er {{ states(''sensor.garage_door_sensor_battery_philips_hue'')
-        }}% på Philips hue dør/vindues sensor på døren i garagen. Batteri: 1 * CR2'
-      related_entity_id: sensor.garage_door_sensor_battery_philips_hue
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.garage_door_sensor_battery_philips_hue'')|int
-        < 5 }}'
+  - variables:
+      sensors:
+      - entity_id: sensor.bedroom_door_sensor_battery
+        battery_type: 1 * CR2
+      - entity_id: sensor.garage_door_sensor_battery
+        battery_type: 1 * CR2
+  - repeat:
+      for_each: '{{ sensors }}'
+      sequence:
+      - variables:
+          i: '{{ repeat.item.entity_id }}'
+          a: '{{ area_name(repeat.item.entity_id) or ''ukendt rum'' }}'
+          b: '{{ repeat.item.battery_type }}'
+          l: '{{ states(repeat.item.entity_id) | int(default=-1) }}'
+          t: '{{ ''vindue'' if ''window'' in i else ''dør'' }}'
+      - action: system_log.write
+        data:
+          level: debug
+          message: 'Entity Id: {{ i }}
+
+            Area: {{ a }}
+
+            Battery type: {{ b }}
+
+            Level: {{ l }}
+
+            Type: {{ t }}'
+      - if:
+        - condition: template
+          value_template: '{{ l >= 0 }}'
+        then:
+        - action: script.create_todo_task
+          data:
+            subject: Skift batteri på {{ t }} sensor i {{ a }}
+            description: 'Batteri niveau er {{ l }}% på Philips Hue {{ t }} sensor,
+              placeret i {{ a }}. Batteritype: {{ b }}'
+            related_entity_id: '{{ i }}'
+            entity_id: todo.todo_smart_todo
+            is_active: '{{ l < 10 }}'
   mode: restart
+  trace:
+    stored_traces: 30
 - id: '1740165836750'
-  alias: Hjem indkøbsseddel slet afsluttede opgaver
-  description: Automatik der sletter afsluttede opgaver
+  alias: Oprydning todo indkøbsseddel
+  description: Automatik der sletter afsluttede opgaver på indkøbsseddel
   triggers:
   - trigger: time
     at: 03:00:00
   conditions: []
   actions:
-  - variables:
-      todos: "{% set completed_tasks = namespace(tasks=[]) %} {% for todo in\n  state_attr('todo.home_shopping_list_todo',
-        'all_todos') %}\n  {% if todo.status == 'completed' and todo.completed | as_datetime
-        < utcnow() - timedelta(days=1) %}\n    {% set completed_tasks.tasks = completed_tasks.tasks
-        + [todo.todo_id] %}\n  {% endif %}\n{% endfor %} {{ completed_tasks.tasks
-        }}"
-  - repeat:
-      count: '{{ todos | length }}'
-      sequence:
-      - action: ms365_todo.delete_todo
-        metadata: {}
-        data:
-          todo_id: '{{ todos[repeat.index - 1] }}'
-          entity_id: todo.home_shopping_list_todo
+  - action: script.cleanup_todo_tasks
+    data:
+      entity_id: todo.todo_shopping_list
+      date: '{{ (now() - timedelta(days=2)).date() }}'
+    response_variable: response
+  - action: system_log.write
+    data:
+      level: info
+      message: 'Deleted: {{ response.deleted }} '
   mode: restart
+  trace:
+    stored_traces: 30
 - id: '1740170480608'
-  alias: Hjem smart todo Aqara dør sensor
-  description: Kontroller batteri status på Aqara dør sensor
+  alias: Todo Aqara dørsensor
+  description: Kontroller batteri status på Aqara dør/vindues sensorer
   triggers:
   - trigger: state
     entity_id:
-    - sensor.emils_room_window_sensor_battery_aqara
-    - sensor.living_room_door_sensor_battery_aqara
+    - sensor.living_room_door_sensor_battery
+    - sensor.living_room_window_sensor_sofa_battery
+    - sensor.kitchen_window_sensor_battery
+    - sensor.bedroom_window_sensor_battery
+    - sensor.emils_room_window_sensor_battery
+    - sensor.charlies_room_window_sensor_battery
   - trigger: time
     at: 03:10:00
   conditions: []
   actions:
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på vindues sensor på Emils værelse
-      description: 'Batteri niveau er {{ states(''sensor.emils_room_window_sensor_battery_aqara'')
-        }}% på Aqara dør/vindues sensor på vinduet i Emils værelse. Batteri: 1 * {{
-        states(''sensor.emils_room_window_sensor_battery_type_aqara'') }}'
-      related_entity_id: sensor.emils_room_window_sensor_battery_aqara
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.emils_room_window_sensor_battery_aqara'')|int
-        < 5 }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på dør sensor til stuen
-      description: 'Batteri niveau er {{ states(''sensor.living_room_door_sensor_battery_aqara'')
-        }}% på Aqara dør/vindues sensor på døren mellem gangen og stuen. Batteri:
-        1 * {{ states(''sensor.living_room_door_sensor_battery_type_aqara'') }}'
-      related_entity_id: sensor.living_room_door_sensor_battery_aqara
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.living_room_door_sensor_battery_aqara'')|int
-        < 5 }}'
+  - variables:
+      sensors:
+      - entity_id: sensor.living_room_door_sensor_battery
+        battery_type: sensor.living_room_door_sensor_battery_type
+        location: mellem gang og stue
+      - entity_id: sensor.living_room_window_sensor_sofa_battery
+        battery_type: sensor.living_room_window_sensor_sofa_battery_type
+        location: bag sofa
+      - entity_id: sensor.kitchen_window_sensor_battery
+        battery_type: sensor.kitchen_window_sensor_battery_type
+      - entity_id: sensor.bedroom_window_sensor_battery
+        battery_type: sensor.bedroom_window_sensor_battery_type
+      - entity_id: sensor.emils_room_window_sensor_battery
+        battery_type: sensor.emils_room_window_sensor_battery_type
+      - entity_id: sensor.charlies_room_window_sensor_battery
+        battery_type: sensor.charlies_room_window_sensor_battery_type
+  - repeat:
+      for_each: '{{ sensors }}'
+      sequence:
+      - variables:
+          i: '{{ repeat.item.entity_id }}'
+          a: '{{ area_name(repeat.item.entity_id) or ''ukendt rum'' }}'
+          b: '{{ states(repeat.item.battery_type) }}'
+          l: '{{ states(repeat.item.entity_id) | int(default=-1) }}'
+          t: '{{ ''vindue'' if ''window'' in i else ''dør'' }}'
+          p: '{{ repeat.item.location or '''' }}'
+      - action: system_log.write
+        metadata: {}
+        data:
+          level: debug
+          message: "Entity Id: {{ i }}      \nArea: {{ a }}      \nBattery type: {{
+            b }}      \nLevel: {{ l }}      \nType: {{ t }}      \nLocation: {{ p
+            }}"
+      - if:
+        - condition: template
+          value_template: '{{ l >= 0 }}'
+        then:
+        - action: script.create_todo_task
+          data:
+            subject: Skift batteri på {{ t }} sensor i {{ a }}
+            description: 'Batteri niveau er {{ l }}% på Aqara {{ t }} sensor, placeret
+              i {{ a }}{{ '' '' ~ p if p else '''' }}. Batteritype: 1 * {{ b }}'
+            related_entity_id: '{{ i }}'
+            entity_id: todo.todo_smart_todo
+            is_active: '{{ l < 10 }}'
   mode: restart
+  trace:
+    stored_traces: 30
 - id: '1740337167224'
-  alias: Hjem smart todo Aqara vibration sensor
-  description: Kontroller batteri status på Aqara enheder
+  alias: Todo Aqara vibrationsensor
+  description: Kontroller batteri status på Aqara vibrationsensorer
   triggers:
   - trigger: state
     entity_id:
-    - sensor.driveway_vibration_sensor_mailbox_battery_aqara
+    - sensor.driveway_vibration_sensor_mailbox_vibration_battery
   - trigger: time
     at: 03:11:00
   conditions: []
   actions:
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på sensoren i postkassen
-      description: 'Batteri niveau er {{ states(''sensor.driveway_vibration_sensor_mailbox_battery_aqara'')
-        }}% på Aqara vibrationssensor i postkassen. Batteri: 1 * CR2032'
-      related_entity_id: sensor.driveway_vibration_sensor_mailbox_battery_aqara
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.driveway_vibration_sensor_mailbox_battery_aqara'')|int
-        < 5 }}'
+  - variables:
+      sensors:
+      - entity_id: sensor.driveway_vibration_sensor_mailbox_vibration_battery
+        location: postkassen
+  - repeat:
+      for_each: '{{ sensors }}'
+      sequence:
+      - variables:
+          i: '{{ repeat.item.entity_id }}'
+          a: '{{ area_name(repeat.item.entity_id) or ''ukendt område'' }}'
+          b: '{{ state_attr(repeat.item.entity_id, ''battery_quantity'') ~ '' * ''
+            ~ state_attr(repeat.item.entity_id, ''battery_size'')}}'
+          l: '{{ states(repeat.item.entity_id) | int(default=-1) }}'
+          p: '{{ repeat.item.location or '''' }}'
+      - action: system_log.write
+        data:
+          level: debug
+          message: 'Entity Id: {{ i }}
+
+            Area: {{ a }}
+
+            Battery type: {{ b }}
+
+            Level: {{ l }}
+
+            Location: {{ p }}'
+      - if:
+        - condition: template
+          value_template: '{{ l >= 0 }}'
+        then:
+        - action: script.create_todo_task
+          data:
+            subject: Skift batteri på vibrationssensor i {{ a }}
+            description: 'Batteri niveau er {{ l }}% på Aqara vibrationssensor, placeret
+              i {{ a }}{{ '', i '' ~ p if p else '''' }}. Batteritype: {{ b }}'
+            related_entity_id: '{{ i }}'
+            entity_id: todo.todo_smart_todo
+            is_active: '{{ l < 20 }}'
   mode: restart
+  trace:
+    stored_traces: 30
 - id: '1740422421448'
   alias: Monique sæt sengetid
   description: Sæt sengetid input hjælper for Monique, når webhook er kaldt
@@ -7798,12 +7860,12 @@
       must_replace: true
   mode: restart
 - id: '1742241186159'
-  alias: Hjem smart todo vaskemaskine
-  description: Opret ToDo opgaver vedrørende vaskemaskine og tørretumbler
+  alias: Todo vaskemaskine
+  description: Opret todo opgaver vedrørende vaskemaskine
   triggers:
   - trigger: numeric_state
     entity_id:
-    - sensor.utility_room_smart_plug_washer_power_aqara
+    - sensor.utility_room_smart_plug_washer_power
     for:
       hours: 0
       minutes: 3
@@ -7812,52 +7874,22 @@
     id: washer_done
   - trigger: numeric_state
     entity_id:
-    - sensor.utility_room_smart_plug_washer_power_aqara
-    above: '5'
-    id: washer_emptied
-  - trigger: numeric_state
-    entity_id:
-    - sensor.utility_room_smart_plug_washer_power_aqara
+    - sensor.utility_room_smart_plug_washer_power
     above: '100'
     id: washer_started
-  - trigger: numeric_state
-    entity_id:
-    - sensor.utility_room_smart_plug_dryer_power_aqara
-    for:
-      hours: 0
-      minutes: 3
-      seconds: 0
-    below: '20'
-    id: dryer_done
-  - trigger: numeric_state
-    entity_id:
-    - sensor.utility_room_smart_plug_dryer_power_aqara
-    above: '3'
-    id: dryer_emptied
-  - trigger: numeric_state
-    entity_id:
-    - sensor.utility_room_smart_plug_dryer_power_aqara
-    above: '100'
-    id: dryer_started
   conditions: []
   actions:
-  - action: script.home_create_todo_task
+  - action: script.create_todo_task
     data:
       subject: Tøm vaskemaskinen
       description: Vaskemaskinen er færdig, tøm og tør tøjet
-      related_entity_id: sensor.utility_room_smart_plug_washer_power_aqara
-      entity_id: todo.home_smart_todo
+      related_entity_id: sensor.utility_room_smart_plug_washer_power
+      entity_id: todo.todo_smart_todo
       is_active: '{{ trigger.id == ''washer_done'' }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Tøm tørretumbler
-      description: Tørretumbleren er færdig, tøm den og læg tøjet på plads
-      related_entity_id: sensor.utility_room_smart_plug_dryer_power_aqara
-      entity_id: todo.home_smart_todo
-      is_active: '{{ trigger.id == ''dryer_done'' }}'
-  mode: restart
+  mode: queued
+  max: 10
   trace:
-    stored_traces: 100
+    stored_traces: 30
 - id: '1747337340117'
   alias: Entre lys
   description: Automatik til at styre lys i entreen
@@ -11108,3 +11140,204 @@
   max: 10
   trace:
     stored_traces: 50
+- id: '1769344314831'
+  alias: Todo tørretumbler
+  description: Opret todo opgaver vedrørende tørretumbler
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_dryer_power
+    for:
+      hours: 0
+      minutes: 3
+      seconds: 0
+    below: '20'
+    id: dryer_done
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_dryer_power
+    above: '3'
+    id: dryer_emptied
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_dryer_power
+    above: '100'
+    id: dryer_started
+  conditions: []
+  actions:
+  - action: script.create_todo_task
+    data:
+      subject: Tøm tørretumbler
+      description: Tørretumbleren er færdig, tøm den og læg tøjet på plads
+      related_entity_id: sensor.utility_room_smart_plug_dryer_power
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ trigger.id == ''dryer_done'' }}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
+- id: '1769363385863'
+  alias: Todo Aqara temperatursensor
+  description: Kontroller batteri status på Aqara temperatursensorer
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.bathroom_temperature_sensor_battery
+  - trigger: time
+    at: 03:18:00
+  conditions: []
+  actions:
+  - variables:
+      sensors:
+      - entity_id: sensor.bathroom_temperature_sensor_battery
+        location: oven på spejlskabet
+  - repeat:
+      for_each: '{{ sensors }}'
+      sequence:
+      - variables:
+          i: '{{ repeat.item.entity_id }}'
+          a: '{{ area_name(repeat.item.entity_id) or ''ukendt rum'' }}'
+          b: '{{ state_attr(repeat.item.entity_id, ''battery_quantity'') ~ '' * ''
+            ~ state_attr(repeat.item.entity_id, ''battery_size'') }}'
+          l: '{{ states(repeat.item.entity_id) | int(default=-1) }}'
+          p: '{{ repeat.item.location or '''' }}'
+      - action: system_log.write
+        metadata: {}
+        data:
+          level: debug
+          message: "Entity Id: {{ i }}      \nArea: {{ a }}      \nBattery type: {{
+            b }}      \nLevel: {{ l }}      \nLocation: {{ p }}"
+      - if:
+        - condition: template
+          value_template: '{{ l >= 0 }}'
+        then:
+        - action: script.create_todo_task
+          data:
+            subject: Skift batteri på temperatursensor i {{ a }}
+            description: 'Batteri niveau er {{ l }}% på Aqara temperatursensor, placeret
+              i {{ a }}{{ '' '' ~ p if p else '''' }}. Batteritype: {{ b }}'
+            related_entity_id: '{{ i }}'
+            entity_id: todo.todo_smart_todo
+            is_active: '{{ l < 20 }}'
+  mode: restart
+  trace:
+    stored_traces: 30
+- id: '1769364737572'
+  alias: Todo Aqara vandsensor
+  description: Kontroller batteri status på Aqara vandsensorer
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.kitchen_water_leak_sensor_sink_battery
+    - sensor.utility_room_water_leak_sensor_sink_battery
+  - trigger: time
+    at: 03:19:00
+  conditions: []
+  actions:
+  - variables:
+      sensors:
+      - entity_id: sensor.kitchen_water_leak_sensor_sink_battery
+        location: under opvaskemaskinen
+      - entity_id: sensor.utility_room_water_leak_sensor_sink_battery
+        location: under skabet, mellem rør
+  - repeat:
+      for_each: '{{ sensors }}'
+      sequence:
+      - variables:
+          i: '{{ repeat.item.entity_id }}'
+          a: '{{ area_name(repeat.item.entity_id) or ''ukendt område'' }}'
+          b: '{{ state_attr(repeat.item.entity_id, ''battery_quantity'') ~ '' * ''
+            ~ state_attr(repeat.item.entity_id, ''battery_size'')}}'
+          l: '{{ states(repeat.item.entity_id) | int(default=-1) }}'
+          p: '{{ repeat.item.location or '''' }}'
+      - action: system_log.write
+        data:
+          level: debug
+          message: 'Entity Id: {{ i }}
+
+            Area: {{ a }}
+
+            Battery type: {{ b }}
+
+            Level: {{ l }}
+
+            Location: {{ p }}'
+      - if:
+        - condition: template
+          value_template: '{{ l >= 0 }}'
+        then:
+        - action: script.create_todo_task
+          data:
+            subject: Skift batteri på vandsensorer i {{ a }}
+            description: 'Batteri niveau er {{ l }}% på Aqara vandsensorer, placeret
+              i {{ a }}{{ '', i '' ~ p if p else '''' }}. Batteritype: {{ b }}'
+            related_entity_id: '{{ i }}'
+            entity_id: todo.todo_smart_todo
+            is_active: '{{ l < 10 }}'
+  mode: restart
+  trace:
+    stored_traces: 30
+- id: '1769369132822'
+  alias: Todo opvaskemaskine
+  description: Opret todo opgaver vedrørende opvaskemaskine
+  triggers:
+  - trigger: state
+    entity_id: sensor.kitchen_dishwasher
+    to: program_ended
+    id: done
+  - trigger: state
+    entity_id: sensor.kitchen_dishwasher
+    to:
+    - waiting_to_start
+    - in_use
+    id: started
+  - trigger: state
+    entity_id: binary_sensor.kitchen_dishwasher_notification_active
+    id: notification
+  - trigger: state
+    entity_id: binary_sensor.kitchen_dishwasher_problem
+    id: problem
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - done
+        - started
+      sequence:
+      - action: script.create_todo_task
+        data:
+          subject: Tøm opvaskemaskinen
+          description: Opvaskemaskine er færdig, tøm og sæt service væk
+          related_entity_id: sensor.kitchen_dishwasher
+          entity_id: todo.todo_smart_todo
+          is_active: '{{ trigger.id == ''done'' }}'
+    - conditions:
+      - condition: trigger
+        id: notification
+      sequence:
+      - action: script.create_todo_task
+        data:
+          subject: Besked fra opvaskemaskinen
+          description: Kontroller opvaskemaskinen der er en aktiv notifikation
+          related_entity_id: binary_sensor.kitchen_dishwasher_notification_active
+          entity_id: todo.todo_smart_todo
+          is_active: '{{ is_state(''binary_sensor.kitchen_dishwasher_notification_active'',
+            ''on'') }}'
+    - conditions:
+      - condition: trigger
+        id: problem
+      sequence:
+      - action: script.create_todo_task
+        data:
+          subject: Problem med opvaskemaskinen
+          description: Kontroller opvaskemaskinen der er registreret et problem
+          related_entity_id: binary_sensor.kitchen_dishwasher_problem
+          entity_id: todo.todo_smart_todo
+          is_active: '{{ is_state(''binary_sensor.kitchen_dishwasher_problem'', ''on'')
+            }}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
