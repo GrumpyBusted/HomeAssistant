@@ -1047,6 +1047,11 @@
     id: auto_locking_expired
   conditions: []
   actions:
+  - action: homeassistant.update_entity
+    data:
+      entity_id: lock.entrance_door
+  - delay:
+      seconds: 3
   - choose:
     - conditions:
       - condition: trigger
@@ -1760,6 +1765,12 @@
     id: emil_leaving
   - trigger: state
     entity_id:
+    - binary_sensor.emil_home
+    from: 'off'
+    to: 'on'
+    id: emil_home
+  - trigger: state
+    entity_id:
     - binary_sensor.emils_room_light
     from: 'off'
     to: 'on'
@@ -1781,6 +1792,7 @@
       - condition: trigger
         id:
         - button_1_short
+        - emil_home
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -4791,32 +4803,105 @@
   triggers:
   - trigger: state
     entity_id:
-    - sensor.garage_3d_printer_prusa
-    to: idle
-    for:
-      hours: 0
-      minutes: 10
-      seconds: 0
+    - sensor.garage_3d_printer
+    to:
+    - finished
+    - idle
+    - ready
+    id: finished
   - trigger: state
     entity_id:
-    - light.garage_light_main_philips_hue
+    - sensor.garage_3d_printer
+    to:
+    - busy
+    - printing
+    id: started
+  - trigger: state
+    entity_id:
+    - sensor.garage_3d_printer
+    to:
+    - stopped
+    - error
+    - attention
+    - pause
+    id: failed
+  - trigger: state
+    entity_id: timer.garage_3d_printer_timer
+    to: idle
+    id: timeout
+  - trigger: state
+    entity_id: light.garage_3d_printer_power
     from: 'on'
     to: 'off'
-  conditions:
-  - condition: state
-    entity_id: sensor.garage_3d_printer_prusa
-    state: idle
-    for:
-      hours: 0
-      minutes: 10
-      seconds: 0
+    id: 'off'
+  - trigger: state
+    entity_id: light.garage_3d_printer_power
+    from: 'off'
+    to: 'on'
+    id: 'on'
+  conditions: []
   actions:
-  - action: light.turn_off
-    metadata: {}
-    data: {}
-    target:
-      entity_id: light.garage_3d_printer_power_philips_hue
-  mode: single
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: finished
+      sequence:
+      - action: timer.start
+        metadata: {}
+        target:
+          entity_id: timer.garage_3d_printer_timer
+        data:
+          duration: 00:10:00
+      - action: script.create_todo_task
+        metadata: {}
+        data:
+          is_active: true
+    - conditions:
+      - condition: trigger
+        id: started
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.garage_3d_printer_timer
+      - action: script.create_todo_task
+        metadata: {}
+        data:
+          is_active: false
+    - conditions:
+      - condition: trigger
+        id: failed
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.garage_3d_printer_timer
+      - action: script.create_todo_task
+        metadata: {}
+        data:
+          is_active: false
+    - conditions:
+      - condition: trigger
+        id: timeout
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: light.garage_3d_printer_power
+    - conditions:
+      - condition: trigger
+        id: 'off'
+      sequence: []
+    - conditions:
+      - condition: trigger
+        id: 'on'
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.garage_3d_printer_timer
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
 - id: '1739016002574'
   alias: Emils værelse blæser
   description: Tænder for Dyson Hot+Cool i Emils værelse, for at varme hurtigere op
@@ -5233,6 +5318,8 @@
   - trigger: state
     entity_id: binary_sensor.parent_home
   - trigger: state
+    entity_id: binary_sensor.bedroom_sleeping
+  - trigger: state
     entity_id: input_boolean.house_sitter
   - trigger: numeric_state
     entity_id: sensor.bedroom_air_quality_score
@@ -5304,6 +5391,9 @@
       - condition: state
         entity_id: binary_sensor.bedroom_window_sensor_door
         state: 'off'
+      - condition: state
+        entity_id: binary_sensor.bedroom_sleeping
+        state: 'off'
       sequence:
       - variables:
           mode: heat
@@ -5311,6 +5401,9 @@
       - condition: template
         value_template: '{{ states("sensor.bedroom_current_temperature")|float(21)
           > max(25, states("sensor.bedroom_target_temperature")|float(21) + 3) }}'
+      - condition: state
+        entity_id: binary_sensor.bedroom_sleeping
+        state: 'off'
       sequence:
       - variables:
           mode: cool
@@ -6110,6 +6203,7 @@
     - sensor.bedroom_window_sensor_battery
     - sensor.emils_room_window_sensor_battery
     - sensor.charlies_room_window_sensor_battery
+    - sensor.patio_door_sensor_battery
   - trigger: time
     at: 03:10:00
   conditions: []
@@ -6130,6 +6224,8 @@
         battery_type: sensor.emils_room_window_sensor_battery_type
       - entity_id: sensor.charlies_room_window_sensor_battery
         battery_type: sensor.charlies_room_window_sensor_battery_type
+      - entity_id: sensor.patio_door_sensor_battery
+        battery_type: sensor.patio_door_sensor_battery_type
   - repeat:
       for_each: '{{ sensors }}'
       sequence:
@@ -7875,6 +7971,13 @@
   - trigger: numeric_state
     entity_id:
     - sensor.utility_room_smart_plug_washer_power
+    above: '3'
+    for:
+      seconds: 5
+    id: washer_planed
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_washer_power
     above: '100'
     id: washer_started
   conditions: []
@@ -9383,6 +9486,11 @@
     id: auto_locking_expired
   conditions: []
   actions:
+  - action: homeassistant.update_entity
+    data:
+      entity_id: lock.patio_door
+  - delay:
+      seconds: 3
   - choose:
     - conditions:
       - condition: trigger
@@ -9715,6 +9823,11 @@
     id: auto_locking_expired
   conditions: []
   actions:
+  - action: homeassistant.update_entity
+    data:
+      entity_id: lock.utility_room_door
+  - delay:
+      seconds: 3
   - choose:
     - conditions:
       - condition: trigger
@@ -9810,6 +9923,11 @@
     id: auto_locking_expired
   conditions: []
   actions:
+  - action: homeassistant.update_entity
+    data:
+      entity_id: lock.garage_door
+  - delay:
+      seconds: 3
   - choose:
     - conditions:
       - condition: trigger
@@ -11290,6 +11408,7 @@
     to:
     - waiting_to_start
     - in_use
+    - programmed
     id: started
   - trigger: state
     entity_id: binary_sensor.kitchen_dishwasher_notification_active
@@ -11339,5 +11458,74 @@
             }}'
   mode: queued
   max: 10
+  trace:
+    stored_traces: 30
+- id: '1769452207183'
+  alias: Todo Yale lås
+  description: Kontroller batteri status på Yale låse
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.entrance_door_battery
+    - sensor.utility_room_door_battery
+    - sensor.garage_door_battery
+    - sensor.patio_door_battery
+    - sensor.patio_door_keypad_battery
+  - trigger: time
+    at: 03:21:00
+  conditions: []
+  actions:
+  - variables:
+      sensors:
+      - entity_id: sensor.entrance_door_battery
+        battery_type: 4 × AA
+      - entity_id: sensor.utility_room_door_battery
+        battery_type: 4 × AA
+      - entity_id: sensor.garage_door_battery
+        battery_type: 4 × AA
+      - entity_id: sensor.patio_door_battery
+        battery_type: 2 × AAA
+      - entity_id: sensor.patio_door_keypad_battery
+        battery_type: 4 × AAA
+  - repeat:
+      for_each: '{{ sensors }}'
+      sequence:
+      - variables:
+          i: '{{ repeat.item.entity_id }}'
+          d: '{{ device_attr(device_id(repeat.item.entity_id), ''name_by_user'') }}'
+          a: '{{ area_name(repeat.item.entity_id) or ''ukendt rum'' }}'
+          b: "{% if repeat.item.battery_type is defined %}\n  {{ repeat.item.battery_type
+            }}\n{% else %}\n  {{ state_attr(repeat.item.entity_id, 'battery_quantity')
+            ~ ' * ' ~ state_attr(repeat.item.entity_id, 'battery_size') }}\n{% endif
+            %}"
+          l: '{{ states(repeat.item.entity_id) | int(default=-1) }}'
+      - action: system_log.write
+        data:
+          level: debug
+          message: 'Entity Id: {{ i }}
+
+            Device: {{ d }}
+
+            Area: {{ a }}
+
+            Battery type: {{ b }}
+
+            Level: {{ l }}'
+      - if:
+        - condition: template
+          value_template: '{{ l >= 0 }}'
+        then:
+        - action: script.create_todo_task
+          data:
+            subject: Skift batteri på {{ d }}
+            description: "<table border=\"0\">\n  <tr>\n    <th align=\"left\">Enhed</th>\n
+              \   <td>{{ d }}</td>\n  </tr>\n  <tr>\n    <th align=\"left\">Batteriniveau</th>\n
+              \   <td>{{ l }}</td>\n  </tr>\n  <tr>\n    <th align=\"left\">Lokation</th>\n
+              \   <td>{{ a }}</td>\n  </tr>\n  <tr>\n    <th align=\"left\">Batteritype</th>\n
+              \   <td>{{ b }}</td>\n  </tr>\n</table>"
+            related_entity_id: '{{ i }}'
+            entity_id: todo.todo_smart_todo
+            is_active: '{{ l < 20 }}'
+  mode: restart
   trace:
     stored_traces: 30

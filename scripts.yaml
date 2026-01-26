@@ -814,8 +814,8 @@ exercising_radiator_valves:
       - automation.toilet_heating
 create_todo_task:
   alias: Opret todo opgave
-  description: Kontroller om samme opgave allerede findes hvis ikke opret den i smart
-    todo
+  description: Kontroller om samme opgave allerede findes – hvis ikke, opret den i
+    Smart ToDo
   fields:
     subject:
       name: Emne
@@ -860,7 +860,7 @@ create_todo_task:
       name: Aktiv
       description: Skal opgaven være aktiv?
       example: true/false
-      required: true
+      required: false
       selector:
         boolean:
       default: true
@@ -874,64 +874,56 @@ create_todo_task:
       default: false
   sequence:
   - variables:
-      todo_entity_id: '{{ related_entity_id | default(''none'') }}'
-      todo_description: "<html> {{ description }} {% if todo_entity_id != 'none' %}\n
-        \ <br><br><i>Relateret:</i> {{ todo_entity_id }}\n{% endif %}  </html>"
+      todo_entity_id: '{{ related_entity_id | default(none) }}'
+      active: '{{ is_active | default(true) | bool }}'
+      existing: "{% set todos = state_attr(entity_id, 'all_todos') | default([]) |
+        rejectattr('status', 'equalto', 'completed') | list %} {% if todo_entity_id
+        is not none %}\n  {{ todos\n     | selectattr('description', 'contains', todo_entity_id
+        | trim)\n     | map(attribute='todo_id')\n     | list }}\n{% else %}\n  {{
+        todos\n     | selectattr('subject', 'equalto', subject | trim)\n     | map(attribute='todo_id')\n
+        \    | list }}\n{% endif %}"
+      existing_count: '{{ existing | length }}'
+      todo_description: "<html>\n  {{ description }}\n  {% if todo_entity_id is not
+        none %}\n    <br><br><i>Relateret:</i> {{ todo_entity_id }}\n  {% endif %}\n</html>"
+  - action: system_log.write
+    data:
+      level: info
+      message: 'Subject: {{ subject }}
+
+        Entity: {{ entity_id }}
+
+        Related entity: {{ todo_entity_id }}
+
+        Active: {{ active }}
+
+        Must replace: {{ must_replace }}
+
+        Existing: {{ existing_count }}'
   - if:
     - condition: template
-      value_template: '{{ is_active | bool }}'
+      value_template: '{{ existing_count > 0 and (must_replace or not active) }}'
     then:
-    - variables:
-        existing: "{% set todos = state_attr(entity_id, 'all_todos') | rejectattr('status',
-          'equalto', 'completed') | list %} {% if todo_entity_id != 'none' %}\n  {{
-          todos\n     | selectattr('description', 'contains', '<i>Relateret:</i> '
-          ~ todo_entity_id)\n     | map(attribute='todo_id')\n     | list }}\n{% else
-          %}\n  {{ todos\n     | selectattr('subject', 'equalto', subject)\n     |
-          map(attribute='todo_id')\n     | list }}\n{% endif %}"
-        existing_count: '{{ existing | length }}'
-    - if:
-      - condition: template
-        value_template: '{{ existing_count > 0 and must_replace }}'
-      then:
-      - repeat:
-          count: '{{ existing_count }}'
-          sequence:
-          - action: ms365_todo.complete_todo
-            metadata: {}
-            data:
-              entity_id: '{{ entity_id }}'
-              todo_id: '{{ existing[repeat.index - 1] }}'
-              completed: true
-    - if:
-      - condition: template
-        value_template: '{{ existing_count == 0 or must_replace }}'
-      then:
-      - action: ms365_todo.new_todo
-        metadata: {}
-        data:
-          entity_id: '{{ entity_id }}'
-          subject: '{{ subject }}'
-          description: '{{ todo_description  }}'
-          due: '{{ utcnow().date().isoformat() }}'
-          reminder: '{{ (utcnow() + timedelta(minutes=1)).isoformat() }}'
-    else:
-    - if:
-      - condition: template
-        value_template: '{{ todo_entity_id != ''none'' }}'
-      then:
-      - variables:
-          todo_ids: '{{ state_attr(entity_id, ''all_todos'') |  selectattr(''description'',
-            ''contains'', todo_entity_id) |  rejectattr(''status'', ''equalto'', ''completed'')
-            |  map(attribute=''todo_id'') |  list }}'
-      - repeat:
-          count: '{{ todo_ids | length }}'
-          sequence:
-          - action: ms365_todo.complete_todo
-            metadata: {}
-            data:
-              entity_id: '{{ entity_id }}'
-              todo_id: '{{ todo_ids[repeat.index - 1] }}'
-              completed: true
+    - repeat:
+        for_each: '{{ existing }}'
+        sequence:
+        - action: ms365_todo.complete_todo
+          metadata: {}
+          data:
+            entity_id: '{{ entity_id }}'
+            todo_id: '{{ repeat.item }}'
+            completed: true
+  - if:
+    - condition: template
+      value_template: '{{ active and (existing_count == 0 or must_replace) }}'
+    then:
+    - action: ms365_todo.new_todo
+      metadata: {}
+      data:
+        entity_id: '{{ entity_id }}'
+        subject: '{{ subject }}'
+        description: '{{ todo_description }}'
+        due: '{{ utcnow().date().isoformat() }}'
+        reminder: '{{ (utcnow() + timedelta(minutes=1)).isoformat() }}'
 living_room_light_rotary:
   alias: Stue lys skru op og ned
   description: Håndting af styr op og ned for lys i stuen
