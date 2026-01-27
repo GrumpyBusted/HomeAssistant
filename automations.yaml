@@ -5492,23 +5492,23 @@
           preset_mode: Auto
         target:
           entity_id: fan.bedroom_air_purifier_fan
-      - action: dyson_local.set_angle
-        data:
-          entity_id: fan.bedroom_air_purifier_fan
-          angle_low: 155
-          angle_high: 225
-      - action: fan.oscillate
-        metadata: {}
-        data:
-          oscillating: 'true'
-        target:
-          entity_id: fan.bedroom_air_purifier_fan
       - action: fan.set_direction
         metadata: {}
         data:
           direction: forward
         target:
           entity_id: fan.bedroom_air_purifier_fan
+      - action: fan.oscillate
+        metadata: {}
+        data:
+          oscillating: 'true'
+        target:
+          entity_id: fan.bedroom_air_purifier_fan
+      - action: dyson_local.set_angle
+        data:
+          entity_id: fan.bedroom_air_purifier_fan
+          angle_low: 155
+          angle_high: 225
     - conditions:
       - condition: template
         value_template: '{{ mode == ''cool'' }}'
@@ -11525,7 +11525,7 @@
               \   <td>{{ b }}</td>\n  </tr>\n</table>"
             related_entity_id: '{{ i }}'
             entity_id: todo.todo_smart_todo
-            is_active: '{{ l < 20 }}'
+            is_active: '{{ l < 15 }}'
   mode: restart
   trace:
     stored_traces: 30
