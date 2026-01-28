@@ -7964,7 +7964,7 @@
     - sensor.utility_room_smart_plug_washer_power
     for:
       hours: 0
-      minutes: 3
+      minutes: 5
       seconds: 0
     below: '20'
     id: washer_done
@@ -8096,7 +8096,7 @@
 
           '
       - condition: state
-        entity_id: binary_sensor.someone_sleeping
+        entity_id: binary_sensor.bedroom_sleeping
         state: 'on'
       sequence:
       - action: light.turn_on
@@ -9509,7 +9509,7 @@
       - action: timer.start
         metadata: {}
         data:
-          duration: 00:00:10
+          duration: 00:01:00
         target:
           entity_id: timer.patio_door_locking_timer
     - conditions:
@@ -10211,7 +10211,7 @@
     stored_traces: 20
 - id: '1765134832184'
   alias: Køkken robotstøvsuger rengøring
-  description: Styring af robotstøvsuger for at gør rent i køkkenet
+  description: Styring af robotstøvsuger for at gør rent i køkkenet og bryggers
   triggers:
   - trigger: state
     entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -10234,6 +10234,10 @@
     entity_id: binary_sensor.kitchen_occupancy
     to: 'off'
     for: 00:02:00
+  - trigger: state
+    entity_id: binary_sensor.utility_room_light_motion
+    to: 'off'
+    for: 00:02:00
   - trigger: time
     at: '11:30:00'
   - trigger: state
@@ -10254,7 +10258,7 @@
           '
       - condition: numeric_state
         entity_id: sensor.living_room_robot_vacuum_battery
-        above: 30
+        above: 40
       - condition: state
         entity_id: binary_sensor.living_room_media
         state: 'off'
@@ -10267,6 +10271,9 @@
       - condition: state
         entity_id: binary_sensor.kitchen_occupancy
         state: 'off'
+      - condition: state
+        entity_id: binary_sensor.utility_room_light_motion
+        state: 'off'
       - condition: template
         value_template: '{{ states(''sensor.living_room_robot_vacuum_time_since_empty_dust_bin'')|int
           < 20 }}
@@ -10276,6 +10283,7 @@
       - action: script.living_room_robot_vacuum_set_current
         data:
           option: kitchen_cleaning
+          started_by: '{{ this.entity_id }}'
     - conditions:
       - condition: template
         value_template: '{{ (states(''input_datetime.kitchen_robot_vacuum_last_cleaning_time'')
@@ -10286,12 +10294,39 @@
         after: '11:00:00'
       - condition: numeric_state
         entity_id: sensor.living_room_robot_vacuum_battery
-        above: 30
+        above: 40
       sequence:
       - action: script.living_room_robot_vacuum_set_current
         data:
           option: kitchen_cleaning
+          started_by: '{{ this.entity_id }}'
   - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_select.living_room_robot_vacuum_current_cleaning
+        state: kitchen_cleaning
+      - condition: time
+        weekday:
+        - mon
+        - wed
+        - fri
+        - sun
+      sequence:
+      - action: script.living_room_robot_vacuum_start_cleaning
+        metadata: {}
+        data:
+          type: vac_mop_low
+          timeout: 15
+          rooms:
+          - Køkken
+          - Bryggers
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.kitchen_robot_vacuum_last_cleaning_time
+        data:
+          datetime: '{{ (now() | as_local).strftime(''%Y-%m-%d %H:%M:%S'') }}
+
+            '
     - conditions:
       - condition: state
         entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -10304,6 +10339,7 @@
           timeout: 15
           rooms:
           - Køkken
+          - Bryggers
       - action: input_datetime.set_datetime
         target:
           entity_id: input_datetime.kitchen_robot_vacuum_last_cleaning_time
@@ -10347,6 +10383,8 @@
       - action: script.living_room_robot_vacuum_set_current
         data:
           option: none
+          started_by:
+            '[object Object]':
     - conditions:
       - condition: trigger
         id: timeout
@@ -10487,111 +10525,6 @@
   max: 10
   trace:
     stored_traces: 100
-- id: '1768142933336'
-  alias: Bryggers robotstøvsuger rengøring
-  description: Styring af robotstøvsuger for at gør rent i bryggerset
-  triggers:
-  - trigger: state
-    entity_id: input_select.living_room_robot_vacuum_current_cleaning
-    to: none
-  - trigger: numeric_state
-    entity_id: sensor.living_room_robot_vacuum_battery
-    above: 30
-  - trigger: state
-    entity_id: binary_sensor.living_room_media
-    to: 'off'
-  - trigger: state
-    entity_id: binary_sensor.bedroom_sleeping
-    to: 'off'
-    for: 00:04:00
-  - trigger: state
-    entity_id: binary_sensor.monique_sleep_window
-    to: 'off'
-    for: 00:04:00
-  - trigger: state
-    entity_id: binary_sensor.utility_room_light
-    to: 'off'
-  - trigger: time
-    at: '11:00:00'
-  - trigger: state
-    entity_id: sensor.living_room_robot_vacuum_time_since_empty_dust_bin
-    to: '0'
-    for: 00:02:00
-  conditions:
-  - condition: state
-    entity_id: input_select.living_room_robot_vacuum_current_cleaning
-    state: none
-  actions:
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ (states(''input_datetime.utility_room_robot_vacuum_last_cleaning_time'')
-          | as_datetime).date() != now().date() }}
-
-          '
-      - condition: numeric_state
-        entity_id: sensor.living_room_robot_vacuum_battery
-        above: 30
-      - condition: state
-        entity_id: binary_sensor.living_room_media
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.monique_sleep_window
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.utility_room_light
-        state: 'off'
-      - condition: template
-        value_template: '{{ states(''sensor.living_room_robot_vacuum_time_since_empty_dust_bin'')|int
-          < 20 }}
-
-          '
-      sequence:
-      - action: script.living_room_robot_vacuum_set_current
-        data:
-          option: utility_room_cleaning
-    - conditions:
-      - condition: template
-        value_template: '{{ (states(''input_datetime.utility_room_robot_vacuum_last_cleaning_time'')
-          | as_datetime | as_local).date() < (now().date() - timedelta(days=1)) }}
-
-          '
-      - condition: time
-        after: '11:00:00'
-      - condition: numeric_state
-        entity_id: sensor.living_room_robot_vacuum_battery
-        above: 30
-      sequence:
-      - action: script.living_room_robot_vacuum_set_current
-        data:
-          option: utility_room_cleaning
-  - choose:
-    - conditions:
-      - condition: state
-        entity_id: input_select.living_room_robot_vacuum_current_cleaning
-        state: utility_room_cleaning
-      sequence:
-      - action: script.living_room_robot_vacuum_start_cleaning
-        metadata: {}
-        data:
-          type: vac_mop
-          timeout: 15
-          rooms:
-          - Bryggers
-      - action: input_datetime.set_datetime
-        target:
-          entity_id: input_datetime.utility_room_robot_vacuum_last_cleaning_time
-        data:
-          datetime: '{{ (now() | as_local).strftime(''%Y-%m-%d %H:%M:%S'') }}
-
-            '
-  mode: queued
-  max: 10
-  trace:
-    stored_traces: 100
 - id: '1768143802884'
   alias: Gang robotstøvsuger rengøring
   description: Styring af robotstøvsuger for at gør rent i gangen
@@ -10663,6 +10596,7 @@
       - action: script.living_room_robot_vacuum_set_current
         data:
           option: hallway_cleaning
+          started_by: '{{ this.entity_id }}'
     - conditions:
       - condition: template
         value_template: '{{ (states(''input_datetime.hallway_robot_vacuum_last_cleaning_time'')
@@ -10681,7 +10615,31 @@
       - action: script.living_room_robot_vacuum_set_current
         data:
           option: hallway_cleaning
+          started_by: '{{ this.entity_id }}'
   - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_select.living_room_robot_vacuum_current_cleaning
+        state: hallway_cleaning
+      - condition: time
+        weekday:
+        - mon
+        - thu
+      sequence:
+      - action: script.living_room_robot_vacuum_start_cleaning
+        metadata: {}
+        data:
+          type: vac_mop
+          timeout: 15
+          rooms:
+          - Gang
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.hallway_robot_vacuum_last_cleaning_time
+        data:
+          datetime: '{{ (now() | as_local).strftime(''%Y-%m-%d %H:%M:%S'') }}
+
+            '
     - conditions:
       - condition: state
         entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -10690,7 +10648,7 @@
       - action: script.living_room_robot_vacuum_start_cleaning
         metadata: {}
         data:
-          type: vac_mop
+          type: vac_mop_low
           timeout: 15
           rooms:
           - Gang
@@ -10769,6 +10727,7 @@
       - action: script.living_room_robot_vacuum_set_current
         data:
           option: living_room_cleaning
+          started_by: '{{ this.entity_id }}'
     - conditions:
       - condition: template
         value_template: '{{ (states(''input_datetime.living_room_robot_vacuum_last_cleaning_time'')
@@ -10784,6 +10743,7 @@
       - action: script.living_room_robot_vacuum_set_current
         data:
           option: living_room_cleaning
+          started_by: '{{ this.entity_id }}'
   - choose:
     - conditions:
       - condition: state
@@ -10796,7 +10756,7 @@
       - action: script.living_room_robot_vacuum_start_cleaning
         metadata: {}
         data:
-          type: vac_mop
+          type: vac_mop_low
           timeout: 30
           rooms:
           - Stue

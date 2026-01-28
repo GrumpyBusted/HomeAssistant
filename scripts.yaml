@@ -354,16 +354,21 @@ living_room_robot_vacuum_start_cleaning:
     stored_traces: 25
   fields:
     type:
+      name: Type
       description: Rengøring type
       required: true
       selector:
         select:
           options:
           - vac
+          - vac_low
           - mop
+          - mop_low
           - vac_mop
+          - vac_mop_low
       default: vac
     timeout:
+      name: Tidsgrænse
       description: Tidsgrænse i minutter
       required: true
       selector:
@@ -374,6 +379,7 @@ living_room_robot_vacuum_start_cleaning:
           mode: slider
       default: 30
     rooms:
+      name: Rum
       description: Rum der skal rengøres
       required: true
       selector:
@@ -467,6 +473,39 @@ living_room_robot_vacuum_start_cleaning:
             entity_id: vacuum.living_room_robot_vacuum
       - conditions:
         - condition: template
+          value_template: '{{ type == ''vac_low'' }}'
+        sequence:
+        - action: vacuum.send_command
+          data:
+            command: set_water_box_custom_mode
+            params:
+              water_box_mode: 200
+            entity_id: select.living_room_robot_vacuum_mop_mode
+        - action: vacuum.set_fan_speed
+          metadata: {}
+          data:
+            fan_speed: quiet
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+        - action: select.select_option
+          target:
+            entity_id: select.living_room_robot_vacuum_mop_intensity
+          data:
+            option: 'off'
+        - action: select.select_option
+          target:
+            entity_id: select.living_room_robot_vacuum_mop_mode
+          data:
+            option: standard
+        - action: vacuum.send_command
+          data:
+            command: app_segment_clean
+            params:
+            - segments: '{{ room_ids }}'
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+      - conditions:
+        - condition: template
           value_template: '{{ type == ''mop'' }}'
         sequence:
         - action: vacuum.send_command
@@ -510,6 +549,49 @@ living_room_robot_vacuum_start_cleaning:
             command: app_start_wash
       - conditions:
         - condition: template
+          value_template: '{{ type == ''mop_low'' }}'
+        sequence:
+        - action: vacuum.send_command
+          data:
+            command: set_water_box_custom_mode
+            params:
+              water_box_mode: 203
+            entity_id: select.living_room_robot_vacuum_mop_mode
+        - action: vacuum.send_command
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+          data:
+            command: app_start_wash
+        - action: vacuum.set_fan_speed
+          metadata: {}
+          data:
+            fan_speed: 'off'
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+        - action: select.select_option
+          target:
+            entity_id: select.living_room_robot_vacuum_mop_intensity
+          data:
+            option: mild
+        - action: select.select_option
+          target:
+            entity_id: select.living_room_robot_vacuum_mop_mode
+          data:
+            option: standard
+        - action: vacuum.send_command
+          data:
+            command: app_segment_clean
+            params:
+            - segments: '{{ room_ids }}'
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+        - action: vacuum.send_command
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+          data:
+            command: app_start_wash
+      - conditions:
+        - condition: template
           value_template: '{{ type == ''vac_mop'' }}'
         sequence:
         - action: vacuum.send_command
@@ -534,6 +616,49 @@ living_room_robot_vacuum_start_cleaning:
             entity_id: select.living_room_robot_vacuum_mop_intensity
           data:
             option: moderate
+        - action: select.select_option
+          target:
+            entity_id: select.living_room_robot_vacuum_mop_mode
+          data:
+            option: standard
+        - action: vacuum.send_command
+          data:
+            command: app_segment_clean
+            params:
+            - segments: '{{ room_ids }}'
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+        - action: vacuum.send_command
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+          data:
+            command: app_start_wash
+      - conditions:
+        - condition: template
+          value_template: '{{ type == ''vac_mop_low'' }}'
+        sequence:
+        - action: vacuum.send_command
+          data:
+            command: set_water_box_custom_mode
+            params:
+              water_box_mode: 201
+            entity_id: select.living_room_robot_vacuum_mop_mode
+        - action: vacuum.send_command
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+          data:
+            command: app_start_wash
+        - action: vacuum.set_fan_speed
+          metadata: {}
+          data:
+            fan_speed: balanced
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+        - action: select.select_option
+          target:
+            entity_id: select.living_room_robot_vacuum_mop_intensity
+          data:
+            option: mild
         - action: select.select_option
           target:
             entity_id: select.living_room_robot_vacuum_mop_mode
@@ -662,12 +787,14 @@ push_notification:
 living_room_robot_vacuum_set_current:
   alias: Stue robotstøvsuger sæt aktuel
   description: Sæt aktuel rengøring for robotstøvsuger
-  mode: single
+  mode: queued
+  max: 2
   trace:
     stored_traces: 50
   fields:
     option:
-      description: Rengøring
+      name: Rengøring
+      description: Rengøring sted
       required: true
       selector:
         select:
@@ -678,8 +805,46 @@ living_room_robot_vacuum_set_current:
           - hallway_cleaning
           - living_room_cleaning
       default: none
+    started_by:
+      name: Automation
+      description: Kaldene automation
+      required: true
+      selector:
+        entity:
+          domain: automation
   sequence:
+  - action: system_log.write
+    data:
+      level: debug
+      message: 'New: {{ option }}
+
+        Old: {{ states(''input_select.living_room_robot_vacuum_current_cleaning'')
+        }}
+
+        Automation: {{ started_by }}'
+  - delay:
+      milliseconds: '{{ range(0, 2000) | random }}'
   - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ states(''input_select.living_room_robot_vacuum_current_cleaning'')
+          == option }}'
+      sequence: []
+    - conditions:
+      - condition: template
+        value_template: '{{ option == ''none'' }}'
+      sequence:
+      - action: input_select.select_option
+        metadata: {}
+        target:
+          entity_id: input_select.living_room_robot_vacuum_current_cleaning
+        data:
+          option: none
+    - conditions:
+      - condition: template
+        value_template: '{{ state_attr(''script.living_room_robot_vacuum_set_current'',
+          ''current'') | int(0) > 1 }}'
+      sequence: []
     - conditions:
       - condition: state
         entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -691,16 +856,8 @@ living_room_robot_vacuum_set_current:
           entity_id: input_select.living_room_robot_vacuum_current_cleaning
         data:
           option: '{{ option }}'
-    - conditions:
-      - condition: template
-        value_template: '{{ option == ''none'' }}'
-      sequence:
-      - action: input_select.select_option
-        metadata: {}
-        target:
-          entity_id: input_select.living_room_robot_vacuum_current_cleaning
-        data:
-          option: none
+  - delay:
+      milliseconds: '{{ range(0, 2000) | random }}'
 set_climate_temperature:
   alias: Sæt radiator temperatur
   description: 'Sæt temperaturen på flere Tado radiator-termostater, men kun hvis
