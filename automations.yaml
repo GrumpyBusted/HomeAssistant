@@ -1064,7 +1064,7 @@
       - action: lock.unlock
         metadata: {}
         data:
-          code: '141095'
+          code: '{{ states(''sensor.yale_code_anders'') }}'
         target:
           entity_id: lock.entrance_door
     - conditions:
@@ -1078,7 +1078,7 @@
       - action: lock.unlock
         metadata: {}
         data:
-          code: '280239'
+          code: '{{ states(''sensor.yale_code_monique'') }}'
         target:
           entity_id: lock.entrance_door
     - conditions:
@@ -1092,7 +1092,7 @@
       - action: lock.unlock
         metadata: {}
         data:
-          code: '180321'
+          code: '{{ states(''sensor.yale_code_emil'') }}'
         target:
           entity_id: lock.entrance_door
     - conditions:
@@ -1106,7 +1106,7 @@
       - action: lock.unlock
         metadata: {}
         data:
-          code: '041023'
+          code: '{{ states(''sensor.yale_code_charlie'') }}'
         target:
           entity_id: lock.entrance_door
     - conditions:
@@ -5769,37 +5769,6 @@
           related_entity_id: '{{ devices[repeat.index - 1].entity_id }}'
           entity_id: todo.home_smart_todo
           is_active: '{{ devices[repeat.index - 1].batteryState != ''NORMAL'' }}'
-  mode: restart
-- id: '1739743296346'
-  alias: Hjem smart todo Withings
-  description: Kontroller batteri status på Withings enheder
-  triggers:
-  - trigger: state
-    entity_id:
-    - sensor.bathroom_thermometer_battery_withings
-    - sensor.bathroom_scale_battery_withings
-  - trigger: time
-    at: 03:16:00
-  conditions: []
-  actions:
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på termometer
-      description: 'Batteri niveau er lav på Withings termometer, det er pladseret
-        på badeværelset. Batteri: 2 * AAA'
-      related_entity_id: sensor.bathroom_thermometer_battery_withings
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.bathroom_thermometer_battery_withings'') == ''low''
-        }}'
-  - action: script.home_create_todo_task
-    data:
-      subject: Skift batteri på badevægt
-      description: 'Batteri niveau er lav på Withings kropsvægt, det er pladseret
-        på badeværelset. Batteri: 4 * AAA'
-      related_entity_id: sensor.bathroom_scale_battery_withings
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.bathroom_scale_battery_withings'') == ''low''
-        }}'
   mode: restart
 - id: '1739744093398'
   alias: Todo IKEA rullegardiner
