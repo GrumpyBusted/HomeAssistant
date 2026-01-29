@@ -575,82 +575,6 @@
   max: 10
   trace:
     stored_traces: 20
-- id: '1735733828705'
-  alias: Hjem - Ingen hjemme
-  description: Når alle har forladt hjemme
-  triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.family_home
-    from: 'on'
-    to: 'off'
-    for:
-      hours: 0
-      minutes: 5
-      seconds: 0
-  conditions:
-  - condition: state
-    entity_id: input_boolean.house_sitter
-    state: 'off'
-  actions:
-  - action: climate.turn_off
-    metadata: {}
-    data: {}
-    target:
-      entity_id: climate.living_room_heat_pump_panasonic
-  - action: automation.turn_off
-    metadata: {}
-    data:
-      stop_actions: false
-    target:
-      entity_id: automation.living_room_heat_pump_booster_turn_off
-  - if:
-    - condition: state
-      entity_id: climate.home_heat_pump_panasonic
-      state: heat
-    then:
-    - action: climate.set_temperature
-      metadata: {}
-      data:
-        temperature: '{{ state_attr(''climate.home_heat_pump_panasonic'', ''min_temp'')
-          }}'
-      target:
-        entity_id: climate.home_heat_pump_panasonic
-    - action: climate.set_preset_mode
-      metadata: {}
-      data:
-        preset_mode: eco
-      target:
-        entity_id: climate.home_heat_pump_panasonic
-    - action: select.select_option
-      metadata: {}
-      data:
-        option: 'off'
-      target:
-        entity_id: select.home_heat_pump_powerful_panasonic
-  - action: light.turn_off
-    metadata: {}
-    data: {}
-    target:
-      entity_id: '{{ states.light |  selectattr(''state'', ''eq'', ''off'') | selectattr(''attributes.lights'',
-        ''=='', undefined) | map(attribute=''entity_id'') | reject(''in'', label_entities(''Tændt
-        når ingen hjemme'')) |  list |  sort }}'
-  - action: climate.set_temperature
-    metadata: {}
-    data:
-      temperature: 17
-    target:
-      entity_id: '{{ states.climate | map(attribute=''entity_id'') | reject(''in'',
-        label_entities(''Tændt når ingen hjemme'')) | list | sort }}'
-  - action: switch.turn_on
-    metadata: {}
-    data: {}
-    target:
-      entity_id:
-      - switch.entrance_door_lock_autolock_yale
-      - switch.garage_door_lock_autolock_yale
-      - switch.utility_room_door_lock_autolock_yale
-  mode: queued
 - id: '1735738251165'
   alias: Stue varmepumpe
   description: Styring af varmepumpe i stuen, for at varme hurtigere op hvis den ønskede
@@ -795,11 +719,8 @@
   actions:
   - choose:
     - conditions:
-      - condition: state
-        entity_id: climate.home_heat_pump_panasonic
-        state: 'off'
       - condition: numeric_state
-        entity_id: sensor.home_minimum_temperature_24h
+        entity_id: sensor.home_indoor_minimum_temperature_24h
         below: 20
       - condition: numeric_state
         entity_id: sensor.home_outside_minimum_temperature_24h
@@ -807,48 +728,10 @@
       - condition: numeric_state
         entity_id: sensor.home_outside_maximum_temperature_24_timer
         below: 15
-      sequence:
-      - action: climate.turn_on
-        metadata: {}
-        data: {}
-        target:
-          entity_id: climate.home_heat_pump_panasonic
-      - action: climate.set_hvac_mode
-        metadata: {}
-        data:
-          hvac_mode: heat
-        target:
-          entity_id: climate.home_heat_pump_panasonic
-      - action: climate.set_preset_mode
-        metadata: {}
-        data:
-          preset_mode: none
-        target:
-          entity_id: climate.home_heat_pump_panasonic
-      - action: select.select_option
-        metadata: {}
-        data:
-          option: 'off'
-        target:
-          entity_id: select.home_heat_pump_powerful_panasonic
-      - action: select.select_option
-        metadata: {}
-        data:
-          option: 'off'
-        target:
-          entity_id: select.home_heat_pump_quiet_mode_panasonic
-      - action: climate.set_temperature
-        metadata: {}
-        data:
-          temperature: 0
-        target:
-          entity_id: climate.home_heat_pump_panasonic
+      sequence: []
     - conditions:
-      - condition: state
-        entity_id: climate.home_heat_pump_panasonic
-        state: heat
       - condition: numeric_state
-        entity_id: sensor.home_minimum_temperature_24h
+        entity_id: sensor.home_indoor_minimum_temperature_24h
         above: 20
       - condition: numeric_state
         entity_id: sensor.home_outside_minimum_temperature_24h
@@ -856,12 +739,7 @@
       - condition: numeric_state
         entity_id: sensor.home_outside_average_temperature_24h
         above: 16
-      sequence:
-      - action: climate.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id: climate.home_heat_pump_panasonic
+      sequence: []
     - conditions:
       - condition: template
         value_template: '{{ states("sensor.living_room_current_temperature")|float
@@ -869,26 +747,7 @@
           < states("sensor.emils_room_target_temperature")|float - 3 or states("sensor.charlies_room_current_temperature")|float
           < states("sensor.charlies_room_target_temperature")|float - 3 or states("sensor.bedroom_current_temperature")|float
           < states("sensor.bedroom_target_temperature")|float - 3 }}'
-      sequence:
-      - action: select.select_option
-        metadata: {}
-        data:
-          option: on-30m
-        target:
-          entity_id: select.home_heat_pump_powerful_panasonic
-      - action: climate.set_preset_mode
-        metadata: {}
-        data:
-          preset_mode: comfort
-        target:
-          entity_id: climate.home_heat_pump_panasonic
-      - action: climate.set_temperature
-        metadata: {}
-        data:
-          temperature: '{{ state_attr(''climate.home_heat_pump_panasonic'', ''max_temp'')
-            }}'
-        target:
-          entity_id: climate.home_heat_pump_panasonic
+      sequence: []
     - conditions:
       - condition: template
         value_template: '{{ states("sensor.living_room_current_temperature")|float
@@ -896,30 +755,7 @@
           < states("sensor.emils_room_target_temperature")|float - 1 or states("sensor.charlies_room_current_temperature")|float
           < states("sensor.charlies_room_target_temperature")|float - 1 or states("sensor.bedroom_current_temperature")|float
           < states("sensor.bedroom_target_temperature")|float - 1 }}'
-      - condition: template
-        value_template: '{{ state_attr(''climate.home_heat_pump_panasonic'', ''max_temp'')|float
-          > state_attr(''climate.home_heat_pump_panasonic'', ''temperature'')|float
-          }}'
-      sequence:
-      - action: select.select_option
-        metadata: {}
-        data:
-          option: 'off'
-        target:
-          entity_id: select.home_heat_pump_powerful_panasonic
-      - action: climate.set_preset_mode
-        metadata: {}
-        data:
-          preset_mode: comfort
-        target:
-          entity_id: climate.home_heat_pump_panasonic
-      - action: climate.set_temperature
-        metadata: {}
-        data:
-          temperature: '{{ state_attr(''climate.home_heat_pump_panasonic'', ''temperature'')|float
-            + 1 }}'
-        target:
-          entity_id: climate.home_heat_pump_panasonic
+      sequence: []
     - conditions:
       - condition: template
         value_template: '{{ states("sensor.living_room_current_temperature")|float
@@ -927,19 +763,7 @@
           < states("sensor.emils_room_target_temperature")|float - 0.5 or states("sensor.charlies_room_current_temperature")|float
           < states("sensor.charlies_room_target_temperature")|float - 0.5 or states("sensor.bedroom_current_temperature")|float
           < states("sensor.bedroom_target_temperature")|float - 0.5 }}'
-      sequence:
-      - action: select.select_option
-        metadata: {}
-        data:
-          option: 'off'
-        target:
-          entity_id: select.home_heat_pump_powerful_panasonic
-      - action: climate.set_preset_mode
-        metadata: {}
-        data:
-          preset_mode: none
-        target:
-          entity_id: climate.home_heat_pump_panasonic
+      sequence: []
     - conditions:
       - condition: template
         value_template: '{{ states("sensor.living_room_current_temperature")|float
@@ -947,30 +771,7 @@
           > states("sensor.emils_room_target_temperature")|float - 0.5 and states("sensor.charlies_room_current_temperature")|float
           > states("sensor.charlies_room_target_temperature")|float - 0.5 and states("sensor.bedroom_current_temperature")|float
           > states("sensor.bedroom_target_temperature")|float - 0.5 }}'
-      - condition: template
-        value_template: '{{ state_attr(''climate.home_heat_pump_panasonic'', ''min_temp'')|float
-          < state_attr(''climate.home_heat_pump_panasonic'', ''temperature'')|float
-          }}'
-      sequence:
-      - action: select.select_option
-        metadata: {}
-        data:
-          option: 'off'
-        target:
-          entity_id: select.home_heat_pump_powerful_panasonic
-      - action: climate.set_preset_mode
-        metadata: {}
-        data:
-          preset_mode: none
-        target:
-          entity_id: climate.home_heat_pump_panasonic
-      - action: climate.set_temperature
-        metadata: {}
-        data:
-          temperature: '{{ state_attr(''climate.home_heat_pump_panasonic'', ''temperature'')|float
-            - 1 }}'
-        target:
-          entity_id: climate.home_heat_pump_panasonic
+      sequence: []
     - conditions:
       - condition: template
         value_template: '{{ states("sensor.living_room_current_temperature")|float
@@ -978,26 +779,7 @@
           > states("sensor.emils_room_target_temperature")|float and states("sensor.charlies_room_current_temperature")|float
           > states("sensor.charlies_room_target_temperature")|float and states("sensor.bedroom_current_temperature")|float
           > states("sensor.bedroom_target_temperature")|float }}'
-      sequence:
-      - action: select.select_option
-        metadata: {}
-        data:
-          option: 'off'
-        target:
-          entity_id: select.home_heat_pump_powerful_panasonic
-      - action: climate.set_preset_mode
-        metadata: {}
-        data:
-          preset_mode: eco
-        target:
-          entity_id: climate.home_heat_pump_panasonic
-      - action: climate.set_temperature
-        metadata: {}
-        data:
-          temperature: '{{ state_attr(''climate.home_heat_pump_panasonic'', ''min_temp'')
-            }}'
-        target:
-          entity_id: climate.home_heat_pump_panasonic
+      sequence: []
   mode: queued
   max: 10
 - id: '1735842629315'
@@ -3697,7 +3479,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: climate.home_central_heating
+        entity_id: binary_sensor.home_central_heating
         state: 'off'
       sequence:
       - variables:
@@ -4412,7 +4194,7 @@
     weekday:
     - mon
   - condition: state
-    entity_id: climate.home_heat_pump_panasonic
+    entity_id: binary_sensor.home_central_heating
     state: 'off'
   actions:
   - action: script.turn_on
@@ -7496,24 +7278,24 @@
   triggers:
   - trigger: numeric_state
     entity_id:
-    - sensor.living_room_printer_black_bk_canon
-    - sensor.living_room_printer_black_pgbk_canon
-    - sensor.living_room_printer_cyan_canon
-    - sensor.living_room_printer_magenta_canon
-    - sensor.living_room_printer_photo_blue_canon
-    - sensor.living_room_printer_yellow_canon
+    - sensor.living_room_printer_black_bk
+    - sensor.living_room_printer_black_pgbk
+    - sensor.living_room_printer_cyan
+    - sensor.living_room_printer_magenta
+    - sensor.living_room_printer_photo_blue
+    - sensor.living_room_printer_yellow
     below: 15
   - trigger: numeric_state
     entity_id:
-    - sensor.living_room_printer_black_bk_canon
-    - sensor.living_room_printer_black_pgbk_canon
-    - sensor.living_room_printer_cyan_canon
-    - sensor.living_room_printer_magenta_canon
-    - sensor.living_room_printer_photo_blue_canon
-    - sensor.living_room_printer_yellow_canon
+    - sensor.living_room_printer_black_bk
+    - sensor.living_room_printer_black_pgbk
+    - sensor.living_room_printer_cyan
+    - sensor.living_room_printer_magenta
+    - sensor.living_room_printer_photo_blue
+    - sensor.living_room_printer_yellow
     above: 20
   - trigger: state
-    entity_id: sensor.living_room_printer_canon
+    entity_id: sensor.living_room_printer
   - trigger: time
     at: 03:17:00
   conditions: []
@@ -7522,111 +7304,107 @@
     - condition: not
       conditions:
       - condition: state
-        entity_id: sensor.living_room_printer_black_pgbk_canon
+        entity_id: sensor.living_room_printer_black_pgbk
         state: unknown
     then:
     - action: script.home_create_todo_task
       data:
         subject: Skift sort (PGBK) blæk på printer
-        description: 'Blæk niveau for sort (PGBK) er {{ states(''sensor.living_room_printer_black_pgbk_canon'')
+        description: 'Blæk niveau for sort (PGBK) er {{ states(''sensor.living_room_printer_black_pgbk'')
           }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 580 PGBK (Black)'
-        related_entity_id: sensor.living_room_printer_black_pgbk_canon
+        related_entity_id: sensor.living_room_printer_black_pgbk
         entity_id: todo.home_smart_todo
-        is_active: '{{ states(''sensor.living_room_printer_black_pgbk_canon'')|int
-          < state_attr(''sensor.living_room_printer_black_pgbk_canon'', ''marker_low_level'')
-          }}'
+        is_active: '{{ states(''sensor.living_room_printer_black_pgbk'')|int < state_attr(''sensor.living_room_printer_black_pgbk'',
+          ''marker_low_level'') }}'
   - if:
     - condition: not
       conditions:
       - condition: state
-        entity_id: sensor.living_room_printer_black_bk_canon
+        entity_id: sensor.living_room_printer_black_bk
         state: unknown
     then:
     - action: script.home_create_todo_task
       data:
         subject: Skift sort (BK) blæk på printer
-        description: 'Blæk niveau for sort (BK) er {{ states(''sensor.living_room_printer_black_bk_canon'')
+        description: 'Blæk niveau for sort (BK) er {{ states(''sensor.living_room_printer_black_bk'')
           }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 BK (Black)'
-        related_entity_id: sensor.living_room_printer_black_bk_canon
+        related_entity_id: sensor.living_room_printer_black_bk
         entity_id: todo.home_smart_todo
-        is_active: '{{ states(''sensor.living_room_printer_black_bk_canon'')|int <
-          state_attr(''sensor.living_room_printer_black_bk_canon'', ''marker_low_level'')
-          }}'
+        is_active: '{{ states(''sensor.living_room_printer_black_bk'')|int < state_attr(''sensor.living_room_printer_black_bk'',
+          ''marker_low_level'') }}'
   - if:
     - condition: not
       conditions:
       - condition: state
-        entity_id: sensor.living_room_printer_cyan_canon
+        entity_id: sensor.living_room_printer_cyan
         state: unknown
     then:
     - action: script.home_create_todo_task
       data:
         subject: Skift cyan blæk på printer
-        description: 'Blæk niveau for cyan er {{ states(''sensor.living_room_printer_cyan_canon'')
+        description: 'Blæk niveau for cyan er {{ states(''sensor.living_room_printer_cyan'')
           }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 C (Cyan)'
-        related_entity_id: sensor.living_room_printer_cyan_canon
+        related_entity_id: sensor.living_room_printer_cyan
         entity_id: todo.home_smart_todo
-        is_active: '{{ states(''sensor.living_room_printer_cyan_canon'')|int < state_attr(''sensor.living_room_printer_cyan_canon'',
+        is_active: '{{ states(''sensor.living_room_printer_cyan'')|int < state_attr(''sensor.living_room_printer_cyan'',
           ''marker_low_level'') }}'
   - if:
     - condition: not
       conditions:
       - condition: state
-        entity_id: sensor.living_room_printer_magenta_canon
+        entity_id: sensor.living_room_printer_magenta
         state: unknown
     then:
     - action: script.home_create_todo_task
       data:
         subject: Skift magenta blæk på printer
-        description: 'Blæk niveau for magenta er {{ states(''sensor.living_room_printer_magenta_canon'')
+        description: 'Blæk niveau for magenta er {{ states(''sensor.living_room_printer_magenta'')
           }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 M (Magenta)'
-        related_entity_id: sensor.living_room_printer_magenta_canon
+        related_entity_id: sensor.living_room_printer_magenta
         entity_id: todo.home_smart_todo
-        is_active: '{{ states(''sensor.living_room_printer_magenta_canon'')|int <
-          state_attr(''sensor.living_room_printer_magenta_canon'', ''marker_low_level'')
-          }}'
+        is_active: '{{ states(''sensor.living_room_printer_magenta'')|int < state_attr(''sensor.living_room_printer_magenta'',
+          ''marker_low_level'') }}'
   - if:
     - condition: not
       conditions:
       - condition: state
-        entity_id: sensor.living_room_printer_photo_blue_canon
+        entity_id: sensor.living_room_printer_photo_blue
         state: unknown
     then:
     - action: script.home_create_todo_task
       data:
         subject: Skift foto blå blæk på printer
-        description: 'Blæk niveau for foto blå er {{ states(''sensor.living_room_printer_photo_blue_canon'')
+        description: 'Blæk niveau for foto blå er {{ states(''sensor.living_room_printer_photo_blue'')
           }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 PB (Photo blå)'
-        related_entity_id: sensor.living_room_printer_photo_blue_canon
+        related_entity_id: sensor.living_room_printer_photo_blue
         entity_id: todo.home_smart_todo
-        is_active: '{{ states(''sensor.living_room_printer_photo_blue_canon'')|int
-          < state_attr(''sensor.living_room_printer_photo_blue_canon'', ''marker_low_level'')
-          }}'
+        is_active: '{{ states(''sensor.living_room_printer_photo_blue'')|int < state_attr(''sensor.living_room_printer_photo_blue'',
+          ''marker_low_level'') }}'
   - if:
     - condition: not
       conditions:
       - condition: state
-        entity_id: sensor.living_room_printer_yellow_canon
+        entity_id: sensor.living_room_printer_yellow
         state: unknown
     then:
     - action: script.home_create_todo_task
       data:
         subject: Skift gul blæk på printer
-        description: 'Blæk niveau for gul er {{ states(''sensor.living_room_printer_yellow_canon'')
+        description: 'Blæk niveau for gul er {{ states(''sensor.living_room_printer_yellow'')
           }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 Y (Yellow)'
-        related_entity_id: sensor.living_room_printer_yellow_canon
+        related_entity_id: sensor.living_room_printer_yellow
         entity_id: todo.home_smart_todo
-        is_active: '{{ states(''sensor.living_room_printer_yellow_canon'')|int < state_attr(''sensor.living_room_printer_yellow_canon'',
+        is_active: '{{ states(''sensor.living_room_printer_yellow'')|int < state_attr(''sensor.living_room_printer_yellow'',
           ''marker_low_level'') }}'
   - action: script.home_create_todo_task
     data:
       subject: Løs problem med printer
       description: 'Der er registreret et problem med Canon TS8300 printer. <br>Message:
-        {{ state_attr(''sensor.living_room_printer_canon'', ''state_message'') }}  <br>Reason:
-        {{ state_attr(''sensor.living_room_printer_canon'', ''state_reason'') }} '
-      related_entity_id: sensor.living_room_printer_canon
+        {{ state_attr(''sensor.living_room_printer'', ''state_message'') }}  <br>Reason:
+        {{ state_attr(''sensor.living_room_printer'', ''state_reason'') }} '
+      related_entity_id: sensor.living_room_printer
       entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.living_room_printer_canon'') not in [''printing'',
+      is_active: '{{ states(''sensor.living_room_printer'') not in [''printing'',
         ''idle''] }}'
   mode: restart
 - id: '1741631411396'
