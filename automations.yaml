@@ -4739,6 +4739,15 @@
               entity_id: scene.driveway_light_sankt_patrick
             data:
               transition: 1
+        - conditions:
+          - condition: template
+            value_template: '{{ now().month == 2 and now().day == 14 }}'
+          sequence:
+          - action: scene.turn_on
+            target:
+              entity_id: scene.driveway_light_valentines
+            data:
+              transition: 1
         default:
         - action: scene.turn_on
           target:
@@ -8388,6 +8397,15 @@
     id: button_4_long
   - trigger: state
     entity_id:
+    - event.living_room_switch_button_1
+    - event.living_room_switch_button_2
+    - event.living_room_switch_button_3
+    - event.living_room_switch_button_4
+    attribute: event_type
+    to: long_release
+    id: living_room_button_long_press
+  - trigger: state
+    entity_id:
     - event.kitchen_switch_rotary
     id: rotary
   - trigger: state
@@ -8418,10 +8436,6 @@
     to:
     - 'on'
     id: person_detected
-  - trigger: state
-    entity_id: binary_sensor.living_room_light
-    to: 'off'
-    id: living_room_light_off
   conditions: []
   actions:
   - choose:
@@ -8547,7 +8561,7 @@
         - button_3_long
         - button_4_long
         - no_one_home
-        - living_room_light_off
+        - living_room_button_long_press
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -11072,11 +11086,30 @@
     entity_id: binary_sensor.someone_home
     to: 'off'
     id: no_one_home
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_1
+    - event.living_room_switch_button_2
+    - event.living_room_switch_button_3
+    - event.living_room_switch_button_4
+    attribute: event_type
+    to: long_release
+    id: living_room_button_long_press
   conditions: []
   actions:
   - variables:
       command: pause
   - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - living_room_button_long_press
+      sequence:
+      - action: media_player.turn_off
+        metadata: {}
+        target:
+          entity_id: media_player.living_room_apple_tv_media_player
+        data: {}
     - conditions:
       - condition: trigger
         id:
@@ -11486,6 +11519,61 @@
             related_entity_id: '{{ i }}'
             entity_id: todo.todo_smart_todo
             is_active: '{{ l < 15 }}'
+  mode: restart
+  trace:
+    stored_traces: 30
+- id: '1769704796507'
+  alias: Todo Haozee Jordfugtighedssensor
+  description: Kontroller batteri status på aozee Jordfugtighedssensor
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.living_room_soil_moisture_sensor_battery
+    - sensor.bedroom_soil_moisture_sensor_battery
+    - sensor.charlies_room_soil_moisture_sensor_battery
+  - trigger: time
+    at: 03:22:00
+  conditions: []
+  actions:
+  - variables:
+      sensors:
+      - entity_id: sensor.living_room_soil_moisture_sensor_battery
+      - entity_id: sensor.bedroom_soil_moisture_sensor_battery
+      - entity_id: sensor.charlies_room_soil_moisture_sensor_battery
+  - repeat:
+      for_each: '{{ sensors }}'
+      sequence:
+      - variables:
+          i: '{{ repeat.item.entity_id }}'
+          d: '{{ device_attr(device_id(repeat.item.entity_id), ''name_by_user'') }}'
+          a: '{{ area_name(repeat.item.entity_id) or ''ukendt rum'' }}'
+          b: "{% if repeat.item.battery_type is defined %}\n  {{ repeat.item.battery_type
+            }}\n{% else %}\n  {{ state_attr(repeat.item.entity_id, 'battery_quantity')
+            ~ ' * ' ~ state_attr(repeat.item.entity_id, 'battery_size') }}\n{% endif
+            %}"
+          l: '{{ states(repeat.item.entity_id) | int(default=-1) }}'
+      - action: system_log.write
+        data:
+          level: debug
+          message: 'Entity Id: {{ i }}
+
+            Area: {{ a }}
+
+            Battery type: {{ b }}
+
+            Level: {{ l }}'
+      - if:
+        - condition: template
+          value_template: '{{ l >= 0 }}'
+        then:
+        - action: script.create_todo_task
+          data:
+            subject: Skift batteri på {{ d }}
+            description: 'Batteri niveau er {{ l }}% på {{ d }}, placeret i {{ a }}.
+              Batteritype: {{ b }}'
+            related_entity_id: '{{ i }}'
+            entity_id: todo.todo_smart_todo
+            is_active: '{{ l < 10 }}'
   mode: restart
   trace:
     stored_traces: 30

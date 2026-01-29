@@ -1067,3 +1067,71 @@
       - 0
       - 255
   icon: mdi:firework
+- id: '1769704246341'
+  name: Indkørsel lys Valentines dag
+  entities:
+    light.driveway_light_right_1:
+      state: 'off'
+    light.driveway_light_left_1:
+      state: 'off'
+    light.driveway_light_left_2:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.45
+      - 0.28
+    light.driveway_light_left_3:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.38
+      - 0.22
+    light.driveway_light_left_4:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.46
+      - 0.3
+    light.driveway_light_left_5:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.45
+      - 0.28
+    light.driveway_light_left_6:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.38
+      - 0.22
+    light.driveway_light_left_7:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.46
+      - 0.3
+    light.driveway_light_left_8:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.45
+      - 0.28
+    light.driveway_light_left_9:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.38
+      - 0.22
+    light.driveway_light_right_2:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.46
+      - 0.3
+    light.driveway_light_right_3:
+      state: 'on'
+      brightness: 55
+      xy_color:
+      - 0.45
+      - 0.28
+  icon: mdi:leaf-circle

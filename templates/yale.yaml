@@ -1,0 +1,17 @@
+- sensor:
+    - name: "Yale Code Anders"
+      unique_id: AF550E28-E277-4507-8463-E205D218577A
+      state: !secret yale_code_anders
+      icon: mdi:key-variant
+    - name: "Yale Code Monique"
+      unique_id: AF550E28-E277-4507-8463-E205D218577B
+      state: !secret yale_code_monique
+      icon: mdi:key-variant     
+    - name: "Yale Code Emil"
+      unique_id: AF550E28-E277-4507-8463-E205D218577C
+      state: !secret yale_code_emil
+      icon: mdi:key-variant     
+    - name: "Yale Code Charlie"
+      unique_id: AF550E28-E277-4507-8463-E205D218577D
+      state: !secret yale_code_charlie
+      icon: mdi:key-variant     
