@@ -10882,43 +10882,7 @@
   - if:
     - condition: template
       value_template: '{{ command == ''off'' }}'
-    then:
-    - parallel:
-      - if:
-        - condition: state
-          entity_id: light.living_room_light_strip_receiver
-          state: 'on'
-        then:
-        - action: light.turn_off
-          data:
-            transition: 1
-          target:
-            entity_id:
-            - light.living_room_light_strip_receiver
-      - if:
-        - condition: state
-          entity_id: light.living_room_smart_plug_receiver_accessories
-          state: 'on'
-        then:
-        - action: light.turn_off
-          target:
-            entity_id: light.living_room_smart_plug_receiver_accessories
-      - if:
-        - condition: state
-          entity_id: media_player.living_room_receiver
-          state: 'on'
-        then:
-        - action: media_player.turn_off
-          target:
-            entity_id: media_player.living_room_receiver
-      - if:
-        - condition: state
-          entity_id: switch.living_room_tv_sync_box_power
-          state: 'on'
-        then:
-        - action: switch.turn_off
-          target:
-            entity_id: switch.living_room_tv_sync_box_power
+    then: []
     else:
     - parallel:
       - if:
@@ -10965,6 +10929,37 @@
         - action: switch.turn_on
           target:
             entity_id: switch.living_room_tv_sync_box_power
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: '{{ command == ''playing'' }}'
+        sequence:
+        - action: huesyncbox.set_sync_state
+          data:
+            device_id: 1cf95a14183d127c38d2f6af89ed61c5
+            power: true
+            sync: true
+            brightness: 100
+            input: input1
+            entertainment_area: TV-område
+            mode: video
+            intensity: moderate
+        - action: switch.turn_on
+          metadata: {}
+          data: {}
+          target:
+            entity_id:
+            - switch.living_room_tv_sync_box_light_sync
+      - conditions:
+        - condition: template
+          value_template: '{{ command == ''pausse'' }}'
+        sequence:
+        - action: switch.turn_off
+          metadata: {}
+          data: {}
+          target:
+            entity_id:
+            - switch.living_room_tv_sync_box_light_sync
   mode: queued
   max: 10
   trace:
