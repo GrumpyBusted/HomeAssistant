@@ -10988,7 +10988,7 @@
             - switch.living_room_tv_sync_box_light_sync
       - conditions:
         - condition: template
-          value_template: '{{ command == ''pause'' }}'
+          value_template: '{{ command == ''pausse'' }}'
         sequence:
         - action: switch.turn_off
           metadata: {}
