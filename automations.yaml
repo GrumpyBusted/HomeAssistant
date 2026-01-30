@@ -10831,6 +10831,7 @@
     id: paused
   - trigger: state
     entity_id: binary_sensor.someone_home
+    from: 'on'
     to: 'off'
     id: no_one_home
   - trigger: state
