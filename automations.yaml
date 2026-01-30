@@ -10882,7 +10882,27 @@
   - if:
     - condition: template
       value_template: '{{ command == ''off'' }}'
-    then: []
+    then:
+    - parallel:
+      - if:
+        - condition: state
+          entity_id: light.living_room_light_strip_receiver
+          state: 'on'
+        then:
+        - action: light.turn_off
+          data:
+            transition: 1
+          target:
+            entity_id:
+            - light.living_room_light_strip_receiver
+      - if:
+        - condition: state
+          entity_id: light.living_room_smart_plug_receiver_accessories
+          state: 'on'
+        then:
+        - action: light.turn_off
+          target:
+            entity_id: light.living_room_smart_plug_receiver_accessories
     else:
     - parallel:
       - if:
