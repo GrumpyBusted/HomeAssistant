@@ -10965,35 +10965,37 @@
         - action: switch.turn_on
           target:
             entity_id: switch.living_room_tv_sync_box_power
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ command == ''playing'' }}'
-      sequence:
-      - action: huesyncbox.set_sync_state
-        data:
-          device_id: 1cf95a14183d127c38d2f6af89ed61c5
-          power: true
-          sync: true
-          brightness: 100
-          input: input1
-          entertainment_area: TV-område
-          mode: video
-          intensity: moderate
-      - action: switch.turn_on
-        metadata: {}
-        data: {}
-        target:
-          entity_id:
-          - switch.living_room_tv_sync_box_light_sync
-    - conditions:
-      - condition: template
-        value_template: '{{ command == ''pause'' }}'
-      sequence:
-      - action: huesyncbox.set_sync_state
-        data:
-          device_id: 1cf95a14183d127c38d2f6af89ed61c5
-          sync: false
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: '{{ command == ''playing'' }}'
+        sequence:
+        - action: huesyncbox.set_sync_state
+          data:
+            device_id: 1cf95a14183d127c38d2f6af89ed61c5
+            power: true
+            sync: true
+            brightness: 100
+            input: input1
+            entertainment_area: TV-område
+            mode: video
+            intensity: moderate
+        - action: switch.turn_on
+          metadata: {}
+          data: {}
+          target:
+            entity_id:
+            - switch.living_room_tv_sync_box_light_sync
+      - conditions:
+        - condition: template
+          value_template: '{{ command == ''pause'' }}'
+        sequence:
+        - action: switch.turn_off
+          metadata: {}
+          data: {}
+          target:
+            entity_id:
+            - switch.living_room_tv_sync_box_light_sync
   mode: queued
   max: 10
   trace:
