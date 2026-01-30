@@ -10903,6 +10903,14 @@
         - action: light.turn_off
           target:
             entity_id: light.living_room_smart_plug_receiver_accessories
+      - if:
+        - condition: state
+          entity_id: switch.living_room_tv_sync_box_power
+          state: 'on'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.living_room_tv_sync_box_power
     else:
     - parallel:
       - if:
