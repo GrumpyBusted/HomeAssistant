@@ -10814,7 +10814,7 @@
   - trigger: state
     entity_id: media_player.living_room_apple_tv_media_player
     to: 'off'
-    id: 'off'
+    id: offs
   - trigger: state
     entity_id: media_player.living_room_apple_tv_media_player
     to: idle
