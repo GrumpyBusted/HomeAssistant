@@ -3449,6 +3449,12 @@
   description: Automatik til at styre varmen på Charlies værelse
   triggers:
   - trigger: state
+    entity_id: sensor.charlies_room_target_temperature
+    id: target_changed
+  - trigger: state
+    entity_id: timer.charlies_room_heating_manual_timer
+    to: idle
+  - trigger: state
     entity_id: binary_sensor.home_central_heating
   - trigger: state
     entity_id: binary_sensor.charlies_room_window_sensor_door
@@ -3466,31 +3472,69 @@
     at:
       entity_id: input_datetime.charlie_wake_up_alarm
       offset: 00:15:00
-  - trigger: state
-    entity_id: timer.charlies_room_heating_manual_timer
-    to: idle
-  conditions:
-  - condition: state
-    entity_id: timer.charlies_room_heating_manual_timer
-    state: idle
+  conditions: []
   actions:
-  - variables:
-      target: 21
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.someone_home
+        state: 'off'
+      - condition: state
+        entity_id: timer.charlies_room_heating_manual_timer
+        state: active
+      sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.charlies_room_heating_manual_timer
+    - conditions:
+      - condition: trigger
+        id: target_changed
+      - condition: template
+        value_template: '{{ states(''sensor.charlies_room_target_temperature'') !=
+          states(''input_number.charlies_room_auto_temperature'') }}'
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 01:00:00
+        target:
+          entity_id: timer.charlies_room_heating_manual_timer
+    - conditions:
+      - condition: template
+        value_template: '{{ states(''sensor.charlies_room_target_temperature'') ==
+          states(''input_number.charlies_room_auto_temperature'') }}'
+      - condition: state
+        entity_id: timer.charlies_room_heating_manual_timer
+        state: active
+      sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.charlies_room_heating_manual_timer
   - choose:
     - conditions:
       - condition: state
         entity_id: binary_sensor.home_central_heating
         state: 'off'
       sequence:
-      - variables:
-          target: 23
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.charlies_room_auto_temperature
+        data:
+          value: 23
     - conditions:
       - condition: state
         entity_id: binary_sensor.charlies_room_window_sensor_door
         state: 'on'
       sequence:
-      - variables:
-          target: 10
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.charlies_room_auto_temperature
+        data:
+          value: 10
     - conditions:
       - condition: state
         entity_id: input_boolean.house_sitter
@@ -3499,8 +3543,11 @@
         entity_id: binary_sensor.charlie_home
         state: 'off'
       sequence:
-      - variables:
-          target: 19
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.charlies_room_auto_temperature
+        data:
+          value: 19
     - conditions:
       - condition: state
         entity_id: binary_sensor.charlie_sleeping
@@ -3510,21 +3557,38 @@
           | as_datetime | as_local %} {% set s = a - timedelta(minutes=15) %} {% set
           e = a + timedelta(minutes=15) %} {{ s <= n < e }}'
       sequence:
-      - variables:
-          target: 21
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.charlies_room_auto_temperature
+        data:
+          value: 21
     - conditions:
       - condition: state
         entity_id: binary_sensor.charlie_sleeping
         state: 'on'
       sequence:
-      - variables:
-          target: 19
-  - action: script.set_climate_temperature
-    data:
-      temperature: '{{ target }}'
-      entities:
-      - climate.charlies_room_radiator_thermostat
-      - climate.charlies_room_temperature_sensor
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.charlies_room_auto_temperature
+        data:
+          value: 19
+    default:
+    - action: input_number.set_value
+      target:
+        entity_id: input_number.charlies_room_auto_temperature
+      data:
+        value: 21
+  - if:
+    - condition: state
+      entity_id: timer.charlies_room_heating_manual_timer
+      state: idle
+    then:
+    - action: script.set_climate_temperature
+      data:
+        temperature: '{{ states(''input_number.charlies_room_auto_temperature'') }}'
+        entities:
+        - climate.charlies_room_radiator_thermostat
+        - climate.charlies_room_temperature_sensor
   mode: restart
   trace:
     stored_traces: 50
@@ -3823,6 +3887,12 @@
   description: Automatik til at styre varmen i stuen
   triggers:
   - trigger: state
+    entity_id: sensor.living_room_target_temperature
+    id: target_changed
+  - trigger: state
+    entity_id: timer.living_room_heating_manual_timer
+    to: idle
+  - trigger: state
     entity_id: binary_sensor.home_central_heating
   - trigger: state
     entity_id: binary_sensor.living_room_window_sensor_sofa_door
@@ -3844,24 +3914,59 @@
     entity_id: binary_sensor.kitchen_occupancy
   - trigger: state
     entity_id: binary_sensor.bedroom_sleeping
-  - trigger: state
-    entity_id: timer.living_room_heating_manual_timer
-    to: idle
-  conditions:
-  - condition: state
-    entity_id: timer.living_room_heating_manual_timer
-    state: idle
+  conditions: []
   actions:
-  - variables:
-      target: 22
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.someone_home
+        state: 'off'
+      - condition: state
+        entity_id: timer.living_room_heating_manual_timer
+        state: active
+      sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.living_room_heating_manual_timer
+    - conditions:
+      - condition: trigger
+        id: target_changed
+      - condition: template
+        value_template: '{{ states(''sensor.living_room_target_temperature'') != states(''input_number.living_room_auto_temperature'')
+          }}'
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 02:00:00
+        target:
+          entity_id: timer.living_room_heating_manual_timer
+    - conditions:
+      - condition: template
+        value_template: '{{ states(''sensor.living_room_target_temperature'') == states(''input_number.living_room_auto_temperature'')
+          }}'
+      - condition: state
+        entity_id: timer.living_room_heating_manual_timer
+        state: active
+      sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.living_room_heating_manual_timer
   - choose:
     - conditions:
       - condition: state
         entity_id: binary_sensor.home_central_heating
         state: 'off'
       sequence:
-      - variables:
-          target: 23
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.living_room_auto_temperature
+        data:
+          value: 23
     - conditions:
       - condition: or
         conditions:
@@ -3878,22 +3983,31 @@
           entity_id: cover.living_room_skylight_window_south
           state: open
       sequence:
-      - variables:
-          target: 10
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.living_room_auto_temperature
+        data:
+          value: 10
     - conditions:
       - condition: state
         entity_id: binary_sensor.someone_home
         state: 'off'
       sequence:
-      - variables:
-          target: 17
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.living_room_auto_temperature
+        data:
+          value: 17
     - conditions:
       - condition: state
         entity_id: binary_sensor.everyone_sleeping
         state: 'on'
       sequence:
-      - variables:
-          target: 17
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.living_room_auto_temperature
+        data:
+          value: 17
     - conditions:
       - condition: state
         entity_id: binary_sensor.living_room_light
@@ -3908,16 +4022,31 @@
         entity_id: binary_sensor.living_room_door_sensor_door
         state: 'off'
       sequence:
-      - variables:
-          target: 19
-  - action: script.set_climate_temperature
-    data:
-      temperature: '{{ target }}'
-      entities:
-      - climate.living_room_radiator_thermostat_bookcase
-      - climate.living_room_radiator_thermostat_dining_table
-      - climate.living_room_radiator_thermostat_sofa
-  mode: restart
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.living_room_auto_temperature
+        data:
+          value: 19
+    default:
+    - action: input_number.set_value
+      target:
+        entity_id: input_number.living_room_auto_temperature
+      data:
+        value: 22
+  - if:
+    - condition: state
+      entity_id: timer.living_room_heating_manual_timer
+      state: idle
+    then:
+    - action: script.set_climate_temperature
+      data:
+        temperature: '{{ states(''input_number.living_room_auto_temperature'') }}'
+        entities:
+        - climate.living_room_radiator_thermostat_bookcase
+        - climate.living_room_radiator_thermostat_dining_table
+        - climate.living_room_radiator_thermostat_sofa
+  mode: queued
+  max: 10
   trace:
     stored_traces: 50
 - id: '1737313921011'
@@ -10845,10 +10974,7 @@
     attribute: event_type
     to: long_release
     id: living_room_button_long_press
-  conditions:
-  - condition: state
-    entity_id: input_boolean.home_assistant_ready
-    state: 'on'
+  conditions: []
   actions:
   - variables:
       command: pause
@@ -11009,14 +11135,12 @@
             - switch.living_room_tv_sync_box_light_sync
       - conditions:
         - condition: template
-          value_template: '{{ command == ''pausse'' }}'
+          value_template: '{{ command == ''pause'' }}'
         sequence:
-        - action: switch.turn_off
-          metadata: {}
-          data: {}
-          target:
-            entity_id:
-            - switch.living_room_tv_sync_box_light_sync
+        - action: huesyncbox.set_sync_state
+          data:
+            device_id: 1cf95a14183d127c38d2f6af89ed61c5
+            sync: false
   mode: queued
   max: 10
   trace:
@@ -11347,34 +11471,3 @@
   mode: restart
   trace:
     stored_traces: 30
-- id: '1769788322673'
-  alias: Home Assistant sæt klar
-  description: Styring af Home Assistant klar flaget
-  triggers:
-  - trigger: homeassistant
-    event: shutdown
-    id: shutdown
-  - trigger: homeassistant
-    event: start
-    id: start
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id:
-        - start
-      sequence:
-      - action: input_boolean.turn_on
-        target:
-          entity_id: input_boolean.ha_ready
-    - conditions:
-      - condition: trigger
-        id:
-        - shutdown
-      sequence:
-      - action: input_boolean.turn_off
-        target:
-          entity_id: input_boolean.ha_ready
-  mode: queued
-  max: 20
