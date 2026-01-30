@@ -10905,6 +10905,14 @@
             entity_id: light.living_room_smart_plug_receiver_accessories
       - if:
         - condition: state
+          entity_id: media_player.living_room_receiver
+          state: 'on'
+        then:
+        - action: media_player.turn_off
+          target:
+            entity_id: media_player.living_room_receiver
+      - if:
+        - condition: state
           entity_id: switch.living_room_tv_sync_box_power
           state: 'on'
         then:
