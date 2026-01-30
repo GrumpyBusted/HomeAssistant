@@ -10814,8 +10814,6 @@
   - trigger: state
     entity_id: media_player.living_room_apple_tv_media_player
     to: 'off'
-    for:
-      seconds: 60
     id: 'off'
   - trigger: state
     entity_id: media_player.living_room_apple_tv_media_player
@@ -10868,6 +10866,9 @@
         id:
         - 'off'
         - no_one_home
+      - condition: template
+        value_template: '{{ state_attr(''media_player.living_room_apple_tv_media_player'',
+          ''source_list'') != none }}'
       sequence:
       - variables:
           command: 'off'
