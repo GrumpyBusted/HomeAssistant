@@ -10814,7 +10814,7 @@
   - trigger: state
     entity_id: media_player.living_room_apple_tv_media_player
     to: 'off'
-    id: offs
+    id: 'off'
   - trigger: state
     entity_id: media_player.living_room_apple_tv_media_player
     to: idle
@@ -10843,7 +10843,10 @@
     attribute: event_type
     to: long_release
     id: living_room_button_long_press
-  conditions: []
+  conditions:
+  - condition: state
+    entity_id: input_boolean.home_assistant_ready
+    state: 'on'
   actions:
   - variables:
       command: pause
@@ -11327,3 +11330,34 @@
   mode: restart
   trace:
     stored_traces: 30
+- id: '1769788322673'
+  alias: Home Assistant sæt klar
+  description: Styring af Home Assistant klar flaget
+  triggers:
+  - trigger: homeassistant
+    event: shutdown
+    id: shutdown
+  - trigger: homeassistant
+    event: start
+    id: start
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - start
+      sequence:
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.ha_ready
+    - conditions:
+      - condition: trigger
+        id:
+        - shutdown
+      sequence:
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.ha_ready
+  mode: queued
+  max: 20
