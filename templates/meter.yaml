@@ -1,0 +1,16 @@
+- sensor:
+    - name: meter_readings_electricity
+      unique_id: 276CD996-CE6A-4E82-9E01-11914786EED8
+      device_class: energy
+      state_class: total_increasing
+      unit_of_measurement: kWh
+      icon: "mdi:meter-electric"
+      state: "0"
+- sensor:
+    - name: meter_readings_water
+      unique_id: 2DE105B5-B9EC-408C-8084-C00805D9838D
+      device_class: water
+      state_class: total_increasing
+      unit_of_measurement: m³
+      icon: "mdi:water-circle"
+      state: "0"

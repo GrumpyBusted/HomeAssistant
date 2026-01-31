@@ -49,10 +49,3 @@ rest_command:
     headers:
       Content-Type: "application/json"
     payload: '{ "data": { "addressID": "{{ addressID }}", "municipality": {{ municipality }} } }'
-
-utility_meter:
-  water_meter_hourly:
-    unique_id: cb3fdfff-72e4-422c-ba65-772cb3ece41b
-    source: sensor.water_meter
-    cycle: hourly
-    always_available: true
