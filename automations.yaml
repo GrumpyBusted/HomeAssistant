@@ -431,7 +431,7 @@
     stored_traces: 20
 - id: '1735725983183'
   alias: Garage lys
-  description: Automatik til at styre lys i garage
+  description: Automatik til at styre lys i garagen
   triggers:
   - trigger: state
     entity_id:
@@ -457,26 +457,26 @@
     id: no_one_home
   - trigger: state
     entity_id:
-    - lock.garage_door
+    - lock.garage_lock
     to: locked
-    id: door_locked
+    id: locked
   - trigger: state
     entity_id:
-    - lock.garage_door
+    - lock.garage_lock
     to: unlocked
-    id: door_unlocked
+    id: unlocked
   - trigger: state
     entity_id:
-    - binary_sensor.garage_door_sensor_opening
+    - binary_sensor.garage_door
     from: 'off'
     to: 'on'
-    id: door_opened
+    id: opened
   - trigger: state
     entity_id:
-    - binary_sensor.garage_door_sensor_opening
+    - binary_sensor.garage_door
     from: 'on'
     to: 'off'
-    id: door_closed
+    id: closed
   - trigger: state
     entity_id:
     - binary_sensor.someone_home
@@ -536,8 +536,8 @@
     - conditions:
       - condition: trigger
         id:
-        - door_opened
-        - door_unlocked
+        - opened
+        - unlocked
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -547,7 +547,7 @@
     - conditions:
       - condition: trigger
         id:
-        - door_locked
+        - locked
         - no_one_home
         - sleeping
       sequence:
@@ -560,9 +560,9 @@
     - conditions:
       - condition: trigger
         id:
-        - door_closed
+        - closed
       - condition: state
-        entity_id: lock.garage_door
+        entity_id: lock.garage_lock
         state: locked
       sequence:
       - action: light.turn_off
@@ -783,7 +783,7 @@
   mode: queued
   max: 10
 - id: '1735842629315'
-  alias: Entre dør lås
+  alias: Entre lås
   description: Automatik til at låse hoveddøren op og i baseret på hvem der er hjemme
   triggers:
   - trigger: state
@@ -824,14 +824,14 @@
     id: sleeping
   - trigger: state
     entity_id:
-    - timer.entrance_door_locking_timer
+    - timer.entrance_lock_timer
     to: idle
     id: auto_locking_expired
   conditions: []
   actions:
   - action: homeassistant.update_entity
     data:
-      entity_id: lock.entrance_door
+      entity_id: lock.entrance_lock
   - delay:
       seconds: 3
   - choose:
@@ -840,7 +840,7 @@
         id:
         - anders_home
       - condition: state
-        entity_id: lock.entrance_door
+        entity_id: lock.entrance_lock
         state: locked
       sequence:
       - action: lock.unlock
@@ -848,13 +848,13 @@
         data:
           code: '{{ states(''sensor.yale_code_anders'') }}'
         target:
-          entity_id: lock.entrance_door
+          entity_id: lock.entrance_lock
     - conditions:
       - condition: trigger
         id:
         - monique_home
       - condition: state
-        entity_id: lock.entrance_door
+        entity_id: lock.entrance_lock
         state: locked
       sequence:
       - action: lock.unlock
@@ -862,13 +862,13 @@
         data:
           code: '{{ states(''sensor.yale_code_monique'') }}'
         target:
-          entity_id: lock.entrance_door
+          entity_id: lock.entrance_lock
     - conditions:
       - condition: trigger
         id:
         - emil_home
       - condition: state
-        entity_id: lock.entrance_door
+        entity_id: lock.entrance_lock
         state: locked
       sequence:
       - action: lock.unlock
@@ -876,13 +876,13 @@
         data:
           code: '{{ states(''sensor.yale_code_emil'') }}'
         target:
-          entity_id: lock.entrance_door
+          entity_id: lock.entrance_lock
     - conditions:
       - condition: trigger
         id:
         - charlie_home
       - condition: state
-        entity_id: lock.entrance_door
+        entity_id: lock.entrance_lock
         state: locked
       sequence:
       - action: lock.unlock
@@ -890,14 +890,14 @@
         data:
           code: '{{ states(''sensor.yale_code_charlie'') }}'
         target:
-          entity_id: lock.entrance_door
+          entity_id: lock.entrance_lock
     - conditions:
       - condition: trigger
         id:
         - no_one_home
         - sleeping
       - condition: state
-        entity_id: lock.entrance_door
+        entity_id: lock.entrance_lock
         state:
         - unlocked
       sequence:
@@ -905,19 +905,19 @@
         metadata: {}
         data: {}
         target:
-          entity_id: lock.entrance_door
+          entity_id: lock.entrance_lock
       - action: timer.start
         metadata: {}
         data:
           duration: 00:00:10
         target:
-          entity_id: timer.entrance_door_locking_timer
+          entity_id: timer.entrance_lock_timer
     - conditions:
       - condition: trigger
         id:
         - auto_locking_expired
       - condition: state
-        entity_id: lock.entrance_door
+        entity_id: lock.entrance_lock
         state:
         - unlocked
       sequence:
@@ -946,7 +946,7 @@
         data:
           title: '{{ title }}'
           message: '{{ message }}'
-          notification_id: entrance_door_auto_lock_warning
+          notification_id: entrance_lock_auto_warning
       - repeat:
           for_each: '{{ notify_persons }}'
           sequence:
@@ -998,12 +998,12 @@
     - binary_sensor.patio_door
     from: 'off'
     to: 'on'
-    id: door_opened
+    id: opened
   - trigger: state
     entity_id:
-    - lock.patio_door
+    - lock.patio_lock
     to: locked
-    id: door_locked
+    id: locked
   - trigger: state
     entity_id: binary_sensor.everyone_sleeping
     from: 'off'
@@ -1139,7 +1139,7 @@
     - conditions:
       - condition: trigger
         id:
-        - door_opened
+        - opened
       - condition: state
         entity_id: binary_sensor.patio_light
         state: 'off'
@@ -1160,7 +1160,7 @@
       - condition: trigger
         id:
         - no_one_home
-        - door_locked
+        - locked
         - sleeping
         - auto_scene
       sequence:
@@ -3895,7 +3895,7 @@
   - trigger: state
     entity_id: binary_sensor.home_central_heating
   - trigger: state
-    entity_id: binary_sensor.living_room_window_sensor_sofa_door
+    entity_id: binary_sensor.living_room_window_sensor_door
   - trigger: state
     entity_id: binary_sensor.patio_door
   - trigger: state
@@ -3909,7 +3909,7 @@
   - trigger: state
     entity_id: binary_sensor.living_room_light
   - trigger: state
-    entity_id: binary_sensor.living_room_media
+    entity_id: binary_sensor.living_room_media_player
   - trigger: state
     entity_id: binary_sensor.kitchen_occupancy
   - trigger: state
@@ -3971,7 +3971,7 @@
       - condition: or
         conditions:
         - condition: state
-          entity_id: binary_sensor.living_room_window_sensor_sofa_door
+          entity_id: binary_sensor.living_room_window_sensor_door
           state: 'on'
         - condition: state
           entity_id: binary_sensor.patio_door
@@ -4013,7 +4013,7 @@
         entity_id: binary_sensor.living_room_light
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.living_room_media
+        entity_id: binary_sensor.living_room_media_player
         state: 'off'
       - condition: state
         entity_id: binary_sensor.kitchen_occupancy
@@ -4360,9 +4360,9 @@
     id: family_home
     trigger: state
   - entity_id:
-    - sensor.entrance_door_operator
-    - sensor.utility_room_door_operator
-    id: door_unlock
+    - sensor.entrance_lock_operator
+    - sensor.utility_room_lock_operator
+    id: unlock
     trigger: state
   actions:
   - data:
@@ -4384,7 +4384,7 @@
         action: input_boolean.turn_off
     - conditions:
       - condition: trigger
-        id: door_unlock
+        id: unlock
       - condition: state
         entity_id: binary_sensor.family_home
         state: 'off'
@@ -5158,66 +5158,74 @@
   - trigger: state
     entity_id: media_player.living_room_apple_tv_media_player
     to: playing
-    id: playing_started
+    id: started
   - trigger: state
     entity_id: media_player.living_room_apple_tv_media_player
-    from: playing
-    id: playing_ended
+    to:
+    - buffering
+    - idle
+    - paused
+    id: ended
   - trigger: state
     entity_id: media_player.living_room_apple_tv_media_player
     to: 'off'
     id: 'off'
+    for:
+      seconds: 3
   - trigger: state
-    entity_id: timer.living_room_media_timer
+    entity_id: timer.living_room_media_player_timer
     to: idle
-    id: timer_ended
+    id: timeout
   - trigger: state
     entity_id: binary_sensor.someone_home
     to: 'off'
-    id: no_one_home
+    id: away
   conditions: []
   actions:
   - choose:
     - conditions:
       - condition: trigger
         id:
-        - playing_started
+        - started
       sequence:
       - action: timer.cancel
         target:
-          entity_id: timer.living_room_media_timer
+          entity_id: timer.living_room_media_player_timer
       - action: input_boolean.turn_on
         metadata: {}
         target:
-          entity_id: input_boolean.living_room_media_status
+          entity_id: input_boolean.living_room_media_player
         data: {}
     - conditions:
       - condition: trigger
         id:
-        - playing_ended
+        - ended
       sequence:
       - action: timer.start
         metadata: {}
         data:
           duration: 00:03:00
         target:
-          entity_id: timer.living_room_media_timer
+          entity_id: timer.living_room_media_player_timer
       - action: input_boolean.turn_on
         metadata: {}
         target:
-          entity_id: input_boolean.living_room_media_status
+          entity_id: input_boolean.living_room_media_player
         data: {}
     - conditions:
       - condition: trigger
         id:
-        - no_one_home
-        - timer_ended
+        - away
+        - timeout
         - 'off'
       sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.living_room_media_player_timer
       - action: input_boolean.turn_off
         metadata: {}
         target:
-          entity_id: input_boolean.living_room_media_status
+          entity_id: input_boolean.living_room_media_player
         data: {}
   mode: queued
   max: 10
@@ -5786,73 +5794,69 @@
   triggers:
   - trigger: state
     entity_id:
-    - sensor.garage_weather_station_battery_netatmo
-    - sensor.garden_anemometer_battery_netatmo
-    - sensor.garden_rain_gauge_battery_netatmo
-    - sensor.garden_weather_station_battery_netatmo
-    - sensor.greenhouse_weather_station_battery_netatmo
-    - sensor.technic_weather_station_battery_netatmo
+    - sensor.garage_weather_station_battery
+    - sensor.garden_anemometer_battery
+    - sensor.garden_rain_gauge_battery
+    - sensor.garden_weather_station_battery
+    - sensor.greenhouse_weather_station_battery
+    - sensor.technic_room_weather_station_battery
   - trigger: time
     at: 03:13:00
   conditions: []
   actions:
-  - action: script.home_create_todo_task
+  - action: script.create_todo_task
     data:
       subject: Skift batteri på vejrstation inde i garagen
-      description: 'Batteri niveau er {{ states(''sensor.garage_weather_station_battery_netatmo'')
+      description: 'Batteri niveau er {{ states(''sensor.garage_weather_station_battery'')
         }}% på Netatmo vejrstationen der står inde i garagen. Batteri: 4 * AAA'
-      related_entity_id: sensor.garage_weather_station_battery_netatmo
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.garage_weather_station_battery_netatmo'')|int
-        < 5 }}'
-  - action: script.home_create_todo_task
+      related_entity_id: sensor.garage_weather_station_battery
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ states(''sensor.garage_weather_station_battery'')|int < 5 }}'
+  - action: script.create_todo_task
     data:
       subject: Problem med strøm til vindmåler
       description: Vindmåleren er tilsluttet strømforsyning, kontroller strømforsyning
         der sidder i teknikrummet og vindmåleren der sidder på gavlen på nord siden
         ved tagryggen
-      related_entity_id: sensor.garden_anemometer_battery_netatmo
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.garden_anemometer_battery_netatmo'')|int < 5
-        }}'
-  - action: script.home_create_todo_task
+      related_entity_id: sensor.garden_anemometer_battery
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ states(''sensor.garden_anemometer_battery'')|int < 5 }}'
+  - action: script.create_todo_task
     data:
       subject: Skift batteri på regnmåler
-      description: 'Batteri niveau er {{ states(''sensor.garden_rain_gauge_battery_netatmo'')
+      description: 'Batteri niveau er {{ states(''sensor.garden_rain_gauge_battery'')
         }}% på Netatmo regnmålet, der er pladseret på galven på nord siden, ned den
         overdækkede terrasse. Batteri: 2 * AAA'
-      related_entity_id: sensor.garden_rain_gauge_battery_netatmo
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.garden_rain_gauge_battery_netatmo'')|int < 5
-        }}'
-  - action: script.home_create_todo_task
+      related_entity_id: sensor.garden_rain_gauge_battery
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ states(''sensor.garden_rain_gauge_battery'')|int < 5 }}'
+  - action: script.create_todo_task
     data:
       subject: Skift batteri på udendørs vejrstation på garagen
-      description: 'Batteri niveau er {{ states(''sensor.garden_weather_station_battery_netatmo'')
+      description: 'Batteri niveau er {{ states(''sensor.garden_weather_station_battery'')
         }}% på Netatmo vejrstationen der sidder udvendigt på garagen. Batteri: 2 *
         AAA'
-      related_entity_id: sensor.garden_weather_station_battery_netatmo
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.garden_weather_station_battery_netatmo'')|int
-        < 5 }}'
-  - action: script.home_create_todo_task
+      related_entity_id: sensor.garden_weather_station_battery
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ states(''sensor.garden_weather_station_battery'')|int < 5 }}'
+  - action: script.create_todo_task
     data:
       subject: Skift batteri på vejrstation i drivhuset
-      description: 'Batteri niveau er {{ states(''sensor.greenhouse_weather_station_battery_netatmo'')
+      description: 'Batteri niveau er {{ states(''sensor.greenhouse_weather_station_battery'')
         }}% på Netatmo vejrstationen i drivhuset. Batteri: 4 * AAA'
-      related_entity_id: sensor.greenhouse_weather_station_battery_netatmo
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.greenhouse_weather_station_battery_netatmo'')|int
-        < 5 }}'
-  - action: script.home_create_todo_task
+      related_entity_id: sensor.greenhouse_weather_station_battery
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ states(''sensor.greenhouse_weather_station_battery'')|int < 5
+        }}'
+  - action: script.create_todo_task
     data:
       subject: Skift batteri på vejrstation i teknikrummet
-      description: 'Batteri niveau er {{ states(''sensor.technic_weather_station_battery_netatmo'')
+      description: 'Batteri niveau er {{ states(''sensor.technic_room_weather_station_battery'')
         }}% på Netatmo vejrstationen i teknikrummet. Batteri: 4 * AAA'
-      related_entity_id: sensor.technic_weather_station_battery_netatmo
-      entity_id: todo.home_smart_todo
-      is_active: '{{ states(''sensor.technic_weather_station_battery_netatmo'')|int
-        < 5 }}'
+      related_entity_id: sensor.technic_room_weather_station_battery
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ states(''sensor.technic_room_weather_station_battery'')|int <
+        5 }}'
   mode: restart
 - id: '1739906369450'
   alias: Todo Philips Hue kontakter
@@ -5929,7 +5933,6 @@
   - trigger: state
     entity_id:
     - sensor.driveway_motion_sensor_entrance_battery
-    - sensor.driveway_motion_sensor_house_east_battery
     - sensor.driveway_motion_sensor_house_south_battery
     - sensor.driveway_motion_sensor_street_battery
     - sensor.garden_motion_sensor_house_east_battery
@@ -6087,7 +6090,7 @@
   - trigger: state
     entity_id:
     - sensor.living_room_door_sensor_battery
-    - sensor.living_room_window_sensor_sofa_battery
+    - sensor.living_room_window_sensor_battery
     - sensor.kitchen_window_sensor_battery
     - sensor.bedroom_window_sensor_battery
     - sensor.emils_room_window_sensor_battery
@@ -6102,8 +6105,8 @@
       - entity_id: sensor.living_room_door_sensor_battery
         battery_type: sensor.living_room_door_sensor_battery_type
         location: mellem gang og stue
-      - entity_id: sensor.living_room_window_sensor_sofa_battery
-        battery_type: sensor.living_room_window_sensor_sofa_battery_type
+      - entity_id: sensor.living_room_window_sensor_battery
+        battery_type: sensor.living_room_window_sensor_battery_type
         location: bag sofa
       - entity_id: sensor.kitchen_window_sensor_battery
         battery_type: sensor.kitchen_window_sensor_battery_type
@@ -6265,21 +6268,15 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.entrance_doorbell_ringing_eufy
+    - binary_sensor.entrance_doorbell_ringing
     from: 'off'
     to: 'on'
   conditions: []
   actions:
   - parallel:
-    - action: light.turn_on
-      metadata: {}
-      data:
-        flash: short
-      target:
-        label_id: dorklokke_lamper
     - if:
       - condition: state
-        entity_id: light.garage_light_main_philips_hue
+        entity_id: light.garage_light_main
         state: 'on'
       then:
       - repeat:
@@ -6289,21 +6286,15 @@
             metadata: {}
             data: {}
             target:
-              entity_id: light.garage_light_main_philips_hue
+              entity_id: light.garage_light_main
           - delay:
-              hours: 0
-              minutes: 0
-              seconds: 0
               milliseconds: 200
           - action: light.turn_on
             metadata: {}
             data: {}
             target:
-              entity_id: light.garage_light_main_philips_hue
+              entity_id: light.garage_light_main
           - delay:
-              hours: 0
-              minutes: 0
-              seconds: 0
               milliseconds: 200
   mode: queued
 - id: '1740779558756'
@@ -6360,12 +6351,12 @@
           date: '{{ pickup_date }}'
         target:
           entity_id: input_datetime.home_garbage_pickup_date
-      - action: script.home_create_todo_task
+      - action: script.create_todo_task
         data:
           subject: Kør affaldscontainer op til vejen
           description: '{{ description_text }}'
           related_entity_id: rest_command.perfect_waste_get_next_address_collection
-          entity_id: todo.home_smart_todo
+          entity_id: todo.todo_smart_todo
           is_active: 'true'
   - if:
     - condition: template
@@ -6378,24 +6369,24 @@
         date: '{{ pickup_date }}'
       target:
         entity_id: input_datetime.home_garbage_pickup_date
-    - action: script.home_create_todo_task
+    - action: script.create_todo_task
       data:
         subject: Hent affaldscontainer ved vejen
         description: Hent affaldscontainere ved vejen og sæt tilbage bag garagen.
         related_entity_id: rest_command.perfect_waste_get_next_address_collection
-        entity_id: todo.home_smart_todo
+        entity_id: todo.todo_smart_todo
         is_active: 'true'
   - if:
     - condition: template
       value_template: '{{ now().weekday() == 1 }}'
     then:
-    - action: script.home_create_todo_task
+    - action: script.create_todo_task
       data:
         subject: Tøm affald
         description: Tøm alle affaldsspande i huset, inklusiv toiletter, værelser,
           og bryggers
         related_entity_id: rest_command.perfect_waste_get_next_address_collection
-        entity_id: todo.home_smart_todo
+        entity_id: todo.todo_smart_todo
         is_active: 'true'
   mode: queued
 - id: '1740941401019'
@@ -6419,44 +6410,44 @@
     at: 05:00:00
   conditions: []
   actions:
-  - action: script.home_create_todo_task
+  - action: script.create_todo_task
     metadata: {}
     data:
       subject: Skift lokations tilladelse for Anders iPhone til altid
       description: I indstilinger under Anonymitet & sikkerhed og Lokalitetstjenester,
         sæt tilladelse for appen Home Assistant til altid og præcis lokation
       related_entity_id: sensor.anders_iphone_location_permission
-      entity_id: todo.home_smart_todo
+      entity_id: todo.todo_smart_todo
       is_active: '{{ states(''sensor.anders_iphone_location_permission'') != ''Authorized
         Always''  }}'
-  - action: script.home_create_todo_task
+  - action: script.create_todo_task
     metadata: {}
     data:
       subject: Skift lokations tilladelse for Monqiue iPhone til altid
       description: I indstilinger under Anonymitet & sikkerhed og Lokalitetstjenester,
         sæt tilladelse for appen Home Assistant til altid og præcis lokation
       related_entity_id: sensor.monique_iphone_location_permission
-      entity_id: todo.home_smart_todo
+      entity_id: todo.todo_smart_todo
       is_active: '{{ states(''sensor.monique_iphone_location_permission'') != ''Authorized
         Always''  }}'
-  - action: script.home_create_todo_task
+  - action: script.create_todo_task
     metadata: {}
     data:
       subject: Skift lokations tilladelse for Emil iPhone til altid
       description: I indstilinger under Anonymitet & sikkerhed og Lokalitetstjenester,
         sæt tilladelse for appen Home Assistant til altid og præcis lokation
       related_entity_id: sensor.emil_iphone_location_permission
-      entity_id: todo.home_smart_todo
+      entity_id: todo.todo_smart_todo
       is_active: '{{ states(''sensor.emil_iphone_location_permission'') != ''Authorized
         Always''  }}'
-  - action: script.home_create_todo_task
+  - action: script.create_todo_task
     metadata: {}
     data:
       subject: Skift lokations tilladelse for Charlie iPhone til altid
       description: I indstilinger under Anonymitet & sikkerhed og Lokalitetstjenester,
         sæt tilladelse for appen Home Assistant til altid og præcis lokation
       related_entity_id: sensor.charlie_iphone_location_permission
-      entity_id: todo.home_smart_todo
+      entity_id: todo.todo_smart_todo
       is_active: '{{ states(''sensor.charlie_iphone_location_permission'') != ''Authorized
         Always''  }}'
   - if:
@@ -6476,14 +6467,14 @@
         minutes: 0
         seconds: 10
         milliseconds: 0
-    - action: script.home_create_todo_task
+    - action: script.create_todo_task
       metadata: {}
       data:
         subject: Problem med lokation opdating fra Anders iPhone
         description: Lokationen fra Anders iPhone er ikke bleve opdateret som forventet,
           kontroller indstillinger for Home Assistant app'en
         related_entity_id: device_tracker.anders_iphone
-        entity_id: todo.home_smart_todo
+        entity_id: todo.todo_smart_todo
         is_active: '{{ (as_timestamp(now()) - as_timestamp(states.device_tracker.anders_iphone.last_updated))
           > 60 }}'
   - if:
@@ -6503,14 +6494,14 @@
         minutes: 0
         seconds: 10
         milliseconds: 0
-    - action: script.home_create_todo_task
+    - action: script.create_todo_task
       metadata: {}
       data:
         subject: Problem med lokation opdating fra Monique iPhone
         description: Lokationen fra Monique iPhone er ikke bleve opdateret som forventet,
           kontroller indstillinger for Home Assistant app'en
         related_entity_id: device_tracker.monique_iphone
-        entity_id: todo.home_smart_todo
+        entity_id: todo.todo_smart_todo
         is_active: '{{ (as_timestamp(now()) - as_timestamp(states.device_tracker.monique_iphone.last_updated))
           > 60 }}'
   - if:
@@ -6530,14 +6521,14 @@
         minutes: 0
         seconds: 10
         milliseconds: 0
-    - action: script.home_create_todo_task
+    - action: script.create_todo_task
       metadata: {}
       data:
         subject: Problem med lokation opdating fra Emil iPhone
         description: Lokationen fra Emil iPhone er ikke bleve opdateret som forventet,
           kontroller indstillinger for Home Assistant app'en
         related_entity_id: device_tracker.emil_iphone
-        entity_id: todo.home_smart_todo
+        entity_id: todo.todo_smart_todo
         is_active: '{{ (as_timestamp(now()) - as_timestamp(states.device_tracker.emil_iphone.last_updated))
           > 60 }}'
   - if:
@@ -6557,14 +6548,14 @@
         minutes: 0
         seconds: 10
         milliseconds: 0
-    - action: script.home_create_todo_task
+    - action: script.create_todo_task
       metadata: {}
       data:
         subject: Problem med lokation opdating fra Charlie iPhone
         description: Lokationen fra Charlie iPhone er ikke bleve opdateret som forventet,
           kontroller indstillinger for Home Assistant app'en
         related_entity_id: device_tracker.charlie_iphone
-        entity_id: todo.home_smart_todo
+        entity_id: todo.todo_smart_todo
         is_active: '{{ (as_timestamp(now()) - as_timestamp(states.device_tracker.charlie_iphone.last_updated))
           > 60 }}'
   mode: single
@@ -6635,7 +6626,7 @@
       - condition: not
         conditions:
         - condition: state
-          entity_id: lock.entrance_door_lock_yale
+          entity_id: lock.entrance_lock
           state: locked
       then:
       - if:
@@ -6670,7 +6661,7 @@
       - condition: not
         conditions:
         - condition: state
-          entity_id: lock.utility_room_door_lock_yale
+          entity_id: lock.utility_room_lock
           state: locked
       then:
       - if:
@@ -6705,7 +6696,7 @@
       - condition: not
         conditions:
         - condition: state
-          entity_id: lock.garage_door_lock_yale
+          entity_id: lock.garage_lock
           state: locked
       then:
       - if:
@@ -6822,7 +6813,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.entrance_door_lock_yale
+            entity_id: lock.entrance_lock
             state: locked
         then:
         - action: notify.mobile_app_emil_iphone
@@ -6838,7 +6829,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.utility_room_door_lock_yale
+            entity_id: lock.utility_room_lock
             state: locked
         then:
         - action: notify.mobile_app_emil_iphone
@@ -6854,7 +6845,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.garage_door_lock_yale
+            entity_id: lock.garage_lock
             state: locked
         then:
         - action: notify.mobile_app_emil_iphone
@@ -6909,7 +6900,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.entrance_door_lock_yale
+            entity_id: lock.entrance_lock
             state: locked
         then:
         - action: notify.mobile_app_charlie_iphone
@@ -6925,7 +6916,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.utility_room_door_lock_yale
+            entity_id: lock.utility_room_lock
             state: locked
         then:
         - action: notify.mobile_app_charlie_iphone
@@ -6941,7 +6932,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.garage_door_lock_yale
+            entity_id: lock.garage_lock
             state: locked
         then:
         - action: notify.mobile_app_charlie_iphone
@@ -7014,7 +7005,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.entrance_door_lock_yale
+            entity_id: lock.entrance_lock
             state: locked
         then:
         - action: notify.mobile_app_anders_iphone
@@ -7030,7 +7021,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.utility_room_door_lock_yale
+            entity_id: lock.utility_room_lock
             state: locked
         then:
         - action: notify.mobile_app_anders_iphone
@@ -7046,7 +7037,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.garage_door_lock_yale
+            entity_id: lock.garage_lock
             state: locked
         then:
         - action: notify.mobile_app_anders_iphone
@@ -7119,7 +7110,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.entrance_door_lock_yale
+            entity_id: lock.entrance_lock
             state: locked
         then:
         - action: notify.mobile_app_monique_iphone
@@ -7135,7 +7126,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.utility_room_door_lock_yale
+            entity_id: lock.utility_room_lock
             state: locked
         then:
         - action: notify.mobile_app_monique_iphone
@@ -7151,7 +7142,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.garage_door_lock_yale
+            entity_id: lock.garage_lock
             state: locked
         then:
         - action: notify.mobile_app_monique_iphone
@@ -7235,7 +7226,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.entrance_door_lock_yale
+            entity_id: lock.entrance_lock
             state: locked
         then:
         - action: notify.mobile_app_emil_iphone
@@ -7251,7 +7242,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.utility_room_door_lock_yale
+            entity_id: lock.utility_room_lock
             state: locked
         then:
         - action: notify.mobile_app_emil_iphone
@@ -7267,7 +7258,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.garage_door_lock_yale
+            entity_id: lock.garage_lock
             state: locked
         then:
         - action: notify.mobile_app_emil_iphone
@@ -7332,7 +7323,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.entrance_door_lock_yale
+            entity_id: lock.entrance_lock
             state: locked
         then:
         - action: notify.mobile_app_charlie_iphone
@@ -7348,7 +7339,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.utility_room_door_lock_yale
+            entity_id: lock.utility_room_lock
             state: locked
         then:
         - action: notify.mobile_app_charlie_iphone
@@ -7364,7 +7355,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.garage_door_lock_yale
+            entity_id: lock.garage_lock
             state: locked
         then:
         - action: notify.mobile_app_charlie_iphone
@@ -7436,13 +7427,13 @@
         entity_id: sensor.living_room_printer_black_pgbk
         state: unknown
     then:
-    - action: script.home_create_todo_task
+    - action: script.create_todo_task
       data:
         subject: Skift sort (PGBK) blæk på printer
         description: 'Blæk niveau for sort (PGBK) er {{ states(''sensor.living_room_printer_black_pgbk'')
           }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 580 PGBK (Black)'
         related_entity_id: sensor.living_room_printer_black_pgbk
-        entity_id: todo.home_smart_todo
+        entity_id: todo.todo_smart_todo
         is_active: '{{ states(''sensor.living_room_printer_black_pgbk'')|int < state_attr(''sensor.living_room_printer_black_pgbk'',
           ''marker_low_level'') }}'
   - if:
@@ -7452,13 +7443,13 @@
         entity_id: sensor.living_room_printer_black_bk
         state: unknown
     then:
-    - action: script.home_create_todo_task
+    - action: script.create_todo_task
       data:
         subject: Skift sort (BK) blæk på printer
         description: 'Blæk niveau for sort (BK) er {{ states(''sensor.living_room_printer_black_bk'')
           }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 BK (Black)'
         related_entity_id: sensor.living_room_printer_black_bk
-        entity_id: todo.home_smart_todo
+        entity_id: todo.todo_smart_todo
         is_active: '{{ states(''sensor.living_room_printer_black_bk'')|int < state_attr(''sensor.living_room_printer_black_bk'',
           ''marker_low_level'') }}'
   - if:
@@ -7468,13 +7459,13 @@
         entity_id: sensor.living_room_printer_cyan
         state: unknown
     then:
-    - action: script.home_create_todo_task
+    - action: script.create_todo_task
       data:
         subject: Skift cyan blæk på printer
         description: 'Blæk niveau for cyan er {{ states(''sensor.living_room_printer_cyan'')
           }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 C (Cyan)'
         related_entity_id: sensor.living_room_printer_cyan
-        entity_id: todo.home_smart_todo
+        entity_id: todo.todo_smart_todo
         is_active: '{{ states(''sensor.living_room_printer_cyan'')|int < state_attr(''sensor.living_room_printer_cyan'',
           ''marker_low_level'') }}'
   - if:
@@ -7484,13 +7475,13 @@
         entity_id: sensor.living_room_printer_magenta
         state: unknown
     then:
-    - action: script.home_create_todo_task
+    - action: script.create_todo_task
       data:
         subject: Skift magenta blæk på printer
         description: 'Blæk niveau for magenta er {{ states(''sensor.living_room_printer_magenta'')
           }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 M (Magenta)'
         related_entity_id: sensor.living_room_printer_magenta
-        entity_id: todo.home_smart_todo
+        entity_id: todo.todo_smart_todo
         is_active: '{{ states(''sensor.living_room_printer_magenta'')|int < state_attr(''sensor.living_room_printer_magenta'',
           ''marker_low_level'') }}'
   - if:
@@ -7500,13 +7491,13 @@
         entity_id: sensor.living_room_printer_photo_blue
         state: unknown
     then:
-    - action: script.home_create_todo_task
+    - action: script.create_todo_task
       data:
         subject: Skift foto blå blæk på printer
         description: 'Blæk niveau for foto blå er {{ states(''sensor.living_room_printer_photo_blue'')
           }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 PB (Photo blå)'
         related_entity_id: sensor.living_room_printer_photo_blue
-        entity_id: todo.home_smart_todo
+        entity_id: todo.todo_smart_todo
         is_active: '{{ states(''sensor.living_room_printer_photo_blue'')|int < state_attr(''sensor.living_room_printer_photo_blue'',
           ''marker_low_level'') }}'
   - if:
@@ -7516,23 +7507,23 @@
         entity_id: sensor.living_room_printer_yellow
         state: unknown
     then:
-    - action: script.home_create_todo_task
+    - action: script.create_todo_task
       data:
         subject: Skift gul blæk på printer
         description: 'Blæk niveau for gul er {{ states(''sensor.living_room_printer_yellow'')
           }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 Y (Yellow)'
         related_entity_id: sensor.living_room_printer_yellow
-        entity_id: todo.home_smart_todo
+        entity_id: todo.todo_smart_todo
         is_active: '{{ states(''sensor.living_room_printer_yellow'')|int < state_attr(''sensor.living_room_printer_yellow'',
           ''marker_low_level'') }}'
-  - action: script.home_create_todo_task
+  - action: script.create_todo_task
     data:
       subject: Løs problem med printer
       description: 'Der er registreret et problem med Canon TS8300 printer. <br>Message:
         {{ state_attr(''sensor.living_room_printer'', ''state_message'') }}  <br>Reason:
         {{ state_attr(''sensor.living_room_printer'', ''state_reason'') }} '
       related_entity_id: sensor.living_room_printer
-      entity_id: todo.home_smart_todo
+      entity_id: todo.todo_smart_todo
       is_active: '{{ states(''sensor.living_room_printer'') not in [''printing'',
         ''idle''] }}'
   mode: restart
@@ -7567,16 +7558,6 @@
     data: {}
     target:
       entity_id: lock.volvo_xc40_lock
-  - delay:
-      hours: 0
-      minutes: 0
-      seconds: 2
-      milliseconds: 0
-  - action: button.press
-    metadata: {}
-    data: {}
-    target:
-      entity_id: button.volvo_xc40_update_data
   mode: queued
 - id: '1741633531272'
   alias: Volvo XC40 kontrol
@@ -7677,7 +7658,7 @@
           entity_id: binary_sensor.volvo_xc40_door_rear_right
           state: 'on'
         - condition: state
-          entity_id: binary_sensor.volvo_xc40_engine_hood
+          entity_id: binary_sensor.volvo_xc40_hood
           state: 'on'
         - condition: state
           entity_id: binary_sensor.volvo_xc40_sunroof
@@ -7717,129 +7698,6 @@
                 critical: 1
                 volume: 1
   mode: queued
-- id: '1742022528405'
-  alias: Hjem overvåg utilgængelige enheder
-  description: Automatik der kontrollere om nogen sensorer eller enheder er unavailable
-    og opretter en To Do-opgave.
-  triggers:
-  - minutes: /30
-    trigger: time_pattern
-  conditions: []
-  actions:
-  - variables:
-      monitored_entities:
-      - binary_sensor.bedroom_door_sensor_opening_philips_hue
-      - binary_sensor.garage_door_sensor_opening_philips_hue
-      - binary_sensor.living_room_door_sensor_open_aqara
-      - binary_sensor.emils_room_window_sensor_open_aqara
-      - binary_sensor.driveway_motion_sensor_street_opening_signify
-      - binary_sensor.driveway_motion_sensor_house_east_opening_signify
-      - binary_sensor.driveway_motion_sensor_house_south_opening_signify
-      - binary_sensor.driveway_motion_sensor_entrance_opening_signify
-      - binary_sensor.driveway_vibration_sensor_mailbox_vibration_aqara
-      - climate.living_room_heat_pump_panasonic
-      - climate.home_heat_pump_panasonic
-      - climate.bathroom_radiator_thermostat_floor_tado
-      - climate.bathroom_radiator_thermostat_wall_tado
-      - climate.utility_room_radiator_thermostat_floor_tado
-      - climate.utility_room_radiator_thermostat_wall_tado
-      - climate.charlies_room_radiator_thermostat_tado
-      - climate.emils_room_radiator_thermostat_tado
-      - climate.hallway_radiator_thermostat_tado
-      - climate.kitchen_radiator_thermostat_tado
-      - climate.bedroom_radiator_thermostat_tado
-      - climate.living_room_radiator_thermostat_bookcase_tado
-      - climate.living_room_radiator_thermostat_sofa_tado
-      - climate.living_room_radiator_thermostat_dining_table_tado
-      - climate.toilet_radiator_thermostat_tado
-      - climate.utility_room_temperature_sensor_tado
-      - cover.bedroom_blind
-      - cover.emils_room_blind
-      - cover.charlies_room_blind
-      - device_tracker.anders_iphone
-      - device_tracker.monique_iphone
-      - device_tracker.emil_iphone
-      - device_tracker.charlie_iphone
-      - device_tracker.volvo_ex30_location
-      - device_tracker.volvo_xc40_location
-      - light.bedroom_light_philips_hue
-      - light.charlies_room_light_philips_hue
-      - light.emils_room_light_philips_hue
-      - light.garage_light_main_philips_hue
-      - light.garage_light_spots_philips_hue
-      - light.garage_light_projector_philips_hue
-      - light.hallway_light_philips_hue
-      - light.living_room_light_china_cabinet_philips_hue
-      - light.living_room_light_dining_table_philips_hue
-      - light.living_room_light_escher_philips_hue
-      - light.living_room_light_glass_cabinet_philips_hue
-      - light.living_room_light_joakim_philips_hue
-      - light.living_room_light_lamp_philips_hue
-      - light.living_room_light_sofa_receiver_philips_hue
-      - light.living_room_light_sofa_spot_philips_hue
-      - light.living_room_light_sofa_window_philips_hue
-      - light.living_room_tv_light_strip_philips_hue
-      - light.patio_light_philips_hue
-      - light.driveway_light_entrance_spot_1_signify
-      - light.driveway_light_entrance_spot_2_signify
-      - light.driveway_light_entrance_spot_3_signify
-      - light.driveway_light_house_east_gledopto
-      - light.driveway_light_house_south_gledopto
-      - light.driveway_light_left_1_signify
-      - light.driveway_light_left_2_signify
-      - light.driveway_light_left_3_signify
-      - light.driveway_light_left_4_signify
-      - light.driveway_light_left_5_signify
-      - light.driveway_light_left_6_signify
-      - light.driveway_light_left_7_signify
-      - light.driveway_light_left_8_signify
-      - light.driveway_light_left_9_signify
-      - lock.volvo_xc40_lock
-      - lock.volvo_ex30_lock
-      - lock.entrance_door_lock_yale
-      - lock.utility_room_door_lock_yale
-      - lock.garage_door_lock_yale
-      - lock.driveway_ev_charger_lock_wallbox
-      - media_player.living_room_receiver_denon
-      - media_player.living_room_tv_media_player_sony_bravia
-      - media_player.living_room_apple_tv_media_player
-      - sensor.anders_iphone_battery_state
-      - sensor.monique_iphone_battery_state
-      - sensor.emil_iphone_battery_state
-      - sensor.charlie_iphone_battery_state
-      - sensor.volvo_ex30_charging_connection_status
-      - sensor.volvo_xc40_charging_connection_status
-      - sensor.driveway_ev_charger_status_description_wallbox
-      - sensor.emils_room_temperature_sensor_temperature_tado
-      - sensor.hallway_temperature_sensor_temperature_tado
-      - sensor.living_room_temperature_sensor_temperature_tado
-      - sensor.charlies_room_temperature_sensor_temperature_tado
-      - sensor.utility_room_smart_plug_washer_power_aqara
-      - sensor.utility_room_smart_plug_dryer_power_aqara
-      unavailable_entities: "{% set ns = namespace(unavailable=[]) %} \n{% for entity
-        in monitored_entities if states(entity) == 'unavailable' %}\n  {% set ns.unavailable
-        = ns.unavailable + [entity] %}\n{% endfor %}\n{{ ns.unavailable }}"
-      description_text: "{{ unavailable_entities | length }} utilgængelige enheder
-        ud af {{ monitored_entities | length }} overvågede.<br>\nFølgende enheder
-        er utilgængelige (unavailable): <ul>  \n{% for entity in unavailable_entities
-        %}\n  <li>{{ state_attr(entity, 'friendly_name') | default(entity) }}</li>\n{%
-        endfor %} </ul>"
-  - action: system_log.write
-    metadata: {}
-    data:
-      level: debug
-      message: '"monitored_entities: {{ monitored_entities | length }}"
-
-        "unavailable_entities: {{ unavailable_entities | length }}"'
-  - action: script.home_create_todo_task
-    data:
-      subject: Tjek utilgængelige enheder
-      description: '{{ description_text }}'
-      related_entity_id: automation.home_check_unavailable_devices
-      entity_id: todo.home_smart_todo
-      is_active: '{{ unavailable_entities | length > 0 }}'
-      must_replace: true
-  mode: restart
 - id: '1742241186159'
   alias: Todo vaskemaskine
   description: Opret todo opgaver vedrørende vaskemaskine
@@ -9353,7 +9211,7 @@
       - siren.bedroom_smoke_alarm_siren
   mode: restart
 - id: '1761840992462'
-  alias: Terrasse dør lås
+  alias: Terrasse lås
   description: Automatik til at styre terrasse dør låsen
   triggers:
   - trigger: state
@@ -9370,7 +9228,7 @@
     id: sleeping
   - trigger: state
     entity_id:
-    - timer.patio_door_locking_timer
+    - timer.patio_lock_timer
     to:
     - idle
     id: auto_locking_expired
@@ -9378,7 +9236,7 @@
   actions:
   - action: homeassistant.update_entity
     data:
-      entity_id: lock.patio_door
+      entity_id: lock.patio_lock
   - delay:
       seconds: 3
   - choose:
@@ -9388,26 +9246,26 @@
         - no_one_home
         - sleeping
       - condition: state
-        entity_id: lock.patio_door
+        entity_id: lock.patio_lock
         state: unlocked
       sequence:
       - action: lock.lock
         metadata: {}
         data: {}
         target:
-          entity_id: lock.patio_door
+          entity_id: lock.patio_lock
       - action: timer.start
         metadata: {}
         data:
           duration: 00:01:00
         target:
-          entity_id: timer.patio_door_locking_timer
+          entity_id: timer.patio_lock_timer
     - conditions:
       - condition: trigger
         id:
         - auto_locking_expired
       - condition: state
-        entity_id: lock.patio_door
+        entity_id: lock.patio_lock
         state:
         - unlocked
       sequence:
@@ -9415,13 +9273,13 @@
         metadata: {}
         data: {}
         target:
-          entity_id: lock.patio_door
+          entity_id: lock.patio_lock
       - delay: 00:00:01
       - if:
         - condition: not
           conditions:
           - condition: state
-            entity_id: lock.patio_door
+            entity_id: lock.patio_lock
             state: locked
         then:
         - variables:
@@ -9449,7 +9307,7 @@
           data:
             title: '{{ title }}'
             message: '{{ message }}'
-            notification_id: patio_door_auto_lock_warning
+            notification_id: patio_lock_auto_warning
         - repeat:
             for_each: '{{ notify_persons }}'
             sequence:
@@ -9516,32 +9374,29 @@
   trace:
     stored_traces: 30
 - id: '1763826566164'
-  alias: Hjem dør lås
+  alias: Hjem lås
   description: Kontrol af at dører er låst
   triggers:
   - trigger: state
     entity_id:
-    - lock.entrance_door
-    - lock.patio_door
-    - lock.utility_room_door
-    - lock.garage_door
+    - lock.entrance_lock
+    - lock.patio_lock
+    - lock.utility_room_lock
+    - lock.garage_lock
     to: unlocked
-    id: door_unlocked
+    id: unlocked
   - trigger: state
     entity_id:
-    - lock.entrance_door
-    - lock.patio_door
-    - lock.utility_room_door
-    - lock.garage_door
-    to:
-    - unlocked
-    id: door_unlocked_10m
+    - lock.entrance_lock
+    - lock.patio_lock
+    - lock.utility_room_lock
+    - lock.garage_lock
+    to: unlocked
+    id: unlocked_10m
     for:
-      hours: 0
       minutes: 10
-      seconds: 0
   - trigger: event
-    event_type: home_door_lock
+    event_type: home_lock
     id: lock
   - trigger: event
     event_type: ios.notification_action_fired
@@ -9549,10 +9404,8 @@
       actionName: DOOR_LOCK_ACTION
     id: lock_action
   - trigger: state
-    entity_id:
-    - timer.home_door_locking_timer
-    to:
-    - idle
+    entity_id: timer.home_lock_timer
+    to: idle
     id: locking_expired
   conditions: []
   actions:
@@ -9583,7 +9436,7 @@
           conditions:
           - condition: trigger
             id:
-            - door_unlocked
+            - unlocked
           - condition: state
             entity_id: binary_sensor.someone_home
             state: 'off'
@@ -9591,7 +9444,7 @@
           conditions:
           - condition: trigger
             id:
-            - door_unlocked_10m
+            - unlocked_10m
           - condition: state
             entity_id: binary_sensor.everyone_sleeping
             state: 'on'
@@ -9600,15 +9453,15 @@
           title: Information
           message: 'Følgende døre er ulåste:
 
-            {% for door in doors | select(''is_state'', ''unlocked'') | list -%}
+            {% for lock in locks | select(''is_state'', ''unlocked'') | list -%}
 
-            - {{ state_attr(door, ''friendly_name'') }}
+            - {{ state_attr(lock, ''friendly_name'') }}
 
             {% endfor -%}'
       - data:
           title: '{{ title }}'
           message: '{{ message }}'
-          notification_id: home_door_lock_warning
+          notification_id: home_lock_warning
         action: persistent_notification.create
       - repeat:
           for_each: '{{ notify_persons }}'
@@ -9620,7 +9473,7 @@
                 push:
                   category: DOOR_LOCK
                   actions:
-                  - action: home_door_lock
+                  - action: home_lock
                     title: Lås
                   sound:
                     name: default
@@ -9632,7 +9485,7 @@
         - lock_action
       sequence:
       - repeat:
-          for_each: '{{ doors }}'
+          for_each: '{{ locks }}'
           sequence:
           - if:
             - condition: template
@@ -9646,26 +9499,26 @@
         data:
           duration: 00:00:10
         target:
-          entity_id: timer.home_door_locking_timer
+          entity_id: timer.home_lock_timer
     - conditions:
       - condition: trigger
         id:
         - locking_expired
       - condition: template
-        value_template: '{{ doors | select(''is_state'', ''unlocked'') | list | count
+        value_template: '{{ locks | select(''is_state'', ''unlocked'') | list | count
           > 0 }}
 
           '
       sequence:
       - variables:
           title: Advarsel
-          message: "Følgende døre kunne ikke fjern låses: \n{% for door in doors |
-            select('is_state', 'unlocked') | list -%}\n- {{ state_attr(door, 'friendly_name')
+          message: "Følgende døre kunne ikke fjern låses: \n{% for lock in locks |
+            select('is_state', 'unlocked') | list -%}\n- {{ state_attr(lock, 'friendly_name')
             }}\n{% endfor -%}"
       - data:
           title: '{{ title }}'
           message: '{{ message }}'
-          notification_id: home_door_lock_warning
+          notification_id: home_lock_warning
         action: persistent_notification.create
       - repeat:
           for_each: '{{ notify_persons }}'
@@ -9680,17 +9533,17 @@
                     critical: 1
             action: '{{ repeat.item }} '
   variables:
-    doors:
-    - lock.entrance_door
-    - lock.patio_door
-    - lock.utility_room_door
-    - lock.garage_door
+    locks:
+    - lock.entrance_lock
+    - lock.patio_lock
+    - lock.utility_room_lock
+    - lock.garage_lock
   mode: queued
   max: 10
   trace:
     stored_traces: 50
 - id: '1763846508906'
-  alias: Bryggers dør lås
+  alias: Bryggers lås
   description: Automatik til at låse bryggersdøren op og i baseret på hvem der er
     hjemme
   triggers:
@@ -9708,14 +9561,14 @@
     id: sleeping
   - trigger: state
     entity_id:
-    - timer.utility_room_door_locking_timer
+    - timer.utility_room_lock_timer
     to: idle
     id: auto_locking_expired
   conditions: []
   actions:
   - action: homeassistant.update_entity
     data:
-      entity_id: lock.utility_room_door
+      entity_id: lock.utility_room_lock
   - delay:
       seconds: 3
   - choose:
@@ -9725,26 +9578,26 @@
         - no_one_home
         - sleeping
       - condition: state
-        entity_id: lock.utility_room_door
+        entity_id: lock.utility_room_lock
         state: unlocked
       sequence:
       - action: lock.lock
         metadata: {}
         data: {}
         target:
-          entity_id: lock.utility_room_door
+          entity_id: lock.utility_room_lock
       - action: timer.start
         metadata: {}
         data:
           duration: 00:00:10
         target:
-          entity_id: timer.utility_room_door_locking_timer
+          entity_id: timer.utility_room_lock_timer
     - conditions:
       - condition: trigger
         id:
         - auto_locking_expired
       - condition: state
-        entity_id: lock.utility_room_door
+        entity_id: lock.utility_room_lock
         state:
         - unlocked
       sequence:
@@ -9773,7 +9626,7 @@
         data:
           title: '{{ title }}'
           message: '{{ message }}'
-          notification_id: utility_room_door_auto_lock_warning
+          notification_id: utility_room_lock_auto_warning
       - repeat:
           for_each: '{{ notify_persons }}'
           sequence:
@@ -9791,7 +9644,7 @@
   trace:
     stored_traces: 100
 - id: '1763847410643'
-  alias: Garage dør lås
+  alias: Garage lås
   description: Automatik til at låse garage døren op og i baseret på hvem der er hjemme
   triggers:
   - trigger: state
@@ -9808,14 +9661,14 @@
     id: sleeping
   - trigger: state
     entity_id:
-    - timer.garage_door_locking_timer
+    - timer.garage_lock_timer
     to: idle
     id: auto_locking_expired
   conditions: []
   actions:
   - action: homeassistant.update_entity
     data:
-      entity_id: lock.garage_door
+      entity_id: lock.garage_lock
   - delay:
       seconds: 3
   - choose:
@@ -9825,26 +9678,26 @@
         - no_one_home
         - sleeping
       - condition: state
-        entity_id: lock.garage_door
+        entity_id: lock.garage_lock
         state: unlocked
       sequence:
       - action: lock.lock
         metadata: {}
         data: {}
         target:
-          entity_id: lock.garage_door
+          entity_id: lock.garage_lock
       - action: timer.start
         metadata: {}
         data:
           duration: 00:00:10
         target:
-          entity_id: timer.garage_door_locking_timer
+          entity_id: timer.garage_lock_timer
     - conditions:
       - condition: trigger
         id:
         - auto_locking_expired
       - condition: state
-        entity_id: lock.garage_door
+        entity_id: lock.garage_lock
         state:
         - unlocked
       sequence:
@@ -9873,7 +9726,7 @@
         data:
           title: '{{ title }}'
           message: '{{ message }}'
-          notification_id: garage_door_auto_lock_warning
+          notification_id: garage_lock_auto_warning
       - repeat:
           for_each: '{{ notify_persons }}'
           sequence:
@@ -10110,7 +9963,7 @@
     entity_id: sensor.living_room_robot_vacuum_battery
     above: 30
   - trigger: state
-    entity_id: binary_sensor.living_room_media
+    entity_id: binary_sensor.living_room_media_player
     to: 'off'
   - trigger: state
     entity_id: binary_sensor.bedroom_sleeping
@@ -10150,7 +10003,7 @@
         entity_id: sensor.living_room_robot_vacuum_battery
         above: 40
       - condition: state
-        entity_id: binary_sensor.living_room_media
+        entity_id: binary_sensor.living_room_media_player
         state: 'off'
       - condition: state
         entity_id: binary_sensor.bedroom_sleeping
@@ -10328,7 +10181,7 @@
     entity_id: binary_sensor.bedroom_sleeping
     to: 'off'
   - trigger: state
-    entity_id: binary_sensor.living_room_media
+    entity_id: binary_sensor.living_room_media_player
     to: 'off'
   - trigger: state
     entity_id: binary_sensor.living_room_door_sensor_door
@@ -10358,7 +10211,7 @@
         entity_id: binary_sensor.bedroom_sleeping
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.living_room_media
+        entity_id: binary_sensor.living_room_media_player
         state: 'off'
       sequence:
       - action: script.living_room_robot_vacuum_empty_dust_bin
@@ -10386,7 +10239,7 @@
         entity_id: binary_sensor.living_room_door_sensor_door
         state: 'on'
       - condition: state
-        entity_id: binary_sensor.living_room_media
+        entity_id: binary_sensor.living_room_media_player
         state: 'off'
       sequence:
       - action: script.living_room_robot_vacuum_empty_dust_bin
@@ -10426,7 +10279,7 @@
     entity_id: sensor.living_room_robot_vacuum_battery
     above: 30
   - trigger: state
-    entity_id: binary_sensor.living_room_media
+    entity_id: binary_sensor.living_room_media_player
     to: 'off'
   - trigger: state
     entity_id: binary_sensor.someone_sleeping
@@ -10463,7 +10316,7 @@
         entity_id: sensor.living_room_robot_vacuum_battery
         above: 30
       - condition: state
-        entity_id: binary_sensor.living_room_media
+        entity_id: binary_sensor.living_room_media_player
         state: 'off'
       - condition: state
         entity_id: binary_sensor.someone_sleeping
@@ -10564,7 +10417,7 @@
     entity_id: sensor.living_room_robot_vacuum_battery
     above: 40
   - trigger: state
-    entity_id: binary_sensor.living_room_media
+    entity_id: binary_sensor.living_room_media_player
     to: 'off'
   - trigger: state
     entity_id: binary_sensor.bedroom_sleeping
@@ -10597,7 +10450,7 @@
         entity_id: sensor.living_room_robot_vacuum_battery
         above: 40
       - condition: state
-        entity_id: binary_sensor.living_room_media
+        entity_id: binary_sensor.living_room_media_player
         state: 'off'
       - condition: state
         entity_id: binary_sensor.bedroom_sleeping
@@ -10805,11 +10658,11 @@
   description: Automatik til at styre timer til soveværelse dør
   triggers:
   - trigger: state
-    entity_id: binary_sensor.bedroom_door_sensor_opening
+    entity_id: binary_sensor.bedroom_door
     to: 'off'
     id: closed
   - trigger: state
-    entity_id: binary_sensor.bedroom_door_sensor_opening
+    entity_id: binary_sensor.bedroom_door
     to: 'on'
     id: opened
   conditions: []
@@ -10831,7 +10684,8 @@
           entity_id: timer.bedroom_door_timer
         data:
           duration: 00:02:00
-  mode: restart
+  mode: queued
+  max: 10
   trace:
     stored_traces: 50
 - id: '1769208997346'
@@ -11353,26 +11207,26 @@
   triggers:
   - trigger: state
     entity_id:
-    - sensor.entrance_door_battery
-    - sensor.utility_room_door_battery
-    - sensor.garage_door_battery
-    - sensor.patio_door_battery
-    - sensor.patio_door_keypad_battery
+    - sensor.entrance_lock_battery
+    - sensor.utility_room_lock_battery
+    - sensor.garage_lock_battery
+    - sensor.patio_lock_battery
+    - sensor.patio_keypad_battery
   - trigger: time
     at: 03:21:00
   conditions: []
   actions:
   - variables:
       sensors:
-      - entity_id: sensor.entrance_door_battery
+      - entity_id: sensor.entrance_lock_battery
         battery_type: 4 × AA
-      - entity_id: sensor.utility_room_door_battery
+      - entity_id: sensor.utility_room_lock_battery
         battery_type: 4 × AA
-      - entity_id: sensor.garage_door_battery
+      - entity_id: sensor.garage_lock_battery
         battery_type: 4 × AA
-      - entity_id: sensor.patio_door_battery
+      - entity_id: sensor.patio_lock_battery
         battery_type: 2 × AAA
-      - entity_id: sensor.patio_door_keypad_battery
+      - entity_id: sensor.patio_keypad_battery
         battery_type: 4 × AAA
   - repeat:
       for_each: '{{ sensors }}'
@@ -11471,3 +11325,278 @@
   mode: restart
   trace:
     stored_traces: 30
+- id: '1769854798414'
+  alias: Stue dør
+  description: Automatik til at styre timer til stue dør
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.living_room_door
+    to: 'off'
+    id: closed
+  - trigger: state
+    entity_id: binary_sensor.living_room_door
+    to: 'on'
+    id: opened
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: closed
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.living_room_door_timer
+    - conditions:
+      - condition: trigger
+        id: opened
+      sequence:
+      - action: timer.start
+        target:
+          entity_id: timer.living_room_door_timer
+        data:
+          duration: 00:02:00
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 50
+- id: '1769856473538'
+  alias: Soveværelse medieafstiller sæt status
+  description: Automatik til at sætte status helper for medie i soveværelset
+  triggers:
+  - trigger: state
+    entity_id: media_player.bedroom_apple_tv_media_player
+    to: playing
+    id: started
+  - trigger: state
+    entity_id: media_player.bedroom_apple_tv_media_player
+    to:
+    - buffering
+    - idle
+    - paused
+    id: ended
+  - trigger: state
+    entity_id: media_player.bedroom_apple_tv_media_player
+    to: 'off'
+    id: 'off'
+    for:
+      seconds: 3
+  - trigger: state
+    entity_id: timer.bedroom_media_player_timer
+    to: idle
+    id: timeout
+  - trigger: state
+    entity_id: binary_sensor.someone_home
+    to: 'off'
+    id: away
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - started
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.bedroom_media_player_timer
+      - action: input_boolean.turn_on
+        metadata: {}
+        target:
+          entity_id: input_boolean.bedroom_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - ended
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.bedroom_media_player_timer
+      - action: input_boolean.turn_on
+        metadata: {}
+        target:
+          entity_id: input_boolean.bedroom_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - away
+        - timeout
+        - 'off'
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.bedroom_media_player_timer
+      - action: input_boolean.turn_off
+        metadata: {}
+        target:
+          entity_id: input_boolean.bedroom_media_player
+        data: {}
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
+- id: '1769856539505'
+  alias: Emils værelse medieafstiller sæt status
+  description: Automatik til at sætte status helper for medie på Emils værelse
+  triggers:
+  - trigger: state
+    entity_id: media_player.emils_room_apple_tv_media_player
+    to: playing
+    id: started
+  - trigger: state
+    entity_id: media_player.emils_room_apple_tv_media_player
+    to:
+    - buffering
+    - idle
+    - paused
+    id: ended
+  - trigger: state
+    entity_id: media_player.emils_room_apple_tv_media_player
+    to: 'off'
+    id: 'off'
+    for:
+      seconds: 3
+  - trigger: state
+    entity_id: timer.emils_room_media_player_timer
+    to: idle
+    id: timeout
+  - trigger: state
+    entity_id: binary_sensor.emil_home
+    to: 'off'
+    id: away
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - started
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.emils_room_media_player_timer
+      - action: input_boolean.turn_on
+        metadata: {}
+        target:
+          entity_id: input_boolean.emils_room_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - ended
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.emils_room_media_player_timer
+      - action: input_boolean.turn_on
+        metadata: {}
+        target:
+          entity_id: input_boolean.emils_room_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - away
+        - timeout
+        - 'off'
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.emils_room_media_player_timer
+      - action: input_boolean.turn_off
+        metadata: {}
+        target:
+          entity_id: input_boolean.emils_room_media_player
+        data: {}
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
+- id: '1769856579014'
+  alias: Charlies værelse medieafstiller sæt status
+  description: Automatik til at sætte status helper for medie på Charlies værelse
+  triggers:
+  - trigger: state
+    entity_id: media_player.charlies_room_apple_tv_media_player
+    to: playing
+    id: started
+  - trigger: state
+    entity_id: media_player.charlies_room_apple_tv_media_player
+    to:
+    - buffering
+    - idle
+    - paused
+    id: ended
+  - trigger: state
+    entity_id: media_player.charlies_room_apple_tv_media_player
+    to: 'off'
+    id: 'off'
+    for:
+      seconds: 3
+  - trigger: state
+    entity_id: timer.charlies_room_media_player_timer
+    to: idle
+    id: timeout
+  - trigger: state
+    entity_id: binary_sensor.charlie_home
+    to: 'off'
+    id: away
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - started
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.charlies_room_media_player_timer
+      - action: input_boolean.turn_on
+        metadata: {}
+        target:
+          entity_id: input_boolean.charlies_room_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - ended
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.charlies_room_media_player_timer
+      - action: input_boolean.turn_on
+        metadata: {}
+        target:
+          entity_id: input_boolean.charlies_room_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - away
+        - timeout
+        - 'off'
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.charlies_room_media_player_timer
+      - action: input_boolean.turn_off
+        metadata: {}
+        target:
+          entity_id: input_boolean.charlies_room_media_player
+        data: {}
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20

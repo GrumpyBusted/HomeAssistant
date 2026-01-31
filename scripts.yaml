@@ -1,11 +1,14 @@
 charlies_room_light_desk_adjust:
   alias: Charlies værelse lys skrivebord tilpas
   description: Regulær lysstyrke på lys ved skrivebord på Charlies værelse
+  mode: queued
+  max: 10
   sequence:
   - variables:
       light_entity: light.charlies_room_light_desk_mid
       step: '{{ brightness_step | int }}'
-  - target:
+  - action: light.turn_on
+    target:
       entity_id:
       - light.charlies_room_light_desk_left
       - light.charlies_room_light_desk_mid
@@ -19,7 +22,6 @@ charlies_room_light_desk_adjust:
         }}\n  {% endif %}\n{% else %}\n  {% set new_brightness = current_brightness
         - step %}\n  {% if new_brightness < 0 %}\n    {{ 0 }}\n  {% else %}\n    {{
         new_brightness }}\n  {% endif %}\n{% endif %}\n"
-    action: light.turn_on
   - choose:
     - conditions:
       - condition: template
@@ -28,10 +30,9 @@ charlies_room_light_desk_adjust:
 
           '
       sequence:
-      - target:
+      - action: input_boolean.turn_off
+        target:
           entity_id: input_boolean.charlies_room_light_desk_brightness_up
-        action: input_boolean.turn_off
-        data: {}
     - conditions:
       - condition: template
         value_template: '{{ is_state(''input_boolean.charlies_room_light_desk_brightness_up'',
@@ -39,19 +40,15 @@ charlies_room_light_desk_adjust:
 
           '
       sequence:
-      - target:
+      - action: input_boolean.turn_on
+        target:
           entity_id: input_boolean.charlies_room_light_desk_brightness_up
-        action: input_boolean.turn_on
-        data: {}
-  mode: queued
-  max: 10
 bedroom_light_sunrise:
   alias: Soveværelse lys solopgang scene
   description: Lys scene til soveværelse til vågn op
   mode: restart
   sequence:
   - event: bedroom_light_sunrise_script
-    event_data: {}
   - choose:
     - conditions:
       - condition: state
@@ -70,7 +67,6 @@ bedroom_light_sunrise:
           entity_id:
           - light.bedroom_light_anders
       - action: timer.start
-        metadata: {}
         data:
           duration: 60
         target:
@@ -97,7 +93,6 @@ bedroom_light_sunrise:
           entity_id:
           - light.bedroom_light_monique
       - action: timer.start
-        metadata: {}
         data:
           duration: 60
         target:
@@ -126,7 +121,6 @@ bedroom_light_sunrise:
           entity_id:
           - light.bedroom_light_window
       - action: timer.start
-        metadata: {}
         data:
           duration: 60
         target:
@@ -156,14 +150,12 @@ bedroom_light_sunrise:
           entity_id:
           - light.bedroom_light_closet
       - action: timer.start
-        metadata: {}
         data:
           duration: 60
         target:
           entity_id: timer.bedroom_light_sunrise_delay_timer
     default:
     - action: light.turn_on
-      metadata: {}
       data:
         transition: 60
         color_temp_kelvin: 2700
@@ -173,7 +165,7 @@ bedroom_light_sunrise:
 bedroom_light_sunset:
   alias: Soveværelse lys solnedgang scene
   description: Lys scene til soveværelse til gå i seng
-  mode: restart
+  mode: single
   sequence:
   - action: timer.start
     metadata: {}
@@ -187,7 +179,6 @@ bedroom_light_sunset:
       state: 'off'
     then:
     - action: light.turn_on
-      metadata: {}
       data:
         transition: 1
         color_temp_kelvin: 2700
@@ -239,8 +230,6 @@ bedroom_light_sunset:
         entity_id:
         - light.bedroom_light_window
   - delay:
-      hours: 0
-      minutes: 0
       seconds: 5
   - parallel:
     - action: light.turn_on
@@ -295,18 +284,14 @@ living_room_robot_vacuum_dock:
     target:
       entity_id: timer.living_room_robot_vacuum_timer
   - action: switch.turn_on
-    metadata: {}
-    data: {}
     target:
       entity_id: switch.living_room_robot_vacuum_do_not_disturb
   - action: time.set_value
-    metadata: {}
     target:
       entity_id: time.living_room_robot_vacuum_do_not_disturb_begin
     data:
       time: 00:00:00
   - action: time.set_value
-    metadata: {}
     target:
       entity_id: time.living_room_robot_vacuum_do_not_disturb_end
     data:
@@ -319,8 +304,6 @@ living_room_robot_vacuum_dock:
         state: docked
     then:
     - action: vacuum.return_to_base
-      metadata: {}
-      data: {}
       target:
         entity_id: vacuum.living_room_robot_vacuum
 living_room_robot_vacuum_empty_dust_bin:
@@ -340,7 +323,6 @@ living_room_robot_vacuum_empty_dust_bin:
     - delay:
         seconds: 60
     - action: input_number.set_value
-      metadata: {}
       data:
         value: '{{ states(''sensor.living_room_robot_vacuum_total_cleaning_time'')|int
           }}'
@@ -392,7 +374,6 @@ living_room_robot_vacuum_start_cleaning:
       message: 'Type: {{ type }} - Timeout: {{ timeout }} - Rooms: {{ rooms }}'
       level: debug
   - action: roborock.get_maps
-    data: {}
     target:
       entity_id: vacuum.living_room_robot_vacuum
     response_variable: response
@@ -407,12 +388,9 @@ living_room_robot_vacuum_start_cleaning:
       message: 'Room ids: {{ room_ids }}'
       level: debug
   - action: switch.turn_on
-    metadata: {}
-    data: {}
     target:
       entity_id: switch.living_room_robot_vacuum_do_not_disturb
   - action: time.set_value
-    metadata: {}
     target:
       entity_id: time.living_room_robot_vacuum_do_not_disturb_begin
     data:
@@ -429,7 +407,6 @@ living_room_robot_vacuum_start_cleaning:
       state: docked
     then:
     - action: timer.start
-      metadata: {}
       data:
         duration: '{{ (timeout | int * 60) | timestamp_custom(''%H:%M:%S'', false)
           }}
@@ -683,6 +660,7 @@ push_notification:
   max: 10
   fields:
     type:
+      name: Type
       description: Besked type
       required: true
       selector:
@@ -692,16 +670,19 @@ push_notification:
           - log
       default: log
     title:
+      name: Title
       description: Besked title
       required: true
       selector:
         object: {}
     message:
+      name: Besked
       description: Besked
       required: true
       selector:
         object: {}
     id:
+      name: Id
       description: Besked id
       required: false
       selector:
@@ -926,8 +907,6 @@ exercising_radiator_valves:
       - climate.utility_room_radiator_thermostat_floor_tado
       - climate.toilet_radiator_thermostat_tado
   - action: automation.turn_off
-    metadata: {}
-    data: {}
     target:
       entity_id:
       - automation.bathroom_heating
@@ -957,8 +936,6 @@ exercising_radiator_valves:
               temperature: 5
           - delay: 00:01:00
   - action: automation.turn_on
-    metadata: {}
-    data: {}
     target:
       entity_id:
       - automation.bathroom_heating
@@ -1064,7 +1041,6 @@ create_todo_task:
         for_each: '{{ existing }}'
         sequence:
         - action: ms365_todo.complete_todo
-          metadata: {}
           data:
             entity_id: '{{ entity_id }}'
             todo_id: '{{ repeat.item }}'
@@ -1074,7 +1050,6 @@ create_todo_task:
       value_template: '{{ active and (existing_count == 0 or must_replace) }}'
     then:
     - action: ms365_todo.new_todo
-      metadata: {}
       data:
         entity_id: '{{ entity_id }}'
         subject: '{{ subject }}'
