@@ -1251,18 +1251,11 @@
     to: 'on'
     id: someone_home
   - trigger: state
-    entity_id:
-    - binary_sensor.hallway_occupancy
-    to:
-    - 'off'
+    entity_id: binary_sensor.hallway_presence
+    to: 'off'
     id: person_cleared
-    for:
-      hours: 0
-      minutes: 2
-      seconds: 0
   - trigger: state
-    entity_id:
-    - binary_sensor.hallway_occupancy
+    entity_id: binary_sensor.hallway_presence
     to: 'on'
     id: person_detected
   - trigger: state
@@ -1276,14 +1269,11 @@
     to: 'off'
     id: bedroom_waking
   - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_door
-    from: 'off'
+    entity_id: binary_sensor.bedroom_door
     to: 'on'
     id: bedroom_door_open
   - trigger: state
-    entity_id:
-    - binary_sensor.hallway_light
+    entity_id: binary_sensor.hallway_light
     from: 'off'
     to: 'on'
     for:
@@ -2751,7 +2741,7 @@
     id: bedtime
   - trigger: state
     entity_id:
-    - binary_sensor.bedroom_occupancy
+    - binary_sensor.bedroom_presence
     from: 'on'
     to: 'off'
     id: bedroom_empty
@@ -2808,13 +2798,13 @@
     id: sunny_overheat_off
   - trigger: state
     entity_id:
-    - binary_sensor.bedroom_window_sensor_door
+    - binary_sensor.bedroom_window
     from: 'on'
     to: 'off'
     id: window_closed
   - trigger: state
     entity_id:
-    - binary_sensor.bedroom_window_sensor_door
+    - binary_sensor.bedroom_window
     from: 'off'
     to: 'on'
     id: window_opened
@@ -2855,7 +2845,7 @@
         - close_short_pressed
         - button_3
       - condition: state
-        entity_id: binary_sensor.bedroom_window_sensor_door
+        entity_id: binary_sensor.bedroom_window
         state: 'on'
       - condition: numeric_state
         entity_id: cover.bedroom_blind
@@ -2936,7 +2926,7 @@
         entity_id: binary_sensor.parent_home
         state: 'on'
       - condition: state
-        entity_id: binary_sensor.bedroom_occupancy
+        entity_id: binary_sensor.bedroom_presence
         state: 'off'
       - condition: or
         conditions:
@@ -3060,7 +3050,7 @@
         position: '{{ [position | int, 60] | min }}'
   - if:
     - condition: state
-      entity_id: binary_sensor.bedroom_window_sensor_door
+      entity_id: binary_sensor.bedroom_window
       state: 'on'
     - condition: template
       value_template: '{{ command != ''force'' }}'
@@ -3599,13 +3589,13 @@
   - trigger: state
     entity_id: binary_sensor.home_central_heating
   - trigger: state
-    entity_id: binary_sensor.bedroom_window_sensor_door
+    entity_id: binary_sensor.bedroom_window
   - trigger: state
     entity_id: binary_sensor.bedroom_sleeping
   - trigger: state
     entity_id: binary_sensor.bedroom_door
   - trigger: state
-    entity_id: binary_sensor.bedroom_occupancy
+    entity_id: binary_sensor.bedroom_presence
   - trigger: state
     entity_id: binary_sensor.parent_home
   - trigger: state
@@ -3640,7 +3630,7 @@
           target: 23
     - conditions:
       - condition: state
-        entity_id: binary_sensor.bedroom_window_sensor_door
+        entity_id: binary_sensor.bedroom_window
         state: 'on'
       sequence:
       - variables:
@@ -3656,16 +3646,11 @@
       - variables:
           target: 17
     - conditions:
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: binary_sensor.bedroom_door
-          state: 'off'
-        - condition: state
-          entity_id: timer.bedroom_door_timer
-          state: active
       - condition: state
-        entity_id: binary_sensor.bedroom_occupancy
+        entity_id: binary_sensor.bedroom_door_long_open
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.bedroom_presence
         state: 'off'
       sequence:
       - variables:
@@ -3903,7 +3888,7 @@
   - trigger: state
     entity_id: cover.living_room_skylight_window_south
   - trigger: state
-    entity_id: binary_sensor.living_room_door_sensor_door
+    entity_id: binary_sensor.living_room_door
   - trigger: state
     entity_id: binary_sensor.someone_home
   - trigger: state
@@ -3911,7 +3896,7 @@
   - trigger: state
     entity_id: binary_sensor.living_room_media_player
   - trigger: state
-    entity_id: binary_sensor.kitchen_occupancy
+    entity_id: binary_sensor.kitchen_presence
   - trigger: state
     entity_id: binary_sensor.bedroom_sleeping
   conditions: []
@@ -4016,10 +4001,10 @@
         entity_id: binary_sensor.living_room_media_player
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.kitchen_occupancy
+        entity_id: binary_sensor.kitchen_presence
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.living_room_door_sensor_door
+        entity_id: binary_sensor.living_room_door
         state: 'off'
       sequence:
       - action: input_number.set_value
@@ -4411,49 +4396,49 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_street_detected
+    - binary_sensor.driveway_street_presence
     from: 'off'
     to: 'on'
     id: detected_street
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_street_detected
+    - binary_sensor.driveway_street_presence
     from: 'on'
     to: 'off'
     id: cleared_street
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_house_south_detected
+    - binary_sensor.driveway_house_south_presence
     from: 'off'
     to: 'on'
     id: detected_south
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_house_south_detected
+    - binary_sensor.driveway_house_south_presence
     from: 'on'
     to: 'off'
     id: cleared_south
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_entrance_detected
+    - binary_sensor.driveway_entrance_presence
     from: 'off'
     to: 'on'
     id: detected_entrance
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_entrance_detected
+    - binary_sensor.driveway_entrance_presence
     from: 'on'
     to: 'off'
     id: cleared_entrance
   - trigger: state
     entity_id:
-    - binary_sensor.garden_motion_sensor_house_east_detected
+    - binary_sensor.garden_house_east_presence
     from: 'off'
     to: 'on'
     id: detected_east
   - trigger: state
     entity_id:
-    - binary_sensor.garden_motion_sensor_house_east_detected
+    - binary_sensor.garden_house_east_presence
     from: 'on'
     to: 'off'
     id: cleared_east
@@ -4589,16 +4574,16 @@
         - cleared_east
         - twilight
       - condition: state
-        entity_id: binary_sensor.driveway_motion_sensor_street_detected
+        entity_id: binary_sensor.driveway_street_presence
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.driveway_motion_sensor_house_south_detected
+        entity_id: binary_sensor.driveway_house_south_presence
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.driveway_motion_sensor_entrance_detected
+        entity_id: binary_sensor.driveway_entrance_presence
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.garden_motion_sensor_house_east_detected
+        entity_id: binary_sensor.garden_house_east_presence
         state: 'off'
       - condition: state
         entity_id: binary_sensor.home_outside_light
@@ -4681,16 +4666,16 @@
         - condition: and
           conditions:
           - condition: state
-            entity_id: binary_sensor.driveway_motion_sensor_street_detected
+            entity_id: binary_sensor.driveway_street_presence
             state: 'off'
           - condition: state
-            entity_id: binary_sensor.driveway_motion_sensor_house_south_detected
+            entity_id: binary_sensor.driveway_house_south_presence
             state: 'off'
           - condition: state
-            entity_id: binary_sensor.driveway_motion_sensor_entrance_detected
+            entity_id: binary_sensor.driveway_entrance_presence
             state: 'off'
           - condition: state
-            entity_id: binary_sensor.garden_motion_sensor_house_east_detected
+            entity_id: binary_sensor.garden_house_east_presence
             state: 'off'
       sequence:
       - repeat:
@@ -7742,39 +7727,29 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.entrance_motion_sensor_motion
-    from: 'off'
+    - binary_sensor.entrance_presence
     to: 'on'
-    id: motion_started
+    id: detected_inside
   - trigger: state
     entity_id:
-    - binary_sensor.entrance_motion_sensor_motion
-    from: 'on'
+    - binary_sensor.entrance_presence
     to: 'off'
-    id: motion_ended
+    id: cleared_inside
   - trigger: state
     entity_id:
-    - timer.entrance_light_timer
-    to: idle
-    id: timer_ended
+    - binary_sensor.driveway_entrance_presence
+    to: 'on'
+    id: detected_outside
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_entrance_presence
+    to: 'off'
+    id: cleared_outside
   - trigger: state
     entity_id:
     - binary_sensor.someone_home
-    from: 'on'
     to: 'off'
     id: no_one_home
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_motion_sensor_entrance_occupancy
-    from: 'off'
-    to: 'on'
-    id: person_outside_detected
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_motion_sensor_entrance_occupancy
-    from: 'on'
-    to: 'off'
-    id: person_outside_cleared
   conditions: []
   actions:
   - variables:
@@ -7783,51 +7758,40 @@
     - conditions:
       - condition: trigger
         id:
-        - motion_started
+        - detected_inside
       - condition: numeric_state
         entity_id: sensor.entrance_motion_sensor_illuminance
         below: 200
       sequence:
-      - action: timer.pause
-        target:
-          entity_id: timer.entrance_light_timer
       - variables:
           light: 'on'
     - conditions:
       - condition: trigger
         id:
-        - person_outside_detected
+        - detected_outside
       - condition: state
         entity_id: binary_sensor.home_outside_light
         state: 'off'
       sequence:
-      - action: timer.pause
-        target:
-          entity_id: timer.entrance_light_timer
       - variables:
           light: 'on'
     - conditions:
       - condition: trigger
         id:
-        - motion_ended
-        - person_outside_cleard
+        - cleared_inside
+        - cleared_outside
       - condition: state
-        entity_id: binary_sensor.entrance_motion_sensor_motion
+        entity_id: binary_sensor.entrance_presence
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.driveway_motion_sensor_entrance_occupancy
+        entity_id: binary_sensor.driveway_entrance_presence
         state: 'off'
       sequence:
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:01:00
-        target:
-          entity_id: timer.entrance_light_timer
+      - variables:
+          light: 'off'
     - conditions:
       - condition: trigger
         id:
-        - timer_ended
         - no_one_home
       sequence:
       - variables:
@@ -7889,21 +7853,16 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.toilet_motion_sensor_motion
+    - binary_sensor.toilet_presence
     from: 'off'
     to: 'on'
-    id: motion_started
+    id: detected
   - trigger: state
     entity_id:
-    - binary_sensor.toilet_motion_sensor_motion
+    - binary_sensor.toilet_presence
     from: 'on'
     to: 'off'
-    id: motion_ended
-  - trigger: state
-    entity_id:
-    - timer.toilet_light_timer
-    to: idle
-    id: timer_ended
+    id: cleared
   - trigger: state
     entity_id:
     - binary_sensor.someone_home
@@ -7916,14 +7875,11 @@
     - conditions:
       - condition: trigger
         id:
-        - motion_started
+        - detected
       - condition: state
         entity_id: binary_sensor.everyone_sleeping
         state: 'on'
       sequence:
-      - action: timer.pause
-        target:
-          entity_id: timer.toilet_light_timer
       - action: light.turn_on
         metadata: {}
         data:
@@ -7935,11 +7891,8 @@
     - conditions:
       - condition: trigger
         id:
-        - motion_started
+        - detected
       sequence:
-      - action: timer.pause
-        target:
-          entity_id: timer.toilet_light_timer
       - action: light.turn_on
         metadata: {}
         data:
@@ -7951,18 +7904,7 @@
     - conditions:
       - condition: trigger
         id:
-        - motion_ended
-      sequence:
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:03:00
-        target:
-          entity_id: timer.toilet_light_timer
-    - conditions:
-      - condition: trigger
-        id:
-        - timer_ended
+        - cleared
         - no_one_home
       sequence:
       - action: light.turn_off
@@ -7982,21 +7924,14 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.utility_room_motion_sensor_motion
-    from: 'off'
+    - binary_sensor.utility_room_presence
     to: 'on'
-    id: motion_started
+    id: detected
   - trigger: state
     entity_id:
-    - binary_sensor.utility_room_motion_sensor_motion
-    from: 'on'
+    - binary_sensor.utility_room_presence
     to: 'off'
-    id: motion_ended
-  - trigger: state
-    entity_id:
-    - timer.utility_room_light_timer
-    to: idle
-    id: timer_ended
+    id: cleared
   - trigger: state
     entity_id:
     - binary_sensor.someone_home
@@ -8009,7 +7944,7 @@
     - conditions:
       - condition: trigger
         id:
-        - motion_started
+        - detected
       - condition: numeric_state
         entity_id: sensor.utility_room_motion_sensor_illuminance
         below: 400
@@ -8017,9 +7952,6 @@
         entity_id: binary_sensor.everyone_sleeping
         state: 'on'
       sequence:
-      - action: timer.pause
-        target:
-          entity_id: timer.utility_room_light_timer
       - action: light.turn_on
         metadata: {}
         data:
@@ -8032,14 +7964,11 @@
     - conditions:
       - condition: trigger
         id:
-        - motion_started
+        - detected
       - condition: numeric_state
         entity_id: sensor.utility_room_motion_sensor_illuminance
         below: 400
       sequence:
-      - action: timer.pause
-        target:
-          entity_id: timer.utility_room_light_timer
       - action: light.turn_on
         metadata: {}
         data:
@@ -8052,19 +7981,8 @@
     - conditions:
       - condition: trigger
         id:
-        - motion_ended
-      sequence:
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:03:00
-        target:
-          entity_id: timer.utility_room_light_timer
-    - conditions:
-      - condition: trigger
-        id:
         - no_one_home
-        - timer_ended
+        - cleared
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -8160,13 +8078,13 @@
     id: lights_on
   - trigger: state
     entity_id:
-    - binary_sensor.kitchen_occupancy
+    - binary_sensor.kitchen_presence
     to:
     - 'off'
     id: person_cleared
   - trigger: state
     entity_id:
-    - binary_sensor.kitchen_occupancy
+    - binary_sensor.kitchen_presence
     to:
     - 'on'
     id: person_detected
@@ -8488,25 +8406,25 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.garden_motion_sensor_house_north_detected
+    - binary_sensor.garden_house_north_presence
     from: 'off'
     to: 'on'
     id: detected_north
   - trigger: state
     entity_id:
-    - binary_sensor.garden_motion_sensor_house_north_detected
+    - binary_sensor.garden_house_north_presence
     from: 'on'
     to: 'off'
     id: cleared_north
   - trigger: state
     entity_id:
-    - binary_sensor.garden_motion_sensor_house_east_detected
+    - binary_sensor.garden_house_east_presence
     from: 'off'
     to: 'on'
     id: detected_east
   - trigger: state
     entity_id:
-    - binary_sensor.garden_motion_sensor_house_east_detected
+    - binary_sensor.garden_house_east_presence
     from: 'on'
     to: 'off'
     id: cleared_east
@@ -8539,10 +8457,10 @@
           - cleared_north
           - cleared_east
         - condition: state
-          entity_id: binary_sensor.garden_motion_sensor_house_north_detected
+          entity_id: binary_sensor.garden_house_north_presence
           state: 'off'
         - condition: state
-          entity_id: binary_sensor.garden_motion_sensor_house_east_detected
+          entity_id: binary_sensor.garden_house_east_presence
           state: 'off'
       sequence:
       - action: light.turn_off
@@ -8562,25 +8480,25 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.garden_motion_sensor_house_west_detected
+    - binary_sensor.garden_house_west_presence
     from: 'off'
     to: 'on'
     id: detected_west
   - trigger: state
     entity_id:
-    - binary_sensor.garden_motion_sensor_house_west_detected
+    - binary_sensor.garden_house_west_presence
     from: 'on'
     to: 'off'
     id: cleared_west
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_house_south_detected
+    - binary_sensor.driveway_house_south_presence
     from: 'off'
     to: 'on'
     id: detected_south
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_house_south_detected
+    - binary_sensor.driveway_house_south_presence
     from: 'on'
     to: 'off'
     id: cleared_south
@@ -8613,10 +8531,10 @@
           - cleared_west
           - cleared_south
         - condition: state
-          entity_id: binary_sensor.garden_motion_sensor_house_west_detected
+          entity_id: binary_sensor.garden_house_west_presence
           state: 'off'
         - condition: state
-          entity_id: binary_sensor.driveway_motion_sensor_house_south_detected
+          entity_id: binary_sensor.driveway_house_south_presence
           state: 'off'
       sequence:
       - action: light.turn_off
@@ -8639,28 +8557,28 @@
     - binary_sensor.driveway_motion_sensor_street_occupancy
     from: 'off'
     to: 'on'
-    id: motion_started
+    id: detected
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_street_occupancy
     from: 'on'
     to: 'off'
-    id: motion_ended
+    id: cleared
   conditions: []
   actions:
   - choose:
     - conditions:
       - condition: trigger
         id:
-        - motion_started
+        - detected
       sequence:
-      - action: timer.pause
+      - action: timer.cancel
         target:
           entity_id: timer.driveway_motion_sensor_street_timer
     - conditions:
       - condition: trigger
         id:
-        - motion_ended
+        - cleared
       sequence:
       - action: timer.start
         metadata: {}
@@ -8681,28 +8599,28 @@
     - binary_sensor.driveway_motion_sensor_house_south_occupancy
     from: 'off'
     to: 'on'
-    id: motion_started
+    id: detected
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_house_south_occupancy
     from: 'on'
     to: 'off'
-    id: motion_ended
+    id: cleared
   conditions: []
   actions:
   - choose:
     - conditions:
       - condition: trigger
         id:
-        - motion_started
+        - detected
       sequence:
-      - action: timer.pause
+      - action: timer.cancel
         target:
           entity_id: timer.driveway_motion_sensor_house_south_timer
     - conditions:
       - condition: trigger
         id:
-        - motion_ended
+        - cleared
       sequence:
       - action: timer.start
         metadata: {}
@@ -8723,28 +8641,28 @@
     - binary_sensor.driveway_motion_sensor_entrance_occupancy
     from: 'off'
     to: 'on'
-    id: motion_started
+    id: detected
   - trigger: state
     entity_id:
     - binary_sensor.driveway_motion_sensor_entrance_occupancy
     from: 'on'
     to: 'off'
-    id: motion_ended
+    id: cleared
   conditions: []
   actions:
   - choose:
     - conditions:
       - condition: trigger
         id:
-        - motion_started
+        - detected
       sequence:
-      - action: timer.pause
+      - action: timer.cancel
         target:
           entity_id: timer.driveway_motion_sensor_entrance_timer
     - conditions:
       - condition: trigger
         id:
-        - motion_ended
+        - cleared
       sequence:
       - action: timer.start
         metadata: {}
@@ -8765,28 +8683,28 @@
     - binary_sensor.garden_motion_sensor_house_east_occupancy
     from: 'off'
     to: 'on'
-    id: motion_started
+    id: detected
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_east_occupancy
     from: 'on'
     to: 'off'
-    id: motion_ended
+    id: cleared
   conditions: []
   actions:
   - choose:
     - conditions:
       - condition: trigger
         id:
-        - motion_started
+        - detected
       sequence:
-      - action: timer.pause
+      - action: timer.cancel
         target:
           entity_id: timer.garden_motion_sensor_house_east_timer
     - conditions:
       - condition: trigger
         id:
-        - motion_ended
+        - cleared
       sequence:
       - action: timer.start
         metadata: {}
@@ -8807,28 +8725,28 @@
     - binary_sensor.garden_motion_sensor_house_north_occupancy
     from: 'off'
     to: 'on'
-    id: motion_started
+    id: detected
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_north_occupancy
     from: 'on'
     to: 'off'
-    id: motion_ended
+    id: cleared
   conditions: []
   actions:
   - choose:
     - conditions:
       - condition: trigger
         id:
-        - motion_started
+        - detected
       sequence:
-      - action: timer.pause
+      - action: timer.cancel
         target:
           entity_id: timer.garden_motion_sensor_house_north_timer
     - conditions:
       - condition: trigger
         id:
-        - motion_ended
+        - cleared
       sequence:
       - action: timer.start
         metadata: {}
@@ -8849,28 +8767,28 @@
     - binary_sensor.garden_motion_sensor_house_west_occupancy
     from: 'off'
     to: 'on'
-    id: motion_started
+    id: detected
   - trigger: state
     entity_id:
     - binary_sensor.garden_motion_sensor_house_west_occupancy
     from: 'on'
     to: 'off'
-    id: motion_ended
+    id: cleared
   conditions: []
   actions:
   - choose:
     - conditions:
       - condition: trigger
         id:
-        - motion_started
+        - detected
       sequence:
-      - action: timer.pause
+      - action: timer.cancel
         target:
           entity_id: timer.garden_motion_sensor_house_west_timer
     - conditions:
       - condition: trigger
         id:
-        - motion_ended
+        - cleared
       sequence:
       - action: timer.start
         metadata: {}
@@ -8888,25 +8806,25 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.garden_motion_sensor_house_east_detected
+    - binary_sensor.garden_house_east_presence
     from: 'off'
     to: 'on'
     id: detected_east
   - trigger: state
     entity_id:
-    - binary_sensor.garden_motion_sensor_house_east_detected
+    - binary_sensor.garden_house_east_presence
     from: 'on'
     to: 'off'
     id: cleared_east
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_entrance_detected
+    - binary_sensor.driveway_entrance_presence
     from: 'off'
     to: 'on'
     id: detected_entrance
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_entrance_detected
+    - binary_sensor.driveway_entrance_presence
     from: 'on'
     to: 'off'
     id: cleared_entrance
@@ -8939,10 +8857,10 @@
           - cleared_east
           - cleared_entrance
         - condition: state
-          entity_id: binary_sensor.garden_motion_sensor_house_east_detected
+          entity_id: binary_sensor.garden_house_east_presence
           state: 'off'
         - condition: state
-          entity_id: binary_sensor.driveway_motion_sensor_entrance_detected
+          entity_id: binary_sensor.driveway_entrance_presence
           state: 'off'
       sequence:
       - action: light.turn_off
@@ -8962,49 +8880,49 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_house_south_detected
+    - binary_sensor.driveway_house_south_presence
     from: 'off'
     to: 'on'
     id: detected_south
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_house_south_detected
+    - binary_sensor.driveway_house_south_presence
     from: 'on'
     to: 'off'
     id: cleared_south
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_entrance_detected
+    - binary_sensor.driveway_entrance_presence
     from: 'off'
     to: 'on'
     id: detected_entrance
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_entrance_detected
+    - binary_sensor.driveway_entrance_presence
     from: 'on'
     to: 'off'
     id: cleared_entrance
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_street_detected
+    - binary_sensor.driveway_street_presence
     from: 'off'
     to: 'on'
     id: detected_street
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_street_detected
+    - binary_sensor.driveway_street_presence
     from: 'on'
     to: 'off'
     id: cleared_street
   - trigger: state
     entity_id:
-    - binary_sensor.garden_motion_sensor_house_west_detected
+    - binary_sensor.garden_house_west_presence
     from: 'off'
     to: 'on'
     id: detected_west
   - trigger: state
     entity_id:
-    - binary_sensor.garden_motion_sensor_house_west_detected
+    - binary_sensor.garden_house_west_presence
     from: 'on'
     to: 'off'
     id: cleared_west
@@ -9041,16 +8959,16 @@
           - cleared_street
           - cleared_west
         - condition: state
-          entity_id: binary_sensor.driveway_motion_sensor_house_south_detected
+          entity_id: binary_sensor.driveway_house_south_presence
           state: 'off'
         - condition: state
-          entity_id: binary_sensor.driveway_motion_sensor_entrance_detected
+          entity_id: binary_sensor.driveway_entrance_presence
           state: 'off'
         - condition: state
-          entity_id: binary_sensor.driveway_motion_sensor_street_detected
+          entity_id: binary_sensor.driveway_street_presence
           state: 'off'
         - condition: state
-          entity_id: binary_sensor.garden_motion_sensor_house_west_detected
+          entity_id: binary_sensor.garden_house_west_presence
           state: 'off'
       sequence:
       - action: light.turn_off
@@ -9070,13 +8988,13 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_entrance_detected
+    - binary_sensor.driveway_entrance_presence
     from: 'off'
     to: 'on'
     id: detected_entrance
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_motion_sensor_entrance_detected
+    - binary_sensor.driveway_entrance_presence
     from: 'on'
     to: 'off'
     id: cleared_entrance
@@ -9121,7 +9039,7 @@
   trace:
     stored_traces: 20
 - id: '1760968576162'
-  alias: Soveværelse tilstedeværelse
+  alias: Soveværelse tilstedeværelsessensor
   description: Automatik til at styre soveværelse tilstedeværelsessensor
   triggers:
   - trigger: state
@@ -9144,9 +9062,9 @@
         id:
         - detected
       sequence:
-      - action: timer.pause
+      - action: timer.cancel
         target:
-          entity_id: timer.bedroom_presence_timer
+          entity_id: timer.bedroom_presence_sensor_timer
     - conditions:
       - condition: trigger
         id:
@@ -9155,13 +9073,13 @@
       - action: timer.start
         metadata: {}
         data:
-          duration: 00:05:00
+          duration: 00:10:00
         target:
-          entity_id: timer.bedroom_presence_timer
+          entity_id: timer.bedroom_presence_sensor_timer
   mode: queued
   max: 10
   trace:
-    stored_traces: 5
+    stored_traces: 20
 - id: '1761149575145'
   alias: Hjem røgalarm
   description: Automatik til at styre og koordinere røgalarmer
@@ -9974,13 +9892,11 @@
     to: 'off'
     for: 00:02:00
   - trigger: state
-    entity_id: binary_sensor.kitchen_occupancy
+    entity_id: binary_sensor.kitchen_presence
     to: 'off'
-    for: 00:02:00
   - trigger: state
-    entity_id: binary_sensor.utility_room_light_motion
+    entity_id: binary_sensor.utility_room_presence
     to: 'off'
-    for: 00:02:00
   - trigger: time
     at: '11:30:00'
   - trigger: state
@@ -10012,10 +9928,10 @@
         entity_id: binary_sensor.monique_sleep_window
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.kitchen_occupancy
+        entity_id: binary_sensor.kitchen_presence
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.utility_room_light_motion
+        entity_id: binary_sensor.utility_room_presence
         state: 'off'
       - condition: template
         value_template: '{{ states(''sensor.living_room_robot_vacuum_time_since_empty_dust_bin'')|int
@@ -10288,12 +10204,11 @@
     entity_id: binary_sensor.monique_sleep_window
     to: 'off'
   - trigger: state
-    entity_id: binary_sensor.hallway_occupancy
+    entity_id: binary_sensor.hallway_presence
     to: 'off'
   - trigger: state
-    entity_id: binary_sensor.living_room_door_sensor_door
+    entity_id: binary_sensor.living_room_door_long_open
     to: 'on'
-    for: 00:02:00
   - trigger: time
     at: '12:00:00'
   - trigger: state
@@ -10325,10 +10240,10 @@
         entity_id: binary_sensor.monique_sleep_window
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.hallway_occupancy
+        entity_id: binary_sensor.hallway_presence
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.living_room_door_sensor_door
+        entity_id: binary_sensor.living_room_door_long_open
         state: 'on'
       - condition: template
         value_template: '{{ states(''sensor.living_room_robot_vacuum_time_since_empty_dust_bin'')|int
@@ -10349,7 +10264,7 @@
       - condition: time
         after: '11:00:00'
       - condition: state
-        entity_id: binary_sensor.living_room_door_sensor_door
+        entity_id: binary_sensor.living_room_door
         state: 'on'
       - condition: numeric_state
         entity_id: sensor.living_room_robot_vacuum_battery
@@ -11596,6 +11511,216 @@
         target:
           entity_id: input_boolean.charlies_room_media_player
         data: {}
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
+- id: '1769871939427'
+  alias: Køkken tilstedeværelsessensor
+  description: Automatik til at styre køkken tilstedeværelsessensor
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.kitchen_presence_sensor_occupancy
+    from: 'off'
+    to: 'on'
+    id: detected
+  - trigger: state
+    entity_id:
+    - binary_sensor.kitchen_presence_sensor_occupancy
+    from: 'on'
+    to: 'off'
+    id: cleared
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - detected
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.kitchen_presence_sensor_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - cleared
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.kitchen_presence_sensor_timer
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
+- id: '1769872044331'
+  alias: Gang tilstedeværelsessensor
+  description: Automatik til at styre gang tilstedeværelsessensor
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.hallway_presence_sensor_occupancy
+    from: 'off'
+    to: 'on'
+    id: detected
+  - trigger: state
+    entity_id:
+    - binary_sensor.hallway_presence_sensor_occupancy
+    from: 'on'
+    to: 'off'
+    id: cleared
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - detected
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.hallway_presence_sensor_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - cleared
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.hallway_presence_sensor_timer
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
+- id: '1769872343999'
+  alias: Bryggers bevægelsessensor
+  description: Håndtering af bevægelsessensoren i bryggerset
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.utility_room_motion_sensor_motion
+    from: 'off'
+    to: 'on'
+    id: detected
+  - trigger: state
+    entity_id:
+    - binary_sensor.utility_room_motion_sensor_motion
+    from: 'on'
+    to: 'off'
+    id: cleared
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - detected
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.utility_room_motion_sensor_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - cleared
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.utility_room_motion_sensor_timer
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
+- id: '1769872488563'
+  alias: Toilet bevægelsessensor
+  description: Håndtering af bevægelsessensoren på toilettet
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.toilet_motion_sensor_motion
+    from: 'off'
+    to: 'on'
+    id: detected
+  - trigger: state
+    entity_id:
+    - binary_sensor.toilet_motion_sensor_motion
+    from: 'on'
+    to: 'off'
+    id: cleared
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - detected
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.toilet_motion_sensor_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - cleared
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.toilet_motion_sensor_timer
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
+- id: '1769872582999'
+  alias: Entre bevægelsessensor
+  description: Håndtering af bevægelsessensoren i entreen
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.entrance_motion_sensor_motion
+    from: 'off'
+    to: 'on'
+    id: detected
+  - trigger: state
+    entity_id:
+    - binary_sensor.entrance_motion_sensor_motion
+    from: 'on'
+    to: 'off'
+    id: cleared
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - detected
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.entrance_motion_sensor_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - cleared
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.entrance_motion_sensor_timer
   mode: queued
   max: 10
   trace:
