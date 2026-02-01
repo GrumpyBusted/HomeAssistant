@@ -720,18 +720,18 @@
   - choose:
     - conditions:
       - condition: numeric_state
-        entity_id: sensor.home_indoor_minimum_temperature_24h
+        entity_id: sensor.home_minimum_temperature_24h
         below: 20
       - condition: numeric_state
         entity_id: sensor.home_outside_minimum_temperature_24h
         below: 10
       - condition: numeric_state
-        entity_id: sensor.home_outside_maximum_temperature_24_timer
+        entity_id: sensor.home_outside_maximum_temperature_24h
         below: 15
       sequence: []
     - conditions:
       - condition: numeric_state
-        entity_id: sensor.home_indoor_minimum_temperature_24h
+        entity_id: sensor.home_minimum_temperature_24h
         above: 20
       - condition: numeric_state
         entity_id: sensor.home_outside_minimum_temperature_24h
@@ -3041,6 +3041,12 @@
       sequence:
       - variables:
           position: 100
+  - action: input_number.set_value
+    metadata: {}
+    target:
+      entity_id: input_number.bedroom_blind_position
+    data:
+      value: '{{ position }}'
   - if:
     - condition: state
       entity_id: binary_sensor.bedroom_sun_overheat
@@ -10185,7 +10191,7 @@
   - trigger: state
     entity_id: binary_sensor.everyone_sleeping
   - trigger: state
-    entity_id: sensor.bathroom_temperature_sensor_humidity
+    entity_id: sensor.bathroom_current_humidity
   conditions: []
   actions:
   - action: number.set_value
@@ -10229,8 +10235,8 @@
       - condition: template
         value_template: '{% set I = states(''sensor.home_current_humidity'') | float(0)
           %}  {% set O = states(''sensor.home_outside_current_humidity'') | float(0)
-          %} {% set B = states(''sensor.bathroom_temperature_sensor_humidity'') |
-          float(0) %} {{ I >= 55 or (I >= 42 and (I - O) >= 8) or B >= I + 5 }}
+          %} {% set B = states(''sensor.bathroom_current_humidity'') | float(0) %}
+          {{ I >= 55 or (I >= 42 and (I - O) >= 8) or B >= I + 5 }}
 
           '
       sequence:

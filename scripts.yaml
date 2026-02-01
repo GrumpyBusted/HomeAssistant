@@ -1150,3 +1150,27 @@ cleanup_todo_tasks:
           todo_id: '{{ delete[repeat.index - 1] }}'
   - stop: All Done
     response_variable: output
+emils_varelse_tand_og_sluk_lys:
+  alias: Emils værelse lys tænd og sluk
+  description: Tænd og slut lys på Emils værelse, script til at blive brugt i iPhone
+    widget
+  mode: queued
+  max: 10
+  sequence:
+  - if:
+    - condition: state
+      entity_id: binary_sensor.emils_room_light
+      state: 'on'
+    then:
+    - action: light.turn_off
+      target:
+        entity_id: light.emils_room_lights
+    else:
+    - action: light.turn_on
+      data:
+        transition: 1
+        color_temp_kelvin: 2700
+        brightness_pct: 80
+      target:
+        entity_id:
+        - light.emils_room_lights
