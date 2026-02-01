@@ -4758,12 +4758,13 @@
   triggers:
   - trigger: state
     entity_id: media_player.living_room_apple_tv_media_player
-    to: playing
+    to:
+    - playing
+    - buffering
     id: started
   - trigger: state
     entity_id: media_player.living_room_apple_tv_media_player
     to:
-    - buffering
     - idle
     - paused
     id: ended
@@ -4816,8 +4817,22 @@
     - conditions:
       - condition: trigger
         id:
-        - away
         - timeout
+      - condition: state
+        entity_id: media_player.living_room_apple_tv_media_player
+        state:
+        - idle
+        - paused
+      sequence:
+      - action: input_boolean.turn_off
+        metadata: {}
+        target:
+          entity_id: input_boolean.living_room_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - away
         - 'off'
       sequence:
       - action: timer.cancel
@@ -7564,9 +7579,10 @@
       - condition: numeric_state
         entity_id: sensor.utility_room_motion_sensor_illuminance
         below: 400
-      - condition: state
-        entity_id: binary_sensor.everyone_sleeping
-        state: 'on'
+      - condition: numeric_state
+        entity_id: light.kitchen_lights
+        attribute: brightness
+        below: 60
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -7665,15 +7681,6 @@
     id: button_4_long
   - trigger: state
     entity_id:
-    - event.living_room_switch_button_1
-    - event.living_room_switch_button_2
-    - event.living_room_switch_button_3
-    - event.living_room_switch_button_4
-    attribute: event_type
-    to: long_release
-    id: living_room_button_long_press
-  - trigger: state
-    entity_id:
     - event.kitchen_switch_rotary
     id: rotary
   - trigger: state
@@ -7704,6 +7711,16 @@
     to:
     - 'on'
     id: person_detected
+  - trigger: state
+    entity_id:
+    - binary_sensor.living_room_light
+    to: 'off'
+    id: living_room_light_off
+  - trigger: state
+    entity_id:
+    - binary_sensor.living_room_light
+    to: 'on'
+    id: living_room_light_on
   conditions: []
   actions:
   - choose:
@@ -7829,7 +7846,7 @@
         - button_3_long
         - button_4_long
         - no_one_home
-        - living_room_button_long_press
+        - living_room_light_off
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -7916,6 +7933,77 @@
       - condition: state
         entity_id: binary_sensor.kitchen_light
         state: 'on'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2300
+          brightness_pct: 50
+        target:
+          entity_id:
+          - light.kitchen_light_strip_countertop
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2300
+          brightness_pct: 15
+        target:
+          entity_id:
+          - light.kitchen_light_pendant_island_left
+          - light.kitchen_light_pendant_island_right
+          - light.kitchen_light_pendant_sink_left
+          - light.kitchen_light_pendant_sink_right
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.kitchen_light_spot_island
+          - light.kicthen_light_spot_cooktop
+          - light.kitchen_light_spot_oven
+          - light.kitchen_light_spot_sink
+          - light.kitchen_light_spot_fridge
+          - light.kitchen_light_spot_hallway
+    - conditions:
+      - condition: trigger
+        id:
+        - living_room_light_on
+      - condition: state
+        entity_id: binary_sensor.kitchen_presence
+        state: 'on'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2700
+          brightness_pct: 80
+        target:
+          entity_id:
+          - light.kitchen_light_strip_countertop
+          - light.kitchen_light_pendant_island_left
+          - light.kitchen_light_pendant_island_right
+          - light.kitchen_light_pendant_sink_left
+          - light.kitchen_light_pendant_sink_right
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.kitchen_light_spot_island
+          - light.kicthen_light_spot_cooktop
+          - light.kitchen_light_spot_oven
+          - light.kitchen_light_spot_sink
+          - light.kitchen_light_spot_fridge
+          - light.kitchen_light_spot_hallway
+    - conditions:
+      - condition: trigger
+        id:
+        - living_room_light_on
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -9292,7 +9380,7 @@
   alias: Aflæs EL måler
   description: Aflæs elektricitets forbrug og gem i CSV fil
   triggers:
-  - at: 00:01:00
+  - at: 01:00:00
     trigger: time
   conditions:
   - condition: template
@@ -9410,7 +9498,7 @@
   alias: Aflæs vand måler
   description: Aflæs vand forbrug og gem i CSV fil
   triggers:
-  - at: 00:02:00
+  - at: 01:00:00
     trigger: time
   conditions:
   - condition: template
@@ -10313,6 +10401,10 @@
     attribute: event_type
     to: long_release
     id: living_room_button_long_press
+  - trigger: state
+    entity_id: binary_sensor.living_room_media_player
+    to: 'off'
+    id: media_off
   conditions: []
   actions:
   - variables:
@@ -10322,6 +10414,20 @@
       - condition: trigger
         id:
         - living_room_button_long_press
+        - no_one_home
+      sequence:
+      - action: media_player.turn_off
+        metadata: {}
+        target:
+          entity_id: media_player.living_room_apple_tv_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - media_off
+      - condition: state
+        entity_id: binary_sensor.living_room_light
+        state: 'off'
       sequence:
       - action: media_player.turn_off
         metadata: {}
@@ -10332,7 +10438,6 @@
       - condition: trigger
         id:
         - 'off'
-        - no_one_home
       - condition: template
         value_template: '{{ state_attr(''media_player.living_room_apple_tv_media_player'',
           ''source_list'') != none }}'
@@ -10909,8 +11014,22 @@
     - conditions:
       - condition: trigger
         id:
-        - away
         - timeout
+      - condition: state
+        entity_id: media_player.bedroom_apple_tv_media_player
+        state:
+        - idle
+        - paused
+      sequence:
+      - action: input_boolean.turn_off
+        metadata: {}
+        target:
+          entity_id: input_boolean.bedroom_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - away
         - 'off'
       sequence:
       - action: timer.cancel
@@ -10989,8 +11108,22 @@
     - conditions:
       - condition: trigger
         id:
-        - away
         - timeout
+      - condition: state
+        entity_id: media_player.emils_room_apple_tv_media_player
+        state:
+        - idle
+        - paused
+      sequence:
+      - action: input_boolean.turn_off
+        metadata: {}
+        target:
+          entity_id: input_boolean.emils_room_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - away
         - 'off'
       sequence:
       - action: timer.cancel
@@ -11069,8 +11202,22 @@
     - conditions:
       - condition: trigger
         id:
-        - away
         - timeout
+      - condition: state
+        entity_id: media_player.charlies_room_apple_tv_media_player
+        state:
+        - idle
+        - paused
+      sequence:
+      - action: input_boolean.turn_off
+        metadata: {}
+        target:
+          entity_id: input_boolean.charlies_room_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - away
         - 'off'
       sequence:
       - action: timer.cancel
@@ -11295,3 +11442,93 @@
   max: 10
   trace:
     stored_traces: 20
+- id: '1769930000823'
+  alias: Emils værelse medieafspiller
+  description: Styring af tilbehør til medie afspilning på Emils værelse
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.emils_room_media_player
+    to: 'off'
+    id: 'off'
+  - trigger: state
+    entity_id: binary_sensor.emil_home
+    to: 'off'
+    id: not_home
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - not_home
+      sequence:
+      - action: media_player.turn_off
+        metadata: {}
+        target:
+          entity_id: media_player.emils_room_apple_tv_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - 'off'
+      - condition: state
+        entity_id: binary_sensor.emils_room_light
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.emils_room_blind
+        state: 'off'
+      sequence:
+      - action: media_player.turn_off
+        metadata: {}
+        target:
+          entity_id: media_player.emils_room_apple_tv_media_player
+        data: {}
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 50
+- id: '1769931237193'
+  alias: Charlies værelse medieafspiller
+  description: Styring af tilbehør til medie afspilning på Charlies værelse
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.charlies_room_media_player
+    to: 'off'
+    id: 'off'
+  - trigger: state
+    entity_id: binary_sensor.charlie_home
+    to: 'off'
+    id: not_home
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - not_home
+      sequence:
+      - action: media_player.turn_off
+        metadata: {}
+        target:
+          entity_id: media_player.charlies_room_apple_tv_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - 'off'
+      - condition: state
+        entity_id: binary_sensor.charlies_room_light
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.charlies_room_blind
+        state: 'off'
+      sequence:
+      - action: media_player.turn_off
+        metadata: {}
+        target:
+          entity_id: media_player.charlies_room_apple_tv_media_player
+        data: {}
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 50
