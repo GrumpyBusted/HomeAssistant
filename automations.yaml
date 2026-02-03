@@ -5932,7 +5932,7 @@
               milliseconds: 200
   mode: queued
 - id: '1740779558756'
-  alias: Hjem smart todo affald
+  alias: Todo affald
   description: Automation til at oprette todo for at tømme affald og tage affaldscontainer
     på til vejen
   triggers:
@@ -5992,24 +5992,17 @@
           related_entity_id: rest_command.perfect_waste_get_next_address_collection
           entity_id: todo.todo_smart_todo
           is_active: 'true'
-  - if:
-    - condition: template
-      value_template: '{{ states(''input_datetime.home_garbage_pickup_date'') == today
-        }}'
-    then:
-    - action: input_datetime.set_datetime
-      metadata: {}
-      data:
-        date: '{{ pickup_date }}'
-      target:
-        entity_id: input_datetime.home_garbage_pickup_date
-    - action: script.create_todo_task
-      data:
-        subject: Hent affaldscontainer ved vejen
-        description: Hent affaldscontainere ved vejen og sæt tilbage bag garagen.
-        related_entity_id: rest_command.perfect_waste_get_next_address_collection
-        entity_id: todo.todo_smart_todo
-        is_active: 'true'
+    - conditions:
+      - condition: template
+        value_template: '{{ states(''input_datetime.home_garbage_pickup_date'') ==
+          today }}'
+      sequence:
+      - action: script.create_todo_task
+        data:
+          subject: Hent affaldscontainer ved vejen
+          description: Hent affaldscontainere ved vejen og sæt tilbage bag garagen.
+          related_entity_id: rest_command.perfect_waste_get_next_address_collection
+          entity_id: todo.todo_smart_todo
   - if:
     - condition: template
       value_template: '{{ now().weekday() == 1 }}'
@@ -6017,12 +6010,13 @@
     - action: script.create_todo_task
       data:
         subject: Tøm affald
-        description: Tøm alle affaldsspande i huset, inklusiv toiletter, værelser,
+        description: Tøm alle affaldsspande i huset, inklusiv toiletter, værelser
           og bryggers
-        related_entity_id: rest_command.perfect_waste_get_next_address_collection
         entity_id: todo.todo_smart_todo
-        is_active: 'true'
   mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
 - id: '1740941401019'
   alias: Hjem smart todo iPhone
   description: Automatik til at kontroller iPhone status
@@ -8782,7 +8776,12 @@
     id: timeout
   - trigger: state
     entity_id: binary_sensor.bedroom_door
-    id: door
+    to: 'off'
+    id: closed
+  - trigger: state
+    entity_id: binary_sensor.bedroom_door
+    to: 'on'
+    id: opened
   conditions: []
   actions:
   - choose:
@@ -8850,7 +8849,9 @@
           entity_id: input_boolean.bedroom_presence
     - conditions:
       - condition: trigger
-        id: door
+        id:
+        - opened
+        - closed
       - condition: state
         entity_id: binary_sensor.bedroom_presence_sensor_occupancy
         state: 'on'
@@ -8860,7 +8861,26 @@
           entity_id: input_boolean.bedroom_presence
     - conditions:
       - condition: trigger
-        id: door
+        id: opened
+      - condition: state
+        entity_id: binary_sensor.bedroom_presence_sensor_occupancy
+        state: 'off'
+      sequence:
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.bedroom_presence
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:00:30
+        target:
+          entity_id: timer.bedroom_presence_sensor_timer
+    - conditions:
+      - condition: trigger
+        id: closed
+      - condition: state
+        entity_id: binary_sensor.bedroom_presence_sensor_occupancy
+        state: 'off'
       sequence:
       - action: input_boolean.turn_off
         target:
@@ -8868,7 +8888,7 @@
   mode: queued
   max: 10
   trace:
-    stored_traces: 20
+    stored_traces: 50
 - id: '1761149575145'
   alias: Hjem røgalarm
   description: Automatik til at styre og koordinere røgalarmer
@@ -10732,6 +10752,8 @@
       sensors:
       - entity_id: sensor.bathroom_temperature_sensor_battery
         location: oven på spejlskabet
+      - entity_id: sensor.patio_temperature_sensor_battery
+        location: på kontakten over sofa
   - repeat:
       for_each: '{{ sensors }}'
       sequence:
