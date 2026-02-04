@@ -3259,6 +3259,8 @@
       level: debug
       message: '{{ conversation_response }}'
   mode: single
+  trace:
+    stored_traces: 30
 - id: '1737244947943'
   alias: Volvo XC40 - Lås
   description: Lås døren op bilen hvis den ikke er låst
@@ -6047,7 +6049,7 @@
       related_entity_id: sensor.anders_iphone_location_permission
       entity_id: todo.todo_smart_todo
       is_active: '{{ states(''sensor.anders_iphone_location_permission'') != ''Authorized
-        Always''  }}'
+        Always'' }}'
   - action: script.create_todo_task
     metadata: {}
     data:
@@ -6057,7 +6059,7 @@
       related_entity_id: sensor.monique_iphone_location_permission
       entity_id: todo.todo_smart_todo
       is_active: '{{ states(''sensor.monique_iphone_location_permission'') != ''Authorized
-        Always''  }}'
+        Always'' }}'
   - action: script.create_todo_task
     metadata: {}
     data:
@@ -6067,7 +6069,7 @@
       related_entity_id: sensor.emil_iphone_location_permission
       entity_id: todo.todo_smart_todo
       is_active: '{{ states(''sensor.emil_iphone_location_permission'') != ''Authorized
-        Always''  }}'
+        Always'' }}'
   - action: script.create_todo_task
     metadata: {}
     data:
@@ -6077,7 +6079,7 @@
       related_entity_id: sensor.charlie_iphone_location_permission
       entity_id: todo.todo_smart_todo
       is_active: '{{ states(''sensor.charlie_iphone_location_permission'') != ''Authorized
-        Always''  }}'
+        Always'' }}'
   - if:
     - condition: state
       entity_id: sensor.anders_iphone_connection_type
@@ -7334,9 +7336,7 @@
     entity_id:
     - sensor.utility_room_smart_plug_washer_power
     for:
-      hours: 0
       minutes: 5
-      seconds: 0
     below: '20'
     id: washer_done
   - trigger: numeric_state
@@ -7344,12 +7344,15 @@
     - sensor.utility_room_smart_plug_washer_power
     above: '3'
     for:
-      seconds: 5
+      seconds: 20
     id: washer_planed
+    below: 10
   - trigger: numeric_state
     entity_id:
     - sensor.utility_room_smart_plug_washer_power
-    above: '100'
+    above: '30'
+    for:
+      seconds: 10
     id: washer_started
   conditions: []
   actions:
@@ -11677,3 +11680,935 @@
   mode: restart
   trace:
     stored_traces: 30
+- id: '1770229021068'
+  alias: Charlies værelse rullegardin ny
+  description: Automatik for rullegardin på Charlies værelse
+  triggers:
+  - trigger: device
+    device_id: 937baa924ab8fff3bfbd80513dde21d2
+    domain: zha
+    type: remote_button_short_press
+    subtype: open
+    id: open_short_pressed
+  - trigger: device
+    device_id: 937baa924ab8fff3bfbd80513dde21d2
+    domain: zha
+    type: remote_button_short_press
+    subtype: close
+    id: close_short_pressed
+  - device_id: 937baa924ab8fff3bfbd80513dde21d2
+    domain: zha
+    type: remote_button_long_release
+    subtype: open
+    trigger: device
+    id: open_long_pressed
+  - device_id: 937baa924ab8fff3bfbd80513dde21d2
+    domain: zha
+    type: remote_button_long_release
+    subtype: close
+    trigger: device
+    id: close_long_pressed
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlie_home
+    to: 'on'
+    id: charlie_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlie_home
+    to: 'off'
+    id: charlie_leaving
+  - trigger: time
+    at:
+    - '12:00:00'
+    id: noon
+  - trigger: time
+    at: input_datetime.charlie_bedtime_alarm
+    id: bedtime
+  - trigger: time
+    at:
+      entity_id: input_datetime.charlie_wake_up_alarm
+      offset: 01:00:00
+    id: wake_up
+  - trigger: state
+    entity_id:
+    - binary_sensor.home_outside_light
+    to: 'off'
+    id: dark_outside
+  - trigger: state
+    entity_id:
+    - binary_sensor.home_outside_light
+    to: 'on'
+    id: light_outside
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlies_room_window
+    to: 'off'
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlies_room_window
+    to: 'on'
+    id: window_opened
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - open_long_pressed
+        - close_long_pressed
+      sequence:
+      - action: cover.stop_cover
+        target:
+          entity_id: cover.charlies_room_blind
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.charlies_room_blind_position
+        data:
+          value: '{{ state_attr(''cover.charlies_room_blind'', ''current_position'')
+            }}'
+    - conditions:
+      - condition: trigger
+        id:
+        - open_short_pressed
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.charlies_room_blind_position
+        data:
+          value: 100
+    - conditions:
+      - condition: trigger
+        id:
+        - close_short_pressed
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.charlies_room_blind_position
+        data:
+          value: 0
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.house_sitter_home
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: trigger
+        id:
+        - charlie_leaving
+        - charlie_home
+        - noon
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'on'
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.charlies_room_blind_position
+        data:
+          value: 100
+    - conditions:
+      - condition: trigger
+        id:
+        - wake_up
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'on'
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.charlies_room_blind_position
+        data:
+          value: 100
+    - conditions:
+      - condition: trigger
+        id:
+        - light_outside
+      - condition: template
+        value_template: '{% set n = now() %}
+
+          {% set w = states(''input_datetime.charlie_wake_up_alarm'') | as_datetime
+          | as_local + timedelta(hours=1) %}
+
+          {{ n.date() == w.date() and n.time() >= w.time() }}'
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.charlies_room_blind_position
+        data:
+          value: 100
+    - conditions:
+      - condition: trigger
+        id:
+        - dark_outside
+        - charlie_leaving
+        - charlie_home
+        - bedtime
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.charlies_room_blind_position
+        data:
+          value: 0
+  - variables:
+      position: '{{ states(''input_number.charlies_room_blind_position'') }}'
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ state_attr(''cover.charlies_room_blind'', ''current_position'')
+          <= 20 }}'
+      - condition: template
+        value_template: '{{ trigger.id == ''close_short_pressed'' }}
+
+          '
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.charlies_room_window
+        state: 'on'
+      sequence:
+      - variables:
+          position: '{{ [position | int, 20] | max }}'
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - open_long_pressed
+        - close_long_pressed
+      sequence: []
+    - conditions:
+      - condition: template
+        value_template: '{{ position == 100 }}'
+      - condition: numeric_state
+        entity_id: cover.charlies_room_blind
+        attribute: current_position
+        below: 100
+      sequence:
+      - action: cover.open_cover
+        target:
+          entity_id: cover.charlies_room_blind
+    - conditions:
+      - condition: template
+        value_template: '{{ position == 0 }}'
+      - condition: numeric_state
+        entity_id: cover.charlies_room_blind
+        attribute: current_position
+        above: 0
+      sequence:
+      - action: cover.close_cover
+        target:
+          entity_id: cover.charlies_room_blind
+    - conditions:
+      - condition: template
+        value_template: '{{ state_attr(''cover.charlies_room_blind'', ''current_position'')
+          != position }}'
+      sequence:
+      - action: cover.set_cover_position
+        data:
+          position: '{{ position }}'
+        target:
+          entity_id: cover.charlies_room_blind
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 50
+- id: '1770235218775'
+  alias: Soveværelse rullegardin ny
+  description: Automatik for rullegardin på soveværelse
+  triggers:
+  - device_id: 8421d7ed40291054dc9c1406bbf716fe
+    domain: zha
+    type: remote_button_short_press
+    subtype: open
+    trigger: device
+    id: open_short_pressed
+  - trigger: device
+    device_id: 8421d7ed40291054dc9c1406bbf716fe
+    domain: zha
+    type: remote_button_short_press
+    subtype: close
+    id: close_short_pressed
+  - device_id: 8421d7ed40291054dc9c1406bbf716fe
+    domain: zha
+    type: remote_button_long_release
+    subtype: open
+    trigger: device
+    id: open_long_pressed
+  - device_id: 8421d7ed40291054dc9c1406bbf716fe
+    domain: zha
+    type: remote_button_long_release
+    subtype: close
+    trigger: device
+    id: close_long_pressed
+  - trigger: state
+    entity_id:
+    - event.bedroom_switch_button_2
+    attribute: event_type
+    to: initial_press
+    id: button_2
+  - trigger: state
+    entity_id:
+    - event.bedroom_switch_button_3
+    attribute: event_type
+    to: initial_press
+    id: button_3
+  - trigger: time
+    at: input_datetime.monique_wake_up_alarm
+    id: wake_up
+  - trigger: state
+    entity_id:
+    - timer.bedroom_blind_timer
+    to: idle
+    id: wake_up_delay
+  - trigger: time
+    at: input_datetime.monique_bedtime_alarm
+    id: bedtime
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_presence
+    from: 'on'
+    to: 'off'
+    id: bedroom_empty
+  - trigger: state
+    entity_id:
+    - binary_sensor.parent_home
+    from: 'off'
+    to: 'on'
+    id: parent_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.parent_home
+    from: 'on'
+    to: 'off'
+    id: parent_left
+  - trigger: state
+    entity_id: binary_sensor.home_outside_light
+    from: 'on'
+    to: 'off'
+    id: dark_outside
+  - trigger: state
+    entity_id:
+    - binary_sensor.home_outside_light
+    from: 'off'
+    to: 'on'
+    id: light_outside
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_light
+    from: 'on'
+    to: 'off'
+    id: light_off
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_light
+    from: 'off'
+    to: 'on'
+    id: light_on
+  - trigger: state
+    entity_id:
+    - sensor.anders_iphone_battery_state
+    - sensor.monique_iphone_battery_state
+    to: Not Charging
+    id: phone_unpluged
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_sun_overheat
+    to: 'on'
+    id: sunny_overheat_on
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_sun_overheat
+    to: 'off'
+    id: sunny_overheat_off
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_window
+    from: 'on'
+    to: 'off'
+    id: window_closed
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_window
+    from: 'off'
+    to: 'on'
+    id: window_opened
+  - trigger: state
+    entity_id: fan.bedroom_air_purifier_fan
+    to: 'off'
+    id: air_purifier_off
+  - trigger: state
+    entity_id: fan.bedroom_air_purifier_fan
+    to: 'on'
+    id: air_purifier_on
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - open_long_pressed
+        - close_long_pressed
+      sequence:
+      - action: cover.stop_cover
+        target:
+          entity_id: cover.bedroom_blind
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.bedroom_blind_position
+        data:
+          value: '{{ state_attr(''cover.bedroom_blind'', ''current_position'') }}'
+    - conditions:
+      - condition: trigger
+        id:
+        - open_short_pressed
+        - button_2
+        - wake_up_delay
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.bedroom_blind_position
+        data:
+          value: 100
+    - conditions:
+      - condition: trigger
+        id:
+        - close_short_pressed
+        - button_3
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.bedroom_blind_position
+        data:
+          value: 0
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.house_sitter_home
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: trigger
+        id:
+        - light_off
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.bedroom_blind_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - wake_up
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.bedroom_blind_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - bedtime
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.bedroom_blind_position
+        data:
+          value: 0
+    - conditions:
+      - condition: trigger
+        id:
+        - bedroom_empty
+        - phone_unpluged
+      - condition: state
+        entity_id: binary_sensor.parent_home
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.bedroom_presence
+        state: 'off'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: sensor.monique_iphone_battery_state
+          state: Not Charging
+        - condition: state
+          entity_id: binary_sensor.monique_home
+          state: 'off'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: sensor.anders_iphone_battery_state
+          state: Not Charging
+        - condition: state
+          entity_id: binary_sensor.anders_home
+          state: 'off'
+      - condition: template
+        value_template: '{% set n = now().timestamp() %} {% set b = as_timestamp(states(''input_datetime.monique_bedtime_alarm''),
+          0) %} {% set w = as_timestamp(states(''input_datetime.monique_wake_up_alarm''),
+          0) %} {{ not (b <= n <= w if b < w else b <= n <= b + 43200) }}
+
+          '
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.bedroom_blind_position
+        data:
+          value: 100
+    - conditions:
+      - condition: trigger
+        id:
+        - parent_home
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
+      - condition: template
+        value_template: '{% set n = now().timestamp() %} {% set b = as_timestamp(states(''input_datetime.monique_bedtime_alarm''),
+          0) %} {% set w = as_timestamp(states(''input_datetime.monique_wake_up_alarm''),
+          0) %} {{ b <= n <= w if b < w else b <= n <= b + 43200 }}
+
+          '
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.bedroom_blind_position
+        data:
+          value: 0
+    - conditions:
+      - condition: trigger
+        id:
+        - parent_home
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.bedroom_blind_position
+        data:
+          value: 100
+    - conditions:
+      - condition: trigger
+        id:
+        - dark_outside
+        - parent_left
+      - condition: state
+        entity_id: binary_sensor.parent_home
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'off'
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.bedroom_blind_position
+        data:
+          value: 0
+    - conditions:
+      - condition: trigger
+        id:
+        - light_outside
+        - parent_left
+      - condition: state
+        entity_id: binary_sensor.parent_home
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'on'
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.bedroom_blind_position
+        data:
+          value: 100
+    - conditions:
+      - condition: trigger
+        id:
+        - sunny_overheat_off
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        above: 59
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.bedroom_blind_position
+        data:
+          value: 100
+    - conditions:
+      - condition: trigger
+        id:
+        - light_on
+      - condition: state
+        entity_id: binary_sensor.parent_home
+        state: 'on'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: sensor.monique_iphone_battery_state
+          state: Not Charging
+        - condition: state
+          entity_id: binary_sensor.monique_home
+          state: 'off'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: sensor.anders_iphone_battery_state
+          state: Not Charging
+        - condition: state
+          entity_id: binary_sensor.anders_home
+          state: 'off'
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.bedroom_blind_position
+        data:
+          value: 100
+  - variables:
+      position: '{{ states(''input_number.bedroom_blind_position'') }}'
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ state_attr(''cover.bedroom_blind'', ''current_position'')
+          <= 20 }}'
+      - condition: template
+        value_template: '{{ trigger.id == ''close_short_pressed'' }}
+
+          '
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.bedroom_window
+        state: 'on'
+      sequence:
+      - variables:
+          position: '{{ [position | int, 20] | max }}'
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ state_attr(''cover.bedroom_blind'', ''current_position'')
+          >= 50 }}'
+      - condition: template
+        value_template: '{{ trigger.id == ''open_short_pressed'' }}
+
+          '
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.bedroom_sun_overheat
+        state: 'on'
+      sequence:
+      - variables:
+          position: '{{ [position | int, 50] | min }}'
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ state_attr(''cover.bedroom_blind'', ''current_position'')
+          <= 60 }}'
+      - condition: template
+        value_template: '{{ trigger.id == ''close_short_pressed'' }}
+
+          '
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: fan.bedroom_air_purifier_fan
+        state: 'on'
+      sequence:
+      - variables:
+          position: '{{ [position | int, 60] | max }}'
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - open_long_pressed
+        - close_long_pressed
+      sequence: []
+    - conditions:
+      - condition: template
+        value_template: '{{ position == 100 }}'
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        below: 100
+      sequence:
+      - action: cover.open_cover
+        target:
+          entity_id: cover.bedroom_blind
+    - conditions:
+      - condition: template
+        value_template: '{{ position == 0 }}'
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        above: 0
+      sequence:
+      - action: cover.close_cover
+        target:
+          entity_id: cover.bedroom_blind
+    - conditions:
+      - condition: template
+        value_template: '{{ position != state_attr(''cover.bedroom_blind'', ''current_position'')
+          }}'
+      sequence:
+      - action: cover.set_cover_position
+        data:
+          position: '{{ position }}'
+        target:
+          entity_id: cover.bedroom_blind
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 50
+- id: '1770236661641'
+  alias: Emils værelse rullegardin ny
+  description: Automatik for rullegardin på Emils værelse
+  triggers:
+  - device_id: 1dd2442d9e607d9f290aebbb666cef43
+    domain: zha
+    type: remote_button_short_press
+    subtype: open
+    trigger: device
+    id: open_short_pressed
+  - trigger: device
+    device_id: 1dd2442d9e607d9f290aebbb666cef43
+    domain: zha
+    type: remote_button_short_press
+    subtype: close
+    id: close_short_pressed
+  - trigger: device
+    device_id: 1dd2442d9e607d9f290aebbb666cef43
+    domain: zha
+    type: remote_button_long_release
+    subtype: open
+    id: open_long_pressed
+  - trigger: device
+    device_id: 1dd2442d9e607d9f290aebbb666cef43
+    domain: zha
+    type: remote_button_long_release
+    subtype: close
+    id: close_long_pressed
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_home
+    from: 'on'
+    to: 'off'
+    id: emil_leaving
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_home
+    from: 'off'
+    to: 'on'
+    id: emil_home
+  - trigger: time
+    at:
+    - '12:00:00'
+    id: noon
+  - trigger: time
+    at: input_datetime.emil_bedtime_alarm
+    id: bedtime
+  - trigger: time
+    at:
+      entity_id: input_datetime.emil_wake_up_alarm
+      offset: 01:00:00
+    id: wake_up
+  - trigger: state
+    entity_id:
+    - binary_sensor.home_outside_light
+    from: 'on'
+    to: 'off'
+    id: dark_outside
+  - trigger: state
+    entity_id:
+    - binary_sensor.home_outside_light
+    from: 'off'
+    to: 'on'
+    id: light_outside
+  - trigger: state
+    entity_id:
+    - binary_sensor.emils_room_window_sensor_door
+    from: 'on'
+    to: 'off'
+    id: window_closed
+  - trigger: state
+    entity_id:
+    - binary_sensor.emils_room_window_sensor_door
+    from: 'off'
+    to: 'on'
+    id: window_opened
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - open_long_pressed
+        - close_long_pressed
+      sequence:
+      - action: cover.stop_cover
+        target:
+          entity_id: cover.emils_room_blind
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.emils_room_blind_position
+        data:
+          value: '{{ state_attr(''cover.emils_room_blind'', ''current_position'')
+            }}'
+    - conditions:
+      - condition: trigger
+        id:
+        - open_short_pressed
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.emils_room_blind_position
+        data:
+          value: 100
+    - conditions:
+      - condition: trigger
+        id:
+        - close_short_pressed
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.emils_room_blind_position
+        data:
+          value: 0
+    - conditions:
+      - condition: trigger
+        id:
+        - emil_leaving
+        - light_outside
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.emil_home
+        state: 'off'
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.emils_room_blind_position
+        data:
+          value: 100
+    - conditions:
+      - condition: trigger
+        id:
+        - emil_leaving
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'off'
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.emils_room_blind_position
+        data:
+          value: 0
+    - conditions:
+      - condition: trigger
+        id:
+        - emil_home
+        - noon
+        - wake_up
+      - condition: state
+        entity_id: binary_sensor.emil_home
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'on'
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.emils_room_blind_position
+        data:
+          value: 40
+    - conditions:
+      - condition: trigger
+        id:
+        - emil_home
+        - noon
+        - wake_up
+      - condition: state
+        entity_id: binary_sensor.home_outside_light
+        state: 'on'
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.emils_room_blind_position
+        data:
+          value: 100
+    - conditions:
+      - condition: trigger
+        id:
+        - emil_home
+        - dark_outside
+        - bedtime
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.emils_room_blind_position
+        data:
+          value: 0
+  - variables:
+      position: '{{ states(''input_number.emils_room_blind_position'') }}'
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ state_attr(''cover.emils_room_blind'', ''current_position'')
+          <= 20 }}'
+      - condition: template
+        value_template: '{{ trigger.id == ''close_short_pressed'' }}
+
+          '
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.emils_room_window
+        state: 'on'
+      sequence:
+      - variables:
+          position: '{{ [position | int, 20] | max }}'
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - open_long_pressed
+        - close_long_pressed
+      sequence: []
+    - conditions:
+      - condition: template
+        value_template: '{{ position == 100 }}'
+      - condition: numeric_state
+        entity_id: cover.emils_room_blind
+        attribute: current_position
+        below: 100
+      sequence:
+      - action: cover.open_cover
+        target:
+          entity_id: cover.emils_room_blind
+    - conditions:
+      - condition: template
+        value_template: '{{ position == 0 }}'
+      - condition: numeric_state
+        entity_id: cover.emils_room_blind
+        attribute: current_position
+        above: 0
+      sequence:
+      - action: cover.close_cover
+        target:
+          entity_id: cover.emils_room_blind
+    - conditions:
+      - condition: template
+        value_template: '{{ position != state_attr(''cover.emils_room_blind'', ''current_position'')
+          }}'
+      sequence:
+      - action: cover.set_cover_position
+        data:
+          position: '{{ position }}'
+        target:
+          entity_id: cover.emils_room_blind
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
