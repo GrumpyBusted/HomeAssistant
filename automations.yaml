@@ -11144,9 +11144,6 @@
     - timer.bedroom_blind_timer
     to: idle
     id: wake_up_delay
-  - trigger: time
-    at: input_datetime.monique_bedtime_alarm
-    id: bedtime
   - trigger: state
     entity_id:
     - binary_sensor.bedroom_presence
@@ -11277,19 +11274,6 @@
           duration: 00:03:00
         target:
           entity_id: timer.bedroom_blind_timer
-    - conditions:
-      - condition: trigger
-        id:
-        - bedtime
-      - condition: state
-        entity_id: binary_sensor.monique_home
-        state: 'on'
-      sequence:
-      - action: input_number.set_value
-        target:
-          entity_id: input_number.bedroom_blind_position
-        data:
-          value: 0
     - conditions:
       - condition: trigger
         id:
@@ -11847,34 +11831,26 @@
   triggers:
   - entity_id: todo.todo_smart_todo
     trigger: state
-    to: "none"
   actions:
   - variables:
-      new_list: '{{ trigger.to_state.attributes.all_todos | default([]) }}'
-      old_list: '{{ trigger.from_state.attributes.all_todos | default([]) }}'
+      new_list: '{{ state_attr(''todo.todo_smart_todo'', ''all_todos'') | default([])
+        | selectattr(''status'', ''eq'', ''completed'') | list }}'
+      old_list: '{{ trigger.from_state.attributes.all_todos | default([]) | selectattr(''status'',
+        ''eq'', ''completed'') | map(attribute=''todo_id'') | list | to_json | from_json
+        }}'
   - repeat:
-      for_each: '{{ new_list | list }}'
+      for_each: '{{ new_list }}'
       sequence:
-      - variables:
-          new_item: '{{ repeat.item }}'
-          old_item: '{% set match = old_list | selectattr(''todo_id'',''eq'',repeat.item.todo_id)
-            | list %} {{ match[0] if match|length > 0 else none }}
-
-            '
       - choose:
         - conditions:
           - condition: template
-            value_template: "{{ old_item is not none\n   and old_item.status != 'completed'\n
-              \  and new_item.status == 'completed' }}\n"
+            value_template: '{{ repeat.item.todo_id not in old_list }}'
           sequence:
-          - event: todo_item_completed
-            event_data:
-              subject: '{{ new_item.subject }}'
-              todo_id: '{{ new_item.todo_id }}'
-              status: '{{ new_item.status }}'
-              description: '{{ new_item.description }}'
-              due: '{{ new_item.due }}'
-              completed: '{{ new_item.completed }}'
+          - action: system_log.write
+            metadata: {}
+            data:
+              level: debug
+              message: '{{ repeat.item }}'
   mode: queued
   max: 10
   trace:
