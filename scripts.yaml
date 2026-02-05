@@ -667,6 +667,7 @@ push_notification:
         select:
           options:
           - critical
+          - info
           - log
       default: log
     title:
@@ -687,7 +688,22 @@ push_notification:
       required: false
       selector:
         object: {}
+    recipient:
+      name: Modtager
+      description: Hvem skal modtage beskeden
+      required: false
+      selector:
+        select:
+          options:
+          - all
+          - anders
+          - monique
+          - charlie
+          - emil
+          - home
+      default: home
     persistent:
+      name: Vedvarende
       description: Vedvarende besked
       required: false
       selector:
@@ -702,24 +718,40 @@ push_notification:
   - variables:
       persons:
       - device: notify.mobile_app_anders_iphone
-        sensor: sensor.anders_distance_from_home
+        sensor: sensor.anders_distance_home
       - device: notify.mobile_app_monique_iphone
-        sensor: sensor.monique_distance_from_home
+        sensor: sensor.monique_distance_home
       - device: notify.mobile_app_emil_iphone
-        sensor: sensor.emil_distance_from_home
+        sensor: sensor.emil_distance_home
       - device: notify.mobile_app_charlie_iphone
-        sensor: sensor.charlie_distance_from_home
-      notify_persons: "{% set ns = namespace(list=[]) %}\n{% for person in persons
-        %}\n  {% set distance = states(person.sensor) | float %}\n  {% set ns.list
-        = ns.list + [{\n      'device': person.device,\n      'distance': distance\n
-        \ }] %}\n{% endfor %} \n{% set notify_persons = ns.list | selectattr('distance',
-        'lt', 0.2) | list %} \n{% if notify_persons | count == 0 %}\n  {% set first_distance
-        = ((ns.list | sort(attribute='distance'))[0]).distance | float %}\n  {% set
-        notify_persons = ns.list | selectattr('distance', 'lt', first_distance + 2.0)
-        | list %}\n{% endif %}\n{{ notify_persons | map(attribute='device') | list
-        }}"
+        sensor: sensor.charlie_distance_home
       notification_id: "{% if not id %}\n  {{ now().strftime('%Y-%m-%d-%H-%M-%S')
         }}-{{ range(0, 100000) | random }}\n{% else %}\n  {{ id }}\n{% endif %}"
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ recipient == ''home'' }}'
+      sequence:
+      - variables:
+          notify_persons: "{% set ns = namespace(list=[]) %}\n{% for person in persons
+            %}\n  {% set distance = states(person.sensor) | float(0) %}\n  {% set
+            ns.list = ns.list + [{\n      'device': person.device,\n      'distance':
+            distance\n  }] %}\n{% endfor %} \n{% set notify_persons = ns.list | selectattr('distance',
+            'lt', 0.2) | list %} \n{% if notify_persons | count == 0 %}\n  {% set
+            first_distance = ((ns.list | sort(attribute='distance'))[0]).distance
+            | float(0) %}\n  {% set notify_persons = ns.list | selectattr('distance',
+            'lt', first_distance + 2.0) | list %}\n{% endif %}\n{{ notify_persons
+            | map(attribute='device') | list }}"
+    - conditions:
+      - condition: template
+        value_template: '{{ recipient == ''all'' }}'
+      sequence:
+      - variables:
+          notify_persons: '{{ persons | map(attribute=''device'') | list }}'
+    default:
+    - variables:
+        notify_persons: '{{ persons | map(attribute=''device'') | select(''search'',
+          ''_'' ~ recipient ~ ''_'') | list }}'
   - action: system_log.write
     data:
       message: 'Id: {{ notification_id }}
@@ -753,8 +785,38 @@ push_notification:
               level: debug
         - conditions:
           - condition: template
+            value_template: '{{ type == ''info'' }}'
+          sequence:
+          - action: system_log.write
+            data:
+              message: 'Action: {{ repeat.item }}
+
+                Title: {{ title }}
+
+                Message: {{ message }}'
+              level: info
+          - action: '{{ repeat.item }} '
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                push:
+                  sound:
+                    name: default
+                    critical: 0
+                    volume: 0
+        - conditions:
+          - condition: template
             value_template: '{{ type == ''critical'' }}'
           sequence:
+          - action: system_log.write
+            data:
+              message: 'Action: {{ repeat.item }}
+
+                Title: {{ title }}
+
+                Message: {{ message }}'
+              level: warning
           - action: '{{ repeat.item }} '
             data:
               title: '{{ title }}'
