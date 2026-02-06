@@ -3636,7 +3636,10 @@
     - conditions:
       - condition: trigger
         id: 'off'
-      sequence: []
+      sequence:
+      - action: homeassistant.disable_config_entry
+        data:
+          config_entry_id: 01JGCEWM58T7N5MY3Z1HSEDK4E
     - conditions:
       - condition: trigger
         id: 'on'
@@ -3644,6 +3647,9 @@
       - action: timer.cancel
         target:
           entity_id: timer.garage_3d_printer_timer
+      - action: homeassistant.enable_config_entry
+        data:
+          config_entry_id: 01JGCEWM58T7N5MY3Z1HSEDK4E
   mode: queued
   max: 10
   trace:
