@@ -910,6 +910,7 @@ set_climate_temperature:
   mode: parallel
   fields:
     entities:
+      name: Enheder
       description: Liste over Tado climate entities der skal opdateres
       required: true
       selector:
@@ -917,6 +918,7 @@ set_climate_temperature:
           domain: climate
           multiple: true
     temperature:
+      name: Temperatur
       description: Ønsket temperatur
       required: true
       selector:
@@ -925,6 +927,14 @@ set_climate_temperature:
           max: 30
           step: 0.1
           unit_of_measurement: °C
+    target_sensor:
+      name: Sensor
+      description: Sensor der holder indstillet temperatur
+      required: false
+      selector:
+        entity:
+          domain: sensor
+          device_class: temperature
   sequence:
   - variables:
       entities_to_update: "{% set ns = namespace(result=[]) %} {% for entity in entities
@@ -949,6 +959,14 @@ set_climate_temperature:
         entity_id: '{{ entities_to_update }}'
       data:
         temperature: '{{ temperature }}'
+    - if:
+      - condition: template
+        value_template: '{{ target_sensor is defined and target_sensor != none }}'
+      then:
+      - wait_template: '{{ states(target_sensor) | float(-999) | round(1) == temperature
+          | round(1) }}'
+        timeout: 00:03:00
+        continue_on_timeout: true
 exercising_radiator_valves:
   alias: Motionering af radiatorventiler
   description: Skru op og ned op thermostater på alle radiator for at motionere radiatorventiler

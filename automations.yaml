@@ -1022,7 +1022,7 @@
     to: 'on'
     for:
       hours: 0
-      minutes: 15
+      minutes: 10
       seconds: 0
     id: lights_on
   - trigger: state
@@ -1970,13 +1970,13 @@
     id: parents_left_home
   - trigger: state
     entity_id:
-    - binary_sensor.bedroom_presence_sensor_occupancy
+    - binary_sensor.bedroom_presence
     from: 'on'
     to: 'off'
     id: bedroom_empty
   - trigger: state
     entity_id:
-    - binary_sensor.bedroom_presence_sensor_occupancy
+    - binary_sensor.bedroom_presence
     from: 'off'
     to: 'on'
     id: motion
@@ -2089,6 +2089,26 @@
       - condition: trigger
         id:
         - bedroom_empty
+      - condition: numeric_state
+        entity_id: light.bedroom_lights
+        attribute: brightness
+        below: 51
+      - condition: state
+        entity_id: input_number.bedroom_blind_position
+        state: '0'
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'on'
+      sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - bedroom_empty
       sequence:
       - action: timer.cancel
         metadata: {}
@@ -2102,6 +2122,38 @@
         target:
           entity_id:
           - light.bedroom_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - motion
+      - condition: state
+        entity_id: binary_sensor.bedroom_blind
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
+      - condition: template
+        value_template: '{% set b = states(''input_datetime.monique_bedtime_alarm'')
+          | as_datetime | as_local %} {{ b <= now() <= b + timedelta(hours=6) }}'
+      sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.bedroom_light_sunrise_delay_timer
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2700
+          brightness_pct: 80
+        target:
+          entity_id: light.bedroom_lights
+      - action: script.bedroom_light_sunset
+        data:
+          transition: 180
+          brightness_from: 200
+          brightness_to: 50
     - conditions:
       - condition: trigger
         id:
@@ -2642,6 +2694,7 @@
         temperature: '{{ states(''sensor.emils_room_desired_temperature'') }}'
         entities:
         - climate.emils_room_radiator_thermostat
+        target_sensor: sensor.emils_room_target_temperature
   mode: restart
   trace:
     stored_traces: 50
@@ -2712,6 +2765,7 @@
         entities:
         - climate.charlies_room_radiator_thermostat
         - climate.charlies_room_temperature_sensor
+        target_sensor: sensor.charlies_room_target_temperature
   mode: restart
   trace:
     stored_traces: 50
@@ -2781,6 +2835,7 @@
         temperature: '{{ states(''sensor.bedroom_desired_temperature'') }}'
         entities:
         - climate.bedroom_radiator_thermostat
+        target_sensor: sensor.bedroom_target_temperature
   mode: restart
   trace:
     stored_traces: 50
@@ -2850,6 +2905,7 @@
         temperature: '{{ states(''sensor.toilet_desired_temperature'') }}'
         entities:
         - climate.toilet_radiator_thermostat
+        target_sensor: sensor.toilet_target_temperature
   mode: restart
   trace:
     stored_traces: 50
@@ -2920,6 +2976,7 @@
         entities:
         - climate.bathroom_radiator_thermostat_floor
         - climate.bathroom_radiator_thermostat_wall
+        target_sensor: sensor.bathroom_target_temperature
   mode: restart
   trace:
     stored_traces: 50
@@ -2991,6 +3048,7 @@
         - climate.utility_room_radiator_thermostat_wall
         - climate.utility_room_radiator_thermostat_floor
         - climate.utility_room_temperature_sensor
+        target_sensor: sensor.utility_room_target_temperature
   mode: restart
   trace:
     stored_traces: 50
@@ -3063,6 +3121,7 @@
         - climate.living_room_radiator_thermostat_dining_table
         - climate.living_room_radiator_thermostat_sofa
         - climate.kitchen_radiator_thermostat
+        target_sensor: sensor.living_room_target_temperature
   mode: queued
   max: 10
   trace:
@@ -3133,6 +3192,7 @@
         temperature: '{{ states(''sensor.hallway_desired_temperature'') }}'
         entities:
         - climate.hallway_radiator_thermostat
+        target_sensor: sensor.hallway_target_temperature
   mode: restart
   trace:
     stored_traces: 50
@@ -3637,9 +3697,10 @@
       - condition: trigger
         id: 'off'
       sequence:
-      - action: homeassistant.disable_config_entry
+      - action: homeassistant.disable_device
         data:
-          config_entry_id: 01JGCEWM58T7N5MY3Z1HSEDK4E
+          device_id:
+          - 5120a1d4206d34361feb88c4094a20de
     - conditions:
       - condition: trigger
         id: 'on'
@@ -3647,9 +3708,10 @@
       - action: timer.cancel
         target:
           entity_id: timer.garage_3d_printer_timer
-      - action: homeassistant.enable_config_entry
+      - action: homeassistant.enable_device
         data:
-          config_entry_id: 01JGCEWM58T7N5MY3Z1HSEDK4E
+          device_id:
+          - 5120a1d4206d34361feb88c4094a20de
   mode: queued
   max: 10
   trace:
@@ -10584,6 +10646,11 @@
         id:
         - detected
       sequence:
+      - target:
+          entity_id: input_datetime.kitchen_presence_sensor_start
+        data:
+          datetime: '{{ now() }}'
+        action: input_datetime.set_datetime
       - action: timer.cancel
         target:
           entity_id: timer.kitchen_presence_sensor_timer
@@ -10592,6 +10659,14 @@
         id:
         - cleared
       sequence:
+      - target:
+          entity_id: input_number.kitchen_presence_sensor_seconds
+        data:
+          value: '{% set start = states(''input_datetime.kitchen_presence_sensor_start'')
+            | as_datetime | as_local %} {% set seconds = states(''input_number.kitchen_presence_sensor_seconds'')
+            | int(0) %} {% set duration = (as_timestamp(now()) - as_timestamp(start))
+            | round(0) %} {{ seconds + duration }}'
+        action: input_number.set_value
       - action: timer.start
         metadata: {}
         data:
@@ -10710,6 +10785,9 @@
         id:
         - detected
       sequence:
+      - action: counter.increment
+        target:
+          entity_id: counter.toilet_motion_sensor_count
       - action: timer.cancel
         target:
           entity_id: timer.toilet_motion_sensor_timer
@@ -11158,6 +11236,12 @@
     id: bedroom_empty
   - trigger: state
     entity_id:
+    - binary_sensor.bedroom_presence
+    from: 'off'
+    to: 'on'
+    id: motion
+  - trigger: state
+    entity_id:
     - binary_sensor.parent_home
     from: 'off'
     to: 'on'
@@ -11191,6 +11275,12 @@
     from: 'off'
     to: 'on'
     id: light_on
+  - trigger: state
+    entity_id:
+    - sensor.anders_iphone_battery_state
+    - sensor.monique_iphone_battery_state
+    to: Charging
+    id: charging
   - trigger: state
     entity_id:
     - sensor.anders_iphone_battery_state
@@ -11283,6 +11373,22 @@
     - conditions:
       - condition: trigger
         id:
+        - motion
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
+      - condition: template
+        value_template: '{% set b = states(''input_datetime.monique_bedtime_alarm'')
+          | as_datetime | as_local %} {{ b <= now() <= b + timedelta(hours=6) }}'
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.bedroom_blind_position
+        data:
+          value: 0
+    - conditions:
+      - condition: trigger
+        id:
         - bedroom_empty
         - phone_unpluged
       - condition: state
@@ -11319,6 +11425,50 @@
           entity_id: input_number.bedroom_blind_position
         data:
           value: 100
+    - conditions:
+      - condition: trigger
+        id:
+        - charging
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.anders_home
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.monique_home
+          state: 'on'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.anders_home
+          state: 'off'
+        - condition: and
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.anders_home
+            state: 'on'
+          - condition: state
+            entity_id: sensor.anders_iphone_battery_state
+            state: Charging
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.monique_home
+          state: 'off'
+        - condition: and
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.monique_home
+            state: 'on'
+          - condition: state
+            entity_id: sensor.monique_iphone_battery_state
+            state: Charging
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.bedroom_blind_position
+        data:
+          value: 0
     - conditions:
       - condition: trigger
         id:
@@ -11857,6 +12007,76 @@
             data:
               level: debug
               message: '{{ repeat.item }}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 50
+- id: '1770410133642'
+  alias: Bryggers dør
+  description: Automatik til at styre timer til bryggers dør
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.utility_room_door
+    to: 'off'
+    id: closed
+  - trigger: state
+    entity_id: binary_sensor.utility_room_door
+    to: 'on'
+    id: opened
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: closed
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.utility_room_door_timer
+    - conditions:
+      - condition: trigger
+        id: opened
+      sequence:
+      - action: timer.start
+        target:
+          entity_id: timer.utility_room_door_timer
+        data:
+          duration: 00:00:15
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 50
+- id: '1770410173949'
+  alias: Terrasse dør
+  description: Automatik til at styre timer til terrasse dør
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.patio_door
+    to: 'off'
+    id: closed
+  - trigger: state
+    entity_id: binary_sensor.patio_door
+    to: 'on'
+    id: opened
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: closed
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.patio_door_timer
+    - conditions:
+      - condition: trigger
+        id: opened
+      sequence:
+      - action: timer.start
+        target:
+          entity_id: timer.patio_door_timer
+        data:
+          duration: 00:00:15
   mode: queued
   max: 10
   trace:
