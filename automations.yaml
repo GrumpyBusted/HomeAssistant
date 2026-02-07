@@ -9951,10 +9951,21 @@
       - condition: trigger
         id:
         - detected
+      - condition: state
+        entity_id: binary_sensor.someone_home
+        state: 'on'
       sequence:
       - action: counter.increment
         target:
           entity_id: counter.toilet_motion_sensor_count
+      - action: timer.cancel
+        target:
+          entity_id: timer.toilet_motion_sensor_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - detected
+      sequence:
       - action: timer.cancel
         target:
           entity_id: timer.toilet_motion_sensor_timer
@@ -11341,16 +11352,16 @@
           description: Indsæt en ny WC-duftpind i gæste-toilettet.
           related_entity_id: input_number.toilet_freshener_last_count
           entity_id: todo.todo_smart_todo
-          active: '{{ states(''counter.toilet_motion_sensor_count'') | int(0) > states(''input_number.toilet_freshener_last_count'')
-            | int(0) + 100 }}'
+          is_active: '{{ states(''counter.toilet_motion_sensor_count'') | int(0) >
+            states(''input_number.toilet_freshener_last_count'') | int(0) + 100 }}'
       - action: script.create_todo_task
         data:
           subject: Fyld sæbe på dispenser på toilettet
           description: Hæld mere sæbe på sæbedispenser på gæste-toilettet.
           related_entity_id: input_number.toilet_soap_last_count
           entity_id: todo.todo_smart_todo
-          active: '{{ states(''counter.toilet_motion_sensor_count'') | int(0) > states(''input_number.toilet_soap_last_count'')
-            | int(0) + 180 }}'
+          is_active: '{{ states(''counter.toilet_motion_sensor_count'') | int(0) >
+            states(''input_number.toilet_soap_last_count'') | int(0) + 180 }}'
     - conditions:
       - condition: trigger
         id: freshener_completed
