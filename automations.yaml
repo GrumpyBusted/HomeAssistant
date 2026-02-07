@@ -11373,3 +11373,67 @@
   max: 10
   trace:
     stored_traces: 30
+- id: '1770473789903'
+  alias: Hjem overvåg enheder
+  description: ''
+  triggers:
+  - event: start
+    trigger: homeassistant
+  - at: '16:00:00'
+    trigger: time
+  conditions: []
+  actions:
+  - delay: 00:00:01
+  - variables:
+      exclude_entities:
+      - binary_sensor.emils_room_window_sensor_door
+      - sensor.emils_room_window_sensor_battery
+      - sensor.emils_room_window_sensor_battery_voltage
+      - sensor.emils_room_window_sensor_battery_type
+      entities: "{% set unavailable = states \n  | rejectattr('domain','in',['button','event','update'])\n
+        \ | selectattr('state','eq','unavailable')\n  | map(attribute='entity_id')\n
+        \ | list %}\n\n{% set unknown = states \n  | selectattr('domain','in',['media_player','sensor','binary_sensor','climate','cover','lock'])\n
+        \ | selectattr('state','eq','unknown') \n  | map(attribute='entity_id')\n
+        \ | list %}\n\n{% set entities = (unavailable + unknown)\n  | reject('in',
+        exclude_entities)\n  | unique\n  | list %}\n\n{{ entities | to_json }}"
+      message: "{% set ns = namespace(result={}) %}\n{% for e in entities | trim |
+        from_json %}\n  {% set dev_id = device_id(e) if device_id(e) else '[NO_DEVICE]'
+        %}\n\n  {% if dev_id not in ns.result %}\n    {% if dev_id == '[NO_DEVICE]'
+        %}\n      {% set dev_name = '[NO_DEVICE]' %}\n      {% set dev_area_name =
+        '' %}\n    {% else %}\n      {% set dev_name = device_attr(dev_id, 'name_by_user')\n
+        \       if device_attr(dev_id, 'name_by_user')\n        else device_attr(dev_id,
+        'name') %}\n      {% set dev_area_name = area_name(device_attr(dev_id, 'area_id'))
+        %}\n    {% endif %}\n\n    {% set ns.result = dict(ns.result, **{\n      dev_id:
+        {\n        \"device_id\": dev_id,\n        \"name\": dev_name,\n        \"area\":
+        dev_area_name,\n        \"entities\": []\n      }\n    }) %}\n  {% endif %}\n\n
+        \ {% set ent_obj = {\n    \"entity_id\": e,\n    \"friendly_name\": state_attr(e,'friendly_name'),\n
+        \   \"state\": states(e),\n    \"last_changed\": states[e].last_changed.isoformat()\n
+        \ } %}\n\n  {% set ns.result = dict(ns.result, **{\n    dev_id: dict(ns.result[dev_id],
+        **{\n      \"entities\": ns.result[dev_id][\"entities\"] + [ent_obj]\n    })\n
+        \ }) %}\n{% endfor %}\n{% set devices = ns.result.values() | list %}\ncount_devices:
+        {{ devices | count }} count_entities: {{ entities | count }} devices: {% for
+        dev in devices %}\n  - device_id: \"{{ dev.device_id }}\"\n    name: \"{{
+        dev.name }}\"\n    area: \"{{ dev.area }}\"\n    entities:\n{% for ent in
+        dev.entities %}\n      - entity_id: \"{{ ent.entity_id }}\"\n        friendly_name:
+        \"{{ ent.friendly_name }}\"\n        state: \"{{ ent.state }}\"\n        last_changed:
+        \"{{ ent.last_changed }}\"\n{% endfor %} {% endfor %}"
+  - if:
+    - condition: template
+      value_template: '{{ entities | trim | from_json | length > 0}}'
+    then:
+    - action: system_log.write
+      data:
+        level: warning
+        message: '{{ exclude_entities }} {{ exclude_entities is iterable }} {{ exclude_entities
+          | count }} {{ message }} x: {{ entities }}'
+    - action: script.push_notification
+      data:
+        type: info
+        recipient: anders
+        persistent: true
+        title: '{{ entities | trim | from_json | length }} sensorer er ikke tilgængelige
+          i HomeAssistant'
+        message: '{{ message }}'
+  mode: single
+  trace:
+    stored_traces: 50
