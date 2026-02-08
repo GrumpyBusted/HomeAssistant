@@ -1098,7 +1098,7 @@ create_todo_task:
         \    | list }}\n{% endif %}"
       existing_count: '{{ existing | length }}'
       todo_description: "<html>\n  {{ description }}\n  {% if todo_entity_id is not
-        none %}\n    <br><br><i>Relateret:</i> {{ todo_entity_id }}\n  {% endif %}\n</html>"
+        none %}\n    <br><br><i>Relateret: {{ todo_entity_id }}</i>\n  {% endif %}\n</html>"
   - action: system_log.write
     data:
       level: info
@@ -1254,3 +1254,119 @@ emils_varelse_tand_og_sluk_lys:
       target:
         entity_id:
         - light.emils_room_lights
+create_todo_battery_task:
+  alias: Opret todo batteri opgave
+  description: Kontroller batteri niveau og opret evt opgave
+  fields:
+    entity_id:
+      name: Sensor
+      description: Sensor med batteri niveau i procent
+      example: sensor.home_sensor_battery
+      required: true
+      selector:
+        entity:
+          domain:
+          - sensor
+    device:
+      name: Enhed
+      description: Enhedsnavn
+      example: Stue dørsensor
+      required: false
+      selector:
+        text:
+    area:
+      name: Rum
+      description: Rum hvor enheden er
+      example: Stue
+      required: false
+      selector:
+        text:
+    location:
+      name: Pladsering
+      description: Pladseringen af enheden
+      example: På reolen
+      required: false
+      selector:
+        text:
+    type:
+      name: Type
+      description: Batteritype
+      example: 2 * AA
+      required: false
+      selector:
+        text:
+    type_entity_id:
+      name: Type sensor
+      description: Sensor med batteri typen
+      example: sensor.home_sensor_battery_type
+      required: false
+      selector:
+        entity:
+          domain:
+          - sensor
+    threshold:
+      name: Grænseværdi
+      description: Grænse for hvornår batteri skal skiftes
+      example: 10
+      required: false
+      default: 10
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: 1
+          mode: box
+  sequence:
+  - variables:
+      _device_name: "{% set i = device_id(entity_id) %}\n{% if device %}\n  {{ device
+        }}\n{% else %}\n  {% set n = device_attr(i, 'name_by_user') %}\n  {% if n
+        %}\n    {{ n }}\n  {% else %}\n    {% set n = device_attr(i, 'name') %}\n
+        \   {% if n %}\n      {{ n }}\n    {% else %}\n      {{ entity_id }}\n    {%
+        endif %}\n  {% endif %}\n{% endif %}"
+      _area: "{% if area %}\n  {{ area }}\n{% else %}\n  {% set n = area_name(entity_id)
+        %}\n  {% if n %}\n    {{ n }}\n  {% else %}\n    {{ '' }}\n  {% endif %}\n{%
+        endif %}"
+      _location: "{% if location %}\n  {{ location }}\n{% else %}\n  {{ '' }}\n{%
+        endif %}"
+      _type: "{% if type %}\n  {{ type }}\n{% else %}\n  {% if type_entity_id %}\n
+        \   {% set t = states(type_entity_id) %}\n    {% if t not in ['unknown','unavailable','none']
+        %}\n      {{ t }}\n    {% else %}\n      {{ '' }}\n    {% endif %}\n  {% else
+        %}\n    {% set q = state_attr(entity_id, 'battery_quantity') %}\n    {% set
+        s = state_attr(entity_id, 'battery_size') %}\n    {% if s %}\n      {% if
+        q %}\n        {{ q ~ ' x ' ~ s }}\n      {% else %}\n        {{ s }}\n      {%
+        endif %}\n    {% else %}\n      {% set t = states(entity_id | replace('_battery',
+        '_battery_type')) %}\n      {% if t not in ['unknown','unavailable','none']
+        %}\n        {{ t }}\n      {% else %}\n        {{ '' }}\n      {% endif %}\n
+        \   {% endif %}\n  {% endif %}\n{% endif %}"
+      _level: '{{ states(entity_id) | int(-1) | round(0) }}'
+      _threshold: "{% if threshold %}\n  {{ threshold | round(0) }}\n{% else %}\n
+        \ 10\n{% endif %}"
+  - action: system_log.write
+    data:
+      level: debug
+      message: 'Entity id: {{ entity_id }}
+
+        Device name: {{ _device_name }}
+
+        Area: {{ _area }}
+
+        Location: {{ _location }}
+
+        Battery type: {{ _type }}
+
+        Level: {{ _level }}
+
+        Threshold: {{ _threshold }}'
+  - if:
+    - condition: template
+      value_template: '{{ _level >= 0 }}'
+    then:
+    - action: script.create_todo_task
+      data:
+        subject: Skift batteri på {{ _device_name }}
+        description: '{% set clean_name = (_device_name | replace(_area, '''')).strip()
+          %} Batteriet på {{ clean_name }} i {{ _area }}{% if _location %}, placeret
+          {{ _location }}{% endif %}, er på {{ _level }}%. Den bruger {{ _type }}.'
+        related_entity_id: '{{ entity_id }}'
+        entity_id: todo.todo_smart_todo
+        is_active: '{{ _level <= _threshold }}'
