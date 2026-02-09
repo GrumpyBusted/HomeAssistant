@@ -1316,6 +1316,18 @@ create_todo_battery_task:
           max: 100
           step: 1
           mode: box
+    temperature:
+      name: Temperatur
+      description: Sensorens temperatur, skipper check hvis temperaturen er uder 1
+        °C
+      example: -3
+      required: false
+      selector:
+        number:
+          min: -20
+          max: 40
+          step: 1
+          mode: box
   sequence:
   - variables:
       _device_name: "{% set i = device_id(entity_id) %}\n{% if device %}\n  {{ device
@@ -1356,10 +1368,12 @@ create_todo_battery_task:
 
         Level: {{ _level }}
 
-        Threshold: {{ _threshold }}'
+        Threshold: {{ _threshold }}
+
+        Temperature: {{ temperature }}'
   - if:
     - condition: template
-      value_template: '{{ _level >= 0 }}'
+      value_template: '{{ _level >= 0 and temperature | float(20.0) > 1.0 }}'
     then:
     - action: script.create_todo_task
       data:
@@ -1370,3 +1384,5 @@ create_todo_battery_task:
         related_entity_id: '{{ entity_id }}'
         entity_id: todo.todo_smart_todo
         is_active: '{{ _level <= _threshold }}'
+  trace:
+    stored_traces: 100

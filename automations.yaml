@@ -4642,7 +4642,7 @@
   alias: Hjem todo IKEA rullegardiner
   description: Kontroller batteri status på IKEA rullegardiner
   triggers:
-  - trigger: state
+  - trigger: numeric_state
     entity_id:
     - sensor.bedroom_blind_battery
     - sensor.emils_room_blind_battery
@@ -4650,6 +4650,20 @@
     - sensor.bedroom_blind_open_close_remote_battery
     - sensor.emils_room_blind_open_close_remote_battery
     - sensor.charlies_room_blind_open_close_remote_battery
+    below: 5
+    for:
+      minutes: 3
+  - trigger: numeric_state
+    entity_id:
+    - sensor.bedroom_blind_battery
+    - sensor.emils_room_blind_battery
+    - sensor.charlies_room_blind_battery
+    - sensor.bedroom_blind_open_close_remote_battery
+    - sensor.emils_room_blind_open_close_remote_battery
+    - sensor.charlies_room_blind_open_close_remote_battery
+    above: 70
+    for:
+      minutes: 3
   - trigger: time
     at: 03:12:00
   conditions: []
@@ -4715,7 +4729,7 @@
   alias: Hjem todo Netatmo
   description: Kontroller batteri status på Netatmo enheder
   triggers:
-  - trigger: state
+  - trigger: numeric_state
     entity_id:
     - sensor.garage_weather_station_battery
     - sensor.garden_anemometer_battery
@@ -4723,6 +4737,20 @@
     - sensor.garden_weather_station_battery
     - sensor.greenhouse_weather_station_battery
     - sensor.technic_room_weather_station_battery
+    below: 5
+    for:
+      minutes: 3
+  - trigger: numeric_state
+    entity_id:
+    - sensor.garage_weather_station_battery
+    - sensor.garden_anemometer_battery
+    - sensor.garden_rain_gauge_battery
+    - sensor.garden_weather_station_battery
+    - sensor.greenhouse_weather_station_battery
+    - sensor.technic_room_weather_station_battery
+    above: 70
+    for:
+      minutes: 3
   - trigger: time
     at: 03:13:00
   conditions: []
@@ -4762,7 +4790,7 @@
   alias: Hjem todo Philips Hue kontakter
   description: Kontroller batteri status på Philips Hue kontakter
   triggers:
-  - trigger: state
+  - trigger: numeric_state
     entity_id:
     - sensor.living_room_switch_battery
     - sensor.kitchen_switch_battery
@@ -4771,6 +4799,21 @@
     - sensor.patio_switch_battery
     - sensor.emils_room_switch_battery
     - sensor.charlies_room_switch_battery
+    below: 5
+    for:
+      minutes: 3
+  - trigger: numeric_state
+    entity_id:
+    - sensor.living_room_switch_battery
+    - sensor.kitchen_switch_battery
+    - sensor.bedroom_switch_battery
+    - sensor.hallway_switch_battery
+    - sensor.patio_switch_battery
+    - sensor.emils_room_switch_battery
+    - sensor.charlies_room_switch_battery
+    above: 70
+    for:
+      minutes: 3
   - trigger: time
     at: 03:15:00
   conditions: []
@@ -4808,7 +4851,7 @@
   alias: Hjem todo Philips Hue bevægelsessensor
   description: Kontroller batteri status på Philips Hue bevægelsessensorer
   triggers:
-  - trigger: state
+  - trigger: numeric_state
     entity_id:
     - sensor.driveway_motion_sensor_entrance_battery
     - sensor.driveway_motion_sensor_house_south_battery
@@ -4819,6 +4862,23 @@
     - sensor.entrance_motion_sensor_battery
     - sensor.utility_room_motion_sensor_battery
     - sensor.toilet_motion_sensor_battery
+    below: 20
+    for:
+      minutes: 3
+  - trigger: numeric_state
+    entity_id:
+    - sensor.driveway_motion_sensor_entrance_battery
+    - sensor.driveway_motion_sensor_house_south_battery
+    - sensor.driveway_motion_sensor_street_battery
+    - sensor.garden_motion_sensor_house_east_battery
+    - sensor.garden_motion_sensor_house_west_battery
+    - sensor.garden_motion_sensor_house_north_battery
+    - sensor.entrance_motion_sensor_battery
+    - sensor.utility_room_motion_sensor_battery
+    - sensor.toilet_motion_sensor_battery
+    above: 70
+    for:
+      minutes: 3
   - trigger: time
     at: 03:20:00
   conditions: []
@@ -4865,10 +4925,20 @@
   alias: Hjem todo Philips Hue dørsensor
   description: Kontroller batteri status på Philips Hue dør og vindue sensorer
   triggers:
-  - trigger: state
+  - trigger: numeric_state
     entity_id:
     - sensor.bedroom_door_sensor_battery
     - sensor.garage_door_sensor_battery
+    below: 10
+    for:
+      minutes: 3
+  - trigger: numeric_state
+    entity_id:
+    - sensor.bedroom_door_sensor_battery
+    - sensor.garage_door_sensor_battery
+    above: 70
+    for:
+      minutes: 3
   - trigger: time
     at: 03:14:00
   conditions: []
@@ -4913,11 +4983,22 @@
   alias: Hjem todo Frient røgalarm
   description: Kontroller batteri status på Frient røgalarm
   triggers:
-  - trigger: state
+  - trigger: numeric_state
     entity_id:
     - sensor.charlies_room_smoke_alarm_battery
     - sensor.emils_room_smoke_alarm_battery
     - sensor.bedroom_smoke_alarm_battery
+    below: 10
+    for:
+      minutes: 3
+  - trigger: numeric_state
+    entity_id:
+    - sensor.charlies_room_smoke_alarm_battery
+    - sensor.emils_room_smoke_alarm_battery
+    - sensor.bedroom_smoke_alarm_battery
+    above: 70
+    for:
+      minutes: 3
   - trigger: time
     at: 03:24:00
   conditions: []
@@ -4940,9 +5021,18 @@
   alias: Hjem todo Aqara vibrationsensor
   description: Kontroller batteri status på Aqara vibrationsensorer
   triggers:
-  - trigger: state
+  - trigger: numeric_state
     entity_id:
     - sensor.driveway_vibration_sensor_mailbox_vibration_battery
+    below: 20
+    for:
+      minutes: 3
+  - trigger: numeric_state
+    entity_id:
+    - sensor.driveway_vibration_sensor_mailbox_vibration_battery
+    above: 70
+    for:
+      minutes: 3
   - trigger: time
     at: 03:11:00
   conditions: []
@@ -9033,9 +9123,22 @@
   alias: Hjem todo Aqara temperatursensor
   description: Kontroller batteri status på Aqara temperatursensorer
   triggers:
-  - trigger: state
+  - trigger: numeric_state
     entity_id:
     - sensor.bathroom_temperature_sensor_battery
+    - sensor.patio_temperature_sensor_battery
+    - sensor.utility_room_freezer_temperature_sensor_battery
+    below: 10
+    for:
+      minutes: 3
+  - trigger: numeric_state
+    entity_id:
+    - sensor.bathroom_temperature_sensor_battery
+    - sensor.patio_temperature_sensor_battery
+    - sensor.utility_room_freezer_temperature_sensor_battery
+    above: 70
+    for:
+      minutes: 3
   - trigger: time
     at: 03:18:00
   conditions: []
@@ -9044,10 +9147,15 @@
       sensors:
       - entity_id: sensor.bathroom_temperature_sensor_battery
         location: oven på spejlskabet
+        temperature: '{{ states(''sensor.bathroom_temperature_sensor_temperature'')
+          }}'
       - entity_id: sensor.patio_temperature_sensor_battery
         location: på kontakten over sofa
+        temperature: '{{ states(''sensor.patio_temperature_sensor_temperature'') }}'
       - entity_id: sensor.utility_room_freezer_temperature_sensor_battery
         location: i kummefryseren
+        temperature: '{{ states(''sensor.utility_room_freezer_temperature_sensor_temperature'')
+          }}'
   - repeat:
       for_each: '{{ sensors }}'
       sequence:
@@ -9055,6 +9163,7 @@
         data:
           entity_id: '{{ repeat.item.entity_id }}'
           location: '{{ repeat.item.location }}'
+          temperature: '{{ repeat.item.temperature }}'
   mode: restart
   trace:
     stored_traces: 30
@@ -9062,10 +9171,20 @@
   alias: Hjem todo Aqara vandsensor
   description: Kontroller batteri status på Aqara vandsensorer
   triggers:
-  - trigger: state
+  - trigger: numeric_state
     entity_id:
     - sensor.kitchen_water_leak_sensor_sink_battery
     - sensor.utility_room_water_leak_sensor_sink_battery
+    below: 10
+    for:
+      minutes: 3
+  - trigger: numeric_state
+    entity_id:
+    - sensor.kitchen_water_leak_sensor_sink_battery
+    - sensor.utility_room_water_leak_sensor_sink_battery
+    above: 70
+    for:
+      minutes: 3
   - trigger: time
     at: 03:19:00
   conditions: []
@@ -9155,13 +9274,26 @@
   alias: Hjem todo Yale lås
   description: Kontroller batteri status på Yale låse
   triggers:
-  - trigger: state
+  - trigger: numeric_state
     entity_id:
     - sensor.entrance_lock_battery
     - sensor.utility_room_lock_battery
     - sensor.garage_lock_battery
     - sensor.patio_lock_battery
     - sensor.patio_keypad_battery
+    below: 15
+    for:
+      minutes: 3
+  - trigger: numeric_state
+    entity_id:
+    - sensor.entrance_lock_battery
+    - sensor.utility_room_lock_battery
+    - sensor.garage_lock_battery
+    - sensor.patio_lock_battery
+    - sensor.patio_keypad_battery
+    above: 70
+    for:
+      minutes: 3
   - trigger: time
     at: 03:21:00
   conditions: []
@@ -9193,11 +9325,22 @@
   alias: Hjem todo Haozee Jordfugtighedssensor
   description: Kontroller batteri status på aozee Jordfugtighedssensor
   triggers:
-  - trigger: state
+  - trigger: numeric_state
     entity_id:
     - sensor.living_room_soil_moisture_sensor_battery
     - sensor.bedroom_soil_moisture_sensor_battery
     - sensor.charlies_room_soil_moisture_sensor_battery
+    below: 10
+    for:
+      minutes: 3
+  - trigger: numeric_state
+    entity_id:
+    - sensor.living_room_soil_moisture_sensor_battery
+    - sensor.bedroom_soil_moisture_sensor_battery
+    - sensor.charlies_room_soil_moisture_sensor_battery
+    above: 70
+    for:
+      minutes: 3
   - trigger: time
     at: 03:22:00
   conditions: []
