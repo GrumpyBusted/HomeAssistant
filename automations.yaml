@@ -9269,7 +9269,7 @@
   mode: queued
   max: 10
   trace:
-    stored_traces: 30
+    stored_traces: 300
 - id: '1769452207183'
   alias: Hjem todo Yale lås
   description: Kontroller batteri status på Yale låse
@@ -10341,17 +10341,9 @@
     to: 'on'
     id: light_on
   - trigger: state
-    entity_id:
-    - sensor.anders_iphone_battery_state
-    - sensor.monique_iphone_battery_state
+    entity_id: sensor.monique_iphone_battery_state
     to: Charging
     id: charging
-  - trigger: state
-    entity_id:
-    - sensor.anders_iphone_battery_state
-    - sensor.monique_iphone_battery_state
-    to: Not Charging
-    id: phone_unpluged
   - trigger: state
     entity_id:
     - binary_sensor.bedroom_sun_overheat
@@ -10442,9 +10434,9 @@
       - condition: state
         entity_id: binary_sensor.monique_home
         state: 'on'
-      - condition: template
-        value_template: '{% set b = states(''input_datetime.monique_bedtime_alarm'')
-          | as_datetime | as_local %} {{ b <= now() <= b + timedelta(hours=6) }}'
+      - condition: state
+        entity_id: binary_sensor.monique_sleep_window
+        state: 'on'
       sequence:
       - action: input_number.set_value
         target:
@@ -10455,35 +10447,25 @@
       - condition: trigger
         id:
         - bedroom_empty
-        - phone_unpluged
       - condition: state
-        entity_id: binary_sensor.parent_home
+        entity_id: binary_sensor.monique_home
         state: 'on'
       - condition: state
-        entity_id: binary_sensor.bedroom_presence
+        entity_id: binary_sensor.monique_sleep_window
         state: 'off'
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: sensor.monique_iphone_battery_state
-          state: Not Charging
-        - condition: state
-          entity_id: binary_sensor.monique_home
-          state: 'off'
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: sensor.anders_iphone_battery_state
-          state: Not Charging
-        - condition: state
-          entity_id: binary_sensor.anders_home
-          state: 'off'
-      - condition: template
-        value_template: '{% set n = now().timestamp() %} {% set b = as_timestamp(states(''input_datetime.monique_bedtime_alarm''),
-          0) %} {% set w = as_timestamp(states(''input_datetime.monique_wake_up_alarm''),
-          0) %} {{ not (b <= n <= w if b < w else b <= n <= b + 43200) }}
-
-          '
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.bedroom_blind_position
+        data:
+          value: 100
+    - conditions:
+      - condition: trigger
+        id:
+        - bedroom_empty
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'off'
       sequence:
       - action: input_number.set_value
         target:
@@ -10494,46 +10476,47 @@
       - condition: trigger
         id:
         - charging
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: binary_sensor.anders_home
-          state: 'on'
-        - condition: state
-          entity_id: binary_sensor.monique_home
-          state: 'on'
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: binary_sensor.anders_home
-          state: 'off'
-        - condition: and
-          conditions:
-          - condition: state
-            entity_id: binary_sensor.anders_home
-            state: 'on'
-          - condition: state
-            entity_id: sensor.anders_iphone_battery_state
-            state: Charging
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: binary_sensor.monique_home
-          state: 'off'
-        - condition: and
-          conditions:
-          - condition: state
-            entity_id: binary_sensor.monique_home
-            state: 'on'
-          - condition: state
-            entity_id: sensor.monique_iphone_battery_state
-            state: Charging
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.monique_sleep_window
+        state: 'on'
       sequence:
       - action: input_number.set_value
         target:
           entity_id: input_number.bedroom_blind_position
         data:
           value: 0
+    - conditions:
+      - condition: trigger
+        id:
+        - light_on
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.monique_sleep_window
+        state: 'off'
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.bedroom_blind_position
+        data:
+          value: 100
+    - conditions:
+      - condition: trigger
+        id:
+        - light_on
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'off'
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.bedroom_blind_position
+        data:
+          value: 100
     - conditions:
       - condition: trigger
         id:
@@ -10572,49 +10555,6 @@
       - condition: state
         entity_id: binary_sensor.home_outside_light
         state: 'on'
-      sequence:
-      - action: input_number.set_value
-        target:
-          entity_id: input_number.bedroom_blind_position
-        data:
-          value: 100
-    - conditions:
-      - condition: trigger
-        id:
-        - sunny_overheat_off
-      - condition: numeric_state
-        entity_id: cover.bedroom_blind
-        attribute: current_position
-        above: 59
-      sequence:
-      - action: input_number.set_value
-        target:
-          entity_id: input_number.bedroom_blind_position
-        data:
-          value: 100
-    - conditions:
-      - condition: trigger
-        id:
-        - light_on
-      - condition: state
-        entity_id: binary_sensor.parent_home
-        state: 'on'
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: sensor.monique_iphone_battery_state
-          state: Not Charging
-        - condition: state
-          entity_id: binary_sensor.monique_home
-          state: 'off'
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: sensor.anders_iphone_battery_state
-          state: Not Charging
-        - condition: state
-          entity_id: binary_sensor.anders_home
-          state: 'off'
       sequence:
       - action: input_number.set_value
         target:
@@ -11371,10 +11311,6 @@
     - delay: 00:03:00
   - variables:
       exclude_entities:
-      - binary_sensor.emils_room_window_sensor_door
-      - sensor.emils_room_window_sensor_battery
-      - sensor.emils_room_window_sensor_battery_voltage
-      - sensor.emils_room_window_sensor_battery_type
       - sensor.emils_room_network_switch_uptime
       - light.living_room_smart_plug_christmas_elf_house
       - light.charlies_room_light_bed_lamp
