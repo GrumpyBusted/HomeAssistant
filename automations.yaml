@@ -11455,13 +11455,11 @@
         data:
           entity_id:
           - switch.driveway_ev_charger_pause
-          - sensor.driveway_ev_charger_state_of_charge
     default:
     - action: homeassistant.enable_entity
       data:
         entity_id:
         - switch.driveway_ev_charger_pause
-        - sensor.driveway_ev_charger_state_of_charge
   mode: single
   trace:
     stored_traces: 10
