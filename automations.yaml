@@ -11405,6 +11405,16 @@
   triggers:
   - trigger: state
     entity_id: switch.kitchen_dishwasher_power
+    from: 'off'
+    to: 'on'
+    for:
+      seconds: 3
+  - trigger: state
+    entity_id: switch.kitchen_dishwasher_power
+    from: 'on'
+    to: 'off'
+    for:
+      seconds: 3
   conditions: []
   actions:
   - choose:
@@ -11440,7 +11450,7 @@
         - sensor.kitchen_dishwasher_start
   mode: single
   trace:
-    stored_traces: 10
+    stored_traces: 300
 - id: '1770535740851'
   alias: Bryggers todo fryser
   description: Overvåg fryser i bryggerset, send beskeder hvis der opstår fejl
