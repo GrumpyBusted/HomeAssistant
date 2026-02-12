@@ -1264,11 +1264,6 @@
     to: 'on'
     id: bedroom_sleeping
   - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_sleeping
-    to: 'off'
-    id: bedroom_waking
-  - trigger: state
     entity_id: binary_sensor.bedroom_door
     to: 'on'
     id: bedroom_door_opened
@@ -1276,6 +1271,11 @@
     entity_id: binary_sensor.bedroom_door
     to: 'off'
     id: bedroom_door_closed
+  - trigger: state
+    entity_id:
+    - light.bedroom_lights
+    attribute: brightness
+    id: bedroom_light_changes
   - trigger: state
     entity_id: binary_sensor.hallway_light
     from: 'off'
@@ -1432,6 +1432,49 @@
     - conditions:
       - condition: trigger
         id:
+        - bedroom_door_closed
+      - condition: state
+        entity_id: binary_sensor.hallway_presence
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.bedroom_sleeping
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2700
+          brightness_pct: 25
+        target:
+          entity_id:
+          - light.hallway_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - bedroom_door_closed
+      - condition: state
+        entity_id: binary_sensor.hallway_presence
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2700
+          brightness_pct: 75
+        target:
+          entity_id:
+          - light.hallway_lights
+    - conditions:
+      - condition: trigger
+        id:
         - bedroom_sleeping
       - condition: state
         entity_id: binary_sensor.bedroom_door
@@ -1443,27 +1486,7 @@
       - action: light.turn_off
         metadata: {}
         data:
-          transition: 10
-        target:
-          entity_id:
-          - light.hallway_lights
-    - conditions:
-      - condition: trigger
-        id:
-        - bedroom_waking
-      - condition: state
-        entity_id: binary_sensor.bedroom_door
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'off'
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          transition: 120
-          color_temp_kelvin: 2700
-          brightness_pct: 75
+          transition: 1
         target:
           entity_id:
           - light.hallway_lights
@@ -1477,15 +1500,17 @@
       - condition: state
         entity_id: binary_sensor.bedroom_sleeping
         state: 'on'
-      sequence: []
+      sequence:
+      - action: light.turn_off
+        data:
+          transition: 0
+        target:
+          entity_id:
+          - light.hallway_lights
     - conditions:
       - condition: trigger
         id:
         - person_detected
-        - bedroom_door_closed
-      - condition: state
-        entity_id: binary_sensor.hallway_presence
-        state: 'on'
       - condition: state
         entity_id: binary_sensor.bedroom_door
         state: 'off'
@@ -1540,6 +1565,25 @@
         target:
           entity_id:
           - light.hallway_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - bedroom_light_changes
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.bedroom_light
+        state: 'on'
+      sequence:
+      - action: light.turn_on
+        target:
+          entity_id: light.hallway_lights
+        data:
+          brightness: '{{ state_attr(''light.bedroom_lights'', ''brightness'') }}'
   mode: queued
   max: 10
   trace:
@@ -2177,9 +2221,9 @@
       - condition: state
         entity_id: binary_sensor.monique_home
         state: 'on'
-      - condition: template
-        value_template: '{% set b = states(''input_datetime.monique_bedtime_alarm'')
-          | as_datetime | as_local %} {{ b <= now() <= b + timedelta(hours=6) }}'
+      - condition: state
+        entity_id: binary_sensor.monique_sleep_window
+        state: 'on'
       sequence:
       - action: timer.cancel
         metadata: {}
@@ -2225,7 +2269,7 @@
         id:
         - lights_on
       - condition: state
-        entity_id: binary_sensor.bedroom_presence_sensor_occupancy
+        entity_id: binary_sensor.bedroom_presence
         state: 'off'
       sequence:
       - action: timer.cancel
@@ -8653,17 +8697,13 @@
   description: Styring af varme genveks ventilationsanlæg
   triggers:
   - trigger: state
-    entity_id:
-    - sensor.home_target_maximum_temperature
+    entity_id: sensor.home_target_maximum_temperature
   - trigger: state
-    entity_id:
-    - sensor.home_current_humidity
+    entity_id: sensor.storage_ventilation_desired_level
   - trigger: state
     entity_id: binary_sensor.someone_home
   - trigger: state
     entity_id: binary_sensor.everyone_sleeping
-  - trigger: state
-    entity_id: sensor.bathroom_current_humidity
   conditions: []
   actions:
   - action: number.set_value
@@ -8674,18 +8714,32 @@
       value: '{{ states(''sensor.home_target_maximum_temperature'') }}'
   - choose:
     - conditions:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.someone_home
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.everyone_sleeping
+          state: 'on'
+        - condition: state
+          entity_id: sensor.storage_ventilation_desired_level
+          state: '1'
+      sequence:
+      - action: climate.set_fan_mode
+        data:
+          fan_mode: low
+        target:
+          entity_id: climate.storage_ventilation_system_ventilation
+      - action: select.select_option
+        data:
+          option: '1'
+        target:
+          entity_id: select.storage_ventilation_system_fan_level
+    - conditions:
       - condition: state
-        entity_id: binary_sensor.someone_home
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.everyone_sleeping
-        state: 'off'
-      - condition: template
-        value_template: '{% set I = states(''sensor.home_current_humidity'') | float(0)
-          %} {% set O = states(''sensor.home_outside_current_humidity'') | float(0)
-          %} {{ I >= 60 or (I >= 48 and (I - O) >= 10) }}
-
-          '
+        entity_id: sensor.storage_ventilation_desired_level
+        state: '4'
       sequence:
       - action: climate.set_fan_mode
         data:
@@ -8699,18 +8753,8 @@
           entity_id: select.storage_ventilation_system_fan_level
     - conditions:
       - condition: state
-        entity_id: binary_sensor.someone_home
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.everyone_sleeping
-        state: 'off'
-      - condition: template
-        value_template: '{% set I = states(''sensor.home_current_humidity'') | float(0)
-          %}  {% set O = states(''sensor.home_outside_current_humidity'') | float(0)
-          %} {% set B = states(''sensor.bathroom_current_humidity'') | float(0) %}
-          {{ I >= 55 or (I >= 42 and (I - O) >= 8) or B >= I + 5 }}
-
-          '
+        entity_id: sensor.storage_ventilation_desired_level
+        state: '3'
       sequence:
       - action: climate.set_fan_mode
         data:
@@ -8724,17 +8768,8 @@
           entity_id: select.storage_ventilation_system_fan_level
     - conditions:
       - condition: state
-        entity_id: binary_sensor.someone_home
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.everyone_sleeping
-        state: 'off'
-      - condition: template
-        value_template: '{% set I = states(''sensor.home_current_humidity'') | float(0)
-          %} {% set O = states(''sensor.home_outside_current_humidity'') | float(0)
-          %} {{ I >= 50 or (I >= 36 and (I - O) >= 6) }}
-
-          '
+        entity_id: sensor.storage_ventilation_desired_level
+        state: '2'
       sequence:
       - action: climate.set_fan_mode
         data:
@@ -8746,21 +8781,10 @@
           option: '2'
         target:
           entity_id: select.storage_ventilation_system_fan_level
-    default:
-    - action: climate.set_fan_mode
-      data:
-        fan_mode: low
-      target:
-        entity_id: climate.storage_ventilation_system_ventilation
-    - action: select.select_option
-      data:
-        option: '1'
-      target:
-        entity_id: select.storage_ventilation_system_fan_level
   mode: queued
   max: 10
   trace:
-    stored_traces: 100
+    stored_traces: 50
 - id: '1769101770558'
   alias: Soveværelse dør
   description: Automatik til at styre timer til soveværelse dør
@@ -9857,7 +9881,7 @@
       - action: timer.start
         metadata: {}
         data:
-          duration: 00:03:00
+          duration: 00:02:00
         target:
           entity_id: timer.utility_room_motion_sensor_timer
   mode: queued
@@ -11732,3 +11756,125 @@
           entity_id: todo.home_smart_todo
           is_active: '{{ devices[repeat.index - 1].batteryState != ''NORMAL'' }}'
   mode: restart
+- id: '1770917834825'
+  alias: Drivhus todo temperatur
+  description: Overvåg temperaturen i drivhuset
+  triggers:
+  - trigger: numeric_state
+    entity_id: sensor.greenhouse_current_temperature
+    below: 0
+  conditions: []
+  actions:
+  - action: script.create_todo_task
+    data:
+      subject: Tænd varmen i drivhuset
+      description: '"Temperaturen i drivhuset er {{ states(''sensor.greenhouse_current_temperature'')
+        }}, tænd for varme blæseren."'
+      entity_id: todo.todo_smart_todo
+      related_entity_id: sensor.greenhouse_current_temperature
+      is_active: '{{ states(''sensor.greenhouse_current_temperature'') | float(10.0)
+        < 0.0 }}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
+- id: '1770918254782'
+  alias: Garage todo temperatur
+  description: Overvåg temperaturen i garagen
+  triggers:
+  - trigger: numeric_state
+    entity_id: sensor.garage_current_temperature
+    below: 0
+    for:
+      hours: 12
+  conditions: []
+  actions:
+  - action: script.create_todo_task
+    data:
+      subject: Der er frost i garagen
+      description: '"Temperaturen i garagen er {{ states(''sensor.garage_current_temperature'')
+        }}, og der har været frost i 12 timer, overvej om sodavand eller andet skal
+        ind."'
+      entity_id: todo.todo_smart_todo
+      related_entity_id: sensor.garage_current_temperature
+      is_active: '{{ states(''sensor.garage_current_temperature'') | float(10.0) <
+        0.0 }}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
+- id: '1770918500447'
+  alias: Garage todo temperatur
+  description: Overvåg temperaturen i garagen
+  triggers:
+  - trigger: numeric_state
+    entity_id: sensor.technic_room_current_temperature
+    below: 10
+  - trigger: numeric_state
+    entity_id: sensor.technic_room_current_temperature
+    above: 30
+  conditions: []
+  actions:
+  - action: script.create_todo_task
+    data:
+      subject: Der er {% if states('sensor.technic_room_current_temperature') | float
+        <= 20 -%} koldt {%- else -%} varmt {%- endif %} i teknik rummet
+      description: Temperaturen i teknik rummet er  {{ states('sensor.technic_room_current_temperature')
+        }} °C, kontroller om døren er lukket eller der er et andet problem.
+      entity_id: todo.todo_smart_todo
+      related_entity_id: sensor.technic_room_current_temperature
+      is_active: '{{ not (10.0 <= states(''sensor.technic_room_current_temperature'')
+        | float(10.0) <= 30.0) }}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
+- id: '1770922045690'
+  alias: Hjem overvåg automation triggers
+  description: Overvåg automations som trigger for meget inden for 24 timer
+  triggers:
+  - at: '16:00:00'
+    trigger: time
+  conditions: []
+  actions:
+  - action: sql.query
+    data:
+      query: "SELECT\n  json_extract(ed.shared_data, '$.entity_id') AS automation_id,\n
+        \ COUNT(*) AS trigger_count\nFROM events e\nJOIN event_types et\n  ON e.event_type_id
+        = et.event_type_id\nJOIN event_data ed\n  ON e.data_id = ed.data_id\nWHERE
+        et.event_type = 'automation_triggered'\n  AND e.time_fired_ts > strftime('%s','now','-24
+        hours')\nGROUP BY automation_id\nORDER BY trigger_count DESC;\n"
+    response_variable: sql_result
+  - variables:
+      default_limit: 200
+      custom_limits:
+        automation.utility_room_motion_sensor: 500
+        automation.utility_room_heating: 300
+      offenders: "{% set res = sql_result.result if sql_result is defined else []
+        %}  {% set ns = namespace(offenders=[]) %} {% for row in res %}\n  {% set
+        automation_id = row.automation_id %}\n  {% set count = row.trigger_count |
+        int %}\n  {% set limit = custom_limits.get(automation_id, default_limit) |
+        int %}\n  {% if count > limit %}\n    {% set ns.offenders = ns.offenders +
+        [dict(row, limit=limit)] %}\n  {% endif %}\n{% endfor %} {{ ns.offenders }}\n"
+      message: "count: {{ offenders | count }} automations: {% for row in offenders
+        %}\n  - automation_id: \"{{ row.automation_id }}\"\n    trigger_count: {{
+        row.trigger_count }}\n    limit: {{ row.limit }}\n{% endfor %}"
+  - if:
+    - condition: template
+      value_template: '{{ offenders | length > 0 }}'
+    then:
+    - action: system_log.write
+      data:
+        level: warning
+        message: 'Automations over trigger limit: {{ message }}'
+    - action: script.push_notification
+      data:
+        type: warning
+        recipient: anders
+        persistent: true
+        id: home_assistant_monitor_automation_trigger_spam
+        title: '{{ offenders | length }} automations trigger for meget (24 timer)'
+        message: '{{ message }}'
+  mode: single
+  trace:
+    stored_traces: 50
