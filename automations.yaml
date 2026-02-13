@@ -12268,13 +12268,13 @@
         id: utility_room_sink_water_leak
         persistent: false
         recipient: home
-        message: Vand lækage sensoren der ligger underkabet med vaskeni bryggerst
+        message: Vand lækage sensoren der ligger under skabet med vasken i bryggerst
           har registret vand.
   - action: script.create_todo_task
     data:
       subject: Vand på gulvet under bryggersvasken
       entity_id: todo.todo_smart_todo
-      description: Vand lækage sensoren der ligger underkabet med vaskeni bryggerst
+      description: Vand lækage sensoren der ligger under skabet med vasken i bryggerst
         har registret vand.
       related_entity_id: binary_sensor.utility_room_sink_water_leak_sensor
       is_active: '{{ is_state(''binary_sensor.utility_room_sink_water_leak_sensor'',
@@ -12289,13 +12289,13 @@
     der opstår lækage
   triggers:
   - trigger: state
-    entity_id: binary_sensor.utility_room_sink_water_leak_sensor
+    entity_id: binary_sensor.kitchen_sink_water_leak_sensor
     to: 'on'
     for:
       seconds: 30
     id: leak
   - trigger: state
-    entity_id: binary_sensor.utility_room_sink_water_leak_sensor
+    entity_id: binary_sensor.kitchen_sink_water_leak_sensor
     to: 'off'
     for:
       seconds: 30
@@ -12311,20 +12311,20 @@
       data:
         type: warning
         title: Advarsel
-        id: utility_room_sink_water_leak
+        id: kitchen_sink_water_leak
         persistent: false
         recipient: home
-        message: Vand lækage sensoren der ligger underkabet med vaskeni bryggerst
-          har registret vand.
+        message: Vand lækage sensoren der ligger under opvaskemaskinen ved vasken
+          i køkkenet har registret vand.
   - action: script.create_todo_task
     data:
-      subject: Vand på gulvet under bryggersvasken
+      subject: Vand på gulvet under køkkenvasken
       entity_id: todo.todo_smart_todo
-      description: Vand lækage sensoren der ligger underkabet med vaskeni bryggerst
-        har registret vand.
-      related_entity_id: binary_sensor.utility_room_sink_water_leak_sensor
-      is_active: '{{ is_state(''binary_sensor.utility_room_sink_water_leak_sensor'',
-        ''on'') }}'
+      description: Vand lækage sensoren der ligger under opvaskemaskinen ved vasken
+        i køkkenet har registret vand.
+      related_entity_id: binary_sensor.kitchen_sink_water_leak_sensor
+      is_active: '{{ is_state(''binary_sensor.kitchen_sink_water_leak_sensor'', ''on'')
+        }}'
   mode: queued
   max: 10
   trace:
