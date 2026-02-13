@@ -1113,6 +1113,7 @@ create_todo_task:
   - variables:
       todo_entity_id: '{{ related_entity_id | default(none) }}'
       active: '{{ is_active | default(true) | bool }}'
+      must_replace: '{{ must_replace | default(false) | bool }}'
       existing: "{% set todos = state_attr(entity_id, 'all_todos') | default([]) |
         rejectattr('status', 'equalto', 'completed') | list %} {% if todo_entity_id
         is not none %}\n  {{ todos\n     | selectattr('description', 'contains', todo_entity_id
@@ -1358,11 +1359,11 @@ create_todo_battery_task:
         %}\n    {{ n }}\n  {% else %}\n    {% set n = device_attr(i, 'name') %}\n
         \   {% if n %}\n      {{ n }}\n    {% else %}\n      {{ entity_id }}\n    {%
         endif %}\n  {% endif %}\n{% endif %}"
-      _area: "{% if area %}\n  {{ area }}\n{% else %}\n  {% set n = area_name(entity_id)
-        %}\n  {% if n %}\n    {{ n }}\n  {% else %}\n    {{ '' }}\n  {% endif %}\n{%
-        endif %}"
-      _location: "{% if location %}\n  {{ location }}\n{% else %}\n  {{ '' }}\n{%
-        endif %}"
+      _area: "{% if area is defined and area %}\n  {{ area }}\n{% else %}\n  {% set
+        n = area_name(entity_id) %}\n  {% if n %}\n    {{ n }}\n  {% else %}\n    {{
+        '' }}\n  {% endif %}\n{% endif %}"
+      _location: "{% if location is defined and location %}\n  {{ location }}\n{%
+        else %}\n  {{ '' }}\n{% endif %}"
       _type: "{% if type %}\n  {{ type }}\n{% else %}\n  {% if type_entity_id %}\n
         \   {% set t = states(type_entity_id) %}\n    {% if t not in ['unknown','unavailable','none']
         %}\n      {{ t }}\n    {% else %}\n      {{ '' }}\n    {% endif %}\n  {% else
@@ -1393,10 +1394,11 @@ create_todo_battery_task:
 
         Threshold: {{ _threshold }}
 
-        Temperature: {{ temperature }}'
+        Temperature: {{ temperature | default(''Ukendt'') }}'
   - if:
     - condition: template
-      value_template: '{{ _level >= 0 and temperature | float(20.0) > 1.0 }}'
+      value_template: '{{ _level >= 0 and (temperature | default(20.0) | float) >
+        1.0 }}'
     then:
     - action: script.create_todo_task
       data:

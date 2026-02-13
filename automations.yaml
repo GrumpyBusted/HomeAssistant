@@ -375,7 +375,7 @@
   triggers:
   - trigger: state
     entity_id:
-    - sensor.driveway_ev_charger_status_description
+    - sensor.driveway_ev_charger_status_description_safe
     to: Locked, car connected
   - trigger: state
     entity_id:
@@ -397,7 +397,7 @@
     - connected
   conditions:
   - condition: state
-    entity_id: sensor.driveway_ev_charger_status_description
+    entity_id: sensor.driveway_ev_charger_status_description_safe
     state: Locked, car connected
   actions:
   - if:
@@ -2045,21 +2045,25 @@
   - trigger: state
     entity_id:
     - binary_sensor.parent_home
-    from: 'on'
     to: 'off'
-    id: parents_left_home
+    id: parents_leave
+  - trigger: state
+    entity_id:
+    - input_boolean.house_sitter
+    to: 'off'
+    id: house_sitter_leave
   - trigger: state
     entity_id:
     - binary_sensor.bedroom_presence
     from: 'on'
     to: 'off'
-    id: bedroom_empty
+    id: cleared
   - trigger: state
     entity_id:
     - binary_sensor.bedroom_presence
     from: 'off'
     to: 'on'
-    id: motion
+    id: detected
   - trigger: state
     entity_id:
     - sensor.anders_iphone_battery_state
@@ -2072,9 +2076,17 @@
   - trigger: state
     entity_id:
     - timer.bedroom_light_sunrise_delay_timer
-    to: idle
     from: active
+    to: idle
     id: sunrise_script
+  - trigger: numeric_state
+    entity_id: input_number.bedroom_blind_position
+    below: 1
+    id: blind_closed
+  - trigger: numeric_state
+    entity_id: input_number.bedroom_blind_position
+    above: 1
+    id: blind_opened
   - trigger: state
     entity_id:
     - binary_sensor.bedroom_light
@@ -2087,17 +2099,22 @@
     id: lights_on
   conditions: []
   actions:
+  - if:
+    - condition: state
+      entity_id: timer.bedroom_light_sunrise_delay_timer
+      state: active
+    then:
+    - action: timer.cancel
+      metadata: {}
+      data: {}
+      target:
+        entity_id: timer.bedroom_light_sunrise_delay_timer
   - choose:
     - conditions:
       - condition: trigger
         id:
         - button_1
       sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
       - action: light.turn_on
         metadata: {}
         data:
@@ -2118,11 +2135,6 @@
         id:
         - button_3
       sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
       - action: script.bedroom_light_sunset
         data:
           transition: 180
@@ -2133,11 +2145,6 @@
         id:
         - button_4
       sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
       - action: light.turn_off
         metadata: {}
         data:
@@ -2148,126 +2155,31 @@
     - conditions:
       - condition: trigger
         id:
-        - parents_left_home
-      - condition: state
-        entity_id: input_boolean.house_sitter
-        state: 'off'
-      sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 1
-        target:
-          entity_id:
-          - light.bedroom_lights
-    - conditions:
-      - condition: trigger
-        id:
-        - bedroom_empty
+        - detected
+        - blind_opened
       - condition: numeric_state
-        entity_id: light.bedroom_lights
-        attribute: brightness
-        below: 51
-      - condition: state
         entity_id: input_number.bedroom_blind_position
-        state: '0'
-      - condition: state
-        entity_id: binary_sensor.bedroom_door
-        state: 'on'
-      sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
-    - conditions:
-      - condition: trigger
-        id:
-        - bedroom_empty
-      sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 1
-        target:
-          entity_id:
-          - light.bedroom_lights
-    - conditions:
-      - condition: trigger
-        id:
-        - motion
-      - condition: state
-        entity_id: binary_sensor.bedroom_blind
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.monique_home
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.monique_sleep_window
-        state: 'on'
-      sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
-      - action: light.turn_on
-        metadata: {}
-        data:
-          transition: 1
-          color_temp_kelvin: 2700
-          brightness_pct: 80
-        target:
-          entity_id: light.bedroom_lights
-      - action: script.bedroom_light_sunset
-        data:
-          transition: 180
-          brightness_from: 200
-          brightness_to: 50
-    - conditions:
-      - condition: trigger
-        id:
-        - motion
-      - condition: state
-        entity_id: binary_sensor.bedroom_blind
-        state: 'on'
-      sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
-      - action: light.turn_on
-        metadata: {}
-        data:
-          transition: 1
-          color_temp_kelvin: 2700
-          brightness_pct: 80
-        target:
-          entity_id: light.bedroom_lights
-    - conditions:
-      - condition: trigger
-        id:
-        - lights_on
+        above: 1
       - condition: state
         entity_id: binary_sensor.bedroom_presence
-        state: 'off'
+        state: 'on'
       sequence:
-      - action: timer.cancel
+      - action: light.turn_on
         metadata: {}
-        data: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2700
+          brightness_pct: 80
         target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
+          entity_id: light.bedroom_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - cleared
+      - condition: numeric_state
+        entity_id: input_number.bedroom_blind_position
+        above: 1
+      sequence:
       - action: light.turn_off
         metadata: {}
         data:
@@ -2298,6 +2210,56 @@
     - conditions:
       - condition: trigger
         id:
+        - parents_leave
+        - house_sitter_leave
+      - condition: state
+        entity_id: binary_sensor.parent_home
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.house_sitter
+        state: 'off'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.bedroom_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - lights_on
+      - condition: state
+        entity_id: binary_sensor.parent_home
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.house_sitter
+        state: 'off'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.bedroom_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - blind_closed
+      - condition: state
+        entity_id: binary_sensor.bedroom_light
+        state: 'on'
+      sequence:
+      - action: script.bedroom_light_sunset
+        data:
+          transition: 180
+          brightness_from: 200
+          brightness_to: 50
+    - conditions:
+      - condition: trigger
+        id:
         - charging
       - condition: or
         conditions:
@@ -2312,33 +2274,18 @@
         - condition: state
           entity_id: binary_sensor.anders_home
           state: 'off'
-        - condition: and
-          conditions:
-          - condition: state
-            entity_id: binary_sensor.anders_home
-            state: 'on'
-          - condition: state
-            entity_id: sensor.anders_iphone_battery_state
-            state: Charging
+        - condition: state
+          entity_id: sensor.anders_iphone_battery_state
+          state: Charging
       - condition: or
         conditions:
         - condition: state
           entity_id: binary_sensor.monique_home
           state: 'off'
-        - condition: and
-          conditions:
-          - condition: state
-            entity_id: binary_sensor.monique_home
-            state: 'on'
-          - condition: state
-            entity_id: sensor.monique_iphone_battery_state
-            state: Charging
+        - condition: state
+          entity_id: sensor.monique_iphone_battery_state
+          state: Charging
       sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
       - action: light.turn_off
         metadata: {}
         data:
@@ -4262,6 +4209,11 @@
   actions:
   - variables:
       mode: 'off'
+      silent_period: '{% set w = as_local(states(''input_datetime.monique_wake_up_alarm'')
+        | as_datetime) %} {% set s = w - timedelta(hours=1) %} {% set n = now() %}
+        {{ s < n < w }}
+
+        '
   - choose:
     - conditions:
       - condition: state
@@ -4270,10 +4222,6 @@
       - condition: state
         entity_id: input_boolean.house_sitter
         state: 'off'
-      sequence: []
-    - conditions:
-      - condition: trigger
-        id: timeout
       sequence: []
     - conditions:
       - condition: trigger
@@ -4302,25 +4250,29 @@
         target:
           entity_id: timer.bedroom_air_purifier_timer
     - conditions:
+      - condition: trigger
+        id: timeout
+      sequence:
+      - variables:
+          mode: 'off'
+    - conditions:
       - condition: template
         value_template: '{{ states("sensor.bedroom_current_temperature")|float(21)
           < states("sensor.bedroom_target_temperature")|float(21) - 1 }}'
       - condition: state
         entity_id: binary_sensor.bedroom_window_sensor_door
         state: 'off'
-      - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'off'
+      - condition: template
+        value_template: '{{ not silent_period }}'
       sequence:
       - variables:
           mode: heat
     - conditions:
       - condition: template
         value_template: '{{ states("sensor.bedroom_current_temperature")|float(21)
-          > max(25, states("sensor.bedroom_target_temperature")|float(21) + 3) }}'
-      - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'off'
+          > 23 }}'
+      - condition: template
+        value_template: '{{ not silent_period }}'
       sequence:
       - variables:
           mode: cool
@@ -4331,10 +4283,9 @@
       - condition: state
         entity_id: binary_sensor.bedroom_window_sensor_door
         state: 'off'
-      - condition: numeric_state
-        entity_id: cover.bedroom_blind
-        attribute: current_position
-        above: 59
+      - condition: state
+        entity_id: binary_sensor.bedroom_sleeping
+        state: 'off'
       sequence:
       - variables:
           mode: filter
@@ -5023,6 +4974,9 @@
     - sensor.charlies_room_smoke_alarm_battery
     - sensor.emils_room_smoke_alarm_battery
     - sensor.bedroom_smoke_alarm_battery
+    - sensor.garage_smoke_alarm_battery
+    - sensor.storage_smoke_alarm_battery
+    - sensor.technic_room_smoke_alarm_battery
     below: 10
     for:
       minutes: 3
@@ -5031,6 +4985,9 @@
     - sensor.charlies_room_smoke_alarm_battery
     - sensor.emils_room_smoke_alarm_battery
     - sensor.bedroom_smoke_alarm_battery
+    - sensor.garage_smoke_alarm_battery
+    - sensor.storage_smoke_alarm_battery
+    - sensor.technic_room_smoke_alarm_battery
     above: 70
     for:
       minutes: 3
@@ -5043,6 +5000,9 @@
       - entity_id: sensor.charlies_room_smoke_alarm_battery
       - entity_id: sensor.emils_room_smoke_alarm_battery
       - entity_id: sensor.bedroom_smoke_alarm_battery
+      - entity_id: sensor.garage_smoke_alarm_battery
+      - entity_id: sensor.storage_smoke_alarm_battery
+      - entity_id: sensor.technic_room_smoke_alarm_battery
   - repeat:
       for_each: '{{ sensors }}'
       sequence:
@@ -8820,7 +8780,7 @@
         target:
           entity_id: timer.bedroom_door_timer
         data:
-          duration: 00:03:00
+          duration: 00:02:00
   mode: queued
   max: 10
   trace:
@@ -10351,14 +10311,12 @@
     subtype: close
     id: close_short_pressed
   - trigger: state
-    entity_id:
-    - event.bedroom_switch_button_2
+    entity_id: event.bedroom_switch_button_2
     attribute: event_type
     to: initial_press
     id: button_2
   - trigger: state
-    entity_id:
-    - event.bedroom_switch_button_3
+    entity_id: event.bedroom_switch_button_3
     attribute: event_type
     to: initial_press
     id: button_3
@@ -10366,100 +10324,63 @@
     at: input_datetime.monique_wake_up_alarm
     id: wake_up
   - trigger: state
-    entity_id:
-    - timer.bedroom_blind_timer
+    entity_id: timer.bedroom_blind_timer
+    from: active
     to: idle
     id: wake_up_delay
   - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_presence
-    from: 'on'
-    to: 'off'
-    id: bedroom_empty
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_presence
-    from: 'off'
+    entity_id: binary_sensor.monique_sleep_window
     to: 'on'
-    id: motion
+    id: bedtime
   - trigger: state
-    entity_id:
-    - binary_sensor.parent_home
-    from: 'off'
-    to: 'on'
-    id: parent_home
-  - trigger: state
-    entity_id:
-    - binary_sensor.parent_home
-    from: 'on'
-    to: 'off'
-    id: parent_left
-  - trigger: state
-    entity_id: binary_sensor.home_outside_light
-    from: 'on'
-    to: 'off'
-    id: dark_outside
-  - trigger: state
-    entity_id:
-    - binary_sensor.home_outside_light
-    from: 'off'
-    to: 'on'
-    id: light_outside
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_light
-    from: 'on'
-    to: 'off'
-    id: light_off
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_light
-    from: 'off'
+    entity_id: binary_sensor.bedroom_light
     to: 'on'
     id: light_on
   - trigger: state
-    entity_id: sensor.monique_iphone_battery_state
-    to: Charging
-    id: charging
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_sun_overheat
+    entity_id: binary_sensor.parent_home
     to: 'on'
-    id: sunny_overheat_on
+    id: parent_home
   - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_sun_overheat
+    entity_id: binary_sensor.parent_home
     to: 'off'
-    id: sunny_overheat_off
+    id: parent_leave
   - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_window
-    from: 'on'
+    entity_id: binary_sensor.home_outside_light
     to: 'off'
-    id: window_closed
+    id: dark_outside
   - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_window
-    from: 'off'
+    entity_id: binary_sensor.home_outside_light
     to: 'on'
-    id: window_opened
+    id: light_outside
+  - trigger: state
+    entity_id: binary_sensor.bedroom_sun_overheat
+    to: 'on'
+  - trigger: state
+    entity_id: binary_sensor.bedroom_sun_overheat
+    to: 'off'
+  - trigger: state
+    entity_id: binary_sensor.bedroom_window
+    to: 'off'
+  - trigger: state
+    entity_id: binary_sensor.bedroom_window
+    to: 'on'
   - trigger: state
     entity_id: fan.bedroom_air_purifier_fan
     to: 'off'
-    id: air_purifier_off
   - trigger: state
     entity_id: fan.bedroom_air_purifier_fan
     to: 'on'
-    id: air_purifier_on
   conditions: []
   actions:
+  - action: timer.pause
+    target:
+      entity_id: timer.bedroom_blind_timer
   - choose:
     - conditions:
       - condition: trigger
         id:
         - open_short_pressed
         - button_2
-        - wake_up_delay
       sequence:
       - action: input_number.set_value
         target:
@@ -10481,15 +10402,10 @@
       - condition: state
         entity_id: binary_sensor.house_sitter_home
         state: 'on'
+      - condition: state
+        entity_id: binary_sensor.parent_home
+        state: 'off'
       sequence: []
-    - conditions:
-      - condition: trigger
-        id:
-        - light_off
-      sequence:
-      - action: timer.cancel
-        target:
-          entity_id: timer.bedroom_blind_timer
     - conditions:
       - condition: trigger
         id:
@@ -10499,37 +10415,14 @@
         state: 'on'
       sequence:
       - action: timer.start
-        metadata: {}
         data:
-          duration: 00:03:00
+          duration: 00:05:00
         target:
           entity_id: timer.bedroom_blind_timer
     - conditions:
       - condition: trigger
         id:
-        - motion
-      - condition: state
-        entity_id: binary_sensor.monique_home
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.monique_sleep_window
-        state: 'on'
-      sequence:
-      - action: input_number.set_value
-        target:
-          entity_id: input_number.bedroom_blind_position
-        data:
-          value: 0
-    - conditions:
-      - condition: trigger
-        id:
-        - bedroom_empty
-      - condition: state
-        entity_id: binary_sensor.monique_home
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.monique_sleep_window
-        state: 'off'
+        - wake_up_delay
       sequence:
       - action: input_number.set_value
         target:
@@ -10539,25 +10432,12 @@
     - conditions:
       - condition: trigger
         id:
-        - bedroom_empty
-      - condition: state
-        entity_id: binary_sensor.monique_home
-        state: 'off'
-      sequence:
-      - action: input_number.set_value
-        target:
-          entity_id: input_number.bedroom_blind_position
-        data:
-          value: 100
-    - conditions:
-      - condition: trigger
-        id:
-        - charging
+        - bedtime
       - condition: state
         entity_id: binary_sensor.monique_home
         state: 'on'
       - condition: state
-        entity_id: binary_sensor.monique_sleep_window
+        entity_id: binary_sensor.bedroom_light
         state: 'on'
       sequence:
       - action: input_number.set_value
@@ -10574,26 +10454,13 @@
         state: 'on'
       - condition: state
         entity_id: binary_sensor.monique_sleep_window
-        state: 'off'
+        state: 'on'
       sequence:
       - action: input_number.set_value
         target:
           entity_id: input_number.bedroom_blind_position
         data:
-          value: 100
-    - conditions:
-      - condition: trigger
-        id:
-        - light_on
-      - condition: state
-        entity_id: binary_sensor.monique_home
-        state: 'off'
-      sequence:
-      - action: input_number.set_value
-        target:
-          entity_id: input_number.bedroom_blind_position
-        data:
-          value: 100
+          value: 0
     - conditions:
       - condition: trigger
         id:
@@ -10608,7 +10475,7 @@
       - condition: trigger
         id:
         - dark_outside
-        - parent_left
+        - parent_leave
       - condition: state
         entity_id: binary_sensor.parent_home
         state: 'off'
@@ -10625,7 +10492,7 @@
       - condition: trigger
         id:
         - light_outside
-        - parent_left
+        - parent_leave
       - condition: state
         entity_id: binary_sensor.parent_home
         state: 'off'
@@ -10640,57 +10507,56 @@
           value: 100
   - variables:
       position: '{{ states(''input_number.bedroom_blind_position'') }}'
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ state_attr(''cover.bedroom_blind'', ''current_position'')
-          <= 20 }}'
-      - condition: template
-        value_template: '{{ trigger.id == ''close_short_pressed'' }}
-
-          '
-      sequence: []
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.bedroom_window
-        state: 'on'
-      sequence:
-      - variables:
-          position: '{{ [position | int, 20] | max }}'
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ state_attr(''cover.bedroom_blind'', ''current_position'')
-          >= 50 }}'
-      - condition: template
-        value_template: '{{ trigger.id == ''open_short_pressed'' }}
-
-          '
-      sequence: []
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.bedroom_sun_overheat
-        state: 'on'
-      sequence:
-      - variables:
-          position: '{{ [position | int, 50] | min }}'
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ state_attr(''cover.bedroom_blind'', ''current_position'')
-          <= 60 }}'
-      - condition: template
-        value_template: '{{ trigger.id == ''close_short_pressed'' }}
-
-          '
-      sequence: []
-    - conditions:
-      - condition: state
-        entity_id: fan.bedroom_air_purifier_fan
-        state: 'on'
-      sequence:
-      - variables:
-          position: '{{ [position | int, 60] | max }}'
+  - if:
+    - condition: state
+      entity_id: binary_sensor.bedroom_window
+      state: 'on'
+    - condition: not
+      conditions:
+      - condition: trigger
+        id:
+        - close_short_pressed
+        - button_3
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        below: 21
+    then:
+    - variables:
+        position: '{{ [position | int, 20] | max }}'
+  - if:
+    - condition: state
+      entity_id: binary_sensor.bedroom_sun_overheat
+      state: 'on'
+    - condition: not
+      conditions:
+      - condition: trigger
+        id:
+        - open_short_pressed
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        above: 49
+    then:
+    - variables:
+        position: '{{ [position | int, 50] | min }}'
+  - if:
+    - condition: state
+      entity_id: fan.bedroom_air_purifier_fan
+      state: 'on'
+    - condition: not
+      conditions:
+      - condition: trigger
+        id:
+        - close_short_pressed
+        - button_3
+      - condition: numeric_state
+        entity_id: cover.bedroom_blind
+        attribute: current_position
+        below: 61
+    then:
+    - variables:
+        position: '{{ [position | int, 60] | max }}'
   - action: system_log.write
     data:
       level: debug
@@ -10735,18 +10601,10 @@
           position: '{{ position }}'
         target:
           entity_id: cover.bedroom_blind
-  - action: system_log.write
-    data:
-      level: debug
-      message: '{{ now() }}'
   - wait_template: '{{ states(''cover.bedroom_blind'') not in [''opening'', ''closing'']
       }}'
     timeout: 00:00:30
     continue_on_timeout: true
-  - action: system_log.write
-    data:
-      level: debug
-      message: '{{ now() }}'
   mode: queued
   max: 10
   trace:
@@ -11451,13 +11309,13 @@
   description: Disable entities på billader
   triggers:
   - trigger: state
-    entity_id: sensor.driveway_ev_charger_status_description
+    entity_id: sensor.driveway_ev_charger_status_description_safe
   conditions: []
   actions:
   - choose:
     - conditions:
       - condition: state
-        entity_id: sensor.driveway_ev_charger_status_description
+        entity_id: sensor.driveway_ev_charger_status_description_safe
         state:
         - Locked
         - Locked, car connected
@@ -11475,7 +11333,7 @@
         - switch.driveway_ev_charger_pause
   mode: single
   trace:
-    stored_traces: 10
+    stored_traces: 100
 - id: '1770507087346'
   alias: Køkken opvaskemaskine
   description: Disable entities på opvaskemaskine
