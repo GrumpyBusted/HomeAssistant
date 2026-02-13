@@ -1255,7 +1255,7 @@
     to: 'off'
     id: person_cleared
   - trigger: state
-    entity_id: binary_sensor.hallway_presence
+    entity_id: binary_sensor.hallway_presence_sensor_occupancy
     to: 'on'
     id: person_detected
   - trigger: state
@@ -1264,6 +1264,11 @@
     to: 'on'
     id: bedroom_sleeping
   - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_sleeping
+    to: 'off'
+    id: bedroom_waking
+  - trigger: state
     entity_id: binary_sensor.bedroom_door
     to: 'on'
     id: bedroom_door_opened
@@ -1271,11 +1276,6 @@
     entity_id: binary_sensor.bedroom_door
     to: 'off'
     id: bedroom_door_closed
-  - trigger: state
-    entity_id:
-    - light.bedroom_lights
-    attribute: brightness
-    id: bedroom_light_changes
   - trigger: state
     entity_id: binary_sensor.hallway_light
     from: 'off'
@@ -1287,6 +1287,198 @@
     id: lights_on
   conditions: []
   actions:
+  - variables:
+      brightness: '{{ (state_attr(''light.hallway_lights'', ''brightness'') | int(0)
+        / 255 * 100) | int(0) }}'
+      kelvin: '{{ state_attr(''light.hallway_lights'', ''color_temp_kelvin'') | int(0)
+        }}'
+      lights:
+      - light.hallway_lights
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1_short
+        - button_1_long
+        - button_2
+        - button_3
+        - button_4
+      sequence: []
+    - conditions:
+      - condition: trigger
+        id:
+        - no_one_home
+      sequence:
+      - variables:
+          brightness: 0
+    - conditions:
+      - condition: trigger
+        id:
+        - lights_on
+      - condition: state
+        entity_id: binary_sensor.someone_home
+        state: 'off'
+      sequence:
+      - variables:
+          brightness: 0
+    - conditions:
+      - condition: trigger
+        id:
+        - someone_home
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.bedroom_sleeping
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      sequence:
+      - variables:
+          brightness: 25
+          lights:
+          - light.hallway_light_bathroom
+          - light.hallway_light_toilet
+    - conditions:
+      - condition: trigger
+        id:
+        - someone_home
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      sequence:
+      - variables:
+          brightness: 75
+          kelvin: 2700
+    - conditions:
+      - condition: trigger
+        id:
+        - bedroom_door_opened
+      - condition: state
+        entity_id: binary_sensor.bedroom_sleeping
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'on'
+      sequence:
+      - variables:
+          brightness: 0
+    - conditions:
+      - condition: trigger
+        id:
+        - bedroom_door_closed
+      - condition: state
+        entity_id: binary_sensor.hallway_presence
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.bedroom_sleeping
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      sequence:
+      - variables:
+          brightness: 25
+          kelvin: 2700
+    - conditions:
+      - condition: trigger
+        id:
+        - bedroom_door_closed
+      - condition: state
+        entity_id: binary_sensor.hallway_presence
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      sequence:
+      - variables:
+          brightness: 75
+          kelvin: 2700
+    - conditions:
+      - condition: trigger
+        id:
+        - bedroom_sleeping
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'on'
+      sequence:
+      - variables:
+          brightness: 0
+    - conditions:
+      - condition: trigger
+        id:
+        - bedroom_waking
+      - condition: state
+        entity_id: binary_sensor.hallway_presence
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      sequence:
+      - variables:
+          brightness: 75
+          kelvin: 2700
+    - conditions:
+      - condition: trigger
+        id:
+        - person_detected
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.bedroom_sleeping
+        state: 'on'
+      sequence:
+      - variables:
+          brightness: 0
+    - conditions:
+      - condition: trigger
+        id:
+        - person_detected
+      - condition: state
+        entity_id: binary_sensor.bedroom_door
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.bedroom_sleeping
+        state: 'on'
+      sequence:
+      - variables:
+          brightness: 25
+          kelvin: 2700
+    - conditions:
+      - condition: trigger
+        id:
+        - person_detected
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.someone_home
+        state: 'on'
+      sequence:
+      - variables:
+          brightness: 75
+          kelvin: 2700
+    - conditions:
+      - condition: trigger
+        id:
+        - person_cleared
+      - condition: state
+        entity_id: binary_sensor.hallway_light
+        state: 'on'
+      sequence:
+      - variables:
+          brightness: 0
   - choose:
     - conditions:
       - condition: trigger
@@ -1294,7 +1486,6 @@
         - button_1_short
       sequence:
       - action: light.turn_on
-        metadata: {}
         data:
           transition: 1
           color_temp_kelvin: 2700
@@ -1308,7 +1499,6 @@
         - button_1_long
       sequence:
       - action: light.turn_on
-        metadata: {}
         data:
           transition: 1
           color_temp_kelvin: 3000
@@ -1322,7 +1512,6 @@
         - button_2
       sequence:
       - action: light.turn_on
-        metadata: {}
         data:
           transition: 0.5
           brightness_step_pct: 10
@@ -1335,7 +1524,6 @@
         - button_3
       sequence:
       - action: light.turn_on
-        metadata: {}
         data:
           transition: 0.5
           brightness_step_pct: -10
@@ -1346,7 +1534,6 @@
       - condition: trigger
         id:
         - button_4
-        - no_one_home
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -1356,234 +1543,38 @@
           entity_id:
           - light.hallway_lights
     - conditions:
-      - condition: trigger
-        id:
-        - lights_on
-      - condition: state
-        entity_id: binary_sensor.someone_home
-        state: 'off'
-      sequence:
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 1
-        target:
-          entity_id:
-          - light.hallway_lights
-    - conditions:
-      - condition: trigger
-        id:
-        - someone_home
-      - condition: state
-        entity_id: binary_sensor.bedroom_door
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'off'
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          transition: 1
-          color_temp_kelvin: 2700
-          brightness_pct: 25
-        target:
-          entity_id:
-          - light.hallway_light_bathroom
-          - light.hallway_light_toilet
-    - conditions:
-      - condition: trigger
-        id:
-        - someone_home
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'off'
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          transition: 1
-          color_temp_kelvin: 2700
-          brightness_pct: 75
-        target:
-          entity_id:
-          - light.hallway_lights
-    - conditions:
-      - condition: trigger
-        id:
-        - bedroom_door_opened
-      - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'on'
-      sequence:
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 0
-        target:
-          entity_id:
-          - light.hallway_lights
-    - conditions:
-      - condition: trigger
-        id:
-        - bedroom_door_closed
-      - condition: state
-        entity_id: binary_sensor.hallway_presence
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'off'
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          transition: 1
-          color_temp_kelvin: 2700
-          brightness_pct: 25
-        target:
-          entity_id:
-          - light.hallway_lights
-    - conditions:
-      - condition: trigger
-        id:
-        - bedroom_door_closed
-      - condition: state
-        entity_id: binary_sensor.hallway_presence
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'off'
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          transition: 1
-          color_temp_kelvin: 2700
-          brightness_pct: 75
-        target:
-          entity_id:
-          - light.hallway_lights
-    - conditions:
-      - condition: trigger
-        id:
-        - bedroom_sleeping
-      - condition: state
-        entity_id: binary_sensor.bedroom_door
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'on'
-      sequence:
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 1
-        target:
-          entity_id:
-          - light.hallway_lights
-    - conditions:
-      - condition: trigger
-        id:
-        - person_detected
-      - condition: state
-        entity_id: binary_sensor.bedroom_door
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'on'
+      - condition: template
+        value_template: '{{ brightness == 0 }}'
       sequence:
       - action: light.turn_off
         data:
-          transition: 0
+          transition: 1
         target:
-          entity_id:
-          - light.hallway_lights
+          entity_id: '{{ lights }}'
     - conditions:
-      - condition: trigger
-        id:
-        - person_detected
       - condition: state
         entity_id: binary_sensor.bedroom_door
         state: 'off'
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'on'
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          transition: 1
-          color_temp_kelvin: 2700
-          brightness_pct: 25
-        target:
-          entity_id:
-          - light.hallway_lights
-    - conditions:
-      - condition: trigger
-        id:
-        - person_detected
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.someone_home
-        state: 'on'
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          transition: 1
-          color_temp_kelvin: 2700
-          brightness_pct: 75
-        target:
-          entity_id:
-          - light.hallway_lights
-    - conditions:
-      - condition: trigger
-        id:
-        - person_cleared
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'on'
-      sequence:
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 1
-        target:
-          entity_id:
-          - light.hallway_lights
-    - conditions:
-      - condition: trigger
-        id:
-        - bedroom_light_changes
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.bedroom_door
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.bedroom_light
-        state: 'on'
       sequence:
       - action: light.turn_on
         target:
-          entity_id: light.hallway_lights
+          entity_id: '{{ lights }}'
         data:
-          brightness: '{{ state_attr(''light.bedroom_lights'', ''brightness'') }}'
+          transition: 1
+          color_temp_kelvin: '{{ kelvin }}'
+          brightness_pct: '{{ brightness }}'
+    default:
+    - action: light.turn_on
+      target:
+        entity_id: '{{ lights }}'
+      data:
+        transition: 1
+        color_temp_kelvin: '{{ kelvin }}'
+        brightness_pct: '{% set bedroom = (state_attr(''light.bedroom_lights'', ''brightness'')
+          | int(0) / 255 * 100) | int %} {{ min(bedroom, brightness) if 0 < bedroom
+          < 75 else brightness }}
+
+          '
   mode: queued
   max: 10
   trace:
@@ -8253,8 +8244,18 @@
   triggers:
   - trigger: state
     entity_id: vacuum.living_room_robot_vacuum
+    to: docked
+  - trigger: state
+    entity_id: vacuum.living_room_robot_vacuum
+    to: docked
+    for:
+      seconds: 120
   - trigger: state
     entity_id: sensor.living_room_robot_vacuum_status
+    to:
+    - idle
+    - charging
+    - charging_complete
   - trigger: state
     entity_id: timer.living_room_robot_vacuum_timer
     to: idle
@@ -8272,6 +8273,11 @@
         - idle
         - charging
         - charging_complete
+      - condition: template
+        value_template: '{{ (now() - states.input_select.living_room_robot_vacuum_current_cleaning.last_updated).total_seconds()
+          > 60 }}
+
+          '
       sequence:
       - action: timer.cancel
         target:
@@ -8279,8 +8285,7 @@
       - action: script.living_room_robot_vacuum_set_current
         data:
           option: none
-          started_by:
-            '[object Object]':
+          started_by: '{{ this.entity_id }}'
     - conditions:
       - condition: trigger
         id: timeout
@@ -9199,15 +9204,15 @@
   triggers:
   - trigger: numeric_state
     entity_id:
-    - sensor.kitchen_water_leak_sensor_sink_battery
-    - sensor.utility_room_water_leak_sensor_sink_battery
+    - sensor.kitchen_sink_water_leak_sensor_battery
+    - sensor.utility_room_sink_water_leak_sensor_battery
     below: 10
     for:
       minutes: 3
   - trigger: numeric_state
     entity_id:
-    - sensor.kitchen_water_leak_sensor_sink_battery
-    - sensor.utility_room_water_leak_sensor_sink_battery
+    - sensor.kitchen_sink_water_leak_sensor_battery
+    - sensor.utility_room_sink_water_leak_sensor_battery
     above: 70
     for:
       minutes: 3
@@ -9217,9 +9222,9 @@
   actions:
   - variables:
       sensors:
-      - entity_id: sensor.kitchen_water_leak_sensor_sink_battery
+      - entity_id: sensor.kitchen_sink_water_leak_sensor_battery
         location: under opvaskemaskinen
-      - entity_id: sensor.utility_room_water_leak_sensor_sink_battery
+      - entity_id: sensor.utility_room_sink_water_leak_sensor_battery
         location: under skabet, mellem rør
   - repeat:
       for_each: '{{ sensors }}'
@@ -9904,23 +9909,14 @@
     from: 'on'
     to: 'off'
     id: cleared
+  - trigger: state
+    entity_id:
+    - timer.toilet_motion_sensor_timer
+    to: idle
+    id: timeout
   conditions: []
   actions:
   - choose:
-    - conditions:
-      - condition: trigger
-        id:
-        - detected
-      - condition: state
-        entity_id: binary_sensor.someone_home
-        state: 'on'
-      sequence:
-      - action: counter.increment
-        target:
-          entity_id: counter.toilet_motion_sensor_count
-      - action: timer.cancel
-        target:
-          entity_id: timer.toilet_motion_sensor_timer
     - conditions:
       - condition: trigger
         id:
@@ -9937,9 +9933,17 @@
       - action: timer.start
         metadata: {}
         data:
-          duration: 00:03:00
+          duration: 00:02:00
         target:
           entity_id: timer.toilet_motion_sensor_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - timeout
+      sequence:
+      - action: counter.increment
+        target:
+          entity_id: counter.toilet_motion_sensor_count
   mode: queued
   max: 10
   trace:
@@ -11335,7 +11339,7 @@
           related_entity_id: input_number.toilet_freshener_last_count
           entity_id: todo.todo_smart_todo
           is_active: '{{ states(''counter.toilet_motion_sensor_count'') | int(0) >
-            states(''input_number.toilet_freshener_last_count'') | int(0) + 100 }}'
+            states(''input_number.toilet_freshener_last_count'') | int(0) + 150 }}'
       - action: script.create_todo_task
         data:
           subject: Fyld sæbe på dispenser på toilettet
@@ -11343,7 +11347,7 @@
           related_entity_id: input_number.toilet_soap_last_count
           entity_id: todo.todo_smart_todo
           is_active: '{{ states(''counter.toilet_motion_sensor_count'') | int(0) >
-            states(''input_number.toilet_soap_last_count'') | int(0) + 180 }}'
+            states(''input_number.toilet_soap_last_count'') | int(0) + 300 }}'
     - conditions:
       - condition: trigger
         id: freshener_completed
@@ -11804,8 +11808,8 @@
   trace:
     stored_traces: 30
 - id: '1770918500447'
-  alias: Garage todo temperatur
-  description: Overvåg temperaturen i garagen
+  alias: Teknik todo temperatur
+  description: Overvåg temperaturen i teknik rummet
   triggers:
   - trigger: numeric_state
     entity_id: sensor.technic_room_current_temperature
@@ -11824,7 +11828,7 @@
       entity_id: todo.todo_smart_todo
       related_entity_id: sensor.technic_room_current_temperature
       is_active: '{{ not (10.0 <= states(''sensor.technic_room_current_temperature'')
-        | float(10.0) <= 30.0) }}'
+        | float(20.0) <= 30.0) }}'
   mode: queued
   max: 10
   trace:
@@ -11878,3 +11882,403 @@
   mode: single
   trace:
     stored_traces: 50
+- id: '1770987477517'
+  alias: Hjem overvåg system
+  description: Overvåg Home Assistant systemet
+  triggers:
+  - entity_id: sensor.technic_room_system_monitor_swap_usage
+    above: 10
+    for:
+      minutes: 2
+    id: high_swap_usage
+    trigger: numeric_state
+  - entity_id: sensor.technic_room_system_monitor_swap_usage
+    above: 30
+    id: critical_swap_usage
+    trigger: numeric_state
+  - entity_id: sensor.technic_room_system_monitor_processor_temperature
+    above: 65
+    for:
+      minutes: 2
+    id: high_cpu_temperature
+    trigger: numeric_state
+  - entity_id: sensor.technic_room_system_monitor_processor_temperature
+    above: 75
+    id: critical_cpu_temperature
+    trigger: numeric_state
+  - entity_id: sensor.technic_room_system_monitor_processor_use
+    above: 70
+    for:
+      seconds: 60
+    id: high_cpu_usage
+    trigger: numeric_state
+  - entity_id: sensor.technic_room_system_monitor_processor_use
+    above: 90
+    id: critical_cpu_usage
+    trigger: numeric_state
+  - entity_id: sensor.technic_room_system_monitor_memory_usage
+    above: 85
+    for:
+      minutes: 2
+    id: high_ram_usage
+    trigger: numeric_state
+  - entity_id: sensor.technic_room_system_monitor_memory_usage
+    above: 92
+    id: critical_ram_usage
+    trigger: numeric_state
+  - entity_id: sensor.technic_room_system_monitor_disk_usage
+    above: 80
+    for:
+      minutes: 5
+    id: high_disk_usage
+    trigger: numeric_state
+  - entity_id: sensor.technic_room_system_monitor_disk_usage
+    above: 90
+    id: critical_disk_usage
+    trigger: numeric_state
+  - at:
+      entity_id: sensor.technic_room_system_monitor_last_boot
+      offset: 00:05:00
+    id: system_booted
+    trigger: time
+  - entity_id: sensor.technic_room_system_monitor_load_1_min
+    above: 4
+    for:
+      minutes: 2
+    id: high_load_1
+    trigger: numeric_state
+  - entity_id: sensor.technic_room_system_monitor_load_1_min
+    above: 6
+    id: critical_load_1
+    trigger: numeric_state
+  - entity_id: sensor.technic_room_system_monitor_load_5_min
+    above: 4
+    for:
+      minutes: 5
+    id: high_load_5
+    trigger: numeric_state
+  - entity_id: sensor.technic_room_system_monitor_load_5_min
+    above: 6
+    id: critical_load_5
+    trigger: numeric_state
+  - entity_id: sensor.technic_room_system_monitor_load_15_min
+    above: 4
+    for:
+      minutes: 10
+    id: high_load_15
+    trigger: numeric_state
+  - entity_id: sensor.technic_room_system_monitor_load_15_min
+    above: 6
+    id: critical_load_15
+    trigger: numeric_state
+  conditions: []
+  actions:
+  - variables:
+      title: ''
+      message: ''
+      entity_id: '{{ trigger.entity_id }}'
+      trigger_id: '{{ trigger.id }}'
+      notification_type: warning
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: high_swap_usage
+      sequence:
+      - variables:
+          title: 'Home Assistant: Højt swap-forbrug'
+          message: 'Swap-forbrug er for højt (over 10% i mindst 2 minutter). Aktuel
+            værdi: {{ states(entity_id) }}% Grænse: 10%
+
+            '
+          notification_type: warning
+    - conditions:
+      - condition: trigger
+        id: critical_swap_usage
+      sequence:
+      - variables:
+          title: 'Home Assistant: Kritisk swap-forbrug'
+          message: 'Swap-forbrug er kritisk højt. Aktuel værdi: {{ states(entity_id)
+            }}% Grænse: 30%
+
+            '
+          notification_type: critical
+    - conditions:
+      - condition: trigger
+        id: high_cpu_temperature
+      sequence:
+      - variables:
+          title: 'Home Assistant: Høj CPU temperatur'
+          message: 'CPU temperaturen er for høj (over 65°C i mindst 2 minutter). Aktuel
+            værdi: {{ states(entity_id) }}°C Grænse: 65°C
+
+            '
+          notification_type: warning
+    - conditions:
+      - condition: trigger
+        id: critical_cpu_temperature
+      sequence:
+      - variables:
+          title: 'Home Assistant: Kritisk CPU temperatur'
+          message: 'CPU temperaturen er kritisk høj. Aktuel værdi: {{ states(entity_id)
+            }}°C Grænse: 75°C
+
+            '
+          notification_type: critical
+    - conditions:
+      - condition: trigger
+        id: high_cpu_usage
+      sequence:
+      - variables:
+          title: 'Home Assistant: Højt CPU forbrug'
+          message: 'CPU forbrug har været højt i mindst 60 sekunder. Aktuel værdi:
+            {{ states(entity_id) }}% Grænse: 70%
+
+            '
+          notification_type: warning
+    - conditions:
+      - condition: trigger
+        id: critical_cpu_usage
+      sequence:
+      - variables:
+          title: 'Home Assistant: Kritisk CPU forbrug'
+          message: 'CPU forbrug er kritisk højt. Aktuel værdi: {{ states(entity_id)
+            }}% Grænse: 90%
+
+            '
+          notification_type: critical
+    - conditions:
+      - condition: trigger
+        id: high_ram_usage
+      sequence:
+      - variables:
+          title: 'Home Assistant: Højt RAM forbrug'
+          message: 'RAM forbrug er for højt (over 85% i mindst 2 minutter). Aktuel
+            værdi: {{ states(entity_id) }}% Grænse: 85%
+
+            '
+          notification_type: warning
+    - conditions:
+      - condition: trigger
+        id: critical_ram_usage
+      sequence:
+      - variables:
+          title: 'Home Assistant: Kritisk RAM forbrug'
+          message: 'RAM forbrug er kritisk højt. Aktuel værdi: {{ states(entity_id)
+            }}% Grænse: 92%
+
+            '
+          notification_type: critical
+    - conditions:
+      - condition: trigger
+        id: high_disk_usage
+      sequence:
+      - variables:
+          title: 'Home Assistant: Højt diskforbrug'
+          message: 'Diskforbrug er for højt (over 80% i mindst 5 minutter). Aktuel
+            værdi: {{ states(entity_id) }}% Grænse: 80%
+
+            '
+          notification_type: warning
+    - conditions:
+      - condition: trigger
+        id: critical_disk_usage
+      sequence:
+      - variables:
+          title: 'Home Assistant: Kritisk diskforbrug'
+          message: 'Diskforbrug er kritisk højt. Aktuel værdi: {{ states(entity_id)
+            }}% Grænse: 90%
+
+            '
+          notification_type: critical
+    - conditions:
+      - condition: trigger
+        id: system_booted
+      sequence:
+      - variables:
+          title: 'Home Assistant: System genstartet'
+          message: 'Home Assistant er blevet genstartet og har nu været oppe i 5 minutter.
+            Sidste genstart: {{ states(entity_id) }}
+
+            '
+          notification_type: warning
+    - conditions:
+      - condition: trigger
+        id: high_load_1
+      sequence:
+      - variables:
+          title: 'Home Assistant: Høj load (1 min)'
+          message: 'System belastning (1 minut) er for høj (over 4.0 i mindst 2 minutter).
+            Aktuel værdi: {{ states(entity_id) }} Grænse: 4.0
+
+            '
+          notification_type: warning
+    - conditions:
+      - condition: trigger
+        id: critical_load_1
+      sequence:
+      - variables:
+          title: 'Home Assistant: Kritisk load (1 min)'
+          message: 'System belastning (1 minut) er kritisk høj. Aktuel værdi: {{ states(entity_id)
+            }} Grænse: 6.0
+
+            '
+          notification_type: critical
+    - conditions:
+      - condition: trigger
+        id: high_load_5
+      sequence:
+      - variables:
+          title: 'Home Assistant: Høj load (5 min)'
+          message: 'System belastning (5 minutter) er for høj (over 4.0 i mindst 5
+            minutter). Aktuel værdi: {{ states(entity_id) }} Grænse: 4.0
+
+            '
+          notification_type: warning
+    - conditions:
+      - condition: trigger
+        id: critical_load_5
+      sequence:
+      - variables:
+          title: 'Home Assistant: Kritisk load (5 min)'
+          message: 'System belastning (5 minutter) er kritisk høj. Aktuel værdi: {{
+            states(entity_id) }} Grænse: 6.0
+
+            '
+          notification_type: critical
+    - conditions:
+      - condition: trigger
+        id: high_load_15
+      sequence:
+      - variables:
+          title: 'Home Assistant: Høj load (15 min)'
+          message: 'System belastning (15 minutter) er for høj (over 4.0 i mindst
+            10 minutter). Aktuel værdi: {{ states(entity_id) }} Grænse: 4.0
+
+            '
+          notification_type: warning
+    - conditions:
+      - condition: trigger
+        id: critical_load_15
+      sequence:
+      - variables:
+          title: 'Home Assistant: Kritisk load (15 min)'
+          message: 'System belastning (15 minutter) er kritisk høj. Aktuel værdi:
+            {{ states(entity_id) }} Grænse: 6.0
+
+            '
+          notification_type: critical
+    default:
+    - variables:
+        title: 'Home Assistant: System alarm'
+        message: 'En ukendt trigger blev aktiveret. Trigger ID: {{ trigger.id }} Entity:
+          {{ trigger.entity_id }} Aktuel værdi: {{ states(trigger.entity_id) }}
+
+          '
+        notification_type: critical
+  - if:
+    - condition: template
+      value_template: '{{ title != '''' }}'
+    then:
+    - data:
+        level: warning
+        message: '{{ title }} - {{ message }} Entity: {{ entity_id }}, Trigger: {{
+          trigger_id }}
+
+          '
+      action: system_log.write
+    - data:
+        type: '{{ notification_type }}'
+        recipient: anders
+        persistent: true
+        id: '{{ entity_id }}'
+        title: '{{ title }}'
+        message: '{{ message }}'
+      action: script.push_notification
+  mode: single
+  trace:
+    stored_traces: 50
+- id: '1770991959858'
+  alias: Hjem todo vanding indendørs
+  description: Opret todo opgaver vedrørende jordfugtighed måler og vanding af blomster
+    indendørs
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.bedroom_soil_moisture_sensor_moisture
+    - sensor.charlies_room_soil_moisture_sensor_moisture
+    - sensor.living_room_soil_moisture_sensor_moisture
+    below: 35
+  - trigger: numeric_state
+    entity_id:
+    - sensor.living_room_soil_moisture_sensor_moisture
+    - sensor.bedroom_soil_moisture_sensor_moisture
+    - sensor.charlies_room_soil_moisture_sensor_moisture
+    above: 60
+  conditions: []
+  actions:
+  - action: script.create_todo_task
+    data:
+      subject: Vand blomster indendørs
+      description: 'Jordfugtigheden på potteplanter er ved at være lav. I stuen er
+        målt {{ states(''sensor.living_room_soil_moisture_sensor_moisture'') }}%,
+        I soveværelset er målt {{ states(''sensor.bedroom_soil_moisture_sensor_moisture'')
+        }}%, og på Charlies værelse er målt {{ states(''sensor.charlies_room_soil_moisture_sensor_moisture'')
+        }}%
+
+        '
+      related_entity_id: sensor.living_room_soil_moisture_sensor_moisture
+      entity_id: todo.todo_smart_todo
+      is_active: "{{ states('sensor.living_room_soil_moisture_sensor_moisture') |
+        float(50.0) < 35.0 or\n   states('sensor.bedroom_soil_moisture_sensor_moisture')
+        | float(50.0) < 35.0 or\n   states('sensor.charlies_room_soil_moisture_sensor_moisture')
+        | float(50.0) < 35.0 }}"
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
+- id: '1770993693621'
+  alias: Bryggers todo vand
+  description: Overvåg om der er vand under vasken bryggerset, send beskeder hvis
+    der opstår lækage
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.utility_room_sink_water_leak_sensor
+    to: 'on'
+    for:
+      seconds: 30
+    id: leak
+  - trigger: state
+    entity_id: binary_sensor.utility_room_sink_water_leak_sensor
+    to: 'off'
+    for:
+      seconds: 30
+  - trigger: time_pattern
+    hours: /1
+  conditions: []
+  actions:
+  - if:
+    - condition: trigger
+      id: leak
+    then:
+    - action: script.push_notification
+      data:
+        type: warning
+        title: Advarsel
+        id: utility_room_sink_water_leak
+        persistent: false
+        recipient: home
+        message: Vand lækage sensoren der ligger underkabet med vaskeni bryggerst
+          har registret vand.
+  - action: script.create_todo_task
+    data:
+      subject: Vand på gulvet under bryggersvasken
+      entity_id: todo.todo_smart_todo
+      description: Vand lækage sensoren der ligger underkabet med vaskeni bryggerst
+        har registret vand.
+      related_entity_id: binary_sensor.utility_room_sink_water_leak_sensor
+      is_active: '{{ is_state(''binary_sensor.utility_room_sink_water_leak_sensor'',
+        ''on'') }}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30

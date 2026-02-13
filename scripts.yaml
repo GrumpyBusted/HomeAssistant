@@ -667,6 +667,7 @@ push_notification:
         select:
           options:
           - critical
+          - warning
           - info
           - log
       default: log
@@ -675,19 +676,19 @@ push_notification:
       description: Besked title
       required: true
       selector:
-        object: {}
+        text: {}
     message:
       name: Besked
       description: Besked
       required: true
       selector:
-        object: {}
+        text: {}
     id:
       name: Id
       description: Besked id
       required: false
       selector:
-        object: {}
+        text: {}
     recipient:
       name: Modtager
       description: Hvem skal modtage beskeden
@@ -734,8 +735,8 @@ push_notification:
       sequence:
       - variables:
           notify_persons: "{% set ns = namespace(list=[]) %}\n{% for person in persons
-            %}\n  {% set distance = states(person.sensor) | float(0) %}\n  {% set
-            ns.list = ns.list + [{\n      'device': person.device,\n      'distance':
+            %}\n  {% set distance = states(person.sensor) | float(99999) %}\n  {%
+            set ns.list = ns.list + [{\n      'device': person.device,\n      'distance':
             distance\n  }] %}\n{% endfor %} \n{% set notify_persons = ns.list | selectattr('distance',
             'lt', 0.2) | list %} \n{% if notify_persons | count == 0 %}\n  {% set
             first_distance = ((ns.list | sort(attribute='distance'))[0]).distance
@@ -795,7 +796,7 @@ push_notification:
 
                 Message: {{ message }}'
               level: info
-          - action: '{{ repeat.item }} '
+          - action: '{{ repeat.item }}'
             data:
               title: '{{ title }}'
               message: '{{ message }}'
@@ -804,6 +805,28 @@ push_notification:
                   sound:
                     name: default
                     critical: 0
+                    volume: 0
+        - conditions:
+          - condition: template
+            value_template: '{{ type == ''warning'' }}'
+          sequence:
+          - action: system_log.write
+            data:
+              message: 'Action: {{ repeat.item }}
+
+                Title: {{ title }}
+
+                Message: {{ message }}'
+              level: warning
+          - action: '{{ repeat.item }}'
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                push:
+                  sound:
+                    name: default
+                    critical: 1
                     volume: 0
         - conditions:
           - condition: template
@@ -816,8 +839,8 @@ push_notification:
                 Title: {{ title }}
 
                 Message: {{ message }}'
-              level: warning
-          - action: '{{ repeat.item }} '
+              level: error
+          - action: '{{ repeat.item }}'
             data:
               title: '{{ title }}'
               message: '{{ message }}'
@@ -833,7 +856,7 @@ living_room_robot_vacuum_set_current:
   mode: queued
   max: 2
   trace:
-    stored_traces: 50
+    stored_traces: 500
   fields:
     option:
       name: Rengøring
