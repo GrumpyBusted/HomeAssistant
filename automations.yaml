@@ -12096,8 +12096,9 @@
       sequence:
       - variables:
           title: 'Home Assistant: System genstartet'
-          message: 'Home Assistant er blevet genstartet og har nu været oppe i 5 minutter.
-            Sidste genstart: {{ states(entity_id) }}
+          message: 'Home Assistant er blevet genstartet for et øjeblik siden. Sidste
+            genstart: {{ states(''sensor.technic_room_system_monitor_last_boot'')
+            | as_datetime | as_local }}
 
             '
           notification_type: warning
@@ -12239,6 +12240,52 @@
 - id: '1770993693621'
   alias: Bryggers todo vand
   description: Overvåg om der er vand under vasken bryggerset, send beskeder hvis
+    der opstår lækage
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.utility_room_sink_water_leak_sensor
+    to: 'on'
+    for:
+      seconds: 30
+    id: leak
+  - trigger: state
+    entity_id: binary_sensor.utility_room_sink_water_leak_sensor
+    to: 'off'
+    for:
+      seconds: 30
+  - trigger: time_pattern
+    hours: /1
+  conditions: []
+  actions:
+  - if:
+    - condition: trigger
+      id: leak
+    then:
+    - action: script.push_notification
+      data:
+        type: warning
+        title: Advarsel
+        id: utility_room_sink_water_leak
+        persistent: false
+        recipient: home
+        message: Vand lækage sensoren der ligger underkabet med vaskeni bryggerst
+          har registret vand.
+  - action: script.create_todo_task
+    data:
+      subject: Vand på gulvet under bryggersvasken
+      entity_id: todo.todo_smart_todo
+      description: Vand lækage sensoren der ligger underkabet med vaskeni bryggerst
+        har registret vand.
+      related_entity_id: binary_sensor.utility_room_sink_water_leak_sensor
+      is_active: '{{ is_state(''binary_sensor.utility_room_sink_water_leak_sensor'',
+        ''on'') }}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
+- id: '1770996223230'
+  alias: Køkken todo vand
+  description: Overvåg om der er vand under vasken i køkkenet, send beskeder hvis
     der opstår lækage
   triggers:
   - trigger: state
