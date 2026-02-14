@@ -4480,7 +4480,7 @@
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
-          type: '{{ repeat.item.battery_type | default('') }}'
+          type: '{{ repeat.item.battery_type | default('''') }}'
           threshold: 5
   mode: restart
   trace:
@@ -4575,8 +4575,8 @@
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
-          type: '{{ repeat.item.battery_type | default('') }}'
-          location: '{{ repeat.item.location | default('') }}'
+          type: '{{ repeat.item.battery_type | default('''') }}'
+          location: '{{ repeat.item.location | default('''') }}'
           threshold: 5
   mode: restart
   trace:
@@ -4637,7 +4637,7 @@
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
-          type: '{{ repeat.item.battery_type | default('') }}'
+          type: '{{ repeat.item.battery_type | default('''') }}'
           threshold: 5
   mode: restart
   trace:
@@ -4710,7 +4710,7 @@
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
-          type: '{{ repeat.item.battery_type | default('') }}'
+          type: '{{ repeat.item.battery_type | default('''') }}'
           location: '{{ repeat.item.location | default('''') }}'
           threshold: 20
   mode: restart
@@ -4750,7 +4750,7 @@
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
-          type: '{{ repeat.item.battery_type | default('') }}'
+          type: '{{ repeat.item.battery_type | default('''') }}'
   mode: restart
   trace:
     stored_traces: 30
@@ -8728,8 +8728,8 @@
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
-          location: '{{ repeat.item.location | default('') }}'
-          temperature: '{{ repeat.item.temperature | default('') }}'
+          location: '{{ repeat.item.location | default('''') }}'
+          temperature: '{{ repeat.item.temperature | default('''') }}'
   mode: restart
   trace:
     stored_traces: 30
@@ -8767,7 +8767,7 @@
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
-          location: '{{ repeat.item.location | default('') }}'
+          location: '{{ repeat.item.location | default('''') }}'
   mode: restart
   trace:
     stored_traces: 30
@@ -8929,7 +8929,7 @@
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
-          type: '{{ repeat.item.battery_type | default('') }}'
+          type: '{{ repeat.item.battery_type | default('''') }}'
           threshold: 15
   mode: restart
   trace:
