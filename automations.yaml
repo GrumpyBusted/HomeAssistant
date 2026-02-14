@@ -617,7 +617,7 @@
         target:
           entity_id: climate.living_room_heat_pump
         data:
-          temperature: '{{ states(''sensor.living_room_target_temperature'')|float(21)
+          temperature: '{{ states(''sensor.living_room_target_temperature'') | float(0)
             }}'
       - action: climate.set_hvac_mode
         target:
@@ -2500,8 +2500,8 @@
       - condition: trigger
         id: target_changed
       - condition: template
-        value_template: '{{ states(''sensor.emils_room_target_temperature'') != states(''sensor.emils_room_desired_temperature'')
-          }}'
+        value_template: '{{ states(''sensor.emils_room_target_temperature'') | float(0.0)
+          != states(''sensor.emils_room_desired_temperature'') | float(21.0) }}'
       sequence:
       - action: timer.start
         metadata: {}
@@ -2511,8 +2511,8 @@
           entity_id: timer.emils_room_heating_manual_timer
     - conditions:
       - condition: template
-        value_template: '{{ states(''sensor.emils_room_target_temperature'') == states(''sensor.emils_room_desired_temperature'')
-          }}'
+        value_template: '{{ states(''sensor.emils_room_target_temperature'') | float(0.0)
+          == states(''sensor.emils_room_desired_temperature'') | float(21.0) }}'
       - condition: state
         entity_id: timer.emils_room_heating_manual_timer
         state: active
@@ -2529,7 +2529,8 @@
     then:
     - action: script.set_climate_temperature
       data:
-        temperature: '{{ states(''sensor.emils_room_desired_temperature'') }}'
+        temperature: '{{ states(''sensor.emils_room_desired_temperature'') | float(21.0)
+          }}'
         entities:
         - climate.emils_room_radiator_thermostat
         target_sensor: sensor.emils_room_target_temperature
@@ -2570,8 +2571,9 @@
       - condition: trigger
         id: target_changed
       - condition: template
-        value_template: '{{ states(''sensor.charlies_room_target_temperature'') !=
-          states(''sensor.charlies_room_desired_temperature'') }}'
+        value_template: '{{ states(''sensor.charlies_room_target_temperature'') |
+          float(0.0) != states(''sensor.charlies_room_desired_temperature'') | float(21.0)
+          }}'
       sequence:
       - action: timer.start
         metadata: {}
@@ -2581,8 +2583,9 @@
           entity_id: timer.charlies_room_heating_manual_timer
     - conditions:
       - condition: template
-        value_template: '{{ states(''sensor.charlies_room_target_temperature'') ==
-          states(''sensor.charlies_room_desired_temperature'') }}'
+        value_template: '{{ states(''sensor.charlies_room_target_temperature'') |
+          float(0.0) == states(''sensor.charlies_room_desired_temperature'') | float(21.0)
+          }}'
       - condition: state
         entity_id: timer.charlies_room_heating_manual_timer
         state: active
@@ -2599,7 +2602,8 @@
     then:
     - action: script.set_climate_temperature
       data:
-        temperature: '{{ states(''sensor.charlies_room_desired_temperature'') }}'
+        temperature: '{{ states(''sensor.charlies_room_desired_temperature'') | float(21.0)
+          }}'
         entities:
         - climate.charlies_room_radiator_thermostat
         - climate.charlies_room_temperature_sensor
@@ -2641,8 +2645,8 @@
       - condition: trigger
         id: target_changed
       - condition: template
-        value_template: '{{ states(''sensor.bedroom_target_temperature'') != states(''sensor.bedroom_desired_temperature'')
-          }}'
+        value_template: '{{ states(''sensor.bedroom_target_temperature'') | float(0.0)
+          != states(''sensor.bedroom_desired_temperature'') | float(21.0) }}'
       sequence:
       - action: timer.start
         metadata: {}
@@ -2652,8 +2656,8 @@
           entity_id: timer.bedroom_heating_manual_timer
     - conditions:
       - condition: template
-        value_template: '{{ states(''sensor.bedroom_target_temperature'') == states(''sensor.bedroom_desired_temperature'')
-          }}'
+        value_template: '{{ states(''sensor.bedroom_target_temperature'') | float(0.0)
+          == states(''sensor.bedroom_desired_temperature'') | float(21.0) }}'
       - condition: state
         entity_id: timer.bedroom_heating_manual_timer
         state: active
@@ -2670,7 +2674,8 @@
     then:
     - action: script.set_climate_temperature
       data:
-        temperature: '{{ states(''sensor.bedroom_desired_temperature'') }}'
+        temperature: '{{ states(''sensor.bedroom_desired_temperature'') | float(21.0)
+          }}'
         entities:
         - climate.bedroom_radiator_thermostat
         target_sensor: sensor.bedroom_target_temperature
@@ -2711,8 +2716,8 @@
       - condition: trigger
         id: target_changed
       - condition: template
-        value_template: '{{ states(''sensor.toilet_target_temperature'') != states(''sensor.toilet_desired_temperature'')
-          }}'
+        value_template: '{{ states(''sensor.toilet_target_temperature'') | float(0.0)
+          != states(''sensor.toilet_desired_temperature'') | float(21.0) }}'
       sequence:
       - action: timer.start
         metadata: {}
@@ -2722,8 +2727,8 @@
           entity_id: timer.toilet_heating_manual_timer
     - conditions:
       - condition: template
-        value_template: '{{ states(''sensor.toilet_target_temperature'') == states(''sensor.toilet_desired_temperature'')
-          }}'
+        value_template: '{{ states(''sensor.toilet_target_temperature'') | float(0.0)
+          == states(''sensor.toilet_desired_temperature'') | float(21.0) }}'
       - condition: state
         entity_id: timer.toilet_heating_manual_timer
         state: active
@@ -2740,7 +2745,8 @@
     then:
     - action: script.set_climate_temperature
       data:
-        temperature: '{{ states(''sensor.toilet_desired_temperature'') }}'
+        temperature: '{{ states(''sensor.toilet_desired_temperature'') | float(21.0)
+          }}'
         entities:
         - climate.toilet_radiator_thermostat
         target_sensor: sensor.toilet_target_temperature
@@ -2781,8 +2787,8 @@
       - condition: trigger
         id: target_changed
       - condition: template
-        value_template: '{{ states(''sensor.bathroom_target_temperature'') != states(''sensor.bathroom_desired_temperature'')
-          }}'
+        value_template: '{{ states(''sensor.bathroom_target_temperature'') | float(0.0)
+          != states(''sensor.bathroom_desired_temperature'') | float(21.0) }}'
       sequence:
       - action: timer.start
         metadata: {}
@@ -2792,8 +2798,8 @@
           entity_id: timer.bathroom_heating_manual_timer
     - conditions:
       - condition: template
-        value_template: '{{ states(''sensor.bathroom_target_temperature'') == states(''sensor.bathroom_desired_temperature'')
-          }}'
+        value_template: '{{ states(''sensor.bathroom_target_temperature'') | float(0.0)
+          == states(''sensor.bathroom_desired_temperature'') | float(21.0) }}'
       - condition: state
         entity_id: timer.bathroom_heating_manual_timer
         state: active
@@ -2810,7 +2816,8 @@
     then:
     - action: script.set_climate_temperature
       data:
-        temperature: '{{ states(''sensor.bathroom_desired_temperature'') }}'
+        temperature: '{{ states(''sensor.bathroom_desired_temperature'') | float(21.0)
+          }}'
         entities:
         - climate.bathroom_radiator_thermostat_floor
         - climate.bathroom_radiator_thermostat_wall
@@ -2852,8 +2859,8 @@
       - condition: trigger
         id: target_changed
       - condition: template
-        value_template: '{{ states(''sensor.utility_room_target_temperature'') !=
-          states(''sensor.utility_room_desired_temperature'') }}'
+        value_template: '{{ states(''sensor.utility_room_target_temperature'') | float(0.0)
+          != states(''sensor.utility_room_desired_temperature'') | float(21.0) }}'
       sequence:
       - action: timer.start
         metadata: {}
@@ -2863,8 +2870,8 @@
           entity_id: timer.utility_room_heating_manual_timer
     - conditions:
       - condition: template
-        value_template: '{{ states(''sensor.utility_room_target_temperature'') ==
-          states(''sensor.utility_room_desired_temperature'') }}'
+        value_template: '{{ states(''sensor.utility_room_target_temperature'') | float(0.0)
+          == states(''sensor.utility_room_desired_temperature'') | float(21.0) }}'
       - condition: state
         entity_id: timer.utility_room_heating_manual_timer
         state: active
@@ -2881,7 +2888,8 @@
     then:
     - action: script.set_climate_temperature
       data:
-        temperature: '{{ states(''sensor.utility_room_desired_temperature'') }}'
+        temperature: '{{ states(''sensor.utility_room_desired_temperature'') | float(21.0)
+          }}'
         entities:
         - climate.utility_room_radiator_thermostat_wall
         - climate.utility_room_radiator_thermostat_floor
@@ -2924,8 +2932,8 @@
       - condition: trigger
         id: target_changed
       - condition: template
-        value_template: '{{ states(''sensor.living_room_target_temperature'') | float(21)
-          != states(''sensor.living_room_desired_temperature'') | float(21) }}'
+        value_template: '{{ states(''sensor.living_room_target_temperature'') | float(0.0)
+          != states(''sensor.living_room_desired_temperature'') | float(21.0) }}'
       sequence:
       - action: timer.start
         metadata: {}
@@ -2935,8 +2943,8 @@
           entity_id: timer.living_room_heating_manual_timer
     - conditions:
       - condition: template
-        value_template: '{{ states(''sensor.living_room_target_temperature'') | float(21)
-          == states(''sensor.living_room_desired_temperature'') | float(21) }}'
+        value_template: '{{ states(''sensor.living_room_target_temperature'') | float(0.0)
+          == states(''sensor.living_room_desired_temperature'') | float(21.0) }}'
       - condition: state
         entity_id: timer.living_room_heating_manual_timer
         state: active
@@ -2953,7 +2961,8 @@
     then:
     - action: script.set_climate_temperature
       data:
-        temperature: '{{ states(''sensor.living_room_desired_temperature'') }}'
+        temperature: '{{ states(''sensor.living_room_desired_temperature'') | float(21.0)
+          }}'
         entities:
         - climate.living_room_radiator_thermostat_bookcase
         - climate.living_room_radiator_thermostat_dining_table
@@ -2998,8 +3007,8 @@
       - condition: trigger
         id: target_changed
       - condition: template
-        value_template: '{{ states(''sensor.hallway_target_temperature'') != states(''sensor.hallway_desired_temperature'')
-          }}'
+        value_template: '{{ states(''sensor.hallway_target_temperature'') | float(0.0)
+          != states(''sensor.hallway_desired_temperature'') | float(21.0) }}'
       sequence:
       - action: timer.start
         metadata: {}
@@ -3009,8 +3018,8 @@
           entity_id: timer.hallway_heating_manual_timer
     - conditions:
       - condition: template
-        value_template: '{{ states(''sensor.hallway_target_temperature'') == states(''sensor.hallway_desired_temperature'')
-          }}'
+        value_template: '{{ states(''sensor.hallway_target_temperature'') | float(0.0)
+          == states(''sensor.hallway_desired_temperature'') | float(21.0) }}'
       - condition: state
         entity_id: timer.hallway_heating_manual_timer
         state: active
@@ -3027,7 +3036,8 @@
     then:
     - action: script.set_climate_temperature
       data:
-        temperature: '{{ states(''sensor.hallway_desired_temperature'') }}'
+        temperature: '{{ states(''sensor.hallway_desired_temperature'') | float(21.0)
+          }}'
         entities:
         - climate.hallway_radiator_thermostat
         target_sensor: sensor.hallway_target_temperature
@@ -3710,8 +3720,8 @@
       - action: climate.set_temperature
         metadata: {}
         data:
-          temperature: '{{ min(states(''sensor.emils_room_target_temperature'')|float(0)
-            + 3, 37) }}'
+          temperature: '{{ min(states(''sensor.emils_room_target_temperature'') |
+            float(0.0) + 3, 37) }}'
           hvac_mode: heat
         target:
           entity_id: climate.emils_room_air_purifier
@@ -3749,8 +3759,8 @@
       - action: climate.set_temperature
         metadata: {}
         data:
-          temperature: '{{ max(1, states(''sensor.emils_room_target_temperature'')|float(0)
-            - 3) }}'
+          temperature: '{{ max(1, states(''sensor.emils_room_target_temperature'')
+            | float(0.0) - 3) }}'
           hvac_mode: cool
         target:
           entity_id: climate.emils_room_air_purifier
@@ -4153,7 +4163,7 @@
       - action: climate.set_temperature
         metadata: {}
         data:
-          temperature: '{{ min(states(''sensor.bedroom_target_temperature'')|float(0)
+          temperature: '{{ min(states(''sensor.bedroom_target_temperature'') | float(0.0)
             + 3, 37) }}'
           hvac_mode: heat
         target:
@@ -4198,8 +4208,8 @@
       - action: climate.set_temperature
         metadata: {}
         data:
-          temperature: '{{ max(1, states(''sensor.bedroom_target_temperature'')|float(0)
-            - 3) }}'
+          temperature: '{{ max(1, states(''sensor.bedroom_target_temperature'') |
+            float(0.0) - 3) }}'
           hvac_mode: cool
         target:
           entity_id: climate.bedroom_air_purifier
@@ -6767,6 +6777,14 @@
     from: 'off'
     to: 'on'
     id: opened
+  - trigger: state
+    entity_id: binary_sensor.bedroom_sleeping
+    to: 'on'
+    id: sleeping
+  - trigger: state
+    entity_id: binary_sensor.bedroom_sleeping
+    to: 'off'
+    id: wake
   conditions: []
   actions:
   - choose:
@@ -6870,6 +6888,24 @@
       - action: input_boolean.turn_off
         target:
           entity_id: input_boolean.bedroom_presence
+    - conditions:
+      - condition: trigger
+        id: sleeping
+      sequence:
+      - action: select.select_option
+        target:
+          entity_id: select.bedroom_presence_sensor_detection_sensitivity
+        data:
+          option: High
+    - conditions:
+      - condition: trigger
+        id: wake
+      sequence:
+      - action: select.select_option
+        target:
+          entity_id: select.bedroom_presence_sensor_detection_sensitivity
+        data:
+          option: Low
   mode: queued
   max: 10
   trace:
@@ -9790,12 +9826,13 @@
         data:
           value: 0
   - variables:
-      position: '{{ states(''input_number.charlies_room_blind_position'') }}'
+      position: '{{ states(''input_number.charlies_room_blind_position'') | int(0)
+        }}'
   - choose:
     - conditions:
       - condition: template
         value_template: '{{ state_attr(''cover.charlies_room_blind'', ''current_position'')
-          <= 20 }}'
+          | int(0) <= 20 }}'
       - condition: template
         value_template: '{{ trigger.id == ''close_short_pressed'' }}
 
@@ -9829,7 +9866,7 @@
       sequence: []
     - conditions:
       - condition: template
-        value_template: '{{ position == 100 }}'
+        value_template: '{{ position | int(0) == 100 }}'
       - condition: numeric_state
         entity_id: cover.charlies_room_blind
         attribute: current_position
@@ -9840,7 +9877,7 @@
           entity_id: cover.charlies_room_blind
     - conditions:
       - condition: template
-        value_template: '{{ position == 0 }}'
+        value_template: '{{ position | int(0) == 0 }}'
       - condition: numeric_state
         entity_id: cover.charlies_room_blind
         attribute: current_position
@@ -9852,7 +9889,7 @@
     - conditions:
       - condition: template
         value_template: '{{ state_attr(''cover.charlies_room_blind'', ''current_position'')
-          != position }}'
+          | int(0) != position | int(0) }}'
       sequence:
       - action: cover.set_cover_position
         data:
@@ -10081,7 +10118,7 @@
         data:
           value: 100
   - variables:
-      position: '{{ states(''input_number.bedroom_blind_position'') }}'
+      position: '{{ states(''input_number.bedroom_blind_position'') | int(0) }}'
   - if:
     - condition: state
       entity_id: binary_sensor.bedroom_window
@@ -10146,7 +10183,7 @@
   - choose:
     - conditions:
       - condition: template
-        value_template: '{{ position == 100 }}'
+        value_template: '{{ position | int(0) == 100 }}'
       - condition: numeric_state
         entity_id: cover.bedroom_blind
         attribute: current_position
@@ -10157,7 +10194,7 @@
           entity_id: cover.bedroom_blind
     - conditions:
       - condition: template
-        value_template: '{{ position == 0 }}'
+        value_template: '{{ position | int(0) == 0 }}'
       - condition: numeric_state
         entity_id: cover.bedroom_blind
         attribute: current_position
@@ -10168,12 +10205,12 @@
           entity_id: cover.bedroom_blind
     - conditions:
       - condition: template
-        value_template: '{{ position != state_attr(''cover.bedroom_blind'', ''current_position'')
-          }}'
+        value_template: '{{ position | int(0) != state_attr(''cover.bedroom_blind'',
+          ''current_position'') | int(0) }}'
       sequence:
       - action: cover.set_cover_position
         data:
-          position: '{{ position }}'
+          position: '{{ position | int(0) }}'
         target:
           entity_id: cover.bedroom_blind
   - wait_template: '{{ states(''cover.bedroom_blind'') not in [''opening'', ''closing'']
@@ -10385,7 +10422,7 @@
       sequence: []
     - conditions:
       - condition: template
-        value_template: '{{ position == 100 }}'
+        value_template: '{{ position | int(0) == 100 }}'
       - condition: numeric_state
         entity_id: cover.emils_room_blind
         attribute: current_position
@@ -10396,7 +10433,7 @@
           entity_id: cover.emils_room_blind
     - conditions:
       - condition: template
-        value_template: '{{ position == 0 }}'
+        value_template: '{{ position | int(0) == 0 }}'
       - condition: numeric_state
         entity_id: cover.emils_room_blind
         attribute: current_position
@@ -10407,12 +10444,12 @@
           entity_id: cover.emils_room_blind
     - conditions:
       - condition: template
-        value_template: '{{ position != state_attr(''cover.emils_room_blind'', ''current_position'')
-          }}'
+        value_template: '{{ position | int(0) != state_attr(''cover.emils_room_blind'',
+          ''current_position'') | int(0) }}'
       sequence:
       - action: cover.set_cover_position
         data:
-          position: '{{ position }}'
+          position: '{{ position | int(0) }}'
         target:
           entity_id: cover.emils_room_blind
   - wait_template: '{{ states(''cover.emils_room_blind'') not in [''opening'', ''closing'']
@@ -11144,12 +11181,24 @@
         tado_password: '{{ states(''sensor.tado_password'') }}'
         tado_client_secret: '{{ states(''sensor.tado_client_secret'') }}'
     response_variable: response
+  - action: system_log.write
+    data:
+      level: debug
+      message: 'Response: {{ response }}
+
+        '
   - variables:
       token: '{{ response.content.access_token }}'
   - action: rest_command.tado_get_profile
     data:
       bearer_token: '{{ token }}'
     response_variable: response
+  - action: system_log.write
+    data:
+      level: debug
+      message: 'Response: {{ response }}
+
+        '
   - variables:
       home_id: '{{ response.content.homes[0].id }}'
   - action: rest_command.tado_get_rooms_and_devices
@@ -11157,6 +11206,12 @@
       home_id: '{{ home_id }}'
       bearer_token: '{{ token }}'
     response_variable: response
+  - action: system_log.write
+    data:
+      level: debug
+      message: 'Response: {{ response }}
+
+        '
   - variables:
       devices: "[\n  {% for room in response.content.rooms %}\n    {% for device in
         room.devices %}\n      {\n        \"roomName\": \"{{ room.roomName }}\",\n
@@ -11818,3 +11873,73 @@
   mode: single
   trace:
     stored_traces: 50
+- id: '1771090096437'
+  alias: Emils værelse todo blæser
+  description: Opret todo opgaver vedrørende blæser på Emils værelse
+  triggers:
+  - trigger: numeric_state
+    entity_id: sensor.emils_room_air_purifier_filter_life_percentage
+    below: 5
+    id: low
+  - trigger: time
+    at: 03:57:00
+    id: periodic
+  - trigger: event
+    event_type: todo_item_completed
+    event_data:
+      related: sensor.emils_room_air_purifier_filter_life_percentage
+    id: todo_completed
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - low
+        - periodic
+      sequence:
+      - action: script.create_todo_task
+        data:
+          subject: Skift filter på blæser på Emil værelse
+          description: Luftrenser på Emils værelse skal have skiftet filter, der er
+            {{ states('sensor.emils_room_air_purifier_filter_life_percentage') }}%
+            tilbage.
+          related_entity_id: sensor.emils_room_air_purifier_filter_life_percentage
+          entity_id: todo.todo_smart_todo
+          is_active: '{{ states(''sensor.emils_room_air_purifier_filter_life_percentage'')
+            | int(100) < 5 }}'
+    - conditions:
+      - condition: trigger
+        id: todo_completed
+      sequence:
+      - action: button.press
+        target:
+          entity_id: button.emils_room_air_purifier_reset_filter_life
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
+- id: '1771090242421'
+  alias: Soveværelse todo blæser
+  description: Opret todo opgaver vedrørende blæser på soveværelse
+  triggers:
+  - trigger: numeric_state
+    entity_id: sensor.bedroom_air_purifier_filter_life
+    below: 5
+  - trigger: time
+    at: 03:58:00
+  conditions: []
+  actions:
+  - action: script.create_todo_task
+    data:
+      subject: Skift filter på blæser i soveværelset
+      description: Luftrenser på soveværelset skal have skiftet filter, der er {{
+        states('sensor.bedroom_air_purifier_filter_life') }}% tilbage.
+      related_entity_id: sensor.bedroom_air_purifier_filter_life
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ states(''sensor.bedroom_air_purifier_filter_life'') | int(100)
+        < 5 }}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30

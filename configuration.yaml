@@ -22,10 +22,8 @@ automation custom: !include_dir_merge_list ./automations
 script custom: !include_dir_merge_named ./scripts
 
 logger:
-  default: info
   logs:
-    aiohue: debug
-    homeassistant.components.hue: debug
+    aiohue.util: warning
 
 shell_command:
   pushupdates_to_github: "/bin/bash pushupdates.sh"
