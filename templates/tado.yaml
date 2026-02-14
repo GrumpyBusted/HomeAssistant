@@ -1,13 +1,7 @@
 - sensor:
-    - name: "Tado Username"
-      unique_id: 7B149E4E-5579-42A2-9B1F-62B65A87C88E
-      state: !secret tado_username
-    - name: "Tado Password"
-      unique_id: 8E130060-87BD-49F2-8610-E14560AB72FA
-      state: !secret tado_password
-    - name: "Tado Client Secret"
-      unique_id: CD0F377F-2B62-4615-9ABB-F89718031596
-      state: !secret tado_client_secret
+    - name: "Tado Refresh Token"
+      unique_id: 948E4853-423F-4D2C-9F1B-8CC87C239CA9
+      state: !secret tado_refresh_token
 - sensor:
     - name: "Tado Device Types"
       unique_id: 05D4CDF1-9E4B-481A-8F0F-13684D95B8FF

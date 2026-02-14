@@ -31,12 +31,14 @@ shell_command:
   csv_to_json: "/bin/bash csv_to_json.sh {{ csvfile }} {{ jsonfile }}"
 
 rest_command:
-  tado_get_auth_token:
-    url: "https://auth.tado.com/oauth/token"
+  tado_get_verification_uri:
+    url: "https://login.tado.com/oauth2/device_authorize?client_id=1bb50063-6b0c-4d11-bd99-387f4a91cc46&scope=offline_access"
     method: "POST"
-    headers:
-      Content-Type: "application/x-www-form-urlencoded"
-    payload: "client_id=tado-web-app&grant_type=password&scope=home.user&username={{ secrets.tado_username }}&password={{ secrets.tado_password }}&client_secret={{ secrets.tado_client_secret }}"
+  tado_get_refresh_token:
+    url: "https://login.tado.com/oauth2/token?client_id=1bb50063-6b0c-4d11-bd99-387f4a91cc46&device_code={{ device_code }}&grant_type=urn:ietf:params:oauth:grant-type:device_code"
+    method: "POST"
+  tado_get_access_token:
+    url: "https://login.tado.com/oauth2/token?client_id=1bb50063-6b0c-4d11-bd99-387f4a91cc46&grant_type=refresh_token&refresh_token={{ secrets.tado_refresh_token }}"
   tado_get_profile:
     url: "https://my.tado.com/api/v2/me"
     method: "GET"

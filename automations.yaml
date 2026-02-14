@@ -11175,7 +11175,7 @@
   conditions: []
   actions:
   - action: rest_command.tado_get_auth_token
-    data:
+    data: 
       secrets:
         tado_username: '{{ states(''sensor.tado_username'') }}'
         tado_password: '{{ states(''sensor.tado_password'') }}'
