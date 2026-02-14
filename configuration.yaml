@@ -21,6 +21,12 @@ template: !include_dir_merge_list ./templates
 automation custom: !include_dir_merge_list ./automations
 script custom: !include_dir_merge_named ./scripts
 
+logger:
+  default: info
+  logs:
+    aiohue: debug
+    homeassistant.components.hue: debug
+
 shell_command:
   pushupdates_to_github: "/bin/bash pushupdates.sh"
   append_to_file: '/bin/bash append_to_file.sh "{{ file }}" "{{ line }}"'

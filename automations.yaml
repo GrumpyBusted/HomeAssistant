@@ -703,85 +703,6 @@
   mode: restart
   trace:
     stored_traces: 100
-- id: '1735743298155'
-  alias: Hjem varmepumpe
-  description: Automatik til styring af central luft-til-vand varmepumpe
-  triggers:
-  - trigger: time_pattern
-    minutes: /15
-  - trigger: state
-    entity_id:
-    - sensor.living_room_target_temperature
-    - sensor.emils_room_target_temperature
-    - sensor.charlies_room_target_temperature
-    - sensor.bedroom_target_temperature
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: numeric_state
-        entity_id: sensor.home_minimum_temperature_24h
-        below: 20
-      - condition: numeric_state
-        entity_id: sensor.home_outside_minimum_temperature_24h
-        below: 10
-      - condition: numeric_state
-        entity_id: sensor.home_outside_maximum_temperature_24h
-        below: 15
-      sequence: []
-    - conditions:
-      - condition: numeric_state
-        entity_id: sensor.home_minimum_temperature_24h
-        above: 20
-      - condition: numeric_state
-        entity_id: sensor.home_outside_minimum_temperature_24h
-        above: 11
-      - condition: numeric_state
-        entity_id: sensor.home_outside_average_temperature_24h
-        above: 16
-      sequence: []
-    - conditions:
-      - condition: template
-        value_template: '{{ states("sensor.living_room_current_temperature")|float
-          < states("sensor.living_room_target_temperature")|float - 3 or states("sensor.emils_room_current_temperature")|float
-          < states("sensor.emils_room_target_temperature")|float - 3 or states("sensor.charlies_room_current_temperature")|float
-          < states("sensor.charlies_room_target_temperature")|float - 3 or states("sensor.bedroom_current_temperature")|float
-          < states("sensor.bedroom_target_temperature")|float - 3 }}'
-      sequence: []
-    - conditions:
-      - condition: template
-        value_template: '{{ states("sensor.living_room_current_temperature")|float
-          < states("sensor.living_room_target_temperature")|float - 1 or states("sensor.emils_room_current_temperature")|float
-          < states("sensor.emils_room_target_temperature")|float - 1 or states("sensor.charlies_room_current_temperature")|float
-          < states("sensor.charlies_room_target_temperature")|float - 1 or states("sensor.bedroom_current_temperature")|float
-          < states("sensor.bedroom_target_temperature")|float - 1 }}'
-      sequence: []
-    - conditions:
-      - condition: template
-        value_template: '{{ states("sensor.living_room_current_temperature")|float
-          < states("sensor.living_room_target_temperature")|float - 0.5 or states("sensor.emils_room_current_temperature")|float
-          < states("sensor.emils_room_target_temperature")|float - 0.5 or states("sensor.charlies_room_current_temperature")|float
-          < states("sensor.charlies_room_target_temperature")|float - 0.5 or states("sensor.bedroom_current_temperature")|float
-          < states("sensor.bedroom_target_temperature")|float - 0.5 }}'
-      sequence: []
-    - conditions:
-      - condition: template
-        value_template: '{{ states("sensor.living_room_current_temperature")|float
-          > states("sensor.living_room_target_temperature")|float - 0.5 and states("sensor.emils_room_current_temperature")|float
-          > states("sensor.emils_room_target_temperature")|float - 0.5 and states("sensor.charlies_room_current_temperature")|float
-          > states("sensor.charlies_room_target_temperature")|float - 0.5 and states("sensor.bedroom_current_temperature")|float
-          > states("sensor.bedroom_target_temperature")|float - 0.5 }}'
-      sequence: []
-    - conditions:
-      - condition: template
-        value_template: '{{ states("sensor.living_room_current_temperature")|float
-          > states("sensor.living_room_target_temperature")|float and states("sensor.emils_room_current_temperature")|float
-          > states("sensor.emils_room_target_temperature")|float and states("sensor.charlies_room_current_temperature")|float
-          > states("sensor.charlies_room_target_temperature")|float and states("sensor.bedroom_current_temperature")|float
-          > states("sensor.bedroom_target_temperature")|float }}'
-      sequence: []
-  mode: queued
-  max: 10
 - id: '1735842629315'
   alias: Entre lås
   description: Automatik til at låse hoveddøren op og i baseret på hvem der er hjemme
@@ -2545,116 +2466,6 @@
   mode: single
   trace:
     stored_traces: 30
-- id: '1737244947943'
-  alias: Volvo XC40 - Lås
-  description: Lås døren op bilen hvis den ikke er låst
-  triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.volvo_xc40_door_front_right
-    - binary_sensor.volvo_xc40_door_front_left
-    - binary_sensor.volvo_xc40_door_rear_right
-    - binary_sensor.volvo_xc40_door_rear_left
-    - binary_sensor.volvo_xc40_tailgate
-    from: 'on'
-    to: 'off'
-    for:
-      hours: 0
-      minutes: 10
-      seconds: 0
-  - trigger: state
-    entity_id:
-    - binary_sensor.volvo_xc40_engine_status
-    from: 'on'
-    to: 'off'
-    for:
-      hours: 0
-      minutes: 10
-      seconds: 0
-  conditions:
-  - condition: state
-    entity_id: binary_sensor.volvo_xc40_door_front_right
-    state: 'off'
-  - condition: state
-    entity_id: binary_sensor.volvo_xc40_door_front_left
-    state: 'off'
-  - condition: state
-    entity_id: binary_sensor.volvo_xc40_door_rear_right
-    state: 'off'
-  - condition: state
-    entity_id: binary_sensor.volvo_xc40_door_rear_left
-    state: 'off'
-  - condition: state
-    entity_id: binary_sensor.volvo_xc40_tailgate
-    state: 'off'
-  - condition: state
-    entity_id: sensor.volvo_xc40_charging_connection_status
-    state: Disconnected
-  - condition: state
-    entity_id: binary_sensor.volvo_xc40_engine_status
-    state: 'off'
-  actions:
-  - action: lock.lock
-    metadata: {}
-    data: {}
-    target:
-      entity_id: lock.volvo_xc40_lock
-  mode: restart
-- id: '1737245308947'
-  alias: Volvo EX30 - Lås
-  description: Lås døren op bilen hvis den ikke er låst
-  triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.volvo_ex30_door_front_right
-    - binary_sensor.volvo_ex30_door_front_left
-    - binary_sensor.volvo_ex30_door_rear_right
-    - binary_sensor.volvo_ex30_door_rear_left
-    - binary_sensor.volvo_ex30_tailgate
-    from: 'on'
-    to: 'off'
-    for:
-      hours: 0
-      minutes: 10
-      seconds: 0
-  - trigger: state
-    entity_id:
-    - binary_sensor.volvo_ex30_engine_status
-    from: 'on'
-    to: 'off'
-    for:
-      hours: 0
-      minutes: 10
-      seconds: 0
-  conditions:
-  - condition: state
-    entity_id: binary_sensor.volvo_ex30_door_front_right
-    state: 'off'
-  - condition: state
-    entity_id: binary_sensor.volvo_ex30_door_front_left
-    state: 'off'
-  - condition: state
-    entity_id: binary_sensor.volvo_ex30_door_rear_right
-    state: 'off'
-  - condition: state
-    entity_id: binary_sensor.volvo_ex30_door_rear_left
-    state: 'off'
-  - condition: state
-    entity_id: binary_sensor.volvo_ex30_tailgate
-    state: 'off'
-  - condition: state
-    entity_id: sensor.volvo_ex30_charging_connection_status
-    state: Disconnected
-  - condition: state
-    entity_id: binary_sensor.volvo_ex30_engine_status
-    state: 'off'
-  actions:
-  - action: lock.lock
-    metadata: {}
-    data: {}
-    target:
-      entity_id: lock.volvo_ex30_lock
-  mode: restart
 - id: '1737299093662'
   alias: Emils værelse varme
   description: Automatik til at styre varmen på Emils værelse
@@ -3224,26 +3035,24 @@
   trace:
     stored_traces: 50
 - id: '1737757884659'
-  alias: Hjem varme slukket
+  alias: Hjem varme motioner radiatorventiler
   description: 'Automatik til at motionere radiator ventiler når varmepumpe er slukket.
 
     '
   triggers:
   - trigger: time
     at: 01:00:00
-  conditions:
-  - condition: time
-    weekday:
-    - mon
-  - condition: state
-    entity_id: binary_sensor.home_central_heating
-    state: 'off'
+  conditions: []
   actions:
-  - action: script.turn_on
-    metadata: {}
-    data: {}
-    target:
-      entity_id: script.exercising_radiator_valves
+  - if:
+    - condition: time
+      weekday:
+      - mon
+    - condition: state
+      entity_id: binary_sensor.home_central_heating
+      state: 'off'
+    then:
+    - action: script.exercising_radiator_valves
   mode: single
 - id: '1737796089950'
   alias: Solcast PV Forecast opdater
@@ -4526,7 +4335,7 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.driveway_vibration_sensor_mailbox_vibration
+    - binary_sensor.driveway_mailbox_vibration_sensor
     from: 'off'
     to: 'on'
     id: new_post
@@ -4536,7 +4345,7 @@
     data:
       subject: Tøm postkasse
       description: Der er nye breve i postkassen ved vejen
-      related_entity_id: binary_sensor.driveway_vibration_sensor_mailbox_vibration
+      related_entity_id: binary_sensor.driveway_mailbox_vibration_sensor
       entity_id: todo.todo_smart_todo
   mode: restart
   trace:
@@ -4671,7 +4480,7 @@
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
-          type: '{{ repeat.item.battery_type }}'
+          type: '{{ repeat.item.battery_type | default('') }}'
           threshold: 5
   mode: restart
   trace:
@@ -4766,8 +4575,8 @@
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
-          type: '{{ repeat.item.battery_type }}'
-          location: '{{ repeat.item.location }}'
+          type: '{{ repeat.item.battery_type | default('') }}'
+          location: '{{ repeat.item.location | default('') }}'
           threshold: 5
   mode: restart
   trace:
@@ -4828,7 +4637,7 @@
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
-          type: '{{ repeat.item.battery_type }}'
+          type: '{{ repeat.item.battery_type | default('') }}'
           threshold: 5
   mode: restart
   trace:
@@ -4901,8 +4710,8 @@
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
-          type: '{{ repeat.item.battery_type }}'
-          location: '{{ repeat.item.location }}'
+          type: '{{ repeat.item.battery_type | default('') }}'
+          location: '{{ repeat.item.location | default('''') }}'
           threshold: 20
   mode: restart
   trace:
@@ -4941,7 +4750,7 @@
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
-          type: '{{ repeat.item.battery_type }}'
+          type: '{{ repeat.item.battery_type | default('') }}'
   mode: restart
   trace:
     stored_traces: 30
@@ -5018,13 +4827,13 @@
   triggers:
   - trigger: numeric_state
     entity_id:
-    - sensor.driveway_vibration_sensor_mailbox_vibration_battery
+    - sensor.driveway_mailbox_vibration_sensor_battery
     below: 20
     for:
       minutes: 3
   - trigger: numeric_state
     entity_id:
-    - sensor.driveway_vibration_sensor_mailbox_vibration_battery
+    - sensor.driveway_mailbox_vibration_sensor_battery
     above: 70
     for:
       minutes: 3
@@ -5034,13 +4843,16 @@
   actions:
   - variables:
       sensors:
-      - entity_id: sensor.driveway_vibration_sensor_mailbox_vibration_battery
+      - entity_id: sensor.driveway_mailbox_vibration_sensor_battery
+        temperature: '{{ states(''sensor.driveway_mailbox_vibration_sensor_device_temperature'')
+          }}'
   - repeat:
       for_each: '{{ sensors }}'
       sequence:
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
+          temperature:
           threshold: 20
   mode: restart
   trace:
@@ -5105,41 +4917,6 @@
   mode: restart
   trace:
     stored_traces: 10
-- id: '1740595186366'
-  alias: Entre dørklokke
-  description: Trigger når dørklokke er aktiveret
-  triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.entrance_doorbell_ringing
-    from: 'off'
-    to: 'on'
-  conditions: []
-  actions:
-  - parallel:
-    - if:
-      - condition: state
-        entity_id: light.garage_light_main
-        state: 'on'
-      then:
-      - repeat:
-          count: 2
-          sequence:
-          - action: light.turn_off
-            metadata: {}
-            data: {}
-            target:
-              entity_id: light.garage_light_main
-          - delay:
-              milliseconds: 200
-          - action: light.turn_on
-            metadata: {}
-            data: {}
-            target:
-              entity_id: light.garage_light_main
-          - delay:
-              milliseconds: 200
-  mode: queued
 - id: '1740779558756'
   alias: Hjem todo affald
   description: Automation til at oprette todo for at tømme affald og tage affaldscontainer
@@ -5531,177 +5308,6 @@
       is_active: '{{ states(''sensor.living_room_printer'') not in [''printing'',
         ''idle''] }}'
   mode: restart
-- id: '1741631411396'
-  alias: Volvo EX30 lås
-  description: Automatik til at låse bilen
-  triggers:
-  - trigger: event
-    event_type: mobile_app_notification_action
-    event_data:
-      action: volvo_ex30_lock
-  conditions: []
-  actions:
-  - action: lock.lock
-    metadata: {}
-    data: {}
-    target:
-      entity_id: lock.volvo_ex30_lock
-  mode: queued
-- id: '1741632116231'
-  alias: Volvo XC40 lås
-  description: Automatik til at låse bilen
-  triggers:
-  - trigger: event
-    event_type: mobile_app_notification_action
-    event_data:
-      action: volvo_xc40_lock
-  conditions: []
-  actions:
-  - action: lock.lock
-    metadata: {}
-    data: {}
-    target:
-      entity_id: lock.volvo_xc40_lock
-  mode: queued
-- id: '1741633531272'
-  alias: Volvo XC40 kontrol
-  description: Automatik til at kontroller status på bilen
-  triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.volvo_xc40_engine_status
-    from: 'on'
-    to: 'off'
-    id: stop
-  - trigger: state
-    entity_id:
-    - binary_sensor.volvo_xc40_engine_status
-  - trigger: state
-    entity_id:
-    - timer.volvo_xc40_engine_status_timer
-    to: idle
-  - trigger: state
-    entity_id:
-    - lock.volvo_xc40_lock
-    to: locked
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.volvo_xc40_engine_status
-        state: 'on'
-      - condition: state
-        entity_id: timer.volvo_xc40_engine_status_timer
-        state: active
-      sequence:
-      - action: timer.finish
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.volvo_xc40_engine_status_timer
-    - conditions:
-      - condition: trigger
-        id:
-        - stop
-      sequence:
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:10:00
-        target:
-          entity_id: timer.volvo_xc40_engine_status_timer
-    - conditions:
-      - condition: not
-        conditions:
-        - condition: state
-          entity_id: lock.volvo_xc40_lock
-          state: locked
-      - condition: state
-        entity_id: timer.volvo_xc40_engine_status_timer
-        state: idle
-      - condition: state
-        entity_id: binary_sensor.volvo_xc40_engine_status
-        state: 'off'
-      sequence:
-      - action: notify.mobile_app_anders_iphone
-        data:
-          title: Bilen er ulåst!
-          message: Volvo XC40 er ikke låst
-          data:
-            actions:
-            - action: volvo_xc40_lock
-              title: Lås
-            push:
-              sound:
-                name: default
-                critical: 1
-                volume: 1
-    - conditions:
-      - condition: state
-        entity_id: lock.volvo_xc40_lock
-        state: locked
-      - condition: state
-        entity_id: timer.volvo_xc40_engine_status_timer
-        state: idle
-      - condition: state
-        entity_id: binary_sensor.volvo_xc40_engine_status
-        state: 'off'
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: binary_sensor.volvo_xc40_door_front_left
-          state: 'on'
-        - condition: state
-          entity_id: binary_sensor.volvo_xc40_door_front_right
-          state: 'on'
-        - condition: state
-          entity_id: binary_sensor.volvo_xc40_door_rear_left
-          state: 'on'
-        - condition: state
-          entity_id: binary_sensor.volvo_xc40_door_rear_right
-          state: 'on'
-        - condition: state
-          entity_id: binary_sensor.volvo_xc40_hood
-          state: 'on'
-        - condition: state
-          entity_id: binary_sensor.volvo_xc40_sunroof
-          state: 'on'
-        - condition: state
-          entity_id: binary_sensor.volvo_xc40_tailgate
-          state: 'on'
-        - condition: state
-          entity_id: binary_sensor.volvo_xc40_window_front_left
-          state: 'on'
-        - condition: state
-          entity_id: binary_sensor.volvo_xc40_window_front_right
-          state: 'on'
-        - condition: state
-          entity_id: binary_sensor.volvo_xc40_window_rear_left
-          state: 'on'
-        - condition: state
-          entity_id: binary_sensor.volvo_xc40_window_rear_right
-          state: 'on'
-        - condition: and
-          conditions:
-          - condition: state
-            entity_id: binary_sensor.volvo_xc40_tank_lid
-            state: 'on'
-          - condition: state
-            entity_id: sensor.volvo_xc40_charging_connection_status
-            state: Disconnected
-      sequence:
-      - action: notify.mobile_app_anders_iphone
-        data:
-          title: Bilen er åben!
-          message: En af dørene eller vinduerne på Volvo XC40 er ikke lukket
-          data:
-            push:
-              sound:
-                name: default
-                critical: 1
-                volume: 1
-  mode: queued
 - id: '1742241186159'
   alias: Bryggers todo vaskemaskine
   description: Opret todo opgaver vedrørende vaskemaskine
@@ -7268,54 +6874,6 @@
   max: 10
   trace:
     stored_traces: 50
-- id: '1761149575145'
-  alias: Hjem røgalarm
-  description: Automatik til at styre og koordinere røgalarmer
-  triggers:
-  - trigger: state
-    entity_id: binary_sensor.home_smoke_alarm
-    from: 'off'
-    to: 'on'
-  conditions: []
-  actions:
-  - variables:
-      active: "{{ states.binary_sensor\n   | selectattr('attributes.device_class',
-        'equalto', 'smoke')\n   | selectattr('state', 'equalto', 'on')\n   | map(attribute='name')\n
-        \  | list }}\n"
-      message: "{% if active | length == 0 %}\n  Ingen røg registreret!\n{% elif active
-        | length == 1 %}\n  Der er registreret røg ved {{ active[0] }}!\n{% else %}\n
-        \ Der er registreret røg ved {{ active[:-1] | join(', ') }} og {{ active[-1]
-        }}!\n{% endif %}  \n"
-      phones:
-      - notify.mobile_app_anders_iphone
-  - repeat:
-      for_each: '{{ phones }}'
-      sequence:
-      - data:
-          title: Røgalarm
-          message: '{{ message }}'
-          data:
-            push:
-              sound:
-                name: default
-                critical: 1
-                volume: 1
-              interruption-level: critical
-            presentation_options:
-            - alert
-            - sound
-            - badge
-        action: '{{ repeat.item }}'
-  - action: siren.turn_on
-    metadata: {}
-    data:
-      volume_level: 0.2
-    target:
-      entity_id:
-      - siren.emils_room_smoke_alarm_siren
-      - siren.charlies_room_smoke_alarm_siren
-      - siren.bedroom_smoke_alarm_siren
-  mode: restart
 - id: '1761840992462'
   alias: Terrasse lås
   description: Automatik til at styre terrasse dør låsen
@@ -8799,6 +8357,14 @@
     entity_id:
     - binary_sensor.bedroom_door
   actions:
+  - action: homeassistant.update_entity
+    target:
+      entity_id:
+      - media_player.hallway_photo_frame_joakim
+      - media_player.hallway_photo_frame_emil
+      - media_player.hallway_photo_frame_charlie
+  - delay:
+      seconds: 3
   - if:
     - condition: or
       conditions:
@@ -8827,7 +8393,16 @@
         - media_player.hallway_photo_frame_charlie
         - media_player.hallway_photo_frame_emil
         - media_player.hallway_photo_frame_joakim
-  mode: restart
+  - delay:
+      seconds: 3
+  - action: homeassistant.update_entity
+    target:
+      entity_id:
+      - media_player.hallway_photo_frame_joakim
+      - media_player.hallway_photo_frame_emil
+      - media_player.hallway_photo_frame_charlie
+  mode: queued
+  max: 10
   trace:
     stored_traces: 20
 - id: '1769257682123'
@@ -9153,8 +8728,8 @@
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
-          location: '{{ repeat.item.location }}'
-          temperature: '{{ repeat.item.temperature }}'
+          location: '{{ repeat.item.location | default('') }}'
+          temperature: '{{ repeat.item.temperature | default('') }}'
   mode: restart
   trace:
     stored_traces: 30
@@ -9192,7 +8767,7 @@
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
-          location: '{{ repeat.item.location }}'
+          location: '{{ repeat.item.location | default('') }}'
   mode: restart
   trace:
     stored_traces: 30
@@ -9354,7 +8929,7 @@
       - action: script.create_todo_battery_task
         data:
           entity_id: '{{ repeat.item.entity_id }}'
-          type: '{{ repeat.item.battery_type }}'
+          type: '{{ repeat.item.battery_type | default('') }}'
           threshold: 15
   mode: restart
   trace:
@@ -11246,7 +10821,6 @@
     - delay: 00:03:00
   - variables:
       exclude_entities:
-      - sensor.emils_room_network_switch_uptime
       - light.living_room_smart_plug_christmas_elf_house
       - light.charlies_room_light_bed_lamp
       - light.charlies_room_light_dresser
@@ -11625,6 +11199,8 @@
   - trigger: numeric_state
     entity_id: sensor.greenhouse_current_temperature
     below: 0
+  - trigger: time
+    at: 02:00:00
   conditions: []
   actions:
   - action: script.create_todo_task
@@ -11645,22 +11221,22 @@
   description: Overvåg temperaturen i garagen
   triggers:
   - trigger: numeric_state
-    entity_id: sensor.garage_current_temperature
-    below: 0
-    for:
-      hours: 12
+    entity_id: sensor.garage_avarage_temperature_24h
+    below: 2
+  - trigger: time
+    at: 02:01:00
   conditions: []
   actions:
   - action: script.create_todo_task
     data:
       subject: Der er frost i garagen
-      description: '"Temperaturen i garagen er {{ states(''sensor.garage_current_temperature'')
-        }}, og der har været frost i 12 timer, overvej om sodavand eller andet skal
-        ind."'
+      description: Temperaturen i garagen er {{ states('sensor.garage_current_temperature')
+        }}°C. Gennemsnittet over de sidste 24 timer er {{ states('sensor.garage_avarage_temperature_24h')
+        }}°C. Overvej om sodavand eller andet skal ind.
       entity_id: todo.todo_smart_todo
-      related_entity_id: sensor.garage_current_temperature
-      is_active: '{{ states(''sensor.garage_current_temperature'') | float(10.0) <
-        0.0 }}'
+      related_entity_id: sensor.garage_avarage_temperature_24h
+      is_active: '{{ states(''sensor.garage_avarage_temperature_24h'') | float(10.0)
+        < 2.0 }}'
   mode: queued
   max: 10
   trace:
@@ -11710,7 +11286,7 @@
   - variables:
       default_limit: 200
       custom_limits:
-        automation.utility_room_motion_sensor: 500
+        automation.utility_room_motion_sensor: 700
         automation.utility_room_heating: 300
       offenders: "{% set res = sql_result.result if sql_result is defined else []
         %}  {% set ns = namespace(offenders=[]) %} {% for row in res %}\n  {% set
@@ -12187,3 +11763,58 @@
   max: 10
   trace:
     stored_traces: 30
+- id: '1771052556655'
+  alias: Hjem overvåg ikke brugt automation
+  description: Overvåg automations som ikke har trigget inden for cutoff (default
+    7 dage med undtagelser
+  triggers:
+  - at: '16:00:00'
+    trigger: time
+  conditions: []
+  actions:
+  - variables:
+      default_days: 7
+      custom_days:
+        automation.kitchen_trash_biofilter_next_change: 180
+        automation.home_meter_reading_electricity: 32
+        automation.home_meter_reading_water: 32
+        automation.monitor_data_folder: 32
+        automation.garage_3d_printer: 999
+      offenders: "{% set ns = namespace(offenders=[]) %}\n{% for a in states.automation
+        | list %}\n  {% set days = custom_days.get(a.entity_id, default_days) | int
+        %}\n  {% set cutoff = now() - timedelta(days=days) %}\n  {% set last = state_attr(a.entity_id,
+        'last_triggered') %}\n\n  {% if last is none %}\n    {% set ns.offenders =
+        ns.offenders + [dict(\n      automation_id=a.entity_id,\n      friendly_name=a.name,\n
+        \     last_triggered='never',\n      days_since=999999,\n      cutoff_days=days\n
+        \   )] %}\n  {% else %}\n    {% set last_dt = as_datetime(last) %}\n    {%
+        set age_days = ((now() - last_dt).total_seconds() / 86400) %}\n\n    {% if
+        last_dt < cutoff %}\n      {% set ns.offenders = ns.offenders + [dict(\n        automation_id=a.entity_id,\n
+        \       friendly_name=a.name,\n        last_triggered=(last_dt | as_local).isoformat(),\n
+        \       days_since=age_days | round(1),\n        cutoff_days=days\n      )]
+        %}\n    {% endif %}\n  {% endif %}\n{% endfor %}\n{{ (ns.offenders | sort(attribute='days_since',
+        reverse=true) | list) | to_json }}\n"
+      offenders_obj: '{{ offenders | trim | from_json }}'
+      message: "count: {{ offenders_obj | count }} automations:\n{% for row in offenders_obj
+        %}\n  - automation_id: \"{{ row.automation_id }}\"\n    friendly_name: \"{{
+        row.friendly_name }}\"\n    last_triggered: \"{{ row.last_triggered }}\"\n
+        \   days_since: {{ row.days_since }}\n    cutoff_days: {{ row.cutoff_days
+        }}\n{% endfor %}"
+  - if:
+    - condition: template
+      value_template: '{{ offenders_obj | length > 0 }}'
+    then:
+    - action: system_log.write
+      data:
+        level: warning
+        message: 'Automations ikke kørt indenfor cutoff: {{ message }}'
+    - action: script.push_notification
+      data:
+        type: info
+        recipient: anders
+        persistent: true
+        id: home_assistant_monitor_automation_not_triggered
+        title: '{{ offenders_obj | length }} automations har ikke kørt for nyligt'
+        message: '{{ message }}'
+  mode: single
+  trace:
+    stored_traces: 50

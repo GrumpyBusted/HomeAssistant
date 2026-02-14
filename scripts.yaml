@@ -1354,29 +1354,30 @@ create_todo_battery_task:
           mode: box
   sequence:
   - variables:
-      _device_name: "{% set i = device_id(entity_id) %}\n{% if device %}\n  {{ device
-        }}\n{% else %}\n  {% set n = device_attr(i, 'name_by_user') %}\n  {% if n
-        %}\n    {{ n }}\n  {% else %}\n    {% set n = device_attr(i, 'name') %}\n
-        \   {% if n %}\n      {{ n }}\n    {% else %}\n      {{ entity_id }}\n    {%
-        endif %}\n  {% endif %}\n{% endif %}"
+      _device_name: "{% set i = device_id(entity_id) %}\n{% if device is defined and
+        device %}\n  {{ device }}\n{% else %}\n  {% set n = device_attr(i, 'name_by_user')
+        %}\n  {% if n %}\n    {{ n }}\n  {% else %}\n    {% set n = device_attr(i,
+        'name') %}\n    {% if n %}\n      {{ n }}\n    {% else %}\n      {{ entity_id
+        }}\n    {% endif %}\n  {% endif %}\n{% endif %}"
       _area: "{% if area is defined and area %}\n  {{ area }}\n{% else %}\n  {% set
         n = area_name(entity_id) %}\n  {% if n %}\n    {{ n }}\n  {% else %}\n    {{
         '' }}\n  {% endif %}\n{% endif %}"
       _location: "{% if location is defined and location %}\n  {{ location }}\n{%
         else %}\n  {{ '' }}\n{% endif %}"
-      _type: "{% if type %}\n  {{ type }}\n{% else %}\n  {% if type_entity_id %}\n
-        \   {% set t = states(type_entity_id) %}\n    {% if t not in ['unknown','unavailable','none']
-        %}\n      {{ t }}\n    {% else %}\n      {{ '' }}\n    {% endif %}\n  {% else
-        %}\n    {% set q = state_attr(entity_id, 'battery_quantity') %}\n    {% set
-        s = state_attr(entity_id, 'battery_size') %}\n    {% if s %}\n      {% if
-        q %}\n        {{ q ~ ' x ' ~ s }}\n      {% else %}\n        {{ s }}\n      {%
-        endif %}\n    {% else %}\n      {% set t = states(entity_id | replace('_battery',
-        '_battery_type')) %}\n      {% if t not in ['unknown','unavailable','none']
-        %}\n        {{ t }}\n      {% else %}\n        {{ '' }}\n      {% endif %}\n
-        \   {% endif %}\n  {% endif %}\n{% endif %}"
+      _type: "{% if type is defined and type %}\n  {{ type }}\n{% else %}\n  {% if
+        type_entity_id is defined and type_entity_id %}\n    {% set t = states(type_entity_id)
+        %}\n    {% if t not in ['unknown','unavailable','none'] %}\n      {{ t }}\n
+        \   {% else %}\n      {{ '' }}\n    {% endif %}\n  {% else %}\n    {% set
+        q = state_attr(entity_id, 'battery_quantity') %}\n    {% set s = state_attr(entity_id,
+        'battery_size') %}\n    {% if s %}\n      {% if q %}\n        {{ q ~ ' x '
+        ~ s }}\n      {% else %}\n        {{ s }}\n      {% endif %}\n    {% else
+        %}\n      {% set t = states(entity_id | replace('_battery', '_battery_type'))
+        %}\n      {% if t not in ['unknown','unavailable','none'] %}\n        {{ t
+        }}\n      {% else %}\n        {{ '' }}\n      {% endif %}\n    {% endif %}\n
+        \ {% endif %}\n{% endif %}"
       _level: '{{ states(entity_id) | int(-1) | round(0) }}'
-      _threshold: "{% if threshold %}\n  {{ threshold | round(0) }}\n{% else %}\n
-        \ 10\n{% endif %}"
+      _threshold: "{% if threshold is defined and threshold %}\n  {{ threshold | round(0)
+        }}\n{% else %}\n  10\n{% endif %}"
   - action: system_log.write
     data:
       level: debug
