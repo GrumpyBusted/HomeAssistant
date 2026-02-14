@@ -5187,8 +5187,7 @@
   alias: Stue todo Canon printer
   description: Kontroller blæk status på Canon printer
   triggers:
-  - trigger: numeric_state
-    entity_id:
+  - entity_id:
     - sensor.living_room_printer_black_bk
     - sensor.living_room_printer_black_pgbk
     - sensor.living_room_printer_cyan
@@ -5196,8 +5195,8 @@
     - sensor.living_room_printer_photo_blue
     - sensor.living_room_printer_yellow
     below: 15
-  - trigger: numeric_state
-    entity_id:
+    trigger: numeric_state
+  - entity_id:
     - sensor.living_room_printer_black_bk
     - sensor.living_room_printer_black_pgbk
     - sensor.living_room_printer_cyan
@@ -5205,114 +5204,53 @@
     - sensor.living_room_printer_photo_blue
     - sensor.living_room_printer_yellow
     above: 20
-  - trigger: state
-    entity_id: sensor.living_room_printer
-  - trigger: time
-    at: 03:17:00
+    trigger: numeric_state
+  - entity_id: sensor.living_room_printer
+    trigger: state
+  - at: 03:17:00
+    trigger: time
   conditions: []
   actions:
-  - if:
-    - condition: not
-      conditions:
-      - condition: state
-        entity_id: sensor.living_room_printer_black_pgbk
-        state: unknown
-    then:
-    - action: script.create_todo_task
-      data:
-        subject: Skift sort (PGBK) blæk på printer
-        description: 'Blæk niveau for sort (PGBK) er {{ states(''sensor.living_room_printer_black_pgbk'')
-          }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 580 PGBK (Black)'
-        related_entity_id: sensor.living_room_printer_black_pgbk
-        entity_id: todo.todo_smart_todo
-        is_active: '{{ states(''sensor.living_room_printer_black_pgbk'')|int < state_attr(''sensor.living_room_printer_black_pgbk'',
-          ''marker_low_level'') }}'
-  - if:
-    - condition: not
-      conditions:
-      - condition: state
-        entity_id: sensor.living_room_printer_black_bk
-        state: unknown
-    then:
-    - action: script.create_todo_task
-      data:
-        subject: Skift sort (BK) blæk på printer
-        description: 'Blæk niveau for sort (BK) er {{ states(''sensor.living_room_printer_black_bk'')
-          }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 BK (Black)'
-        related_entity_id: sensor.living_room_printer_black_bk
-        entity_id: todo.todo_smart_todo
-        is_active: '{{ states(''sensor.living_room_printer_black_bk'')|int < state_attr(''sensor.living_room_printer_black_bk'',
-          ''marker_low_level'') }}'
-  - if:
-    - condition: not
-      conditions:
-      - condition: state
-        entity_id: sensor.living_room_printer_cyan
-        state: unknown
-    then:
-    - action: script.create_todo_task
-      data:
-        subject: Skift cyan blæk på printer
-        description: 'Blæk niveau for cyan er {{ states(''sensor.living_room_printer_cyan'')
-          }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 C (Cyan)'
-        related_entity_id: sensor.living_room_printer_cyan
-        entity_id: todo.todo_smart_todo
-        is_active: '{{ states(''sensor.living_room_printer_cyan'')|int < state_attr(''sensor.living_room_printer_cyan'',
-          ''marker_low_level'') }}'
-  - if:
-    - condition: not
-      conditions:
-      - condition: state
-        entity_id: sensor.living_room_printer_magenta
-        state: unknown
-    then:
-    - action: script.create_todo_task
-      data:
-        subject: Skift magenta blæk på printer
-        description: 'Blæk niveau for magenta er {{ states(''sensor.living_room_printer_magenta'')
-          }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 M (Magenta)'
-        related_entity_id: sensor.living_room_printer_magenta
-        entity_id: todo.todo_smart_todo
-        is_active: '{{ states(''sensor.living_room_printer_magenta'')|int < state_attr(''sensor.living_room_printer_magenta'',
-          ''marker_low_level'') }}'
-  - if:
-    - condition: not
-      conditions:
-      - condition: state
-        entity_id: sensor.living_room_printer_photo_blue
-        state: unknown
-    then:
-    - action: script.create_todo_task
-      data:
-        subject: Skift foto blå blæk på printer
-        description: 'Blæk niveau for foto blå er {{ states(''sensor.living_room_printer_photo_blue'')
-          }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 PB (Photo blå)'
-        related_entity_id: sensor.living_room_printer_photo_blue
-        entity_id: todo.todo_smart_todo
-        is_active: '{{ states(''sensor.living_room_printer_photo_blue'')|int < state_attr(''sensor.living_room_printer_photo_blue'',
-          ''marker_low_level'') }}'
-  - if:
-    - condition: not
-      conditions:
-      - condition: state
-        entity_id: sensor.living_room_printer_yellow
-        state: unknown
-    then:
-    - action: script.create_todo_task
-      data:
-        subject: Skift gul blæk på printer
-        description: 'Blæk niveau for gul er {{ states(''sensor.living_room_printer_yellow'')
-          }}% på Canon TS8300 printer.<br> Blæk type: Canon Pixma 581 Y (Yellow)'
-        related_entity_id: sensor.living_room_printer_yellow
-        entity_id: todo.todo_smart_todo
-        is_active: '{{ states(''sensor.living_room_printer_yellow'')|int < state_attr(''sensor.living_room_printer_yellow'',
-          ''marker_low_level'') }}'
+  - repeat:
+      for_each:
+      - entity: sensor.living_room_printer_black_pgbk
+        name: sort (PGBK)
+        ink: Canon Pixma 580 PGBK (Black)
+      - entity: sensor.living_room_printer_black_bk
+        name: sort (BK)
+        ink: Canon Pixma 581 BK (Black)
+      - entity: sensor.living_room_printer_cyan
+        name: cyan
+        ink: Canon Pixma 581 C (Cyan)
+      - entity: sensor.living_room_printer_magenta
+        name: magenta
+        ink: Canon Pixma 581 M (Magenta)
+      - entity: sensor.living_room_printer_photo_blue
+        name: foto blå
+        ink: Canon Pixma 581 PB (Photo blå)
+      - entity: sensor.living_room_printer_yellow
+        name: gul
+        ink: Canon Pixma 581 Y (Yellow)
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ states(repeat.item.entity) != ''unknown'' }}'
+        then:
+        - action: script.create_todo_task
+          data:
+            subject: Skift {{ repeat.item.name }} blæk på printer
+            description: 'Blæk niveau for {{ repeat.item.name }} er {{ states(repeat.item.entity)
+              }}% på Canon TS8300 printer.<br> Blæk type: {{ repeat.item.ink }}'
+            related_entity_id: '{{ repeat.item.entity }}'
+            entity_id: todo.todo_smart_todo
+            is_active: '{{ states(repeat.item.entity)|int < state_attr(repeat.item.entity,
+              ''marker_low_level'') }}'
   - action: script.create_todo_task
     data:
       subject: Løs problem med printer
-      description: 'Der er registreret et problem med Canon TS8300 printer. <br>Message:
-        {{ state_attr(''sensor.living_room_printer'', ''state_message'') }}  <br>Reason:
-        {{ state_attr(''sensor.living_room_printer'', ''state_reason'') }} '
+      description: 'Der er registreret et problem med Canon TS8300 printer.<br> Message:
+        {{ state_attr(''sensor.living_room_printer'', ''state_message'') }}<br> Reason:
+        {{ state_attr(''sensor.living_room_printer'', ''state_reason'') }}'
       related_entity_id: sensor.living_room_printer
       entity_id: todo.todo_smart_todo
       is_active: '{{ states(''sensor.living_room_printer'') not in [''printing'',
@@ -8392,7 +8330,24 @@
   - trigger: state
     entity_id:
     - binary_sensor.bedroom_door
+  - trigger: homeassistant
+    event: start
+    id: started
   actions:
+  - if:
+    - condition: trigger
+      id: started
+    then:
+    - action: androidtv.adb_command
+      data:
+        command: echo test
+      target:
+        entity_id:
+        - media_player.hallway_photo_frame_joakim
+        - media_player.hallway_photo_frame_emil
+        - media_player.hallway_photo_frame_charlie
+    - delay:
+        seconds: 30
   - action: homeassistant.update_entity
     target:
       entity_id:
@@ -11237,7 +11192,8 @@
       devices: "[\n  {% for room in response.content.rooms %}\n    {% for device in
         room.devices %}\n      {\n        \"roomName\": \"{{ room.roomName }}\",\n
         \       \"deviceSerialNo\": \"{{ device.serialNumber }}\",\n        \"batteryState\":
-        \"{{ device.batteryState }}\",\n        \"type\": \"{{ state_attr('sensor.tado_device_types',
+        \"{{ device.batteryState }}\",\n        \"mountingState\": \"{{ device.mountingState
+        | default('') }}\",\n        \"type\": \"{{ state_attr('sensor.tado_device_types',
         'types').get(device.type, device.type) }}\",\n        \"location\": \"{{ state_attr('sensor.tado_device_locations',
         'locations').get(device.serialNumber, device.serialNumber) }}\",\n        \"entity_id\":
         \"{{ state_attr('sensor.tado_device_ids', 'ids').get(device.serialNumber,
@@ -11267,6 +11223,20 @@
           related_entity_id: '{{ devices[repeat.index - 1].entity_id }}'
           entity_id: todo.todo_smart_todo
           is_active: '{{ devices[repeat.index - 1].batteryState != ''NORMAL'' }}'
+      - action: script.create_todo_task
+        data:
+          subject: Monter {{ devices[repeat.index - 1].type }} korrekt i {{ devices[repeat.index
+            - 1].roomName }}{{ '' if not devices[repeat.index - 1].location else '
+            (' ~ devices[repeat.index - 1].location ~ ')'}}
+          description: Monter og kalibrer Tado {{ devices[repeat.index - 1].type }}
+            med serie no {{ devices[repeat.index - 1].deviceSerialNo }}, der er pladseret
+            {{ devices[repeat.index - 1].roomName }}{{ '' if not devices[repeat.index
+            - 1].location else ' (' ~ devices[repeat.index - 1].location ~ ')'}},
+            monteringsstatus er {{ devices[repeat.index - 1].mountingState }}.
+          related_entity_id: '{{ devices[repeat.index - 1].entity_id }}_mount'
+          entity_id: todo.todo_smart_todo
+          is_active: '{{ (devices[repeat.index - 1].mountingState | default(''''))
+            not in ['''', ''CALIBRATED''] }}'
   mode: restart
 - id: '1770917834825'
   alias: Drivhus todo temperatur
