@@ -1,8 +1,4 @@
 - sensor:
-    - name: "Tado Refresh Token"
-      unique_id: 948E4853-423F-4D2C-9F1B-8CC87C239CA9
-      state: !secret tado_refresh_token
-- sensor:
     - name: "Tado Device Types"
       unique_id: 05D4CDF1-9E4B-481A-8F0F-13684D95B8FF
       state: "OK"

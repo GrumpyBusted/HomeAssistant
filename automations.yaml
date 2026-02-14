@@ -11174,24 +11174,45 @@
     at: 03:20:00
   conditions: []
   actions:
-  - action: rest_command.tado_get_auth_token
-    data: 
-      secrets:
-        tado_username: '{{ states(''sensor.tado_username'') }}'
-        tado_password: '{{ states(''sensor.tado_password'') }}'
-        tado_client_secret: '{{ states(''sensor.tado_client_secret'') }}'
-    response_variable: response
-  - action: system_log.write
+  - action: rest_command.tado_get_access_token
     data:
-      level: debug
-      message: 'Response: {{ response }}
-
-        '
+      refresh_token: '{{ states(''input_text.tado_refresh_token'') }}'
+    response_variable: response
+  - if:
+    - condition: template
+      value_template: '{{ response.status != 200 }}'
+    then:
+    - action: script.push_notification
+      data:
+        type: warning
+        recipient: anders
+        persistent: true
+        id: rest_command.tado_get_access_token
+        title: 'Fejl ved get access token fra Tado - Status: {{ response.status }}'
+        message: '{{ response }}'
+    - stop: Fejl fra get_access_token fra tado
   - variables:
-      token: '{{ response.content.access_token }}'
+      access_token: '{{ response.content.access_token }}'
+      refresh_token: '{{ response.content.refresh_token }}'
+  - if:
+    - condition: template
+      value_template: '{{ refresh_token == '''' or access_token == '''' }}'
+    then:
+    - action: system_log.write
+      data:
+        level: debug
+        message: 'Response: {{ response }}
+
+          '
+    - stop: Ingen token fra get_access_token fra Tado
+  - action: input_text.set_value
+    target:
+      entity_id: input_text.tado_refresh_token
+    data:
+      value: '{{ refresh_token }}'
   - action: rest_command.tado_get_profile
     data:
-      bearer_token: '{{ token }}'
+      bearer_token: '{{ access_token }}'
     response_variable: response
   - action: system_log.write
     data:
@@ -11204,7 +11225,7 @@
   - action: rest_command.tado_get_rooms_and_devices
     data:
       home_id: '{{ home_id }}'
-      bearer_token: '{{ token }}'
+      bearer_token: '{{ access_token }}'
     response_variable: response
   - action: system_log.write
     data:
@@ -11244,7 +11265,7 @@
             batteri status er {{ devices[repeat.index - 1].batteryState }}. Batteri:
             {{ devices[repeat.index - 1].battery }}'
           related_entity_id: '{{ devices[repeat.index - 1].entity_id }}'
-          entity_id: todo.home_smart_todo
+          entity_id: todo.todo_smart_todo
           is_active: '{{ devices[repeat.index - 1].batteryState != ''NORMAL'' }}'
   mode: restart
 - id: '1770917834825'

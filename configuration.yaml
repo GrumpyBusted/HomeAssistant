@@ -38,7 +38,8 @@ rest_command:
     url: "https://login.tado.com/oauth2/token?client_id=1bb50063-6b0c-4d11-bd99-387f4a91cc46&device_code={{ device_code }}&grant_type=urn:ietf:params:oauth:grant-type:device_code"
     method: "POST"
   tado_get_access_token:
-    url: "https://login.tado.com/oauth2/token?client_id=1bb50063-6b0c-4d11-bd99-387f4a91cc46&grant_type=refresh_token&refresh_token={{ secrets.tado_refresh_token }}"
+    url: "https://login.tado.com/oauth2/token?client_id=1bb50063-6b0c-4d11-bd99-387f4a91cc46&grant_type=refresh_token&refresh_token={{ refresh_token }}"
+    method: "POST"
   tado_get_profile:
     url: "https://my.tado.com/api/v2/me"
     method: "GET"
