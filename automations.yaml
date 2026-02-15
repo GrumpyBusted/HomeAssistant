@@ -1209,6 +1209,7 @@
   conditions: []
   actions:
   - variables:
+      transition: 1
       brightness: '{{ (state_attr(''light.hallway_lights'', ''brightness'') | int(0)
         / 255 * 100) | int(0) }}'
       kelvin: '{{ state_attr(''light.hallway_lights'', ''color_temp_kelvin'') | int(0)
@@ -1257,6 +1258,7 @@
         state: 'off'
       sequence:
       - variables:
+          transition: 10
           brightness: 25
           lights:
           - light.hallway_light_bathroom
@@ -1285,6 +1287,18 @@
       sequence:
       - variables:
           brightness: 0
+          transition: 0
+    - conditions:
+      - condition: trigger
+        id:
+        - bedroom_door_opened
+      - condition: state
+        entity_id: binary_sensor.hallway_presence
+        state: 'on'
+      sequence:
+      - variables:
+          brightness: 75
+          transition: 2700
     - conditions:
       - condition: trigger
         id:
@@ -1300,6 +1314,7 @@
         state: 'off'
       sequence:
       - variables:
+          transition: 10
           brightness: 25
           kelvin: 2700
     - conditions:
@@ -1309,9 +1324,6 @@
       - condition: state
         entity_id: binary_sensor.hallway_presence
         state: 'on'
-      - condition: state
-        entity_id: binary_sensor.hallway_light
-        state: 'off'
       sequence:
       - variables:
           brightness: 75
@@ -1329,6 +1341,7 @@
       sequence:
       - variables:
           brightness: 0
+          transition: 30
     - conditions:
       - condition: trigger
         id:
@@ -1344,6 +1357,7 @@
         state: 'off'
       sequence:
       - variables:
+          transition: 60
           brightness: 75
           kelvin: 2700
     - conditions:
@@ -1372,8 +1386,15 @@
       - condition: state
         entity_id: binary_sensor.bedroom_sleeping
         state: 'on'
+      - condition: state
+        entity_id: binary_sensor.monique_sleep_window
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
       sequence:
       - variables:
+          transition: 10
           brightness: 25
           kelvin: 2700
     - conditions:
@@ -1469,7 +1490,7 @@
       sequence:
       - action: light.turn_off
         data:
-          transition: 1
+          transition: '{{ transition }}'
         target:
           entity_id: '{{ lights }}'
     - conditions:
@@ -1481,7 +1502,7 @@
         target:
           entity_id: '{{ lights }}'
         data:
-          transition: 1
+          transition: '{{ transition }}'
           color_temp_kelvin: '{{ kelvin }}'
           brightness_pct: '{{ brightness }}'
     default:
@@ -1489,7 +1510,7 @@
       target:
         entity_id: '{{ lights }}'
       data:
-        transition: 1
+        transition: '{{ transition }}'
         color_temp_kelvin: '{{ kelvin }}'
         brightness_pct: '{% set bedroom = (state_attr(''light.bedroom_lights'', ''brightness'')
           | int(0) / 255 * 100) | int %} {{ min(bedroom, brightness) if 0 < bedroom
@@ -2077,13 +2098,9 @@
       - condition: trigger
         id:
         - detected
-        - blind_opened
       - condition: numeric_state
         entity_id: input_number.bedroom_blind_position
         above: 1
-      - condition: state
-        entity_id: binary_sensor.bedroom_presence
-        state: 'on'
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -2097,9 +2114,6 @@
       - condition: trigger
         id:
         - cleared
-      - condition: numeric_state
-        entity_id: input_number.bedroom_blind_position
-        above: 1
       sequence:
       - action: light.turn_off
         metadata: {}
@@ -2108,6 +2122,35 @@
         target:
           entity_id:
           - light.bedroom_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - blind_opened
+      - condition: state
+        entity_id: binary_sensor.bedroom_presence
+        state: 'on'
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 30
+          color_temp_kelvin: 2700
+          brightness_pct: 80
+        target:
+          entity_id: light.bedroom_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - blind_closed
+      - condition: state
+        entity_id: binary_sensor.bedroom_light
+        state: 'on'
+      sequence:
+      - action: script.bedroom_light_sunset
+        data:
+          transition: 180
+          brightness_from: 200
+          brightness_to: 50
     - conditions:
       - condition: trigger
         id:
@@ -2165,19 +2208,6 @@
         target:
           entity_id:
           - light.bedroom_lights
-    - conditions:
-      - condition: trigger
-        id:
-        - blind_closed
-      - condition: state
-        entity_id: binary_sensor.bedroom_light
-        state: 'on'
-      sequence:
-      - action: script.bedroom_light_sunset
-        data:
-          transition: 180
-          brightness_from: 200
-          brightness_to: 50
     - conditions:
       - condition: trigger
         id:
@@ -3456,6 +3486,9 @@
   - trigger: state
     entity_id:
     - sensor.garage_3d_printer
+    from:
+    - busy
+    - printing
     to:
     - finished
     - idle
@@ -3505,9 +3538,21 @@
         data:
           duration: 00:10:00
       - action: script.create_todo_task
-        metadata: {}
         data:
-          is_active: true
+          subject: Hent 3D printer
+          entity_id: todo.todo_smart_todo
+          description: 3D-printeren i garagen er færdig, hent printet og gør printeren
+            ren.
+          related_entity_id: sensor.garage_3d_printer
+      - action: script.push_notification
+        data:
+          type: info
+          recipient: emil
+          persistent: false
+          id: 3d_printer_finished
+          title: 3D-print er færdig
+          message: 3D-printeren i garagen er færdig, hent printet og gør printeren
+            ren.
     - conditions:
       - condition: trigger
         id: started
@@ -3515,10 +3560,6 @@
       - action: timer.cancel
         target:
           entity_id: timer.garage_3d_printer_timer
-      - action: script.create_todo_task
-        metadata: {}
-        data:
-          is_active: false
     - conditions:
       - condition: trigger
         id: failed
@@ -3527,16 +3568,31 @@
         target:
           entity_id: timer.garage_3d_printer_timer
       - action: script.create_todo_task
-        metadata: {}
         data:
-          is_active: false
+          subject: Kontroller 3D printer
+          entity_id: todo.todo_smart_todo
+          description: 3D-printeren i garagen er stoppet med status [{{ states('sensor.garage_3d_printer')
+            }}], kontroller og genstart.
+          related_entity_id: sensor.garage_3d_printer
+      - action: script.push_notification
+        data:
+          type: warning
+          recipient: emil
+          persistent: false
+          id: 3d_printer_failed
+          title: 3D-print er fejlet
+          message: 3D-printeren i garagen er stoppet med status [{{states('sensor.garage_3d_printer')
+            }}]
     - conditions:
       - condition: trigger
         id: timeout
+      - condition: state
+        entity_id: sensor.garage_3d_printer
+        state:
+        - idle
+        - finished
       sequence:
       - action: light.turn_off
-        metadata: {}
-        data: {}
         target:
           entity_id: light.garage_3d_printer_power
     - conditions:
@@ -3547,17 +3603,39 @@
         data:
           device_id:
           - 5120a1d4206d34361feb88c4094a20de
+      - delay:
+          seconds: 3
+      - action: homeassistant.disable_config_entry
+        data:
+          config_entry_id: 01JGCEWM58T7N5MY3Z1HSEDK4E
+      - delay:
+          seconds: 3
     - conditions:
       - condition: trigger
         id: 'on'
       sequence:
-      - action: timer.cancel
-        target:
-          entity_id: timer.garage_3d_printer_timer
+      - action: homeassistant.enable_config_entry
+        data:
+          config_entry_id: 01JGCEWM58T7N5MY3Z1HSEDK4E
+      - delay:
+          seconds: 3
       - action: homeassistant.enable_device
         data:
           device_id:
           - 5120a1d4206d34361feb88c4094a20de
+      - delay:
+          seconds: 3
+      - action: homeassistant.reload_config_entry
+        data:
+          entry_id: 01JGCEWM58T7N5MY3Z1HSEDK4E
+      - delay:
+          seconds: 3
+      - action: timer.start
+        metadata: {}
+        target:
+          entity_id: timer.garage_3d_printer_timer
+        data:
+          duration: 01:00:00
   mode: queued
   max: 10
   trace:
@@ -3896,19 +3974,19 @@
   description: Automatik til at sætte status helper for medie i stuen
   triggers:
   - trigger: state
-    entity_id: media_player.living_room_apple_tv_media_player
+    entity_id: sensor.living_room_apple_tv_media_player_safe
     to:
     - playing
     - buffering
     id: started
   - trigger: state
-    entity_id: media_player.living_room_apple_tv_media_player
+    entity_id: sensor.living_room_apple_tv_media_player_safe
     to:
     - idle
     - paused
     id: ended
   - trigger: state
-    entity_id: media_player.living_room_apple_tv_media_player
+    entity_id: sensor.living_room_apple_tv_media_player_safe
     to: 'off'
     id: 'off'
     for:
@@ -3958,7 +4036,7 @@
         id:
         - timeout
       - condition: state
-        entity_id: media_player.living_room_apple_tv_media_player
+        entity_id: sensor.living_room_apple_tv_media_player_safe
         state:
         - idle
         - paused
@@ -4105,6 +4183,9 @@
       - condition: state
         entity_id: binary_sensor.bedroom_sleeping
         state: 'off'
+      - condition: numeric_state
+        entity_id: input_number.bedroom_blind_position
+        above: 1
       sequence:
       - variables:
           mode: filter
@@ -5014,175 +5095,109 @@
   trace:
     stored_traces: 30
 - id: '1740941401019'
-  alias: Todo iPhone indstilinger
-  description: Automatik til at kontroller iPhone status
+  alias: Todo iPhone indstillinger
+  description: Automatik til at kontrollere iPhone-status
   triggers:
-  - trigger: state
-    entity_id:
+  - entity_id:
     - sensor.anders_iphone_location_permission
     - sensor.monique_iphone_location_permission
     - sensor.emil_iphone_location_permission
     - sensor.charlie_iphone_location_permission
-  - trigger: state
-    entity_id:
+    id: permission_changed
+    trigger: state
+  - entity_id:
     - sensor.anders_iphone_connection_type
     - sensor.monique_iphone_connection_type
     - sensor.emil_iphone_connection_type
     - sensor.charlie_iphone_connection_type
     to: Wi-Fi
-  - trigger: time
-    at: 05:00:00
+    id: wifi_connected
+    trigger: state
+  - at: 05:00:00
+    id: periodic
+    trigger: time
   conditions: []
   actions:
-  - action: script.create_todo_task
-    metadata: {}
-    data:
-      subject: Skift lokations tilladelse for Anders iPhone til altid
-      description: I indstilinger under Anonymitet & sikkerhed og Lokalitetstjenester,
-        sæt tilladelse for appen Home Assistant til altid og præcis lokation
-      related_entity_id: sensor.anders_iphone_location_permission
-      entity_id: todo.todo_smart_todo
-      is_active: '{{ states(''sensor.anders_iphone_location_permission'') != ''Authorized
-        Always'' }}'
-  - action: script.create_todo_task
-    metadata: {}
-    data:
-      subject: Skift lokations tilladelse for Monqiue iPhone til altid
-      description: I indstilinger under Anonymitet & sikkerhed og Lokalitetstjenester,
-        sæt tilladelse for appen Home Assistant til altid og præcis lokation
-      related_entity_id: sensor.monique_iphone_location_permission
-      entity_id: todo.todo_smart_todo
-      is_active: '{{ states(''sensor.monique_iphone_location_permission'') != ''Authorized
-        Always'' }}'
-  - action: script.create_todo_task
-    metadata: {}
-    data:
-      subject: Skift lokations tilladelse for Emil iPhone til altid
-      description: I indstilinger under Anonymitet & sikkerhed og Lokalitetstjenester,
-        sæt tilladelse for appen Home Assistant til altid og præcis lokation
-      related_entity_id: sensor.emil_iphone_location_permission
-      entity_id: todo.todo_smart_todo
-      is_active: '{{ states(''sensor.emil_iphone_location_permission'') != ''Authorized
-        Always'' }}'
-  - action: script.create_todo_task
-    metadata: {}
-    data:
-      subject: Skift lokations tilladelse for Charlie iPhone til altid
-      description: I indstilinger under Anonymitet & sikkerhed og Lokalitetstjenester,
-        sæt tilladelse for appen Home Assistant til altid og præcis lokation
-      related_entity_id: sensor.charlie_iphone_location_permission
-      entity_id: todo.todo_smart_todo
-      is_active: '{{ states(''sensor.charlie_iphone_location_permission'') != ''Authorized
-        Always'' }}'
+  - variables:
+      iphones:
+      - name: Anders
+        location_permission: sensor.anders_iphone_location_permission
+        connection_type: sensor.anders_iphone_connection_type
+        device_tracker: device_tracker.anders_iphone
+        notify: notify.mobile_app_anders_iphone
+      - name: Monique
+        location_permission: sensor.monique_iphone_location_permission
+        connection_type: sensor.monique_iphone_connection_type
+        device_tracker: device_tracker.monique_iphone
+        notify: notify.mobile_app_monique_iphone
+      - name: Emil
+        location_permission: sensor.emil_iphone_location_permission
+        connection_type: sensor.emil_iphone_connection_type
+        device_tracker: device_tracker.emil_iphone
+        notify: notify.mobile_app_emil_iphone
+      - name: Charlie
+        location_permission: sensor.charlie_iphone_location_permission
+        connection_type: sensor.charlie_iphone_connection_type
+        device_tracker: device_tracker.charlie_iphone
+        notify: notify.mobile_app_charlie_iphone
   - if:
-    - condition: state
-      entity_id: sensor.anders_iphone_connection_type
-      state: Wi-Fi
+    - condition: trigger
+      id:
+      - permission_changed
+      - periodic
     then:
-    - data:
-        entity_id:
-        - device_tracker.anders_iphone
-      action: homeassistant.update_entity
-    - action: notify.mobile_app_anders_iphone
-      data:
-        message: request_location_update
-    - delay:
-        hours: 0
-        minutes: 0
-        seconds: 10
-        milliseconds: 0
-    - action: script.create_todo_task
-      metadata: {}
-      data:
-        subject: Problem med lokation opdating fra Anders iPhone
-        description: Lokationen fra Anders iPhone er ikke bleve opdateret som forventet,
-          kontroller indstillinger for Home Assistant app'en
-        related_entity_id: device_tracker.anders_iphone
-        entity_id: todo.todo_smart_todo
-        is_active: '{{ (as_timestamp(now()) - as_timestamp(states.device_tracker.anders_iphone.last_updated))
-          > 60 }}'
+    - repeat:
+        for_each: '{{ iphones }}'
+        sequence:
+        - action: script.create_todo_task
+          data:
+            subject: 'Lokation: Tillad altid ({{ repeat.item.name }} iPhone)'
+            description: Gå til Indstillinger → Anonymitet & sikkerhed → Lokalitetstjenester,
+              og sæt Home Assistant til "Altid". Slå også "Præcis lokalitet" til.
+            related_entity_id: '{{ repeat.item.location_permission }}'
+            entity_id: todo.todo_smart_todo
+            is_active: '{{ states(repeat.item.location_permission) != ''Authorized
+              Always'' }}'
   - if:
-    - condition: state
-      entity_id: sensor.monique_iphone_connection_type
-      state: Wi-Fi
+    - condition: trigger
+      id:
+      - wifi_connected
+      - periodic
     then:
-    - data:
-        entity_id:
-        - device_tracker.monique_iphone
-      action: homeassistant.update_entity
-    - action: notify.mobile_app_monique_iphone
-      data:
-        message: request_location_update
-    - delay:
-        hours: 0
-        minutes: 0
-        seconds: 10
-        milliseconds: 0
-    - action: script.create_todo_task
-      metadata: {}
-      data:
-        subject: Problem med lokation opdating fra Monique iPhone
-        description: Lokationen fra Monique iPhone er ikke bleve opdateret som forventet,
-          kontroller indstillinger for Home Assistant app'en
-        related_entity_id: device_tracker.monique_iphone
-        entity_id: todo.todo_smart_todo
-        is_active: '{{ (as_timestamp(now()) - as_timestamp(states.device_tracker.monique_iphone.last_updated))
-          > 60 }}'
-  - if:
-    - condition: state
-      entity_id: sensor.emil_iphone_connection_type
-      state: Wi-Fi
-    then:
-    - data:
-        entity_id:
-        - device_tracker.emil_iphone
-      action: homeassistant.update_entity
-    - action: notify.mobile_app_emil_iphone
-      data:
-        message: request_location_update
-    - delay:
-        hours: 0
-        minutes: 0
-        seconds: 10
-        milliseconds: 0
-    - action: script.create_todo_task
-      metadata: {}
-      data:
-        subject: Problem med lokation opdating fra Emil iPhone
-        description: Lokationen fra Emil iPhone er ikke bleve opdateret som forventet,
-          kontroller indstillinger for Home Assistant app'en
-        related_entity_id: device_tracker.emil_iphone
-        entity_id: todo.todo_smart_todo
-        is_active: '{{ (as_timestamp(now()) - as_timestamp(states.device_tracker.emil_iphone.last_updated))
-          > 60 }}'
-  - if:
-    - condition: state
-      entity_id: sensor.charlie_iphone_connection_type
-      state: Wi-Fi
-    then:
-    - data:
-        entity_id:
-        - device_tracker.charlie_iphone
-      action: homeassistant.update_entity
-    - action: notify.mobile_app_charlie_iphone
-      data:
-        message: request_location_update
-    - delay:
-        hours: 0
-        minutes: 0
-        seconds: 10
-        milliseconds: 0
-    - action: script.create_todo_task
-      metadata: {}
-      data:
-        subject: Problem med lokation opdating fra Charlie iPhone
-        description: Lokationen fra Charlie iPhone er ikke bleve opdateret som forventet,
-          kontroller indstillinger for Home Assistant app'en
-        related_entity_id: device_tracker.charlie_iphone
-        entity_id: todo.todo_smart_todo
-        is_active: '{{ (as_timestamp(now()) - as_timestamp(states.device_tracker.charlie_iphone.last_updated))
-          > 60 }}'
+    - repeat:
+        for_each: '{{ iphones }}'
+        sequence:
+        - if:
+          - condition: template
+            value_template: '{{ states(repeat.item.connection_type) == ''Wi-Fi'' }}'
+          then:
+          - action: homeassistant.update_entity
+            data:
+              entity_id: '{{ repeat.item.device_tracker }}'
+          - action: '{{ repeat.item.notify }}'
+            data:
+              message: request_location_update
+    - delay: 00:00:10
+    - repeat:
+        for_each: '{{ iphones }}'
+        sequence:
+        - if:
+          - condition: template
+            value_template: '{{ states(repeat.item.connection_type) == ''Wi-Fi'' }}'
+          then:
+          - action: script.create_todo_task
+            data:
+              subject: Lokation opdateres ikke ({{ repeat.item.name }} iPhone)
+              description: Lokationen fra {{ repeat.item.name }} iPhone er ikke blevet
+                opdateret som forventet. Kontroller Home Assistant appens lokationsindstillinger
+                og baggrundsopdatering.
+              related_entity_id: '{{ repeat.item.device_tracker }}'
+              entity_id: todo.todo_smart_todo
+              is_active: "{{ (as_timestamp(now()) -\n    as_timestamp(states[repeat.item.device_tracker].last_updated))
+                > 60 }}"
   mode: single
+  trace:
+    stored_traces: 20
 - id: '1741115279443'
   alias: Stue todo Canon printer
   description: Kontroller blæk status på Canon printer
@@ -5263,22 +5278,20 @@
   - trigger: numeric_state
     entity_id:
     - sensor.utility_room_smart_plug_washer_power
+    below: 20
     for:
       minutes: 5
-    below: '20'
     id: washer_done
   - trigger: numeric_state
     entity_id:
     - sensor.utility_room_smart_plug_washer_power
-    above: '3'
+    above: 3
     for:
-      seconds: 20
-    id: washer_planed
-    below: 10
+      seconds: 10
   - trigger: numeric_state
     entity_id:
     - sensor.utility_room_smart_plug_washer_power
-    above: '30'
+    above: 100
     for:
       seconds: 10
     id: washer_started
@@ -8401,23 +8414,23 @@
   description: Styring af tilbehør til medie afspilning i Stuen
   triggers:
   - trigger: state
-    entity_id: media_player.living_room_apple_tv_media_player
+    entity_id: sensor.living_room_apple_tv_media_player_safe
     to: 'off'
     id: 'off'
     for:
       seconds: 3
   - trigger: state
-    entity_id: media_player.living_room_apple_tv_media_player
+    entity_id: sensor.living_room_apple_tv_media_player_safe
     to: idle
     id: waiting
   - trigger: state
-    entity_id: media_player.living_room_apple_tv_media_player
+    entity_id: sensor.living_room_apple_tv_media_player_safe
     to:
     - playing
     - buffering
     id: playing
   - trigger: state
-    entity_id: media_player.living_room_apple_tv_media_player
+    entity_id: sensor.living_room_apple_tv_media_player_safe
     to: paused
     id: paused
   - trigger: state
@@ -8494,7 +8507,7 @@
         - condition: not
           conditions:
           - condition: state
-            entity_id: media_player.living_room_apple_tv_media_player
+            entity_id: sensor.living_room_apple_tv_media_player_safe
             state: 'off'
         then:
         - action: media_player.turn_off
@@ -8540,7 +8553,7 @@
     else:
     - if:
       - condition: state
-        entity_id: media_player.living_room_apple_tv_media_player
+        entity_id: sensor.living_room_apple_tv_media_player_safe
         state: 'off'
       then:
       - action: media_player.turn_on
@@ -8843,33 +8856,29 @@
       related_entity_id: sensor.kitchen_dishwasher_safe_problem
       entity_id: todo.todo_smart_todo
       is_active: '{{ is_state(''sensor.kitchen_dishwasher_safe'', ''failure'') }}'
-  - action: script.create_todo_task
-    data:
-      subject: Indsæt ny Powerdisk i opvaskermaskinen
-      description: Powerdisk niveauet i opvaskemaskinen er {{ states('sensor.kitchen_dishwasher_powerdisk_level_safe')
-        }} %, indsæt ny Powerdisk.
-      related_entity_id: sensor.kitchen_dishwasher_powerdisk_level_safe
-      entity_id: todo.todo_smart_todo
-      is_active: '{{ states(''sensor.kitchen_dishwasher_powerdisk_level_safe'') |
-        int(100) < 3 }}'
-  - action: script.create_todo_task
-    data:
-      subject: Fyld salt på opvaskermaskinen
-      description: Salt niveauet i opvaskemaskinen er {{ states('sensor.kitchen_dishwasher_salt_level_safe')
-        }} %, fyld mere salt på.
-      related_entity_id: sensor.kitchen_dishwasher_salt_level_safe
-      entity_id: todo.todo_smart_todo
-      is_active: '{{ states(''sensor.kitchen_dishwasher_salt_level_safe'') | int(100)
-        < 15 }}'
-  - action: script.create_todo_task
-    data:
-      subject: Fyld afspændingsmiddel på opvaskermaskinen
-      description: Afspændingsmiddel niveauet i opvaskemaskinen er {{ states('sensor.kitchen_dishwasher_rinse_aid_level_safe')
-        }} %, fyld mere Afspændingsmiddel på.
-      related_entity_id: sensor.kitchen_dishwasher_rinse_aid_level_safe
-      entity_id: todo.todo_smart_todo
-      is_active: '{{ states(''sensor.kitchen_dishwasher_rinse_aid_level_safe'') |
-        int(100) < 15 }}'
+  - variables:
+      supply_tasks:
+      - subject: PowerDisk
+        entity_id: sensor.kitchen_dishwasher_powerdisk_level_safe
+        threshold: 3
+      - subject: Salt
+        entity_id: sensor.kitchen_dishwasher_salt_level_safe
+        threshold: 15
+      - subject: Afspændingsmiddel
+        entity_id: sensor.kitchen_dishwasher_rinse_aid_level_safe
+        threshold: 15
+  - repeat:
+      for_each: '{{ supply_tasks }}'
+      sequence:
+      - action: script.create_todo_task
+        data:
+          subject: Fyld {{ repeat.item.subject }} på (opvaskemaskine)
+          description: '{{ repeat.item.subject }}-niveauet i opvaskemaskinen er {{
+            states(repeat.item.entity_id) }}%.'
+          related_entity_id: '{{ repeat.item.entity_id }}'
+          entity_id: todo.todo_smart_todo
+          is_active: '{{ states(repeat.item.entity_id) | int(100) < repeat.item.threshold
+            }}'
   mode: queued
   max: 10
   trace:
@@ -9003,18 +9012,18 @@
   description: Automatik til at sætte status helper for medie i soveværelset
   triggers:
   - trigger: state
-    entity_id: media_player.bedroom_apple_tv_media_player
+    entity_id: sensor.bedroom_apple_tv_media_player_safe
     to: playing
     id: started
   - trigger: state
-    entity_id: media_player.bedroom_apple_tv_media_player
+    entity_id: sensor.bedroom_apple_tv_media_player_safe
     to:
     - buffering
     - idle
     - paused
     id: ended
   - trigger: state
-    entity_id: media_player.bedroom_apple_tv_media_player
+    entity_id: sensor.bedroom_apple_tv_media_player_safe
     to: 'off'
     id: 'off'
     for:
@@ -9064,7 +9073,7 @@
         id:
         - timeout
       - condition: state
-        entity_id: media_player.bedroom_apple_tv_media_player
+        entity_id: sensor.bedroom_apple_tv_media_player_safe
         state:
         - idle
         - paused
@@ -9097,18 +9106,18 @@
   description: Automatik til at sætte status helper for medie på Emils værelse
   triggers:
   - trigger: state
-    entity_id: media_player.emils_room_apple_tv_media_player
+    entity_id: sensor.emils_room_apple_tv_media_player_safe
     to: playing
     id: started
   - trigger: state
-    entity_id: media_player.emils_room_apple_tv_media_player
+    entity_id: sensor.emils_room_apple_tv_media_player_safe
     to:
     - buffering
     - idle
     - paused
     id: ended
   - trigger: state
-    entity_id: media_player.emils_room_apple_tv_media_player
+    entity_id: sensor.emils_room_apple_tv_media_player_safe
     to: 'off'
     id: 'off'
     for:
@@ -9158,7 +9167,7 @@
         id:
         - timeout
       - condition: state
-        entity_id: media_player.emils_room_apple_tv_media_player
+        entity_id: sensor.charlies_room_apple_tv_media_player_safe
         state:
         - idle
         - paused
@@ -9191,18 +9200,18 @@
   description: Automatik til at sætte status helper for medie på Charlies værelse
   triggers:
   - trigger: state
-    entity_id: media_player.charlies_room_apple_tv_media_player
+    entity_id: sensor.charlies_room_apple_tv_media_player_safe
     to: playing
     id: started
   - trigger: state
-    entity_id: media_player.charlies_room_apple_tv_media_player
+    entity_id: sensor.charlies_room_apple_tv_media_player_safe
     to:
     - buffering
     - idle
     - paused
     id: ended
   - trigger: state
-    entity_id: media_player.charlies_room_apple_tv_media_player
+    entity_id: sensor.charlies_room_apple_tv_media_player_safe
     to: 'off'
     id: 'off'
     for:
@@ -9252,7 +9261,7 @@
         id:
         - timeout
       - condition: state
-        entity_id: media_player.charlies_room_apple_tv_media_player
+        entity_id: sensor.charlies_room_apple_tv_media_player_safe
         state:
         - idle
         - paused
@@ -9783,23 +9792,16 @@
   - variables:
       position: '{{ states(''input_number.charlies_room_blind_position'') | int(0)
         }}'
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ state_attr(''cover.charlies_room_blind'', ''current_position'')
-          | int(0) <= 20 }}'
-      - condition: template
-        value_template: '{{ trigger.id == ''close_short_pressed'' }}
-
-          '
-      sequence: []
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.charlies_room_window
-        state: 'on'
-      sequence:
-      - variables:
-          position: '{{ [position | int, 20] | max }}'
+  - if:
+    - condition: state
+      entity_id: binary_sensor.charlies_room_window
+      state: 'on'
+    - condition: template
+      value_template: "{{ not(trigger.id == 'close_short_pressed'\n   and (state_attr('cover.charlies_room_blind','current_position')
+        | float(999)) <= 20) }}\n"
+    then:
+    - variables:
+        position: '{{ [position | int, 20] | max }}'
   - action: system_log.write
     data:
       level: debug
@@ -9896,14 +9898,6 @@
     to: idle
     id: wake_up_delay
   - trigger: state
-    entity_id: binary_sensor.monique_sleep_window
-    to: 'on'
-    id: bedtime
-  - trigger: state
-    entity_id: binary_sensor.bedroom_light
-    to: 'on'
-    id: light_on
-  - trigger: state
     entity_id: binary_sensor.parent_home
     to: 'on'
     id: parent_home
@@ -9937,6 +9931,16 @@
   - trigger: state
     entity_id: fan.bedroom_air_purifier_fan
     to: 'on'
+  - trigger: event
+    event_type: bedroom_blind
+    event_data:
+      command: open
+    id: open_event
+  - trigger: event
+    event_type: bedroom_blind
+    event_data:
+      command: close
+    id: close_event
   conditions: []
   actions:
   - action: timer.pause
@@ -9948,6 +9952,7 @@
         id:
         - open_short_pressed
         - button_2
+        - open_event
       sequence:
       - action: input_number.set_value
         target:
@@ -9959,6 +9964,7 @@
         id:
         - close_short_pressed
         - button_3
+        - close_event
       sequence:
       - action: input_number.set_value
         target:
@@ -9996,38 +10002,6 @@
           entity_id: input_number.bedroom_blind_position
         data:
           value: 100
-    - conditions:
-      - condition: trigger
-        id:
-        - bedtime
-      - condition: state
-        entity_id: binary_sensor.monique_home
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.bedroom_light
-        state: 'on'
-      sequence:
-      - action: input_number.set_value
-        target:
-          entity_id: input_number.bedroom_blind_position
-        data:
-          value: 0
-    - conditions:
-      - condition: trigger
-        id:
-        - light_on
-      - condition: state
-        entity_id: binary_sensor.monique_home
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.monique_sleep_window
-        state: 'on'
-      sequence:
-      - action: input_number.set_value
-        target:
-          entity_id: input_number.bedroom_blind_position
-        data:
-          value: 0
     - conditions:
       - condition: trigger
         id:
@@ -10078,16 +10052,10 @@
     - condition: state
       entity_id: binary_sensor.bedroom_window
       state: 'on'
-    - condition: not
-      conditions:
-      - condition: trigger
-        id:
-        - close_short_pressed
-        - button_3
-      - condition: numeric_state
-        entity_id: cover.bedroom_blind
-        attribute: current_position
-        below: 21
+    - condition: template
+      value_template: "{{ not(trigger.id in ['close_short_pressed','button_3']\n   and
+        (state_attr('cover.bedroom_blind','current_position') | float(999)) <= 20)
+        }}\n"
     then:
     - variables:
         position: '{{ [position | int, 20] | max }}'
@@ -10095,15 +10063,10 @@
     - condition: state
       entity_id: binary_sensor.bedroom_sun_overheat
       state: 'on'
-    - condition: not
-      conditions:
-      - condition: trigger
-        id:
-        - open_short_pressed
-      - condition: numeric_state
-        entity_id: cover.bedroom_blind
-        attribute: current_position
-        above: 49
+    - condition: template
+      value_template: "{{ not(trigger.id in ['open_short_pressed','button_2','open_event']\n
+        \  and (state_attr('cover.bedroom_blind','current_position') | float(999))
+        >= 50) }}\n"
     then:
     - variables:
         position: '{{ [position | int, 50] | min }}'
@@ -10111,16 +10074,10 @@
     - condition: state
       entity_id: fan.bedroom_air_purifier_fan
       state: 'on'
-    - condition: not
-      conditions:
-      - condition: trigger
-        id:
-        - close_short_pressed
-        - button_3
-      - condition: numeric_state
-        entity_id: cover.bedroom_blind
-        attribute: current_position
-        below: 61
+    - condition: template
+      value_template: "{{ not(trigger.id in ['close_short_pressed','button_3','close_event']\n
+        \  and (state_attr('cover.bedroom_blind','current_position') | float(999))
+        <= 60) }}\n"
     then:
     - variables:
         position: '{{ [position | int, 60] | max }}'
@@ -10158,16 +10115,12 @@
       - action: cover.close_cover
         target:
           entity_id: cover.bedroom_blind
-    - conditions:
-      - condition: template
-        value_template: '{{ position | int(0) != state_attr(''cover.bedroom_blind'',
-          ''current_position'') | int(0) }}'
-      sequence:
-      - action: cover.set_cover_position
-        data:
-          position: '{{ position | int(0) }}'
-        target:
-          entity_id: cover.bedroom_blind
+    default:
+    - action: cover.set_cover_position
+      data:
+        position: '{{ position | int(0) }}'
+      target:
+        entity_id: cover.bedroom_blind
   - wait_template: '{{ states(''cover.bedroom_blind'') not in [''opening'', ''closing'']
       }}'
     timeout: 00:00:30
@@ -10340,23 +10293,16 @@
           value: 0
   - variables:
       position: '{{ states(''input_number.emils_room_blind_position'') }}'
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ state_attr(''cover.emils_room_blind'', ''current_position'')
-          <= 20 }}'
-      - condition: template
-        value_template: '{{ trigger.id == ''close_short_pressed'' }}
-
-          '
-      sequence: []
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.emils_room_window
-        state: 'on'
-      sequence:
-      - variables:
-          position: '{{ [position | int, 20] | max }}'
+  - if:
+    - condition: state
+      entity_id: binary_sensor.emils_room_window
+      state: 'on'
+    - condition: template
+      value_template: "{{ not(trigger.id == 'close_short_pressed'\n   and (state_attr('cover.emils_room_blind','current_position')
+        | float(999)) <= 20) }}\n"
+    then:
+    - variables:
+        position: '{{ [position | int, 20] | max }}'
   - action: system_log.write
     data:
       level: debug
@@ -10700,6 +10646,9 @@
   - trigger: time
     at: input_datetime.kitchen_trash_biofilter_next_change
     id: deadline
+  - at: 03:51:00
+    id: periodic
+    trigger: time
   - trigger: event
     event_type: todo_item_completed
     event_data:
@@ -10710,7 +10659,9 @@
   - choose:
     - conditions:
       - condition: trigger
-        id: deadline
+        id:
+        - deadline
+        - periodic
       sequence:
       - action: script.create_todo_task
         data:
@@ -10719,6 +10670,8 @@
             skabet ved siden af vasken.
           related_entity_id: input_datetime.kitchen_trash_biofilter_next_change
           entity_id: todo.todo_smart_todo
+          is_active: '{{ states(''input_datetime.kitchen_trash_biofilter_next_change'')
+            | as_datetime | as_local < now() }}'
     - conditions:
       - condition: trigger
         id: todo_completed
@@ -10764,7 +10717,7 @@
           related_entity_id: input_number.toilet_freshener_last_count
           entity_id: todo.todo_smart_todo
           is_active: '{{ states(''counter.toilet_motion_sensor_count'') | int(0) >
-            states(''input_number.toilet_freshener_last_count'') | int(0) + 150 }}'
+            states(''input_number.toilet_freshener_last_count'') | int(0) + 200 }}'
       - action: script.create_todo_task
         data:
           subject: Fyld sæbe på dispenser på toilettet
@@ -11245,6 +11198,9 @@
   - trigger: numeric_state
     entity_id: sensor.greenhouse_current_temperature
     below: 0
+  - trigger: numeric_state
+    entity_id: sensor.greenhouse_heating_smart_plug_power
+    below: 5
   - trigger: time
     at: 02:00:00
   conditions: []
@@ -11256,8 +11212,9 @@
         }}, tænd for varme blæseren."'
       entity_id: todo.todo_smart_todo
       related_entity_id: sensor.greenhouse_current_temperature
-      is_active: '{{ states(''sensor.greenhouse_current_temperature'') | float(10.0)
-        < 0.0 }}'
+      is_active: "{{ states('sensor.greenhouse_current_temperature') | float(10.0)
+        < 0.0 and\n   states('sensor.greenhouse_heating_smart_plug_power') | float(0.0)
+        < 5.0 }}"
   mode: queued
   max: 10
   trace:
@@ -11332,7 +11289,7 @@
   - variables:
       default_limit: 200
       custom_limits:
-        automation.utility_room_motion_sensor: 700
+        automation.utility_room_motion_sensor: 1000
         automation.utility_room_heating: 300
       offenders: "{% set res = sql_result.result if sql_result is defined else []
         %}  {% set ns = namespace(offenders=[]) %} {% for row in res %}\n  {% set
@@ -11821,11 +11778,12 @@
   - variables:
       default_days: 7
       custom_days:
-        automation.kitchen_trash_biofilter_next_change: 180
         automation.home_meter_reading_electricity: 32
         automation.home_meter_reading_water: 32
         automation.monitor_data_folder: 32
         automation.garage_3d_printer: 999
+        automation.driveway_todo_mailbox: 999
+        automation.kitchen_fridge: 999
       offenders: "{% set ns = namespace(offenders=[]) %}\n{% for a in states.automation
         | list %}\n  {% set days = custom_days.get(a.entity_id, default_days) | int
         %}\n  {% set cutoff = now() - timedelta(days=days) %}\n  {% set last = state_attr(a.entity_id,
@@ -11934,3 +11892,64 @@
   max: 10
   trace:
     stored_traces: 30
+- id: '1771155412598'
+  alias: Hjem overvåg Zigbee network
+  description: Overvåg alle Zigbee LQI sensorer og advar ved lav signal kvalitet
+  triggers:
+  - event: start
+    id: started
+    trigger: homeassistant
+  - at: 03:50:00
+    id: nightly
+    trigger: time
+  conditions: []
+  actions:
+  - if:
+    - condition: trigger
+      id: started
+    then:
+    - delay: 00:06:00
+  - variables:
+      default_limit: 30
+      special_limits:
+        sensor.garage_smoke_alarm_lqi: 3
+      lqi_entities: '{% set lqi = states.sensor | selectattr(''entity_id'', ''match'',
+        ''.*_lqi$'') | map(attribute=''entity_id'') | list %} {{ lqi | to_json }}'
+      bad_entities: "{% set ns = namespace(result=[]) %} {% set stale_limit = timedelta(hours=1)
+        %} {% for e in lqi_entities | trim | from_json %}\n  {% set s = states[e]
+        %}\n  {% if s is not none %}\n    {% set state = s.state %}\n    {% set limit
+        = special_limits.get(e, default_limit) %}\n    {% set is_stale = (now() -
+        s.last_updated) > stale_limit %}\n    {% if state in ['unknown','unavailable','none','None','']
+        %}\n      {% set ns.result = ns.result + [e] %}\n    {% else %}\n      {%
+        set val = state | float(999) %}\n      {% if val < limit or is_stale %}\n
+        \       {% set ns.result = ns.result + [e] %}\n      {% endif %}\n    {% endif
+        %}\n  {% endif %}\n{% endfor %} {{ ns.result | unique | list | to_json }}"
+      message: "{% for e in bad_entities | trim | from_json %}\n  {% set dev_id =
+        device_id(e) %}\n  {% set dev_name = device_attr(dev_id, 'name_by_user') if
+        device_attr(dev_id, 'name_by_user') else device_attr(dev_id, 'name') %}\n
+        \ {% set limit = special_limits.get(e, default_limit) %}\n  {% set last_updated
+        = states[e].last_updated %}\n- device: \"{{ dev_name }}\"\n  entity_id: \"{{
+        e }}\"\n  name: \"{{ state_attr(e,'friendly_name') }}\"\n  lqi: \"{{ states(e)
+        }}\"\n  limit: \"{{ limit }}\"\n  last_updated: \"{{ last_updated.isoformat()
+        }}\"\n  seconds_since_update: \"{{ (now() - last_updated).total_seconds()
+        | int }}\"\n{% endfor %}"
+  - if:
+    - condition: template
+      value_template: '{{ bad_entities | trim | from_json | length > 0 }}'
+    then:
+    - data:
+        level: warning
+        message: 'Zigbee LQI WARNING: {{ bad_entities }}'
+      action: system_log.write
+    - data:
+        type: warning
+        recipient: anders
+        persistent: true
+        id: home_assistant_monitor_lqi_low
+        title: '{{ bad_entities | trim | from_json | length }} Zigbee enheder har
+          lav LQI'
+        message: '{{ message }}'
+      action: script.push_notification
+  mode: single
+  trace:
+    stored_traces: 50

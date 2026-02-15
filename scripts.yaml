@@ -167,12 +167,6 @@ bedroom_light_sunset:
   description: Lys scene til soveværelse til gå i seng
   mode: single
   sequence:
-  - action: timer.start
-    metadata: {}
-    data:
-      duration: 01:00:00
-    target:
-      entity_id: timer.bedroom_light_sunset_timer
   - if:
     - condition: state
       entity_id: binary_sensor.bedroom_light
@@ -181,6 +175,7 @@ bedroom_light_sunset:
     - action: light.turn_on
       data:
         transition: 1
+        brightness_pct: 80
         color_temp_kelvin: 2700
       target:
         entity_id: light.bedroom_lights
@@ -1267,6 +1262,8 @@ emils_varelse_tand_og_sluk_lys:
       state: 'on'
     then:
     - action: light.turn_off
+      data:
+        transition: 1
       target:
         entity_id: light.emils_room_lights
     else:
@@ -1378,6 +1375,9 @@ create_todo_battery_task:
       _level: '{{ states(entity_id) | int(-1) | round(0) }}'
       _threshold: "{% if threshold is defined and threshold %}\n  {{ threshold | round(0)
         }}\n{% else %}\n  10\n{% endif %}"
+      _temperature: "{% if temperature is defined and temperature not in [none, 'unknown',
+        'unavailable'] %}\n  {{ temperature | float }}\n{% else %}\n  20.0\n{% endif
+        %}        "
   - action: system_log.write
     data:
       level: debug
@@ -1398,8 +1398,7 @@ create_todo_battery_task:
         Temperature: {{ temperature | default(''Ukendt'') }}'
   - if:
     - condition: template
-      value_template: '{{ _level >= 0 and (temperature | default(20.0) | float) >
-        1.0 }}'
+      value_template: '{{ _level | int(100) >= 0 and _temperature | float > 1.0 }}'
     then:
     - action: script.create_todo_task
       data:
@@ -1412,3 +1411,69 @@ create_todo_battery_task:
         is_active: '{{ _level <= _threshold }}'
   trace:
     stored_traces: 100
+living_room_light_sofa_toggle:
+  alias: Stue lys sofa tænd og sluk
+  description: Tænd og slut lys over sofa i stuen, script til at blive brugt i iPhone
+    widget
+  sequence:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.monique_home
+        state: 'on'
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: light.living_room_light_coffee_table_1
+        state: 'on'
+      sequence:
+      - action: light.turn_off
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.living_room_light_coffee_table_1
+          - light.living_room_light_coffee_table_2
+    default:
+    - action: light.turn_on
+      metadata: {}
+      data:
+        transition: 1
+        color_temp_kelvin: 2100
+        brightness_pct: 80
+      target:
+        entity_id:
+        - light.living_room_light_coffee_table_1
+        - light.living_room_light_coffee_table_2
+  mode: queued
+  max: 10
+bedroom_blind_up:
+  alias: Soveværelse rullegardin op
+  description: Kør rullegardinet i soveværelse op, script til at blive brugt i iPhone
+    widget
+  sequence:
+  - if:
+    - condition: state
+      entity_id: binary_sensor.monique_home
+      state: 'on'
+    then:
+    - event: bedroom_blind
+      event_data:
+        command: open
+  mode: queued
+  max: 10
+bedroom_blind_down:
+  alias: Soveværelse rullegardin ned
+  description: Kør rullegardinet i soveværelse ned, script til at blive brugt i iPhone
+    widget
+  sequence:
+  - if:
+    - condition: state
+      entity_id: binary_sensor.monique_home
+      state: 'on'
+    then:
+    - event: bedroom_blind
+      event_data:
+        command: close
+  mode: queued
+  max: 10
