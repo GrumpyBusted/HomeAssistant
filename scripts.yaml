@@ -705,6 +705,24 @@ push_notification:
       selector:
         boolean: {}
       default: false
+    category:
+      name: Kategori
+      description: Push action category
+      required: false
+      selector:
+        text: {}
+    action:
+      name: Aktion
+      description: Push action name
+      required: false
+      selector:
+        text: {}
+    action_title:
+      name: Aktion title
+      description: Push action title
+      required: false
+      selector:
+        text: {}
   sequence:
   - action: system_log.write
     data:
@@ -782,6 +800,8 @@ push_notification:
         - conditions:
           - condition: template
             value_template: '{{ type == ''info'' }}'
+          - condition: template
+            value_template: '{{ category is not defined or category == '''' }}'
           sequence:
           - action: system_log.write
             data:
@@ -803,7 +823,35 @@ push_notification:
                     volume: 0
         - conditions:
           - condition: template
+            value_template: '{{ type == ''info'' }}'
+          sequence:
+          - action: system_log.write
+            data:
+              message: 'Action: {{ repeat.item }}
+
+                Title: {{ title }}
+
+                Message: {{ message }}'
+              level: info
+          - action: '{{ repeat.item }}'
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                push:
+                  category: '{{ category }}'
+                  actions:
+                  - action: '{{ action }}'
+                    title: '{{ action_title }}'
+                  sound:
+                    name: default
+                    critical: 0
+                    volume: 0
+        - conditions:
+          - condition: template
             value_template: '{{ type == ''warning'' }}'
+          - condition: template
+            value_template: '{{ category is not defined or category == '''' }}'
           sequence:
           - action: system_log.write
             data:
@@ -822,7 +870,57 @@ push_notification:
                   sound:
                     name: default
                     critical: 1
-                    volume: 0
+                    volume: 0.3
+        - conditions:
+          - condition: template
+            value_template: '{{ type == ''warning'' }}'
+          sequence:
+          - action: system_log.write
+            data:
+              message: 'Action: {{ repeat.item }}
+
+                Title: {{ title }}
+
+                Message: {{ message }}'
+              level: warning
+          - action: '{{ repeat.item }}'
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                push:
+                  category: '{{ category }}'
+                  actions:
+                  - action: '{{ action }}'
+                    title: '{{ action_title }}'
+                  sound:
+                    name: default
+                    critical: 1
+                    volume: 0.3
+        - conditions:
+          - condition: template
+            value_template: '{{ type == ''critical'' }}'
+          - condition: template
+            value_template: '{{ category is not defined or category == '''' }}'
+          sequence:
+          - action: system_log.write
+            data:
+              message: 'Action: {{ repeat.item }}
+
+                Title: {{ title }}
+
+                Message: {{ message }}'
+              level: error
+          - action: '{{ repeat.item }}'
+            data:
+              title: '{{ title }}'
+              message: '{{ message }}'
+              data:
+                push:
+                  sound:
+                    name: default
+                    critical: 1
+                    volume: 1
         - conditions:
           - condition: template
             value_template: '{{ type == ''critical'' }}'
@@ -841,6 +939,10 @@ push_notification:
               message: '{{ message }}'
               data:
                 push:
+                  category: '{{ category }}'
+                  actions:
+                  - action: '{{ action }}'
+                    title: '{{ action_title }}'
                   sound:
                     name: default
                     critical: 1

@@ -582,43 +582,35 @@
   triggers:
   - trigger: state
     entity_id:
-    - sensor.living_room_target_temperature
-  - trigger: state
-    entity_id: sensor.living_room_current_temperature
-    for:
-      minutes: 1
-  - trigger: state
-    entity_id:
-    - binary_sensor.someone_home
-  - trigger: state
-    entity_id:
-    - binary_sensor.everyone_sleeping
+    - sensor.living_room_heat_pump_mode
+    - binary_sensor.living_room_window
+    - binary_sensor.patio_door_long_open
+    - binary_sensor.kitchen_window
   actions:
   - choose:
     - conditions:
-      - condition: template
-        value_template: '{{ states("sensor.living_room_current_temperature")|float(21)
-          < states("sensor.living_room_target_temperature")|float(21) - 1 }}'
       - condition: state
-        entity_id: binary_sensor.someone_home
-        state: 'on'
+        entity_id: sensor.living_room_heat_pump_mode
+        state: boost
       - condition: state
-        entity_id: binary_sensor.everyone_sleeping
+        entity_id: binary_sensor.living_room_window
         state: 'off'
       - condition: state
-        entity_id: climate.living_room_heat_pump
+        entity_id: binary_sensor.patio_door_long_open
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.kitchen_window
         state: 'off'
       sequence:
       - action: climate.turn_on
         target:
           entity_id: climate.living_room_heat_pump
-        data: {}
       - action: climate.set_temperature
         target:
           entity_id: climate.living_room_heat_pump
         data:
           temperature: '{{ states(''sensor.living_room_target_temperature'') | float(0)
-            }}'
+            + 1 }}'
       - action: climate.set_hvac_mode
         target:
           entity_id: climate.living_room_heat_pump
@@ -634,72 +626,69 @@
           entity_id: climate.living_room_heat_pump
         data:
           swing_mode: Auto
-    - conditions:
-      - condition: or
-        conditions:
-        - condition: template
-          value_template: '{{ states("sensor.living_room_current_temperature")|float(21)
-            > states("sensor.living_room_target_temperature")|float(21) - 0.5 }}'
-        - condition: state
-          entity_id: binary_sensor.someone_home
-          state: 'off'
-        - condition: state
-          entity_id: binary_sensor.everyone_sleeping
-          state: 'on'
-      - condition: state
-        entity_id: climate.living_room_heat_pump
-        state: heat
-      sequence:
-      - action: climate.turn_off
+      - action: climate.set_preset_mode
         metadata: {}
-        data: {}
+        data:
+          preset_mode: boost
         target:
           entity_id: climate.living_room_heat_pump
+    - conditions:
+      - condition: state
+        entity_id: sensor.living_room_heat_pump_mode
+        state: heat
+      - condition: state
+        entity_id: binary_sensor.living_room_window
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.patio_door_long_open
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.kitchen_window
+        state: 'off'
+      sequence:
+      - action: climate.turn_on
+        target:
+          entity_id: climate.living_room_heat_pump
+      - action: climate.set_temperature
+        target:
+          entity_id: climate.living_room_heat_pump
+        data:
+          temperature: '{{ states(''sensor.living_room_target_temperature'') | float(0)
+            + 1 }}'
+      - action: climate.set_hvac_mode
+        target:
+          entity_id: climate.living_room_heat_pump
+        data:
+          hvac_mode: heat
+      - action: climate.set_fan_mode
+        target:
+          entity_id: climate.living_room_heat_pump
+        data:
+          fan_mode: Auto
+      - action: climate.set_swing_mode
+        target:
+          entity_id: climate.living_room_heat_pump
+        data:
+          swing_mode: Auto
       - action: climate.set_preset_mode
         metadata: {}
         data:
           preset_mode: none
         target:
           entity_id: climate.living_room_heat_pump
-  - if:
-    - condition: state
-      entity_id: climate.living_room_heat_pump
-      state: heat
-    then:
-    - if:
-      - condition: template
-        value_template: '{{ states("sensor.living_room_current_temperature")|float(21)
-          < states("sensor.living_room_target_temperature")|float(21) - 1.5 }}'
-      then:
-      - if:
-        - condition: not
-          conditions:
-          - condition: state
-            entity_id: binary_sensor.everyone_sleeping
-            attribute: preset_mode
-            state: boost
-        then:
-        - action: climate.set_preset_mode
-          metadata: {}
-          data:
-            preset_mode: boost
-          target:
-            entity_id: climate.living_room_heat_pump
-      else:
-      - if:
-        - condition: not
-          conditions:
-          - condition: state
-            entity_id: binary_sensor.everyone_sleeping
-            attribute: preset_mode
-            state: none
-        then:
-        - action: climate.set_preset_mode
-          metadata: {}
-          data:
-            preset_mode: none
-          target:
-            entity_id: climate.living_room_heat_pump
+    - conditions:
+      - condition: state
+        entity_id: sensor.living_room_heat_pump_mode
+        state: 'off'
+      sequence:
+      - action: climate.turn_off
+        target:
+          entity_id: climate.living_room_heat_pump
+      - action: climate.set_preset_mode
+        data:
+          preset_mode: none
+        target:
+          entity_id: climate.living_room_heat_pump
   mode: restart
   trace:
     stored_traces: 100
@@ -842,44 +831,14 @@
         state:
         - unlocked
       sequence:
-      - variables:
-          persons:
-          - device: notify.mobile_app_anders_iphone
-            sensor: sensor.anders_distance_home
-          - device: notify.mobile_app_monique_iphone
-            sensor: sensor.monique_distance_home
-          - device: notify.mobile_app_emil_iphone
-            sensor: sensor.emil_distance_home
-          - device: notify.mobile_app_charlie_iphone
-            sensor: sensor.charlie_distance_home
-          notify_persons: "{% set ns = namespace(list=[]) %} {% for person in persons
-            %}\n  {% set distance = states(person.sensor) | float %}\n  {% set ns.list
-            = ns.list + [{'device': person.device, 'distance': distance}] %}\n{% endfor
-            %}  {% set notify_persons = ns.list | selectattr('distance', 'lt', 0.2)
-            | list %}  {% if notify_persons | count == 0 %}\n  {% set first_distance
-            = ((ns.list | sort(attribute='distance'))[0]).distance | float %}\n  {%
-            set notify_persons = ns.list | selectattr('distance', 'lt', first_distance
-            + 2.0) | list %}\n{% endif %} {{ notify_persons | map(attribute='device')
-            | list }}"
+      - action: script.push_notification
+        data:
+          type: critical
           title: Advarsel
           message: Hoveddøren kunne ikke låses automatisk!
-      - action: persistent_notification.create
-        data:
-          title: '{{ title }}'
-          message: '{{ message }}'
-          notification_id: entrance_lock_auto_warning
-      - repeat:
-          for_each: '{{ notify_persons }}'
-          sequence:
-          - action: '{{ repeat.item }} '
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              data:
-                push:
-                  sound:
-                    name: default
-                    critical: 1
+          id: entrance_lock_auto_warning
+          recipient: home
+          persistent: false
   mode: queued
   max: 10
   trace:
@@ -3646,15 +3605,9 @@
     hvis den ønskede temperatur er væsentligt koldere end den aktuelle.
   triggers:
   - trigger: state
-    entity_id:
-    - sensor.emils_room_target_temperature
+    entity_id: sensor.emils_room_air_purifier_mode
   - trigger: state
-    entity_id: sensor.emils_room_current_temperature
-    for:
-      minutes: 1
-  - trigger: state
-    entity_id:
-    - binary_sensor.emil_home
+    entity_id: binary_sensor.emil_home
   - trigger: numeric_state
     entity_id: sensor.emils_room_air_quality_score
     above: 50
@@ -3664,13 +3617,11 @@
   - trigger: state
     entity_id: binary_sensor.emils_room_light
   - trigger: state
-    entity_id: binary_sensor.emils_room_window_sensor_door
-    from: 'off'
+    entity_id: binary_sensor.emils_room_window
     to: 'on'
     id: window_opened
   - trigger: state
-    entity_id: binary_sensor.emils_room_window_sensor_door
-    from: 'on'
+    entity_id: binary_sensor.emils_room_window
     to: 'off'
     id: window_closed
   - trigger: state
@@ -3718,22 +3669,19 @@
         target:
           entity_id: timer.emils_room_air_purifier_timer
     - conditions:
-      - condition: template
-        value_template: '{{ states("sensor.emils_room_current_temperature")|float(21)
-          < states("sensor.emils_room_target_temperature")|float(21) - 1 }}'
-      - condition: not
-        conditions:
-        - condition: state
-          entity_id: binary_sensor.emils_room_window_sensor_door
-          state: 'on'
+      - condition: state
+        entity_id: sensor.emils_room_air_purifier_mode
+        state: heat
+      - condition: state
+        entity_id: binary_sensor.emils_room_window
+        state: 'off'
       sequence:
       - variables:
           mode: heat
     - conditions:
-      - condition: template
-        value_template: '{{ states("sensor.emils_room_current_temperature")|float(21)
-          > max(25, states("sensor.emils_room_target_temperature")|float(21) + 3)
-          }}'
+      - condition: state
+        entity_id: sensor.emils_room_air_purifier_mode
+        state: cool
       sequence:
       - variables:
           mode: cool
@@ -3741,11 +3689,9 @@
       - condition: numeric_state
         entity_id: sensor.emils_room_air_quality_score
         below: 50
-      - condition: not
-        conditions:
-        - condition: state
-          entity_id: binary_sensor.emils_room_window_sensor_door
-          state: 'on'
+      - condition: state
+        entity_id: binary_sensor.emils_room_window
+        state: 'off'
       sequence:
       - variables:
           mode: filter
@@ -4070,12 +4016,7 @@
     hvis den ønskede temperatur er væsentligt koldere end den aktuelle.
   triggers:
   - trigger: state
-    entity_id:
-    - sensor.bedroom_target_temperature
-  - trigger: state
-    entity_id: sensor.bedroom_current_temperature
-    for:
-      minutes: 1
+    entity_id: sensor.bedroom_air_purifier_mode
   - trigger: state
     entity_id: binary_sensor.parent_home
   - trigger: state
@@ -4089,13 +4030,11 @@
     entity_id: sensor.bedroom_air_quality_score
     below: 50
   - trigger: state
-    entity_id: binary_sensor.bedroom_window_sensor_door
-    from: 'off'
+    entity_id: binary_sensor.bedroom_window
     to: 'on'
     id: window_opened
   - trigger: state
-    entity_id: binary_sensor.bedroom_window_sensor_door
-    from: 'on'
+    entity_id: binary_sensor.bedroom_window
     to: 'off'
     id: window_closed
   - trigger: state
@@ -4147,15 +4086,9 @@
         target:
           entity_id: timer.bedroom_air_purifier_timer
     - conditions:
-      - condition: trigger
-        id: timeout
-      sequence:
-      - variables:
-          mode: 'off'
-    - conditions:
-      - condition: template
-        value_template: '{{ states("sensor.bedroom_current_temperature")|float(21)
-          < states("sensor.bedroom_target_temperature")|float(21) - 1 }}'
+      - condition: state
+        entity_id: sensor.bedroom_air_purifier_mode
+        state: heat
       - condition: state
         entity_id: binary_sensor.bedroom_window_sensor_door
         state: 'off'
@@ -4165,9 +4098,9 @@
       - variables:
           mode: heat
     - conditions:
-      - condition: template
-        value_template: '{{ states("sensor.bedroom_current_temperature")|float(21)
-          > 23 }}'
+      - condition: state
+        entity_id: sensor.bedroom_air_purifier_mode
+        state: cool
       - condition: template
         value_template: '{{ not silent_period }}'
       sequence:
@@ -6933,44 +6866,14 @@
             entity_id: lock.patio_lock
             state: locked
         then:
-        - variables:
-            persons:
-            - device: notify.mobile_app_anders_iphone
-              sensor: sensor.anders_distance_home
-            - device: notify.mobile_app_monique_iphone
-              sensor: sensor.monique_distance_home
-            - device: notify.mobile_app_emil_iphone
-              sensor: sensor.emil_distance_home
-            - device: notify.mobile_app_charlie_iphone
-              sensor: sensor.charlie_distance_home
-            notify_persons: "{% set ns = namespace(list=[]) %} {% for person in persons
-              %}\n  {% set distance = states(person.sensor) | float %}\n  {% set ns.list
-              = ns.list + [{'device': person.device, 'distance': distance}] %}\n{%
-              endfor %}  {% set notify_persons = ns.list | selectattr('distance',
-              'lt', 0.2) | list %}  {% if notify_persons | count == 0 %}\n  {% set
-              first_distance = ((ns.list | sort(attribute='distance'))[0]).distance
-              | float %}\n  {% set notify_persons = ns.list | selectattr('distance',
-              'lt', first_distance + 2.0) | list %}\n{% endif %} {{ notify_persons
-              | map(attribute='device') | list }}"
+        - action: script.push_notification
+          data:
+            type: critical
             title: Advarsel
             message: Terrassedøren kunne ikke låses automatisk!
-        - action: persistent_notification.create
-          data:
-            title: '{{ title }}'
-            message: '{{ message }}'
-            notification_id: patio_lock_auto_warning
-        - repeat:
-            for_each: '{{ notify_persons }}'
-            sequence:
-            - action: '{{ repeat.item }} '
-              data:
-                title: '{{ title }}'
-                message: '{{ message }}'
-                data:
-                  push:
-                    sound:
-                      name: default
-                      critical: 1
+            id: patio_lock_auto_warning
+            recipient: home
+            persistent: false
   mode: queued
   max: 10
   trace:
@@ -7024,175 +6927,6 @@
   mode: restart
   trace:
     stored_traces: 30
-- id: '1763826566164'
-  alias: Hjem lås
-  description: Kontrol af at dører er låst
-  triggers:
-  - trigger: state
-    entity_id:
-    - lock.entrance_lock
-    - lock.patio_lock
-    - lock.utility_room_lock
-    - lock.garage_lock
-    to: unlocked
-    id: unlocked
-  - trigger: state
-    entity_id:
-    - lock.entrance_lock
-    - lock.patio_lock
-    - lock.utility_room_lock
-    - lock.garage_lock
-    to: unlocked
-    id: unlocked_10m
-    for:
-      minutes: 10
-  - trigger: event
-    event_type: home_lock
-    id: lock
-  - trigger: event
-    event_type: ios.notification_action_fired
-    event_data:
-      actionName: DOOR_LOCK_ACTION
-    id: lock_action
-  - trigger: state
-    entity_id: timer.home_lock_timer
-    to: idle
-    id: locking_expired
-  conditions: []
-  actions:
-  - variables:
-      persons:
-      - device: notify.mobile_app_anders_iphone
-        sensor: sensor.anders_distance_home
-      - device: notify.mobile_app_monique_iphone
-        sensor: sensor.monique_distance_home
-      - device: notify.mobile_app_emil_iphone
-        sensor: sensor.emil_distance_home
-      - device: notify.mobile_app_charlie_iphone
-        sensor: sensor.charlie_distance_home
-      notify_persons: "{% set ns = namespace(list=[]) %}\n{% for person in persons
-        %}\n  {% set distance = states(person.sensor) | float %}\n  {% set ns.list
-        = ns.list + [{\n      'device': person.device,\n      'distance': distance\n
-        \ }] %}\n{% endfor %} \n{% set notify_persons = ns.list | selectattr('distance',
-        'lt', 0.2) | list %} \n{% if notify_persons | count == 0 %}\n  {% set first_distance
-        = ((ns.list | sort(attribute='distance'))[0]).distance | float %}\n  {% set
-        notify_persons = ns.list | selectattr('distance', 'lt', first_distance + 2.0)
-        | list %}\n{% endif %}\n{{ notify_persons | map(attribute='device') | list
-        }}"
-  - choose:
-    - conditions:
-      - condition: or
-        conditions:
-        - condition: and
-          conditions:
-          - condition: trigger
-            id:
-            - unlocked
-          - condition: state
-            entity_id: binary_sensor.someone_home
-            state: 'off'
-        - condition: and
-          conditions:
-          - condition: trigger
-            id:
-            - unlocked_10m
-          - condition: state
-            entity_id: binary_sensor.everyone_sleeping
-            state: 'on'
-      sequence:
-      - variables:
-          title: Information
-          message: 'Følgende døre er ulåste:
-
-            {% for lock in locks | select(''is_state'', ''unlocked'') | list -%}
-
-            - {{ state_attr(lock, ''friendly_name'') }}
-
-            {% endfor -%}'
-      - data:
-          title: '{{ title }}'
-          message: '{{ message }}'
-          notification_id: home_lock_warning
-        action: persistent_notification.create
-      - repeat:
-          for_each: '{{ notify_persons }}'
-          sequence:
-          - data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              data:
-                push:
-                  category: DOOR_LOCK
-                  actions:
-                  - action: home_lock
-                    title: Lås
-                  sound:
-                    name: default
-            action: '{{ repeat.item }} '
-    - conditions:
-      - condition: trigger
-        id:
-        - lock
-        - lock_action
-      sequence:
-      - repeat:
-          for_each: '{{ locks }}'
-          sequence:
-          - if:
-            - condition: template
-              value_template: '{{ is_state(repeat.item, ''unlocked'') }}'
-            then:
-            - target:
-                entity_id: '{{ repeat.item }}'
-              action: lock.lock
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:00:10
-        target:
-          entity_id: timer.home_lock_timer
-    - conditions:
-      - condition: trigger
-        id:
-        - locking_expired
-      - condition: template
-        value_template: '{{ locks | select(''is_state'', ''unlocked'') | list | count
-          > 0 }}
-
-          '
-      sequence:
-      - variables:
-          title: Advarsel
-          message: "Følgende døre kunne ikke fjern låses: \n{% for lock in locks |
-            select('is_state', 'unlocked') | list -%}\n- {{ state_attr(lock, 'friendly_name')
-            }}\n{% endfor -%}"
-      - data:
-          title: '{{ title }}'
-          message: '{{ message }}'
-          notification_id: home_lock_warning
-        action: persistent_notification.create
-      - repeat:
-          for_each: '{{ notify_persons }}'
-          sequence:
-          - data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              data:
-                push:
-                  sound:
-                    name: default
-                    critical: 1
-            action: '{{ repeat.item }} '
-  variables:
-    locks:
-    - lock.entrance_lock
-    - lock.patio_lock
-    - lock.utility_room_lock
-    - lock.garage_lock
-  mode: queued
-  max: 10
-  trace:
-    stored_traces: 50
 - id: '1763846508906'
   alias: Bryggers lås
   description: Automatik til at låse bryggersdøren op og i baseret på hvem der er
@@ -7252,44 +6986,14 @@
         state:
         - unlocked
       sequence:
-      - variables:
-          persons:
-          - device: notify.mobile_app_anders_iphone
-            sensor: sensor.anders_distance_home
-          - device: notify.mobile_app_monique_iphone
-            sensor: sensor.monique_distance_home
-          - device: notify.mobile_app_emil_iphone
-            sensor: sensor.emil_distance_home
-          - device: notify.mobile_app_charlie_iphone
-            sensor: sensor.charlie_distance_home
-          notify_persons: "{% set ns = namespace(list=[]) %} {% for person in persons
-            %}\n  {% set distance = states(person.sensor) | float %}\n  {% set ns.list
-            = ns.list + [{'device': person.device, 'distance': distance}] %}\n{% endfor
-            %}  {% set notify_persons = ns.list | selectattr('distance', 'lt', 0.2)
-            | list %}  {% if notify_persons | count == 0 %}\n  {% set first_distance
-            = ((ns.list | sort(attribute='distance'))[0]).distance | float %}\n  {%
-            set notify_persons = ns.list | selectattr('distance', 'lt', first_distance
-            + 2.0) | list %}\n{% endif %} {{ notify_persons | map(attribute='device')
-            | list }}"
+      - action: script.push_notification
+        data:
+          type: critical
           title: Advarsel
           message: Bryggers døren kunne ikke låses automatisk!
-      - action: persistent_notification.create
-        data:
-          title: '{{ title }}'
-          message: '{{ message }}'
-          notification_id: utility_room_lock_auto_warning
-      - repeat:
-          for_each: '{{ notify_persons }}'
-          sequence:
-          - action: '{{ repeat.item }} '
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              data:
-                push:
-                  sound:
-                    name: default
-                    critical: 1
+          id: utility_room_lock_auto_warning
+          recipient: home
+          persistent: false
   mode: queued
   max: 10
   trace:
@@ -7352,44 +7056,14 @@
         state:
         - unlocked
       sequence:
-      - variables:
-          persons:
-          - device: notify.mobile_app_anders_iphone
-            sensor: sensor.anders_distance_home
-          - device: notify.mobile_app_monique_iphone
-            sensor: sensor.monique_distance_home
-          - device: notify.mobile_app_emil_iphone
-            sensor: sensor.emil_distance_home
-          - device: notify.mobile_app_charlie_iphone
-            sensor: sensor.charlie_distance_home
-          notify_persons: "{% set ns = namespace(list=[]) %} {% for person in persons
-            %}\n  {% set distance = states(person.sensor) | float %}\n  {% set ns.list
-            = ns.list + [{'device': person.device, 'distance': distance}] %}\n{% endfor
-            %}  {% set notify_persons = ns.list | selectattr('distance', 'lt', 0.2)
-            | list %}  {% if notify_persons | count == 0 %}\n  {% set first_distance
-            = ((ns.list | sort(attribute='distance'))[0]).distance | float %}\n  {%
-            set notify_persons = ns.list | selectattr('distance', 'lt', first_distance
-            + 2.0) | list %}\n{% endif %} {{ notify_persons | map(attribute='device')
-            | list }}"
+      - action: script.push_notification
+        data:
+          type: critical
           title: Advarsel
           message: Garage døren kunne ikke låses automatisk!
-      - action: persistent_notification.create
-        data:
-          title: '{{ title }}'
-          message: '{{ message }}'
-          notification_id: garage_lock_auto_warning
-      - repeat:
-          for_each: '{{ notify_persons }}'
-          sequence:
-          - action: '{{ repeat.item }} '
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              data:
-                push:
-                  sound:
-                    name: default
-                    critical: 1
+          id: garage_lock_auto_warning
+          recipient: home
+          persistent: false
   mode: queued
   max: 10
   trace:
@@ -7657,6 +7331,9 @@
       - condition: state
         entity_id: binary_sensor.bedroom_sleeping
         state: 'off'
+      - condition: numeric_state
+        entity_id: input_number.bedroom_blind_position
+        above: 1
       - condition: state
         entity_id: binary_sensor.monique_sleep_window
         state: 'off'
@@ -7683,7 +7360,7 @@
 
           '
       - condition: time
-        after: '11:00:00'
+        after: '11:30:00'
       - condition: numeric_state
         entity_id: sensor.living_room_robot_vacuum_battery
         above: 40
@@ -8009,7 +7686,7 @@
 
           '
       - condition: time
-        after: '11:00:00'
+        after: '12:00:00'
       - condition: state
         entity_id: binary_sensor.living_room_door
         state: 'on'
@@ -8117,6 +7794,9 @@
       - condition: state
         entity_id: binary_sensor.bedroom_sleeping
         state: 'off'
+      - condition: numeric_state
+        entity_id: input_number.bedroom_blind_position
+        above: 1
       - condition: state
         entity_id: binary_sensor.monique_sleep_window
         state: 'off'
@@ -9943,9 +9623,6 @@
     id: close_event
   conditions: []
   actions:
-  - action: timer.pause
-    target:
-      entity_id: timer.bedroom_blind_timer
   - choose:
     - conditions:
       - condition: trigger
@@ -9954,6 +9631,9 @@
         - button_2
         - open_event
       sequence:
+      - action: timer.pause
+        target:
+          entity_id: timer.bedroom_blind_timer
       - action: input_number.set_value
         target:
           entity_id: input_number.bedroom_blind_position
@@ -9966,6 +9646,9 @@
         - button_3
         - close_event
       sequence:
+      - action: timer.pause
+        target:
+          entity_id: timer.bedroom_blind_timer
       - action: input_number.set_value
         target:
           entity_id: input_number.bedroom_blind_position
@@ -9978,7 +9661,10 @@
       - condition: state
         entity_id: binary_sensor.parent_home
         state: 'off'
-      sequence: []
+      sequence:
+      - action: timer.pause
+        target:
+          entity_id: timer.bedroom_blind_timer
     - conditions:
       - condition: trigger
         id:
@@ -10717,7 +10403,7 @@
           related_entity_id: input_number.toilet_freshener_last_count
           entity_id: todo.todo_smart_todo
           is_active: '{{ states(''counter.toilet_motion_sensor_count'') | int(0) >
-            states(''input_number.toilet_freshener_last_count'') | int(0) + 200 }}'
+            states(''input_number.toilet_freshener_last_count'') | int(0) + 300 }}'
       - action: script.create_todo_task
         data:
           subject: Fyld sæbe på dispenser på toilettet
@@ -11781,9 +11467,10 @@
         automation.home_meter_reading_electricity: 32
         automation.home_meter_reading_water: 32
         automation.monitor_data_folder: 32
-        automation.garage_3d_printer: 999
-        automation.driveway_todo_mailbox: 999
-        automation.kitchen_fridge: 999
+        automation.garage_3d_printer: 9999
+        automation.driveway_todo_mailbox: 9999
+        automation.kitchen_fridge: 9999
+        automation.living_room_tv: 9999
       offenders: "{% set ns = namespace(offenders=[]) %}\n{% for a in states.automation
         | list %}\n  {% set days = custom_days.get(a.entity_id, default_days) | int
         %}\n  {% set cutoff = now() - timedelta(days=days) %}\n  {% set last = state_attr(a.entity_id,
