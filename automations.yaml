@@ -583,8 +583,14 @@
   - trigger: state
     entity_id:
     - sensor.living_room_heat_pump_mode
+  - trigger: state
+    entity_id:
     - binary_sensor.living_room_window
+  - trigger: state
+    entity_id:
     - binary_sensor.patio_door_long_open
+  - trigger: state
+    entity_id:
     - binary_sensor.kitchen_window
   actions:
   - choose:
@@ -680,6 +686,11 @@
       - condition: state
         entity_id: sensor.living_room_heat_pump_mode
         state: 'off'
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: climate.living_room_heat_pump
+          state: 'off'
       sequence:
       - action: climate.turn_off
         target:
@@ -1110,16 +1121,16 @@
     id: button_3
   - trigger: state
     entity_id:
-    - event.hallway_switch_button_4
-    id: button_4
-    attribute: event_type
-    to: initial_press
-  - trigger: state
-    entity_id:
     - binary_sensor.someone_home
     from: 'on'
     to: 'off'
     id: no_one_home
+  - trigger: state
+    entity_id:
+    - event.hallway_switch_button_4
+    id: button_4
+    attribute: event_type
+    to: initial_press
   - trigger: state
     entity_id:
     - binary_sensor.anders_home
@@ -1219,6 +1230,7 @@
       - variables:
           transition: 10
           brightness: 25
+          kelvin: 2500
           lights:
           - light.hallway_light_bathroom
           - light.hallway_light_toilet
@@ -1257,7 +1269,7 @@
       sequence:
       - variables:
           brightness: 75
-          transition: 2700
+          kelvin: 2700
     - conditions:
       - condition: trigger
         id:
@@ -1300,7 +1312,7 @@
       sequence:
       - variables:
           brightness: 0
-          transition: 30
+          transition: 10
     - conditions:
       - condition: trigger
         id:
@@ -4360,17 +4372,39 @@
   - trigger: state
     entity_id:
     - binary_sensor.driveway_mailbox_vibration_sensor
-    from: 'off'
     to: 'on'
     id: new_post
+  - trigger: state
+    entity_id:
+    - binary_sensor.driveway_mailbox_vibration_sensor
+    to: unavailable
+    for:
+      seconds: 180
+    id: sensor_unavailable
   conditions: []
   actions:
-  - action: script.create_todo_task
-    data:
-      subject: Tøm postkasse
-      description: Der er nye breve i postkassen ved vejen
-      related_entity_id: binary_sensor.driveway_mailbox_vibration_sensor
-      entity_id: todo.todo_smart_todo
+  - choose:
+    - conditions:
+        condition: trigger
+        id: new_post
+      sequence:
+      - action: script.create_todo_task
+        data:
+          subject: Tøm postkasse
+          description: Der er nye breve i postkassen ved vejen
+          related_entity_id: binary_sensor.driveway_mailbox_vibration_sensor
+          entity_id: todo.todo_smart_todo
+    - conditions:
+        condition: trigger
+        id: sensor_unavailable
+      sequence:
+      - action: script.create_todo_task
+        data:
+          subject: Der kan være noget i postkassen
+          description: Sensoren på postkasssen har været utilgængelig i længere tid
+            og der kan derfor være post i postkassen ved vejen
+          related_entity_id: binary_sensor.driveway_mailbox_vibration_sensor
+          entity_id: todo.todo_smart_todo
   mode: restart
   trace:
     stored_traces: 30
@@ -8513,6 +8547,33 @@
         entity_id: todo.todo_smart_todo
         is_active: '{{ states(''sensor.kitchen_dishwasher_safe'') == ''program_ended''
           }}'
+  - variables:
+      supply_tasks:
+      - subject: PowerDisk
+        entity_id: sensor.kitchen_dishwasher_powerdisk_level_safe
+        threshold: 3
+      - subject: Salt
+        entity_id: sensor.kitchen_dishwasher_salt_level_safe
+        threshold: 15
+      - subject: Afspændingsmiddel
+        entity_id: sensor.kitchen_dishwasher_rinse_aid_level_safe
+        threshold: 15
+      supply_todos: "{% set ns = namespace(count=0) %} {% for item in supply_tasks
+        %}\n  {% if states(item.entity_id) | float(100) < item.threshold | float(10)
+        %}\n    {% set ns.count = ns.count + 1 %}\n  {% endif %}\n{% endfor %} {{
+        ns.count }}"
+  - repeat:
+      for_each: '{{ supply_tasks }}'
+      sequence:
+      - action: script.create_todo_task
+        data:
+          subject: Fyld {{ repeat.item.subject }} på (opvaskemaskine)
+          description: '{{ repeat.item.subject }}-niveauet i opvaskemaskinen er {{
+            states(repeat.item.entity_id) | float(100) | round(0) }}%.'
+          related_entity_id: '{{ repeat.item.entity_id }}'
+          entity_id: todo.todo_smart_todo
+          is_active: '{{ states(repeat.item.entity_id) | float(100) < repeat.item.threshold
+            | float(10) }}'
   - action: script.create_todo_task
     data:
       subject: Besked fra opvaskemaskinen
@@ -8520,7 +8581,7 @@
       related_entity_id: binary_sensor.kitchen_dishwasher_notification_active_safe
       entity_id: todo.todo_smart_todo
       is_active: '{{ is_state(''binary_sensor.kitchen_dishwasher_notification_active_safe'',
-        ''on'') }}'
+        ''on'') and supply_todos | int(0) == 0 }}'
   - action: script.create_todo_task
     data:
       subject: Problem med opvaskemaskinen
@@ -8536,29 +8597,6 @@
       related_entity_id: sensor.kitchen_dishwasher_safe_problem
       entity_id: todo.todo_smart_todo
       is_active: '{{ is_state(''sensor.kitchen_dishwasher_safe'', ''failure'') }}'
-  - variables:
-      supply_tasks:
-      - subject: PowerDisk
-        entity_id: sensor.kitchen_dishwasher_powerdisk_level_safe
-        threshold: 3
-      - subject: Salt
-        entity_id: sensor.kitchen_dishwasher_salt_level_safe
-        threshold: 15
-      - subject: Afspændingsmiddel
-        entity_id: sensor.kitchen_dishwasher_rinse_aid_level_safe
-        threshold: 15
-  - repeat:
-      for_each: '{{ supply_tasks }}'
-      sequence:
-      - action: script.create_todo_task
-        data:
-          subject: Fyld {{ repeat.item.subject }} på (opvaskemaskine)
-          description: '{{ repeat.item.subject }}-niveauet i opvaskemaskinen er {{
-            states(repeat.item.entity_id) }}%.'
-          related_entity_id: '{{ repeat.item.entity_id }}'
-          entity_id: todo.todo_smart_todo
-          is_active: '{{ states(repeat.item.entity_id) | int(100) < repeat.item.threshold
-            }}'
   mode: queued
   max: 10
   trace:
@@ -10973,10 +11011,15 @@
         hours')\nGROUP BY automation_id\nORDER BY trigger_count DESC;\n"
     response_variable: sql_result
   - variables:
-      default_limit: 200
+      default_limit: 100
       custom_limits:
         automation.utility_room_motion_sensor: 1000
-        automation.utility_room_heating: 300
+        automation.utility_room_light: 200
+        automation.hallway_light: 200
+        automation.hallway_presence_sensor: 200
+        automation.living_room_heat_pump: 200
+        automation.driveway_light_house_south: 200
+        automation.driveway_light: 200
       offenders: "{% set res = sql_result.result if sql_result is defined else []
         %}  {% set ns = namespace(offenders=[]) %} {% for row in res %}\n  {% set
         automation_id = row.automation_id %}\n  {% set count = row.trigger_count |
@@ -11579,64 +11622,66 @@
   max: 10
   trace:
     stored_traces: 30
-- id: '1771155412598'
-  alias: Hjem overvåg Zigbee network
-  description: Overvåg alle Zigbee LQI sensorer og advar ved lav signal kvalitet
+- id: '1771357000655'
+  alias: Loftrum todo ventilationsanlæg
+  description: Opret todo opgaver vedrørende filter m.m. på ventilationsanlæget i
+    loftrummet
   triggers:
-  - event: start
-    id: started
-    trigger: homeassistant
-  - at: 03:50:00
-    id: nightly
-    trigger: time
+  - trigger: numeric_state
+    entity_id: sensor.storage_ventilation_system_days_left_until_filter_change
+    below: 1
+  - trigger: numeric_state
+    entity_id: sensor.storage_ventilation_system_days_left_until_filter_change
+    above: 89
+  - trigger: time
+    at: 03:40:00
+  - trigger: event
+    event_type: todo_item_completed
+    event_data:
+      related: sensor.storage_ventilation_system_days_left_until_filter_change
+    id: todo_completed
   conditions: []
   actions:
   - if:
     - condition: trigger
-      id: started
+      id: todo_completed
     then:
-    - delay: 00:06:00
+    - action: button.press
+      target:
+        entity_id: button.storage_ventilation_system_reset_filter
+    - action: input_boolean.toggle
+      target:
+        entity_id: input_boolean.storage_ventilation_system_replace_pollen_filter_next
+    else:
+    - action: script.create_todo_task
+      data:
+        subject: Udskift filter på ventilationsanlægget
+        description: "Udskift {% if is_state('input_boolean.storage_ventilation_system_replace_pollen_filter_next',
+          'on') %}\n  både Standardfilter (tynde blå) og Pollenfilter (tykke hvide)\n{%
+          else %}\n  Standardfilter (tynde blå)\n{% endif %}\n på ventilationsanlægget
+          på loftet.\n Husk at nulstille filter alarm til 90 dage."
+        related_entity_id: sensor.storage_ventilation_system_days_left_until_filter_change
+        entity_id: todo.todo_smart_todo
+        is_active: '{{ states(''sensor.storage_ventilation_system_days_left_until_filter_change'')
+          | int(99) < 1 }}'
   - variables:
-      default_limit: 30
-      special_limits:
-        sensor.garage_smoke_alarm_lqi: 3
-      lqi_entities: '{% set lqi = states.sensor | selectattr(''entity_id'', ''match'',
-        ''.*_lqi$'') | map(attribute=''entity_id'') | list %} {{ lqi | to_json }}'
-      bad_entities: "{% set ns = namespace(result=[]) %} {% set stale_limit = timedelta(hours=1)
-        %} {% for e in lqi_entities | trim | from_json %}\n  {% set s = states[e]
-        %}\n  {% if s is not none %}\n    {% set state = s.state %}\n    {% set limit
-        = special_limits.get(e, default_limit) %}\n    {% set is_stale = (now() -
-        s.last_updated) > stale_limit %}\n    {% if state in ['unknown','unavailable','none','None','']
-        %}\n      {% set ns.result = ns.result + [e] %}\n    {% else %}\n      {%
-        set val = state | float(999) %}\n      {% if val < limit or is_stale %}\n
-        \       {% set ns.result = ns.result + [e] %}\n      {% endif %}\n    {% endif
-        %}\n  {% endif %}\n{% endfor %} {{ ns.result | unique | list | to_json }}"
-      message: "{% for e in bad_entities | trim | from_json %}\n  {% set dev_id =
-        device_id(e) %}\n  {% set dev_name = device_attr(dev_id, 'name_by_user') if
-        device_attr(dev_id, 'name_by_user') else device_attr(dev_id, 'name') %}\n
-        \ {% set limit = special_limits.get(e, default_limit) %}\n  {% set last_updated
-        = states[e].last_updated %}\n- device: \"{{ dev_name }}\"\n  entity_id: \"{{
-        e }}\"\n  name: \"{{ state_attr(e,'friendly_name') }}\"\n  lqi: \"{{ states(e)
-        }}\"\n  limit: \"{{ limit }}\"\n  last_updated: \"{{ last_updated.isoformat()
-        }}\"\n  seconds_since_update: \"{{ (now() - last_updated).total_seconds()
-        | int }}\"\n{% endfor %}"
-  - if:
-    - condition: template
-      value_template: '{{ bad_entities | trim | from_json | length > 0 }}'
-    then:
-    - data:
-        level: warning
-        message: 'Zigbee LQI WARNING: {{ bad_entities }}'
-      action: system_log.write
-    - data:
-        type: warning
-        recipient: anders
-        persistent: true
-        id: home_assistant_monitor_lqi_low
-        title: '{{ bad_entities | trim | from_json | length }} Zigbee enheder har
-          lav LQI'
-        message: '{{ message }}'
-      action: script.push_notification
-  mode: single
+      message: "{% set raw_list = states('sensor.storage_ventilation_system_active_alarm_list')
+        %} {% set raw_count = states('sensor.storage_ventilation_system_active_alarm_count')
+        | int(0) %} {% set alarms = raw_list.split('\\n') | map('trim') | reject('equalto','')
+        | list %} {% set filtered = alarms | reject('search', 'Change filter') | list
+        %} {% set removed = alarms | length - filtered | length %} {% set new_count
+        = raw_count - removed %} {% if new_count < 0 %}\n  {% set new_count = 0 %}\n{%
+        endif %} {% if new_count > 0 and filtered | length > 0 %} Antal alarmer: {{
+        new_count }} Liste: {{ filtered | join('\\n') }} {% endif %}      "
+  - action: script.create_todo_task
+    data:
+      subject: Alarm på ventilationsanlægget
+      description: "Der er en eller flere alarmer på ventilationsanlægget. \n{{ message
+        }}"
+      related_entity_id: sensor.storage_ventilation_system_days_left_until_filter_change
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ message | trim | length > 0 }}'
+  mode: queued
+  max: 10
   trace:
-    stored_traces: 50
+    stored_traces: 30
