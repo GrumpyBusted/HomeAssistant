@@ -1522,7 +1522,7 @@ living_room_light_sofa_toggle:
     - conditions:
       - condition: state
         entity_id: binary_sensor.monique_home
-        state: 'on'
+        state: 'off'
       sequence: []
     - conditions:
       - condition: state

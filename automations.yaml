@@ -7801,6 +7801,9 @@
   - trigger: state
     entity_id: binary_sensor.living_room_door_sensor_door
     to: 'off'
+  - trigger: numeric_state
+    entity_id: input_number.bedroom_blind_position
+    above: 1
   - trigger: time
     at: '12:30:00'
   - trigger: state
@@ -8057,6 +8060,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.bedroom_door
+  - trigger: state
+    entity_id:
+    - media_player.hallway_photo_frame_joakim
+    - media_player.hallway_photo_frame_emil
+    - media_player.hallway_photo_frame_charlie
+    from: unavailable
+    id: Available
   - trigger: homeassistant
     event: start
     id: started
@@ -11374,7 +11384,9 @@
     - sensor.bedroom_soil_moisture_sensor_moisture
     - sensor.charlies_room_soil_moisture_sensor_moisture
     - sensor.living_room_soil_moisture_sensor_moisture
-    below: 35
+    below: 40
+    for:
+      seconds: 180
   - trigger: numeric_state
     entity_id:
     - sensor.living_room_soil_moisture_sensor_moisture
@@ -11387,18 +11399,18 @@
     data:
       subject: Vand blomster indendørs
       description: 'Jordfugtigheden på potteplanter er ved at være lav. I stuen er
-        målt {{ states(''sensor.living_room_soil_moisture_sensor_moisture'') }}%,
-        I soveværelset er målt {{ states(''sensor.bedroom_soil_moisture_sensor_moisture'')
-        }}%, og på Charlies værelse er målt {{ states(''sensor.charlies_room_soil_moisture_sensor_moisture'')
-        }}%
+        målt {{ states(''sensor.living_room_soil_moisture_sensor_moisture'') | float(0)
+        | round(0) }}%, I soveværelset er målt {{ states(''sensor.bedroom_soil_moisture_sensor_moisture'')
+        | float(0) | round(0) }}%, og på Charlies værelse er målt {{ states(''sensor.charlies_room_soil_moisture_sensor_moisture'')
+        | float(0) | round(0) }}%
 
         '
       related_entity_id: sensor.living_room_soil_moisture_sensor_moisture
       entity_id: todo.todo_smart_todo
       is_active: "{{ states('sensor.living_room_soil_moisture_sensor_moisture') |
-        float(50.0) < 35.0 or\n   states('sensor.bedroom_soil_moisture_sensor_moisture')
-        | float(50.0) < 35.0 or\n   states('sensor.charlies_room_soil_moisture_sensor_moisture')
-        | float(50.0) < 35.0 }}"
+        float(50.0) < 40.0 or\n   states('sensor.bedroom_soil_moisture_sensor_moisture')
+        | float(50.0) < 40.0 or\n   states('sensor.charlies_room_soil_moisture_sensor_moisture')
+        | float(50.0) < 40.0 }}"
   mode: queued
   max: 10
   trace:
