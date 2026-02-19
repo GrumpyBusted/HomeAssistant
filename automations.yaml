@@ -2072,6 +2072,9 @@
       - condition: numeric_state
         entity_id: input_number.bedroom_blind_position
         above: 1
+      - condition: numeric_state
+        entity_id: sensor.home_outside_avarage_illuminance_15m
+        below: 5000
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -2100,6 +2103,9 @@
       - condition: state
         entity_id: binary_sensor.bedroom_presence
         state: 'on'
+      - condition: numeric_state
+        entity_id: sensor.home_outside_avarage_illuminance_15m
+        below: 5000
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -6926,6 +6932,16 @@
   - trigger: numeric_state
     entity_id: sensor.home_outside_current_temperature
     above: 3
+  - trigger: state
+    entity_id: climate.storage_ventilation_system_ventilation
+    attribute: fan_mode
+    to:
+    - 'off'
+  - trigger: state
+    entity_id: climate.storage_ventilation_system_ventilation
+    attribute: fan_mode
+    from:
+    - 'off'
   actions:
   - choose:
     - conditions:
@@ -6938,6 +6954,12 @@
       - condition: state
         entity_id: binary_sensor.everyone_sleeping
         state: 'off'
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: climate.storage_ventilation_system_ventilation
+          attribute: fan_mode
+          state: 'off'
       sequence:
       - action: switch.turn_on
         target:
@@ -7931,7 +7953,14 @@
     entity_id: binary_sensor.someone_home
   - trigger: state
     entity_id: binary_sensor.everyone_sleeping
-  conditions: []
+  conditions:
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: climate.storage_ventilation_system_ventilation
+      attribute: fan_mode
+      state:
+      - 'off'
   actions:
   - action: number.set_value
     metadata: {}
@@ -11647,7 +11676,17 @@
     below: 1
   - trigger: numeric_state
     entity_id: sensor.storage_ventilation_system_days_left_until_filter_change
-    above: 89
+    above: 1
+  - trigger: state
+    entity_id: climate.storage_ventilation_system_ventilation
+    attribute: fan_mode
+    to:
+    - 'off'
+  - trigger: state
+    entity_id: climate.storage_ventilation_system_ventilation
+    attribute: fan_mode
+    from:
+    - 'off'
   - trigger: time
     at: 03:40:00
   - trigger: event
@@ -11696,7 +11735,57 @@
       related_entity_id: sensor.storage_ventilation_system_days_left_until_filter_change
       entity_id: todo.todo_smart_todo
       is_active: '{{ message | trim | length > 0 }}'
+  - action: script.create_todo_task
+    data:
+      subject: Tænd ventilationsanlægget
+      description: 'Ventilationsanlægget på loftet er slukket, tænd det igen. '
+      related_entity_id: climate.storage_ventilation_system_ventilation
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ is_state_attr(''climate.storage_ventilation_system_ventilation'',
+        ''fan_mode'', ''off'') }}'
   mode: queued
   max: 10
   trace:
     stored_traces: 30
+- id: '1771522267634'
+  alias: Soveværelse sover
+  description: Styring af timer til soveværelse sover
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_sleeping
+    from: 'off'
+    to: 'on'
+    id: sleeping
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_sleeping
+    from: 'on'
+    to: 'off'
+    id: waking
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - sleeping
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:30:00
+        target:
+          entity_id: timer.bedroom_sleeping_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - waking
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.bedroom_sleeping_timer
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
