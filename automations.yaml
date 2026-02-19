@@ -10451,7 +10451,7 @@
           related_entity_id: input_number.toilet_freshener_last_count
           entity_id: todo.todo_smart_todo
           is_active: '{{ states(''counter.toilet_motion_sensor_count'') | int(0) >
-            states(''input_number.toilet_freshener_last_count'') | int(0) + 300 }}'
+            states(''input_number.toilet_freshener_last_count'') | int(0) + 400 }}'
       - action: script.create_todo_task
         data:
           subject: Fyld sæbe på dispenser på toilettet
@@ -10459,7 +10459,7 @@
           related_entity_id: input_number.toilet_soap_last_count
           entity_id: todo.todo_smart_todo
           is_active: '{{ states(''counter.toilet_motion_sensor_count'') | int(0) >
-            states(''input_number.toilet_soap_last_count'') | int(0) + 300 }}'
+            states(''input_number.toilet_soap_last_count'') | int(0) + 500 }}'
     - conditions:
       - condition: trigger
         id: freshener_completed
@@ -11522,6 +11522,9 @@
         automation.home_meter_reading_electricity: 32
         automation.home_meter_reading_water: 32
         automation.monitor_data_folder: 32
+        automation.emils_room_blind_stop: 9999
+        automation.charlies_room_blind_stop: 9999
+        automation.living_room_blind_stop: 9999
         automation.garage_3d_printer: 9999
         automation.driveway_todo_mailbox: 9999
         automation.kitchen_fridge: 9999
