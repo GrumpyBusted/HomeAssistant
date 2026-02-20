@@ -24,6 +24,8 @@ script custom: !include_dir_merge_named ./scripts
 logger:
   logs:
     aiohue.util: warning
+system_log:
+  fire_event: true    
 
 shell_command:
   pushupdates_to_github: "/bin/bash pushupdates.sh"

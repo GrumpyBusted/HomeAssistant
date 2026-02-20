@@ -841,6 +841,9 @@
         entity_id: lock.entrance_lock
         state:
         - unlocked
+      - condition: state
+        entity_id: binary_sensor.house_sitter_home
+        state: 'off'
       sequence:
       - action: script.push_notification
         data:
@@ -3117,6 +3120,9 @@
     - conditions:
       - condition: trigger
         id: family_home
+      - condition: template
+        value_template: '{{ now() > (states.input_boolean.house_sitter.last_updated
+          + timedelta(minutes=15)) }}'
       sequence:
       - target:
           entity_id: input_boolean.house_sitter
@@ -5310,10 +5316,12 @@
     - binary_sensor.someone_home
     to: 'off'
     id: no_one_home
+  - trigger: state
+    entity_id: binary_sensor.bedroom_sleeping
   conditions: []
   actions:
   - variables:
-      light: ''
+      light: '{{ states(''binary_sensor.entrance_light'') }}'
   - choose:
     - conditions:
       - condition: trigger
@@ -6905,6 +6913,9 @@
           - condition: state
             entity_id: lock.patio_lock
             state: locked
+        - condition: state
+          entity_id: binary_sensor.house_sitter_home
+          state: 'off'
         then:
         - action: script.push_notification
           data:
@@ -7041,6 +7052,9 @@
         entity_id: lock.utility_room_lock
         state:
         - unlocked
+      - condition: state
+        entity_id: binary_sensor.house_sitter_home
+        state: 'off'
       sequence:
       - action: script.push_notification
         data:
@@ -7111,6 +7125,9 @@
         entity_id: lock.garage_lock
         state:
         - unlocked
+      - condition: state
+        entity_id: binary_sensor.house_sitter_home
+        state: 'off'
       sequence:
       - action: script.push_notification
         data:
@@ -7441,7 +7458,7 @@
         metadata: {}
         data:
           type: vac_mop_low
-          timeout: 15
+          timeout: 30
           rooms:
           - Køkken
           - Bryggers
@@ -7461,7 +7478,7 @@
         metadata: {}
         data:
           type: vac_mop
-          timeout: 15
+          timeout: 30
           rooms:
           - Køkken
           - Bryggers
@@ -7768,7 +7785,7 @@
         metadata: {}
         data:
           type: vac_mop
-          timeout: 15
+          timeout: 30
           rooms:
           - Gang
       - action: input_datetime.set_datetime
@@ -7787,7 +7804,7 @@
         metadata: {}
         data:
           type: vac_mop_low
-          timeout: 15
+          timeout: 30
           rooms:
           - Gang
       - action: input_datetime.set_datetime
@@ -7901,7 +7918,7 @@
         metadata: {}
         data:
           type: vac_mop_low
-          timeout: 30
+          timeout: 45
           rooms:
           - Stue
       - action: input_datetime.set_datetime
@@ -7927,7 +7944,7 @@
         metadata: {}
         data:
           type: vac
-          timeout: 35
+          timeout: 45
           rooms:
           - Stue
       - action: input_datetime.set_datetime
@@ -9559,6 +9576,12 @@
     then:
     - variables:
         position: '{{ [position | int, 20] | max }}'
+  - wait_template: '{{ states(''cover.charlies_room_blind'') not in [''opening'',
+      ''closing''] }}
+
+      '
+    timeout: 00:00:30
+    continue_on_timeout: true
   - action: system_log.write
     data:
       level: debug
@@ -9809,6 +9832,10 @@
           entity_id: input_number.bedroom_blind_position
         data:
           value: 100
+  - wait_template: '{{ states(''cover.bedroom_blind'') not in [''opening'', ''closing'']
+      }}'
+    timeout: 00:00:30
+    continue_on_timeout: true
   - variables:
       position: '{{ states(''input_number.bedroom_blind_position'') | int(0) }}'
   - if:
@@ -9878,12 +9905,16 @@
       - action: cover.close_cover
         target:
           entity_id: cover.bedroom_blind
-    default:
-    - action: cover.set_cover_position
-      data:
-        position: '{{ position | int(0) }}'
-      target:
-        entity_id: cover.bedroom_blind
+    - conditions:
+      - condition: template
+        value_template: '{{ position | int(0) != state_attr(''cover.bedroom_blind'',
+          ''current_position'') }}'
+      sequence:
+      - action: cover.set_cover_position
+        data:
+          position: '{{ position | int(0) }}'
+        target:
+          entity_id: cover.bedroom_blind
   - wait_template: '{{ states(''cover.bedroom_blind'') not in [''opening'', ''closing'']
       }}'
     timeout: 00:00:30
@@ -10066,6 +10097,12 @@
     then:
     - variables:
         position: '{{ [position | int, 20] | max }}'
+  - wait_template: '{{ states(''cover.emils_room_blind'') not in [''opening'', ''closing'']
+      }}
+
+      '
+    timeout: 00:00:30
+    continue_on_timeout: true
   - action: system_log.write
     data:
       level: debug
@@ -11017,6 +11054,10 @@
   - trigger: numeric_state
     entity_id: sensor.technic_room_current_temperature
     above: 30
+  - trigger: time
+    at: 01:00:00
+  - trigger: time
+    at: '13:00:00'
   conditions: []
   actions:
   - action: script.create_todo_task
@@ -11059,6 +11100,13 @@
         automation.living_room_heat_pump: 200
         automation.driveway_light_house_south: 200
         automation.driveway_light: 200
+        automation.kitchen_presence_sensor: 200
+        automation.driveway_motion_sensor_entrance: 200
+        automation.toilet_motion_sensor: 200
+        automation.driveway_motion_sensor_house_south: 200
+        automation.garden_motion_sensor_house_east: 200
+        automation.entrance_light: 150
+        automation.living_room_media_player_set_status: 150
       offenders: "{% set res = sql_result.result if sql_result is defined else []
         %}  {% set ns = namespace(offenders=[]) %} {% for row in res %}\n  {% set
         automation_id = row.automation_id %}\n  {% set count = row.trigger_count |
