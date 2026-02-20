@@ -11837,3 +11837,44 @@
   max: 10
   trace:
     stored_traces: 20
+- id: '1771616998173'
+  alias: Hjem overvåg log
+  description: Overvåg om der er fejl i loggen
+  triggers:
+  - trigger: event
+    event_type: system_log_event
+  conditions: []
+  actions:
+  - variables:
+      exclude:
+        ERROR:
+        - homeassistant.components.twinkly.coordinator
+        - homeassistant.components.apple_tv
+      include:
+        WARNING:
+        - homeassistant.helpers.template
+  - action: system_log.write
+    data:
+      level: debug
+      message: '{{ trigger }}
+
+        '
+  - if:
+    - condition: template
+      value_template: "{% set name = trigger.event.data.name %} {% set level = trigger.event.data.level
+        %} {% if level == 'ERROR' %}\n  {{ not exclude.ERROR | select('in', name)
+        | list }}\n{% elif level == 'WARNING' %}\n  {{ include.WARNING | select('in',
+        name) | list | length > 0 }}\n{% else %}\n  false\n{% endif %}\n"
+    then:
+    - action: script.push_notification
+      data:
+        type: warning
+        recipient: anders
+        persistent: true
+        id: home_assistant_monitor_log
+        title: '{{ trigger.event.data.level | title }} in Home Assistant Log'
+        message: '{{ trigger }}
+
+          '
+  mode: queued
+  max: 30

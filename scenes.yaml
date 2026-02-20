@@ -281,7 +281,6 @@
       color_mode: color_temp
       brightness: 180
       color_temp_kelvin: 2777
-      color_temp: 360
       hs_color:
       - 28.233
       - 63.317
@@ -315,7 +314,6 @@
       color_mode: color_temp
       brightness: 180
       color_temp_kelvin: 2777
-      color_temp: 360
       hs_color:
       - 28.233
       - 63.317
@@ -349,7 +347,6 @@
       color_mode: color_temp
       brightness: 160
       color_temp_kelvin: 2857
-      color_temp: 350
       hs_color:
       - 28.077
       - 60.925
@@ -383,7 +380,6 @@
       color_mode: color_temp
       brightness: 160
       color_temp_kelvin: 2857
-      color_temp: 350
       hs_color:
       - 28.077
       - 60.925
@@ -459,7 +455,6 @@
       color_mode: color_temp
       brightness: 220
       color_temp_kelvin: 2941
-      color_temp: 340
       hs_color:
       - 27.925
       - 58.522
@@ -493,7 +488,6 @@
       color_mode: color_temp
       brightness: 220
       color_temp_kelvin: 2941
-      color_temp: 340
       hs_color:
       - 27.925
       - 58.522
@@ -527,7 +521,6 @@
       color_mode: color_temp
       brightness: 170
       color_temp_kelvin: 2777
-      color_temp: 360
       hs_color:
       - 28.233
       - 63.317
@@ -569,7 +562,6 @@
       color_mode: xy
       brightness: 140
       color_temp_kelvin:
-      color_temp:
       hs_color:
       - 123.093
       - 76.078
@@ -611,7 +603,6 @@
       color_mode: xy
       brightness: 200
       color_temp_kelvin:
-      color_temp:
       hs_color:
       - 8.056
       - 84.706
@@ -653,7 +644,6 @@
       color_mode: xy
       brightness: 170
       color_temp_kelvin:
-      color_temp:
       hs_color:
       - 14.924
       - 77.255
@@ -680,7 +670,6 @@
       color_mode: color_temp
       brightness: 220
       color_temp_kelvin: 2702
-      color_temp: 370
       hs_color:
       - 28.391
       - 65.659
@@ -707,7 +696,6 @@
       color_mode: color_temp
       brightness: 220
       color_temp_kelvin: 2702
-      color_temp: 370
       hs_color:
       - 28.391
       - 65.659
@@ -749,7 +737,6 @@
       color_mode: xy
       brightness: 150
       color_temp_kelvin:
-      color_temp:
       hs_color:
       - 15.467
       - 88.235
@@ -791,7 +778,6 @@
       color_mode: xy
       brightness: 150
       color_temp_kelvin:
-      color_temp:
       hs_color:
       - 15.467
       - 88.235
@@ -825,7 +811,6 @@
       color_mode: color_temp
       brightness: 90
       color_temp_kelvin: 2631
-      color_temp: 380
       hs_color:
       - 28.55
       - 67.974
@@ -859,7 +844,6 @@
       color_mode: color_temp
       brightness: 90
       color_temp_kelvin: 2631
-      color_temp: 380
       hs_color:
       - 28.55
       - 67.974
@@ -919,7 +903,6 @@
       color_mode: xy
       brightness: 180
       color_temp_kelvin:
-      color_temp:
       hs_color:
       - 117.065
       - 72.157
@@ -940,7 +923,6 @@
       color_mode: xy
       brightness: 180
       color_temp_kelvin:
-      color_temp:
       hs_color:
       - 117.065
       - 72.157
