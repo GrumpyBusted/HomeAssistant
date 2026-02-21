@@ -415,11 +415,12 @@ living_room_robot_vacuum_start_cleaning:
           value_template: '{{ type == ''vac'' }}'
         sequence:
         - action: vacuum.send_command
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
           data:
             command: set_water_box_custom_mode
             params:
               water_box_mode: 200
-            entity_id: select.living_room_robot_vacuum_mop_mode
         - action: vacuum.set_fan_speed
           metadata: {}
           data:
@@ -448,11 +449,12 @@ living_room_robot_vacuum_start_cleaning:
           value_template: '{{ type == ''vac_low'' }}'
         sequence:
         - action: vacuum.send_command
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
           data:
             command: set_water_box_custom_mode
             params:
               water_box_mode: 200
-            entity_id: select.living_room_robot_vacuum_mop_mode
         - action: vacuum.set_fan_speed
           metadata: {}
           data:
@@ -481,11 +483,12 @@ living_room_robot_vacuum_start_cleaning:
           value_template: '{{ type == ''mop'' }}'
         sequence:
         - action: vacuum.send_command
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
           data:
             command: set_water_box_custom_mode
             params:
               water_box_mode: 203
-            entity_id: select.living_room_robot_vacuum_mop_mode
         - action: vacuum.send_command
           target:
             entity_id: vacuum.living_room_robot_vacuum
@@ -524,11 +527,12 @@ living_room_robot_vacuum_start_cleaning:
           value_template: '{{ type == ''mop_low'' }}'
         sequence:
         - action: vacuum.send_command
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
           data:
             command: set_water_box_custom_mode
             params:
               water_box_mode: 203
-            entity_id: select.living_room_robot_vacuum_mop_mode
         - action: vacuum.send_command
           target:
             entity_id: vacuum.living_room_robot_vacuum
@@ -567,11 +571,12 @@ living_room_robot_vacuum_start_cleaning:
           value_template: '{{ type == ''vac_mop'' }}'
         sequence:
         - action: vacuum.send_command
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
           data:
             command: set_water_box_custom_mode
             params:
               water_box_mode: 201
-            entity_id: select.living_room_robot_vacuum_mop_mode
         - action: vacuum.send_command
           target:
             entity_id: vacuum.living_room_robot_vacuum
@@ -610,11 +615,12 @@ living_room_robot_vacuum_start_cleaning:
           value_template: '{{ type == ''vac_mop_low'' }}'
         sequence:
         - action: vacuum.send_command
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
           data:
             command: set_water_box_custom_mode
             params:
               water_box_mode: 201
-            entity_id: select.living_room_robot_vacuum_mop_mode
         - action: vacuum.send_command
           target:
             entity_id: vacuum.living_room_robot_vacuum
@@ -1213,7 +1219,7 @@ create_todo_task:
       must_replace: '{{ must_replace | default(false) | bool }}'
       existing: "{% set todos = state_attr(entity_id, 'all_todos') | default([]) |
         rejectattr('status', 'equalto', 'completed') | list %} {% if todo_entity_id
-        is not none %}\n  {{ todos\n     | selectattr('description', 'contains', todo_entity_id
+        is not none %}\n  {{ todos\n     | selectattr('description', 'search', todo_entity_id
         | trim)\n     | map(attribute='todo_id')\n     | list }}\n{% else %}\n  {{
         todos\n     | selectattr('subject', 'equalto', subject | trim)\n     | map(attribute='todo_id')\n
         \    | list }}\n{% endif %}"
@@ -1257,6 +1263,8 @@ create_todo_task:
         description: '{{ todo_description }}'
         due: '{{ utcnow().date().isoformat() }}'
         reminder: '{{ (utcnow() + timedelta(minutes=1)).isoformat() }}'
+  mode: queued
+  max: 20
 living_room_light_rotary:
   alias: Stue lys skru op og ned
   description: Håndting af styr op og ned for lys i stuen

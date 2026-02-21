@@ -5228,7 +5228,8 @@
       sequence:
       - if:
         - condition: template
-          value_template: '{{ states(repeat.item.entity) != ''unknown'' }}'
+          value_template: '{{ states(repeat.item.entity) not in [''unknown'', ''unavailable'']
+            }}'
         then:
         - action: script.create_todo_task
           data:
@@ -5237,8 +5238,8 @@
               }}% på Canon TS8300 printer.<br> Blæk type: {{ repeat.item.ink }}'
             related_entity_id: '{{ repeat.item.entity }}'
             entity_id: todo.todo_smart_todo
-            is_active: '{{ states(repeat.item.entity)|int < state_attr(repeat.item.entity,
-              ''marker_low_level'') }}'
+            is_active: '{{ states(repeat.item.entity)|int(100) < state_attr(repeat.item.entity,
+              ''marker_low_level'')|int(15) }}'
   - action: script.create_todo_task
     data:
       subject: Løs problem med printer
@@ -11846,34 +11847,66 @@
   conditions: []
   actions:
   - variables:
-      exclude:
-        ERROR:
-        - homeassistant.components.twinkly.coordinator
-        - homeassistant.components.apple_tv
-      include:
-        WARNING:
-        - homeassistant.helpers.template
+      filters:
+        exclude:
+          error:
+          - name: ^homeassistant\.components\.twinkly
+          - name: ^homeassistant\.components\.ipp\.coordinator$
+            message: ^Timeout fetching ipp data
+          - name: ^homeassistant\.components\.ipp\.coordinator$
+            message: ^Error requesting ipp data
+          - name: ^homeassistant\.helpers\.translation$
+            message: ^Error while parsing localized (da)
+          - name: ^homeassistant\.components\.system_log\.external$
+          - name: ^homeassistant\.components\.apple_tv$
+            message: ^Failed to connect
+          - name: ^pyatv\.protocols\.companion$
+            message: ^Could not fetch SystemStatus
+          - name: ^custom_components\.sonnenbatterie$
+            message: Timeout fetching sonnenbatterie data
+          - name: ^homeassistant\.helpers\.dispatcher$
+            message: Exception in async_signal_reachable_callback
+          - name: ^homeassistant\.components\.unifi$
+            message: ^Websocket disconnected$
+          - name: ^aiounifi\.interfaces\.connectivity
+        include:
+          warning:
+          - name: ^homeassistant\.helpers\.template$
+          - name: ^homeassistant\.components\.script
+            message: Already running$
+          - name: ^homeassistant\.helpers\.service
+            message: ^Referenced entities \..+ are missing or not currently available
   - action: system_log.write
     data:
       level: debug
-      message: '{{ trigger }}
+      message: 'name={{ trigger.event.data.name }}
+
+        level={{ trigger.event.data.level }}
+
+        message={{ trigger.event.data.message | default('''') }}
+
+        trigger={{ trigger }}
 
         '
   - if:
     - condition: template
       value_template: "{% set name = trigger.event.data.name %} {% set level = trigger.event.data.level
-        %} {% if level == 'ERROR' %}\n  {{ not exclude.ERROR | select('in', name)
-        | list }}\n{% elif level == 'WARNING' %}\n  {{ include.WARNING | select('in',
-        name) | list | length > 0 }}\n{% else %}\n  false\n{% endif %}\n"
+        %} {% set message = trigger.event.data.message | default('') %}\n{% macro
+        matches(rules) %}\n  {% set ns = namespace(found=false) %}\n  {% for rule
+        in rules %}\n    {% if name is search(rule.name) %}\n      {% if rule.message
+        is not defined or message is search(rule.message) %}\n        {% set ns.found
+        = true %}\n      {% endif %}\n    {% endif %}\n  {% endfor %}\n  {{ ns.found
+        }}\n{% endmacro %}\n{% if level == 'ERROR' %}\n  {{ not matches(filters.exclude.error)
+        }}\n{% elif level == 'WARNING' %}\n  {{ matches(filters.include.warning) }}\n{%
+        else %}\n  false\n{% endif %}\n"
     then:
     - action: script.push_notification
       data:
         type: warning
         recipient: anders
         persistent: true
-        id: home_assistant_monitor_log
         title: '{{ trigger.event.data.level | title }} in Home Assistant Log'
-        message: '{{ trigger }}
+        message: '{{ trigger | to_json }}
 
           '
   mode: queued
