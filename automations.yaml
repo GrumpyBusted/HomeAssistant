@@ -5201,6 +5201,8 @@
     trigger: numeric_state
   - entity_id: sensor.living_room_printer
     trigger: state
+    from: printing
+    to: idle
   - at: 03:17:00
     trigger: time
   conditions: []
@@ -5255,35 +5257,18 @@
   alias: Bryggers todo vaskemaskine
   description: Opret todo opgaver vedrørende vaskemaskine
   triggers:
-  - trigger: numeric_state
-    entity_id:
-    - sensor.utility_room_smart_plug_washer_power
-    below: 20
-    for:
-      minutes: 5
-    id: washer_done
-  - trigger: numeric_state
-    entity_id:
-    - sensor.utility_room_smart_plug_washer_power
-    above: 3
-    for:
-      seconds: 10
-  - trigger: numeric_state
-    entity_id:
-    - sensor.utility_room_smart_plug_washer_power
-    above: 100
-    for:
-      seconds: 10
-    id: washer_started
+  - trigger: state
+    entity_id: input_select.utility_room_washer_state
   conditions: []
   actions:
   - action: script.create_todo_task
     data:
       subject: Tøm vaskemaskinen
       description: Vaskemaskinen er færdig, tøm og tør tøjet
-      related_entity_id: sensor.utility_room_smart_plug_washer_power
+      related_entity_id: input_select.utility_room_washer_state
       entity_id: todo.todo_smart_todo
-      is_active: '{{ trigger.id == ''washer_done'' }}'
+      is_active: '{{ is_state(''input_select.utility_room_washer_state'', ''finished'')
+        }}'
   mode: queued
   max: 10
   trace:
@@ -8428,34 +8413,18 @@
   alias: Bryggers todo tørretumbler
   description: Opret todo opgaver vedrørende tørretumbler
   triggers:
-  - trigger: numeric_state
-    entity_id:
-    - sensor.utility_room_smart_plug_dryer_power
-    for:
-      hours: 0
-      minutes: 3
-      seconds: 0
-    below: '20'
-    id: dryer_done
-  - trigger: numeric_state
-    entity_id:
-    - sensor.utility_room_smart_plug_dryer_power
-    above: '3'
-    id: dryer_emptied
-  - trigger: numeric_state
-    entity_id:
-    - sensor.utility_room_smart_plug_dryer_power
-    above: '100'
-    id: dryer_started
+  - trigger: state
+    entity_id: input_select.utility_room_dryer_state
   conditions: []
   actions:
   - action: script.create_todo_task
     data:
       subject: Tøm tørretumbler
       description: Tørretumbleren er færdig, tøm den og læg tøjet på plads
-      related_entity_id: sensor.utility_room_smart_plug_dryer_power
+      related_entity_id: input_select.utility_room_dryer_state
       entity_id: todo.todo_smart_todo
-      is_active: '{{ trigger.id == ''dryer_done'' }}'
+      is_active: '{{ is_state(''input_select.utility_room_dryer_state'', ''finished'')
+        }}'
   mode: queued
   max: 10
   trace:
@@ -10556,6 +10525,10 @@
   - event: start
     trigger: homeassistant
     id: started
+  - trigger: state
+    entity_id: timer.home_monitor_entities_timer
+    from: active
+    to: idle
   - at: '16:00:00'
     trigger: time
   conditions: []
@@ -10564,63 +10537,73 @@
     - condition: trigger
       id: started
     then:
-    - delay: 00:03:00
-  - variables:
-      exclude_entities:
-      - light.living_room_smart_plug_christmas_elf_house
-      - light.charlies_room_light_bed_lamp
-      - light.charlies_room_light_dresser
-      - sensor.living_room_printer_black_bk
-      - sensor.living_room_printer_black_pgbk
-      - sensor.living_room_printer_cyan
-      - sensor.living_room_printer_magenta
-      - sensor.living_room_printer_photo_blue
-      - sensor.living_room_printer_yellow
-      entities: "{% set unavailable = states \n  | rejectattr('domain','in',['button','event','update'])\n
-        \ | selectattr('state','eq','unavailable')\n  | map(attribute='entity_id')\n
-        \ | list %}\n\n{% set unknown = states \n  | selectattr('domain','in',['media_player','sensor','binary_sensor','climate','cover','lock'])\n
-        \ | selectattr('state','eq','unknown') \n  | map(attribute='entity_id')\n
-        \ | list %}\n\n{% set entities = (unavailable + unknown)\n  | reject('in',
-        exclude_entities)\n  | unique\n  | list %}\n\n{{ entities | to_json }}"
-      message: "{% set ns = namespace(result={}) %}\n{% for e in entities | trim |
-        from_json %}\n  {% set dev_id = device_id(e) if device_id(e) else '[NO_DEVICE]'
-        %}\n\n  {% if dev_id not in ns.result %}\n    {% if dev_id == '[NO_DEVICE]'
-        %}\n      {% set dev_name = '[NO_DEVICE]' %}\n      {% set dev_area_name =
-        '' %}\n    {% else %}\n      {% set dev_name = device_attr(dev_id, 'name_by_user')\n
-        \       if device_attr(dev_id, 'name_by_user')\n        else device_attr(dev_id,
-        'name') %}\n      {% set dev_area_name = area_name(device_attr(dev_id, 'area_id'))
-        %}\n    {% endif %}\n\n    {% set ns.result = dict(ns.result, **{\n      dev_id:
-        {\n        \"device_id\": dev_id,\n        \"name\": dev_name,\n        \"area\":
-        dev_area_name,\n        \"entities\": []\n      }\n    }) %}\n  {% endif %}\n\n
-        \ {% set ent_obj = {\n    \"entity_id\": e,\n    \"friendly_name\": state_attr(e,'friendly_name'),\n
-        \   \"state\": states(e),\n    \"last_changed\": states[e].last_changed.isoformat()\n
-        \ } %}\n\n  {% set ns.result = dict(ns.result, **{\n    dev_id: dict(ns.result[dev_id],
-        **{\n      \"entities\": ns.result[dev_id][\"entities\"] + [ent_obj]\n    })\n
-        \ }) %}\n{% endfor %}\n{% set devices = ns.result.values() | list %}\ncount_devices:
-        {{ devices | count }} count_entities: {{ entities | count }} devices: {% for
-        dev in devices %}\n  - device_id: \"{{ dev.device_id }}\"\n    name: \"{{
-        dev.name }}\"\n    area: \"{{ dev.area }}\"\n    entities:\n{% for ent in
-        dev.entities %}\n      - entity_id: \"{{ ent.entity_id }}\"\n        friendly_name:
-        \"{{ ent.friendly_name }}\"\n        state: \"{{ ent.state }}\"\n        last_changed:
-        \"{{ ent.last_changed }}\"\n{% endfor %} {% endfor %}"
-  - if:
-    - condition: template
-      value_template: '{{ entities | trim | from_json | length > 0}}'
-    then:
-    - action: system_log.write
+    - action: timer.start
+      target:
+        entity_id: timer.home_monitor_entities_timer
       data:
-        level: warning
-        message: '{{ exclude_entities }} {{ exclude_entities is iterable }} {{ exclude_entities
-          | count }} {{ message }} x: {{ entities }}'
-    - action: script.push_notification
-      data:
-        type: info
-        recipient: anders
-        persistent: true
-        id: home_assistant_monitor_unavailable_entities
-        title: '{{ entities | trim | from_json | length }} sensorer er ikke tilgængelige
-          i HomeAssistant'
-        message: '{{ message }}'
+        duration:
+          minutes: 5
+    else:
+    - action: timer.cancel
+      target:
+        entity_id: timer.home_monitor_entities_timer
+    - variables:
+        exclude_entities:
+        - light.living_room_smart_plug_christmas_elf_house
+        - light.charlies_room_light_bed_lamp
+        - light.charlies_room_light_dresser
+        - sensor.living_room_printer_black_bk
+        - sensor.living_room_printer_black_pgbk
+        - sensor.living_room_printer_cyan
+        - sensor.living_room_printer_magenta
+        - sensor.living_room_printer_photo_blue
+        - sensor.living_room_printer_yellow
+        entities: "{% set unavailable = states \n  | rejectattr('domain','in',['button','event','update'])\n
+          \ | selectattr('state','eq','unavailable')\n  | map(attribute='entity_id')\n
+          \ | list %}\n\n{% set unknown = states \n  | selectattr('domain','in',['media_player','sensor','binary_sensor','climate','cover','lock'])\n
+          \ | selectattr('state','eq','unknown') \n  | map(attribute='entity_id')\n
+          \ | list %}\n\n{% set entities = (unavailable + unknown)\n  | reject('in',
+          exclude_entities)\n  | unique\n  | list %}\n\n{{ entities | to_json }}"
+        message: "{% set ns = namespace(result={}) %}\n{% for e in entities | trim
+          | from_json %}\n  {% set dev_id = device_id(e) if device_id(e) else '[NO_DEVICE]'
+          %}\n\n  {% if dev_id not in ns.result %}\n    {% if dev_id == '[NO_DEVICE]'
+          %}\n      {% set dev_name = '[NO_DEVICE]' %}\n      {% set dev_area_name
+          = '' %}\n    {% else %}\n      {% set dev_name = device_attr(dev_id, 'name_by_user')\n
+          \       if device_attr(dev_id, 'name_by_user')\n        else device_attr(dev_id,
+          'name') %}\n      {% set dev_area_name = area_name(device_attr(dev_id, 'area_id'))
+          %}\n    {% endif %}\n\n    {% set ns.result = dict(ns.result, **{\n      dev_id:
+          {\n        \"device_id\": dev_id,\n        \"name\": dev_name,\n        \"area\":
+          dev_area_name,\n        \"entities\": []\n      }\n    }) %}\n  {% endif
+          %}\n\n  {% set ent_obj = {\n    \"entity_id\": e,\n    \"friendly_name\":
+          state_attr(e,'friendly_name'),\n    \"state\": states(e),\n    \"last_changed\":
+          states[e].last_changed.isoformat()\n  } %}\n\n  {% set ns.result = dict(ns.result,
+          **{\n    dev_id: dict(ns.result[dev_id], **{\n      \"entities\": ns.result[dev_id][\"entities\"]
+          + [ent_obj]\n    })\n  }) %}\n{% endfor %}\n{% set devices = ns.result.values()
+          | list %}\ncount_devices: {{ devices | count }} count_entities: {{ entities
+          | count }} devices: {% for dev in devices %}\n  - device_id: \"{{ dev.device_id
+          }}\"\n    name: \"{{ dev.name }}\"\n    area: \"{{ dev.area }}\"\n    entities:\n{%
+          for ent in dev.entities %}\n      - entity_id: \"{{ ent.entity_id }}\"\n
+          \       friendly_name: \"{{ ent.friendly_name }}\"\n        state: \"{{
+          ent.state }}\"\n        last_changed: \"{{ ent.last_changed }}\"\n{% endfor
+          %} {% endfor %}"
+    - if:
+      - condition: template
+        value_template: '{{ entities | trim | from_json | length > 0}}'
+      then:
+      - action: system_log.write
+        data:
+          level: warning
+          message: '{{ exclude_entities }} {{ exclude_entities is iterable }} {{ exclude_entities
+            | count }} {{ message }} x: {{ entities }}'
+      - action: script.push_notification
+        data:
+          type: info
+          recipient: anders
+          persistent: true
+          id: home_assistant_monitor_unavailable_entities
+          title: '{{ entities | trim | from_json | length }} sensorer er ikke tilgængelige
+            i HomeAssistant'
+          message: '{{ message }}'
   mode: single
   trace:
     stored_traces: 50
@@ -11230,8 +11213,9 @@
   - variables:
       title: ''
       message: ''
-      entity_id: '{{ trigger.entity_id }}'
-      trigger_id: '{{ trigger.id }}'
+      entity_id: '{{ trigger.entity_id | default('''') }}'
+      trigger_id: '{{ trigger.id | default('''') }}'
+      entity_state: '{{ states(entity_id) if entity_id else ''N/A'' }}'
       notification_type: warning
   - choose:
     - conditions:
@@ -11241,7 +11225,7 @@
       - variables:
           title: 'Home Assistant: Højt swap-forbrug'
           message: 'Swap-forbrug er for højt (over 10% i mindst 2 minutter). Aktuel
-            værdi: {{ states(entity_id) }}% Grænse: 10%
+            værdi: {{ entity_state }}% Grænse: 10%
 
             '
           notification_type: warning
@@ -11251,8 +11235,8 @@
       sequence:
       - variables:
           title: 'Home Assistant: Kritisk swap-forbrug'
-          message: 'Swap-forbrug er kritisk højt. Aktuel værdi: {{ states(entity_id)
-            }}% Grænse: 30%
+          message: 'Swap-forbrug er kritisk højt. Aktuel værdi: {{ entity_state }}%
+            Grænse: 30%
 
             '
           notification_type: critical
@@ -11263,7 +11247,7 @@
       - variables:
           title: 'Home Assistant: Høj CPU temperatur'
           message: 'CPU temperaturen er for høj (over 65°C i mindst 2 minutter). Aktuel
-            værdi: {{ states(entity_id) }}°C Grænse: 65°C
+            værdi: {{ entity_state }}°C Grænse: 65°C
 
             '
           notification_type: warning
@@ -11273,7 +11257,7 @@
       sequence:
       - variables:
           title: 'Home Assistant: Kritisk CPU temperatur'
-          message: 'CPU temperaturen er kritisk høj. Aktuel værdi: {{ states(entity_id)
+          message: 'CPU temperaturen er kritisk høj. Aktuel værdi: {{ entity_state
             }}°C Grænse: 75°C
 
             '
@@ -11285,7 +11269,7 @@
       - variables:
           title: 'Home Assistant: Højt CPU forbrug'
           message: 'CPU forbrug har været højt i mindst 60 sekunder. Aktuel værdi:
-            {{ states(entity_id) }}% Grænse: 70%
+            {{ entity_state }}% Grænse: 70%
 
             '
           notification_type: warning
@@ -11295,8 +11279,8 @@
       sequence:
       - variables:
           title: 'Home Assistant: Kritisk CPU forbrug'
-          message: 'CPU forbrug er kritisk højt. Aktuel værdi: {{ states(entity_id)
-            }}% Grænse: 90%
+          message: 'CPU forbrug er kritisk højt. Aktuel værdi: {{ entity_state }}%
+            Grænse: 90%
 
             '
           notification_type: critical
@@ -11307,7 +11291,7 @@
       - variables:
           title: 'Home Assistant: Højt RAM forbrug'
           message: 'RAM forbrug er for højt (over 85% i mindst 2 minutter). Aktuel
-            værdi: {{ states(entity_id) }}% Grænse: 85%
+            værdi: {{ entity_state }}% Grænse: 85%
 
             '
           notification_type: warning
@@ -11317,8 +11301,8 @@
       sequence:
       - variables:
           title: 'Home Assistant: Kritisk RAM forbrug'
-          message: 'RAM forbrug er kritisk højt. Aktuel værdi: {{ states(entity_id)
-            }}% Grænse: 92%
+          message: 'RAM forbrug er kritisk højt. Aktuel værdi: {{ entity_state }}%
+            Grænse: 92%
 
             '
           notification_type: critical
@@ -11329,7 +11313,7 @@
       - variables:
           title: 'Home Assistant: Højt diskforbrug'
           message: 'Diskforbrug er for højt (over 80% i mindst 5 minutter). Aktuel
-            værdi: {{ states(entity_id) }}% Grænse: 80%
+            værdi: {{ entity_state }}% Grænse: 80%
 
             '
           notification_type: warning
@@ -11339,8 +11323,8 @@
       sequence:
       - variables:
           title: 'Home Assistant: Kritisk diskforbrug'
-          message: 'Diskforbrug er kritisk højt. Aktuel værdi: {{ states(entity_id)
-            }}% Grænse: 90%
+          message: 'Diskforbrug er kritisk højt. Aktuel værdi: {{ entity_state }}%
+            Grænse: 90%
 
             '
           notification_type: critical
@@ -11363,7 +11347,7 @@
       - variables:
           title: 'Home Assistant: Høj load (1 min)'
           message: 'System belastning (1 minut) er for høj (over 4.0 i mindst 2 minutter).
-            Aktuel værdi: {{ states(entity_id) }} Grænse: 4.0
+            Aktuel værdi: {{ entity_state }} Grænse: 4.0
 
             '
           notification_type: warning
@@ -11373,7 +11357,7 @@
       sequence:
       - variables:
           title: 'Home Assistant: Kritisk load (1 min)'
-          message: 'System belastning (1 minut) er kritisk høj. Aktuel værdi: {{ states(entity_id)
+          message: 'System belastning (1 minut) er kritisk høj. Aktuel værdi: {{ entity_state
             }} Grænse: 6.0
 
             '
@@ -11385,7 +11369,7 @@
       - variables:
           title: 'Home Assistant: Høj load (5 min)'
           message: 'System belastning (5 minutter) er for høj (over 4.0 i mindst 5
-            minutter). Aktuel værdi: {{ states(entity_id) }} Grænse: 4.0
+            minutter). Aktuel værdi: {{ entity_state }} Grænse: 4.0
 
             '
           notification_type: warning
@@ -11396,7 +11380,7 @@
       - variables:
           title: 'Home Assistant: Kritisk load (5 min)'
           message: 'System belastning (5 minutter) er kritisk høj. Aktuel værdi: {{
-            states(entity_id) }} Grænse: 6.0
+            entity_state }} Grænse: 6.0
 
             '
           notification_type: critical
@@ -11407,7 +11391,7 @@
       - variables:
           title: 'Home Assistant: Høj load (15 min)'
           message: 'System belastning (15 minutter) er for høj (over 4.0 i mindst
-            10 minutter). Aktuel værdi: {{ states(entity_id) }} Grænse: 4.0
+            10 minutter). Aktuel værdi: {{ entity_state }} Grænse: 4.0
 
             '
           notification_type: warning
@@ -11418,15 +11402,15 @@
       - variables:
           title: 'Home Assistant: Kritisk load (15 min)'
           message: 'System belastning (15 minutter) er kritisk høj. Aktuel værdi:
-            {{ states(entity_id) }} Grænse: 6.0
+            {{ entity_state }} Grænse: 6.0
 
             '
           notification_type: critical
     default:
     - variables:
         title: 'Home Assistant: System alarm'
-        message: 'En ukendt trigger blev aktiveret. Trigger ID: {{ trigger.id }} Entity:
-          {{ trigger.entity_id }} Aktuel værdi: {{ states(trigger.entity_id) }}
+        message: 'En ukendt trigger blev aktiveret. Trigger ID: {{ trigger_id }} Entity:
+          {{ entity_id }} Aktuel værdi: {{ entity_state }}
 
           '
         notification_type: critical
@@ -11437,7 +11421,7 @@
     - data:
         level: warning
         message: '{{ title }} - {{ message }} Entity: {{ entity_id }}, Trigger: {{
-          trigger_id }}
+          trigger_id | default('''') }}
 
           '
       action: system_log.write
@@ -11607,6 +11591,7 @@
         automation.driveway_todo_mailbox: 9999
         automation.kitchen_fridge: 9999
         automation.living_room_tv: 9999
+        automation.home_monitor_system: 9999
       offenders: "{% set ns = namespace(offenders=[]) %}\n{% for a in states.automation
         | list %}\n  {% set days = custom_days.get(a.entity_id, default_days) | int
         %}\n  {% set cutoff = now() - timedelta(days=days) %}\n  {% set last = state_attr(a.entity_id,
@@ -11844,7 +11829,10 @@
   triggers:
   - trigger: event
     event_type: system_log_event
-  conditions: []
+  conditions:
+  - condition: template
+    value_template: "{{ trigger.event.data.level in ['ERROR', 'WARNING'] and trigger.event.data.name
+      != 'homeassistant.components.automation.home_monitor_log' }} \n"
   actions:
   - variables:
       filters:
@@ -11852,14 +11840,12 @@
           error:
           - name: ^homeassistant\.components\.twinkly
           - name: ^homeassistant\.components\.ipp\.coordinator$
-            message: ^Timeout fetching ipp data
-          - name: ^homeassistant\.components\.ipp\.coordinator$
-            message: ^Error requesting ipp data
           - name: ^homeassistant\.helpers\.translation$
             message: ^Error while parsing localized (da)
-          - name: ^homeassistant\.components\.system_log\.external$
           - name: ^homeassistant\.components\.apple_tv$
             message: ^Failed to connect
+          - name: ^homeassistant\.components\.apple_tv$
+            message: ^Unloading .+ config entry
           - name: ^pyatv\.protocols\.companion$
             message: ^Could not fetch SystemStatus
           - name: ^custom_components\.sonnenbatterie$
@@ -11869,13 +11855,17 @@
           - name: ^homeassistant\.components\.unifi$
             message: ^Websocket disconnected$
           - name: ^aiounifi\.interfaces\.connectivity
+          - name: ^frontend\.js\.modern
+          - name: ^zigpy\.zcl$
+          - name: ^homeassistant$
+            message: ^Error doing job
         include:
           warning:
           - name: ^homeassistant\.helpers\.template$
           - name: ^homeassistant\.components\.script
             message: Already running$
           - name: ^homeassistant\.helpers\.service
-            message: ^Referenced entities \..+ are missing or not currently available
+            message: ^Referenced entities .+ are missing or not currently available
   - action: system_log.write
     data:
       level: debug
@@ -11891,14 +11881,18 @@
   - if:
     - condition: template
       value_template: "{% set name = trigger.event.data.name %} {% set level = trigger.event.data.level
-        %} {% set message = trigger.event.data.message | default('') %}\n{% macro
-        matches(rules) %}\n  {% set ns = namespace(found=false) %}\n  {% for rule
-        in rules %}\n    {% if name is search(rule.name) %}\n      {% if rule.message
-        is not defined or message is search(rule.message) %}\n        {% set ns.found
-        = true %}\n      {% endif %}\n    {% endif %}\n  {% endfor %}\n  {{ ns.found
-        }}\n{% endmacro %}\n{% if level == 'ERROR' %}\n  {{ not matches(filters.exclude.error)
-        }}\n{% elif level == 'WARNING' %}\n  {{ matches(filters.include.warning) }}\n{%
-        else %}\n  false\n{% endif %}\n"
+        %} {% set raw = trigger.event.data.message | default('') %}\n{% if raw is
+        string %}\n  {% set message = raw %}\n{% elif raw is iterable %}\n  {% set
+        message = raw | join(' ') %}\n{% else %}\n  {% set message = raw | string
+        %}\n{% endif %}\n{% set ns = namespace(\n    exclude=false,\n    include=false\n)
+        %}           {% for rule in filters.exclude.error %}\n  {% if name is search(rule.name)
+        %}\n    {% if rule.message is not defined or message is search(rule.message)
+        %}\n      {% set ns.excluded = true %}\n    {% endif %}\n  {% endif %}\n{%
+        endfor %}\n{% for rule in filters.include.warning %}\n  {% if name is search(rule.name)
+        %}\n    {% if rule.message is not defined or message is search(rule.message)
+        %}\n      {% set ns.include = true %}\n    {% endif %}\n  {% endif %}\n{%
+        endfor %}\n{% if level == 'ERROR' %}\n  {{ not ns.excluded }}\n{% elif level
+        == 'WARNING' %}\n  {{ ns.included }}\n{% else %}\n  false\n{% endif %}\n"
     then:
     - action: script.push_notification
       data:
@@ -11906,8 +11900,182 @@
         recipient: anders
         persistent: true
         title: '{{ trigger.event.data.level | title }} in Home Assistant Log'
-        message: '{{ trigger | to_json }}
+        message: '{{ trigger }}
 
           '
   mode: queued
   max: 30
+  trace:
+    stored_traces: 100
+- id: '1771692983110'
+  alias: Bryggers vaskemaskine
+  description: Skaber vaskemaskine status udfra strømforbrug
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_washer_power
+    below: 2
+    for:
+      seconds: 10
+    id: nothing
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_washer_power
+    above: 2
+    for:
+      seconds: 3
+    id: turned_on
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_washer_power
+    above: 3
+    for:
+      seconds: 10
+    id: planning
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_washer_power
+    above: 50
+    for:
+      seconds: 10
+    id: running
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: running
+      sequence:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.utility_room_washer_state
+        data:
+          option: started
+    - conditions:
+      - condition: trigger
+        id: nothing
+      - condition: state
+        entity_id: input_select.utility_room_washer_state
+        state: started
+      sequence:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.utility_room_washer_state
+        data:
+          option: finished
+    - conditions:
+      - condition: trigger
+        id: turned_on
+      - condition: state
+        entity_id: input_select.utility_room_washer_state
+        state: finished
+      sequence:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.utility_room_washer_state
+        data:
+          option: emptied
+    - conditions:
+      - condition: trigger
+        id: planning
+      - condition: state
+        entity_id: input_select.utility_room_washer_state
+        state:
+        - finished
+        - emptied
+      sequence:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.utility_room_washer_state
+        data:
+          option: planned
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
+- id: '1771697802150'
+  alias: Bryggers tørretumbler
+  description: Skaber tørretumbler status udfra strømforbrug
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_dryer_power
+    below: 3
+    for:
+      seconds: 5
+    id: nothing
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_dryer_power
+    above: 3
+    for:
+      seconds: 3
+    id: turned_on
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_dryer_power
+    above: 4
+    for:
+      seconds: 10
+    id: planning
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_dryer_power
+    above: 50
+    for:
+      seconds: 3
+    id: running
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: running
+      sequence:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.utility_room_dryer_state
+        data:
+          option: started
+    - conditions:
+      - condition: trigger
+        id: nothing
+      - condition: state
+        entity_id: input_select.utility_room_dryer_state
+        state: started
+      sequence:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.utility_room_dryer_state
+        data:
+          option: finished
+    - conditions:
+      - condition: trigger
+        id: turned_on
+      - condition: state
+        entity_id: input_select.utility_room_dryer_state
+        state: finished
+      sequence:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.utility_room_dryer_state
+        data:
+          option: emptied
+    - conditions:
+      - condition: trigger
+        id: planning
+      - condition: state
+        entity_id: input_select.utility_room_dryer_state
+        state:
+        - finished
+        - emptied
+      sequence:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.utility_room_dryer_state
+        data:
+          option: planned
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30

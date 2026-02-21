@@ -737,15 +737,19 @@ push_notification:
       level: debug
   - variables:
       persons:
-      - device: notify.mobile_app_anders_iphone
-        sensor: sensor.anders_distance_home
-      - device: notify.mobile_app_monique_iphone
-        sensor: sensor.monique_distance_home
-      - device: notify.mobile_app_emil_iphone
-        sensor: sensor.emil_distance_home
-      - device: notify.mobile_app_charlie_iphone
-        sensor: sensor.charlie_distance_home
-      notification_id: "{% if not id %}\n  {{ now().strftime('%Y-%m-%d-%H-%M-%S')
+      - notifier: notify.mobile_app_anders_iphone
+        distance: sensor.anders_distance_home
+        sleeping: binary_sensor.anders_sleeping
+      - notifier: notify.mobile_app_monique_iphone
+        distance: sensor.monique_distance_home
+        sleeping: binary_sensor.monique_sleeping
+      - notifier: notify.mobile_app_emil_iphone
+        distance: sensor.emil_distance_home
+        sleeping: binary_sensor.emil_sleeping
+      - notifier: notify.mobile_app_charlie_iphone
+        distance: sensor.charlie_distance_home
+        sleeping: binary_sensor.charlie_sleeping
+      notification_id: "{% if id is not defined or not id %}\n  {{ now().strftime('%Y-%m-%d-%H-%M-%S')
         }}-{{ range(0, 100000) | random }}\n{% else %}\n  {{ id }}\n{% endif %}"
   - choose:
     - conditions:
@@ -754,23 +758,29 @@ push_notification:
       sequence:
       - variables:
           notify_persons: "{% set ns = namespace(list=[]) %}\n{% for person in persons
-            %}\n  {% set distance = states(person.sensor) | float(99999) %}\n  {%
-            set ns.list = ns.list + [{\n      'device': person.device,\n      'distance':
-            distance\n  }] %}\n{% endfor %} \n{% set notify_persons = ns.list | selectattr('distance',
-            'lt', 0.2) | list %} \n{% if notify_persons | count == 0 %}\n  {% set
-            first_distance = ((ns.list | sort(attribute='distance'))[0]).distance
+            %}\n  {% set distance = states(person.distance) | float(99999) %}\n  {%
+            set sleeping = is_state(person.sleeping, 'on') %}\n  {% set ns.list =
+            ns.list + [{\n      'notifier': person.notifier,\n      'distance': distance,\n
+            \     'sleeping': sleeping\n  }] %}\n{% endfor %}\n{% set nearby = ns.list
+            | selectattr('distance', 'lt', 0.2) | list %}\n{% if nearby | count ==
+            0 %}\n  {% set first_distance = (ns.list | sort(attribute='distance'))[0].distance
+            | float(0) %}\n  {% set nearby = ns.list | selectattr('distance', 'lt',
+            first_distance + 2.0) | list %}\n{% endif %}\n{% if notify_persons | count
+            == 0 %}\n  {% set first_distance = ((ns.list | sort(attribute='distance'))[0]).distance
             | float(0) %}\n  {% set notify_persons = ns.list | selectattr('distance',
-            'lt', first_distance + 2.0) | list %}\n{% endif %}\n{{ notify_persons
-            | map(attribute='device') | list }}"
+            'lt', first_distance + 2.0) | list %}\n{% endif %}\n{% set awake = nearby
+            | selectattr('sleeping', 'eq', false) | list %}\n{% if awake | count >
+            0 %}\n  {{ awake | map(attribute='notifier') | list }}\n{% else %}\n  {{
+            nearby | map(attribute='notifier') | list }}\n{% endif %}"
     - conditions:
       - condition: template
         value_template: '{{ recipient == ''all'' }}'
       sequence:
       - variables:
-          notify_persons: '{{ persons | map(attribute=''device'') | list }}'
+          notify_persons: '{{ persons | map(attribute=''notifier'') | list }}'
     default:
     - variables:
-        notify_persons: '{{ persons | map(attribute=''device'') | select(''search'',
+        notify_persons: '{{ persons | map(attribute=''notifier'') | select(''search'',
           ''_'' ~ recipient ~ ''_'') | list }}'
   - action: system_log.write
     data:
@@ -790,33 +800,23 @@ push_notification:
   - repeat:
       for_each: '{{ notify_persons }}'
       sequence:
+      - action: system_log.write
+        data:
+          message: 'Action: {{ repeat.item }}
+
+            Title: {{ title }}
+
+            Message: {{ message }}'
+          level: "{% if type == 'critical' %}\n  warning\n{% elif type == 'warning'
+            %}\n  warning\n{% elif type == 'info' %}\n  info\n{% else %}\n  debug\n{%
+            endif %}\n"
       - choose:
-        - conditions:
-          - condition: template
-            value_template: '{{ type == ''log'' }}'
-          sequence:
-          - action: system_log.write
-            data:
-              message: 'Action: {{ repeat.item }}
-
-                Title: {{ title }}
-
-                Message: {{ message }}'
-              level: debug
         - conditions:
           - condition: template
             value_template: '{{ type == ''info'' }}'
           - condition: template
             value_template: '{{ category is not defined or category == '''' }}'
           sequence:
-          - action: system_log.write
-            data:
-              message: 'Action: {{ repeat.item }}
-
-                Title: {{ title }}
-
-                Message: {{ message }}'
-              level: info
           - action: '{{ repeat.item }}'
             data:
               title: '{{ title }}'
@@ -831,14 +831,6 @@ push_notification:
           - condition: template
             value_template: '{{ type == ''info'' }}'
           sequence:
-          - action: system_log.write
-            data:
-              message: 'Action: {{ repeat.item }}
-
-                Title: {{ title }}
-
-                Message: {{ message }}'
-              level: info
           - action: '{{ repeat.item }}'
             data:
               title: '{{ title }}'
@@ -859,14 +851,6 @@ push_notification:
           - condition: template
             value_template: '{{ category is not defined or category == '''' }}'
           sequence:
-          - action: system_log.write
-            data:
-              message: 'Action: {{ repeat.item }}
-
-                Title: {{ title }}
-
-                Message: {{ message }}'
-              level: warning
           - action: '{{ repeat.item }}'
             data:
               title: '{{ title }}'
@@ -881,14 +865,6 @@ push_notification:
           - condition: template
             value_template: '{{ type == ''warning'' }}'
           sequence:
-          - action: system_log.write
-            data:
-              message: 'Action: {{ repeat.item }}
-
-                Title: {{ title }}
-
-                Message: {{ message }}'
-              level: warning
           - action: '{{ repeat.item }}'
             data:
               title: '{{ title }}'
@@ -909,14 +885,6 @@ push_notification:
           - condition: template
             value_template: '{{ category is not defined or category == '''' }}'
           sequence:
-          - action: system_log.write
-            data:
-              message: 'Action: {{ repeat.item }}
-
-                Title: {{ title }}
-
-                Message: {{ message }}'
-              level: error
           - action: '{{ repeat.item }}'
             data:
               title: '{{ title }}'
@@ -931,14 +899,6 @@ push_notification:
           - condition: template
             value_template: '{{ type == ''critical'' }}'
           sequence:
-          - action: system_log.write
-            data:
-              message: 'Action: {{ repeat.item }}
-
-                Title: {{ title }}
-
-                Message: {{ message }}'
-              level: error
           - action: '{{ repeat.item }}'
             data:
               title: '{{ title }}'
@@ -1388,6 +1348,7 @@ emils_varelse_tand_og_sluk_lys:
 create_todo_battery_task:
   alias: Opret todo batteri opgave
   description: Kontroller batteri niveau og opret evt opgave
+  mode: parallel
   fields:
     entity_id:
       name: Sensor
@@ -1508,7 +1469,7 @@ create_todo_battery_task:
         Temperature: {{ temperature | default(''Ukendt'') }}'
   - if:
     - condition: template
-      value_template: '{{ _level | int(100) >= 0 and _temperature | float > 1.0 }}'
+      value_template: '{{ _level | int(100) >= 0 and _temperature | float > 2.0 }}'
     then:
     - action: script.create_todo_task
       data:
