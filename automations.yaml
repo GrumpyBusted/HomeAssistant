@@ -740,6 +740,7 @@
   - trigger: state
     entity_id:
     - binary_sensor.everyone_sleeping
+    - binary_sensor.bedroom_sleeping
     from: 'off'
     to: 'on'
     id: sleeping
@@ -4587,6 +4588,21 @@
       entity_id: todo.todo_smart_todo
       is_active: '{{ states(''sensor.living_room_robot_vacuum_error'') != ''none''
         }}'
+  - if:
+    - condition: not
+      conditions:
+      - condition: state
+        entity_id: sensor.living_room_robot_vacuum_error
+        state: none
+    then:
+    - action: script.push_notification
+      data:
+        type: warning
+        recipient: home
+        id: living_room_robot_vacuum_error
+        title: Løs problem med Dobby
+        message: Advarsel på Roborock robot støvsuger. Kode {{ states('sensor.living_room_robot_vacuum_error')
+          }}
   mode: restart
   trace:
     stored_traces: 30
@@ -6994,6 +7010,7 @@
   - trigger: state
     entity_id:
     - binary_sensor.everyone_sleeping
+    - binary_sensor.bedroom_sleeping
     from: 'off'
     to: 'on'
     id: sleeping
@@ -10981,7 +10998,7 @@
   triggers:
   - trigger: numeric_state
     entity_id: sensor.greenhouse_current_temperature
-    below: 0
+    below: -1
   - trigger: numeric_state
     entity_id: sensor.greenhouse_heating_smart_plug_power
     below: 5
@@ -10997,7 +11014,7 @@
       entity_id: todo.todo_smart_todo
       related_entity_id: sensor.greenhouse_current_temperature
       is_active: "{{ states('sensor.greenhouse_current_temperature') | float(10.0)
-        < 0.0 and\n   states('sensor.greenhouse_heating_smart_plug_power') | float(0.0)
+        < -1.0 and\n   states('sensor.greenhouse_heating_smart_plug_power') | float(0.0)
         < 5.0 }}"
   mode: queued
   max: 10
@@ -11859,6 +11876,19 @@
           - name: ^zigpy\.zcl$
           - name: ^homeassistant$
             message: ^Error doing job
+          - name: ^pymiele\.pymiele$
+            message: Not enough data to satisfy transfer length header
+          - name: ^homeassistant\.components\.wallbox\.coordinator$
+            message: Error fetching wallbox data
+          - name: ^pysmartthings$
+            message: Connection error occurred while subscribing to events
+          - name: ^metno$
+          - name: ^homeassistant\.components\.met\.coordinator$
+            message: Error fetching met data
+          - name: ^homeassistant\.components\.volvo\.coordinator^$
+            message: Unable to update data
+          - name: ^homeassistant\.components\.apple_tv\.media_player$
+            message: Failed to update app list
         include:
           warning:
           - name: ^homeassistant\.helpers\.template$
@@ -11885,14 +11915,15 @@
         string %}\n  {% set message = raw %}\n{% elif raw is iterable %}\n  {% set
         message = raw | join(' ') %}\n{% else %}\n  {% set message = raw | string
         %}\n{% endif %}\n{% set ns = namespace(\n    exclude=false,\n    include=false\n)
-        %}           {% for rule in filters.exclude.error %}\n  {% if name is search(rule.name)
-        %}\n    {% if rule.message is not defined or message is search(rule.message)
-        %}\n      {% set ns.excluded = true %}\n    {% endif %}\n  {% endif %}\n{%
-        endfor %}\n{% for rule in filters.include.warning %}\n  {% if name is search(rule.name)
-        %}\n    {% if rule.message is not defined or message is search(rule.message)
-        %}\n      {% set ns.include = true %}\n    {% endif %}\n  {% endif %}\n{%
-        endfor %}\n{% if level == 'ERROR' %}\n  {{ not ns.excluded }}\n{% elif level
-        == 'WARNING' %}\n  {{ ns.included }}\n{% else %}\n  false\n{% endif %}\n"
+        %}      \n{% if level == 'ERROR' %}\n  {% for rule in filters.exclude.error
+        %}\n    {% if name is search(rule.name) %}\n      {% if rule.message is not
+        defined or message is search(rule.message) %}\n        {% set ns.exclude =
+        true %}\n      {% endif %}\n    {% endif %}\n  {% endfor %}\n  {{ not ns.exclude
+        }}\n{% elif level == 'WARNING' %}\n  {% for rule in filters.include.warning
+        %}\n    {% if name is search(rule.name) %}\n      {% if rule.message is not
+        defined or message is search(rule.message) %}\n        {% set ns.include =
+        true %}\n      {% endif %}\n    {% endif %}\n  {% endfor %}\n  {{ ns.include
+        }}\n{% else %}\n  false\n{% endif %}\n"
     then:
     - action: script.push_notification
       data:
@@ -12079,3 +12110,80 @@
   max: 10
   trace:
     stored_traces: 30
+- id: '1771745687585'
+  alias: Hjem overvåg netværk
+  description: Overvåg internet og netværks enheder
+  triggers:
+  - trigger: time_pattern
+    hours: /1
+  conditions: []
+  actions:
+  - variables:
+      min_speed: 300
+      max_ping: 20
+      max_latency: 25
+      max_cpu: 80
+      max_memory: 90
+      download: '{{ states(''sensor.internet_speed_download'') | float(0) }}'
+      upload: '{{ states(''sensor.internet_speed_upload'') | float(0) }}'
+      ping: '{{ states(''sensor.internet_speed_ping'') | float(0) }}'
+      wan_google: '{{ states(''sensor.technic_room_cloud_gateway_google_wan_latency'')
+        | float(0) }}'
+      wan_cloudflare: '{{ states(''sensor.technic_room_cloud_gateway_cloudflare_wan_latency'')
+        | float(0) }}'
+      unifi_devices:
+      - sensor.technic_room_cloud_gateway
+      - sensor.emils_room_network_switch
+      - sensor.garage_network_switch
+      - sensor.living_room_network_switch
+      - sensor.hallway_accesspoint
+      - sensor.living_room_accesspoint
+      - sensor.garage_accesspoint
+      - sensor.patio_accesspoint
+      unifi_problems: "{% set ns = namespace(list=[]) %} {% for base in unifi_devices
+        %}\n  {% set state_sensor = base ~ '_state' %}\n  {% set cpu_sensor = base
+        ~ '_cpu_utilization' %}\n  {% set memory_sensor = base ~ '_memory_utilization'
+        %}\n  {% set state = states(state_sensor) | lower %}\n  {% set cpu = states(cpu_sensor)
+        | float(0) %}\n  {% set memory = states(memory_sensor) | float(0) %}\n  {%
+        set dev_id = device_id(state_sensor) %}\n  {% if dev_id %}\n    {% set dev_name
+        = device_attr(dev_id,'name_by_user') if device_attr(dev_id,'name_by_user')
+        else device_attr(dev_id,'name') %}\n  {% else %}\n    {% set dev_name = base
+        %}\n  {% endif %}\n  {% set issues = [] %}\n  {% if state != 'connected' %}\n
+        \   {% set issues = issues + ['ikke forbundet (' ~ state ~ ')'] %}\n  {% endif
+        %}\n  {% if cpu > max_cpu %}\n    {% set issues = issues + ['CPU ' ~ cpu ~
+        '%'] %}\n  {% endif %}\n  {% if memory > max_memory %}\n    {% set issues
+        = issues + ['Hukommelse ' ~ memory ~ '%'] %}\n  {% endif %}\n  {% if issues
+        | length > 0 %}\n    {% set ns.list = ns.list + [dev_name ~ ': ' ~ issues
+        | join(', ')] %}\n  {% endif %}\n{% endfor %} {{ ns.list }}\n"
+      problems: "{% set issues = [] %} {% if download < min_speed %}\n  {% set issues
+        = issues + ['Download under ' ~ min_speed ~ ' Mbps (' ~ download ~ ')'] %}\n{%
+        endif %} {% if upload < min_speed %}\n  {% set issues = issues + ['Upload
+        under ' ~ min_speed ~ ' Mbps (' ~ upload ~ ')'] %}\n{% endif %} {% if ping
+        > max_ping %}\n  {% set issues = issues + ['Ping for høj (' ~ ping ~ ' ms)']
+        %}\n{% endif %} {% if wan_google > max_latency %}\n  {% set issues = issues
+        + ['Google WAN latency høj (' ~ wan_google ~ ' ms)'] %}\n{% endif %} {% if
+        wan_cloudflare > max_latency %}\n  {% set issues = issues + ['Cloudflare WAN
+        latency høj (' ~ wan_cloudflare ~ ' ms)'] %}\n{% endif %} {% if unifi_problems
+        | length > 0 %}\n  {% set issues = issues + unifi_problems %}\n{% endif %}
+        {{ issues }}\n"
+  - if:
+    - condition: template
+      value_template: '{{ problems | length > 0 }}'
+    then:
+    - action: system_log.write
+      data:
+        level: warning
+        message: 'Netværksproblem: {{ problems }}'
+    - action: script.push_notification
+      data:
+        type: info
+        recipient: anders
+        persistent: true
+        id: home_monitor_network
+        title: Netværksproblem opdaget
+        message: '{{ problems | join(''\n'') }}
+
+          '
+  mode: single
+  trace:
+    stored_traces: 20

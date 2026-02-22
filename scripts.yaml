@@ -993,7 +993,8 @@ set_climate_temperature:
     setpunktet er anderledes for at undgå unødige kald
 
     '
-  mode: parallel
+  mode: queued
+  max: 20
   fields:
     entities:
       name: Enheder
@@ -1028,30 +1029,31 @@ set_climate_temperature:
         \ %}\n  {% if (current | round(1)) != (temperature | round(1)) %}\n    {%
         set ns.result = ns.result + [entity] %}\n  {% endif %}\n{% endfor %} {{ ns.result
         }}\n"
-  - action: system_log.write
-    data:
-      level: info
-      message: 'Entities: {{ entities_to_update }}
-
-        Temperature: {{ temperature }}
-
-        '
   - if:
     - condition: template
       value_template: '{{ entities_to_update | count > 0 }}'
     then:
+    - action: system_log.write
+      data:
+        level: info
+        message: 'Entities: {{ entities_to_update }}
+
+          Temperature: {{ temperature }}
+
+          '
     - action: climate.set_temperature
       target:
         entity_id: '{{ entities_to_update }}'
       data:
         temperature: '{{ temperature }}'
+    - delay: 00:00:02
     - if:
       - condition: template
         value_template: '{{ target_sensor is defined and target_sensor != none }}'
       then:
       - wait_template: '{{ states(target_sensor) | float(-999) | round(1) == temperature
           | round(1) }}'
-        timeout: 00:03:00
+        timeout: 00:01:00
         continue_on_timeout: true
 exercising_radiator_valves:
   alias: Motionering af radiatorventiler
