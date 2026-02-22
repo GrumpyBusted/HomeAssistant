@@ -1,0 +1,9 @@
+- sensor:
+    - name: "Unifi Admin Username"
+      unique_id: 3E843E1D-A667-4EE9-B481-7E866CFEF625
+      state: !secret unifi_user
+      icon: mdi:account
+    - name: "Unifi Admin Password"
+      unique_id: D94EE665-1ECD-4478-8E35-301D002843B2
+      state: !secret unifi_password
+      icon: mdi:account-key

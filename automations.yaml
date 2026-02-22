@@ -6857,6 +6857,7 @@
   - trigger: state
     entity_id:
     - binary_sensor.everyone_sleeping
+    - binary_sensor.bedroom_sleeping
     from: 'off'
     to: 'on'
     id: sleeping
@@ -7084,6 +7085,7 @@
   - trigger: state
     entity_id:
     - binary_sensor.everyone_sleeping
+    - binary_sensor.bedroom_sleeping
     from: 'off'
     to: 'on'
     id: sleeping

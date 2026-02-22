@@ -31,6 +31,19 @@ shell_command:
   pushupdates_to_github: "/bin/bash pushupdates.sh"
   append_to_file: '/bin/bash append_to_file.sh "{{ file }}" "{{ line }}"'
   csv_to_json: "/bin/bash csv_to_json.sh {{ csvfile }} {{ jsonfile }}"
+  unifi_speedtest: "/bin/bash /config/scripts/unifi_speedtest.sh {{ user }} {{ password }}"
+
+command_line:
+  - sensor:
+      name: unifi_gateway_speedtest
+      command: "/config/scripts/unifi_speedtest.sh"
+      scan_interval: 3600
+      value_template: "{{ value_json.xput_download }}"
+      unit_of_measurement: "Mbps"
+      json_attributes:
+        - xput_upload
+        - latency
+        - rundate
 
 rest_command:
   tado_get_verification_uri:
