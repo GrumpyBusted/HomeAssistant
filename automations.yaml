@@ -740,10 +740,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.everyone_sleeping
-    - binary_sensor.bedroom_sleeping
     from: 'off'
     to: 'on'
     id: sleeping
+  - trigger: numeric_state
+    entity_id: input_number.bedroom_blind_position
+    below: 1
+    id: bedroom_blind_down
   - trigger: state
     entity_id:
     - timer.entrance_lock_timer
@@ -814,10 +817,19 @@
         target:
           entity_id: lock.entrance_lock
     - conditions:
-      - condition: trigger
-        id:
-        - no_one_home
-        - sleeping
+      - condition: or
+        conditions:
+        - condition: trigger
+          id:
+          - no_one_home
+          - sleeping
+      - condition: and
+        conditions:
+        - condition: trigger
+          id:
+          - bedroom_blind_down
+        - condition: time
+          after: '20:00:00'
       - condition: state
         entity_id: lock.entrance_lock
         state:
@@ -6857,10 +6869,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.everyone_sleeping
-    - binary_sensor.bedroom_sleeping
     from: 'off'
     to: 'on'
     id: sleeping
+  - trigger: numeric_state
+    entity_id: input_number.bedroom_blind_position
+    below: 1
+    id: bedroom_blind_down
   - trigger: state
     entity_id:
     - timer.patio_lock_timer
@@ -6876,10 +6891,19 @@
       seconds: 3
   - choose:
     - conditions:
-      - condition: trigger
-        id:
-        - no_one_home
-        - sleeping
+      - condition: or
+        conditions:
+        - condition: trigger
+          id:
+          - no_one_home
+          - sleeping
+      - condition: and
+        conditions:
+        - condition: trigger
+          id:
+          - bedroom_blind_down
+        - condition: time
+          after: '20:00:00'
       - condition: state
         entity_id: lock.patio_lock
         state: unlocked
@@ -7011,10 +7035,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.everyone_sleeping
-    - binary_sensor.bedroom_sleeping
     from: 'off'
     to: 'on'
     id: sleeping
+  - trigger: numeric_state
+    entity_id: input_number.bedroom_blind_position
+    below: 1
+    id: bedroom_blind_down
   - trigger: state
     entity_id:
     - timer.utility_room_lock_timer
@@ -7029,10 +7056,19 @@
       seconds: 3
   - choose:
     - conditions:
-      - condition: trigger
-        id:
-        - no_one_home
-        - sleeping
+      - condition: or
+        conditions:
+        - condition: trigger
+          id:
+          - no_one_home
+          - sleeping
+      - condition: and
+        conditions:
+        - condition: trigger
+          id:
+          - bedroom_blind_down
+        - condition: time
+          after: '20:00:00'
       - condition: state
         entity_id: lock.utility_room_lock
         state: unlocked
@@ -7085,10 +7121,13 @@
   - trigger: state
     entity_id:
     - binary_sensor.everyone_sleeping
-    - binary_sensor.bedroom_sleeping
     from: 'off'
     to: 'on'
     id: sleeping
+  - trigger: numeric_state
+    entity_id: input_number.bedroom_blind_position
+    below: 1
+    id: bedroom_blind_down
   - trigger: state
     entity_id:
     - timer.garage_lock_timer
@@ -7103,10 +7142,19 @@
       seconds: 3
   - choose:
     - conditions:
-      - condition: trigger
-        id:
-        - no_one_home
-        - sleeping
+      - condition: or
+        conditions:
+        - condition: trigger
+          id:
+          - no_one_home
+          - sleeping
+      - condition: and
+        conditions:
+        - condition: trigger
+          id:
+          - bedroom_blind_down
+        - condition: time
+          after: '20:00:00'
       - condition: state
         entity_id: lock.garage_lock
         state: unlocked
@@ -12121,6 +12169,7 @@
   conditions: []
   actions:
   - variables:
+      wan_min_speed: 800
       min_speed: 300
       max_ping: 20
       max_latency: 25
@@ -12157,17 +12206,31 @@
         = issues + ['Hukommelse ' ~ memory ~ '%'] %}\n  {% endif %}\n  {% if issues
         | length > 0 %}\n    {% set ns.list = ns.list + [dev_name ~ ': ' ~ issues
         | join(', ')] %}\n  {% endif %}\n{% endfor %} {{ ns.list }}\n"
-      problems: "{% set issues = [] %} {% if download < min_speed %}\n  {% set issues
-        = issues + ['Download under ' ~ min_speed ~ ' Mbps (' ~ download ~ ')'] %}\n{%
-        endif %} {% if upload < min_speed %}\n  {% set issues = issues + ['Upload
-        under ' ~ min_speed ~ ' Mbps (' ~ upload ~ ')'] %}\n{% endif %} {% if ping
-        > max_ping %}\n  {% set issues = issues + ['Ping for høj (' ~ ping ~ ' ms)']
-        %}\n{% endif %} {% if wan_google > max_latency %}\n  {% set issues = issues
-        + ['Google WAN latency høj (' ~ wan_google ~ ' ms)'] %}\n{% endif %} {% if
-        wan_cloudflare > max_latency %}\n  {% set issues = issues + ['Cloudflare WAN
-        latency høj (' ~ wan_cloudflare ~ ' ms)'] %}\n{% endif %} {% if unifi_problems
-        | length > 0 %}\n  {% set issues = issues + unifi_problems %}\n{% endif %}
-        {{ issues }}\n"
+  - action: shell_command.unifi_speedtest
+    data:
+      user: '{{ states(''sensor.unifi_admin_username'') }}'
+      password: '{{ states(''sensor.unifi_admin_password'') }}'
+    response_variable: response
+  - variables:
+      speedtest: '{{ response.stdout.split(''output:'')[-1] | trim | from_json }}'
+      wan_upload: '{{ speedtest.xput_upload | float(0.0) }}'
+      wan_download: '{{ speedtest.xput_download | float(0.0) }}'
+  - variables:
+      problems: "{% set issues = [] %}\n{% if wan_download < wan_min_speed %}\n  {%
+        set issues = issues + ['WAN Download under ' ~ wan_min_speed ~ ' Mbps (' ~
+        wan_download ~ ')'] %}\n{% endif %}\n{% if wan_upload < wan_min_speed %}\n
+        \ {% set issues = issues + ['WAN Upload under ' ~ wan_min_speed ~ ' Mbps ('
+        ~ wan_upload ~ ')'] %}\n{% endif %}\n{% if download < min_speed %}\n  {% set
+        issues = issues + ['LAN Download under ' ~ min_speed ~ ' Mbps (' ~ download
+        ~ ')'] %}\n{% endif %}\n{% if upload < min_speed %}\n  {% set issues = issues
+        + ['LAN Upload under ' ~ min_speed ~ ' Mbps (' ~ upload ~ ')'] %}\n{% endif
+        %} {% if ping > max_ping %}\n  {% set issues = issues + ['Ping for høj ('
+        ~ ping ~ ' ms)'] %}\n{% endif %} {% if wan_google > max_latency %}\n  {% set
+        issues = issues + ['Google WAN latency høj (' ~ wan_google ~ ' ms)'] %}\n{%
+        endif %} {% if wan_cloudflare > max_latency %}\n  {% set issues = issues +
+        ['Cloudflare WAN latency høj (' ~ wan_cloudflare ~ ' ms)'] %}\n{% endif %}
+        {% if unifi_problems | length > 0 %}\n  {% set issues = issues + unifi_problems
+        %}\n{% endif %} {{ issues }}\n"
   - if:
     - condition: template
       value_template: '{{ problems | length > 0 }}'
