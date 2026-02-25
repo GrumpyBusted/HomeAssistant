@@ -3,7 +3,7 @@
   description: Automatik der sletter afsluttede opgaver fra smart todo listen
   triggers:
   - trigger: time
-    at: 03:24:00
+    at: 02:01:00
   conditions: []
   actions:
   - action: script.cleanup_todo_tasks

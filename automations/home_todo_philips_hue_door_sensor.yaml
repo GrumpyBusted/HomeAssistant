@@ -1,0 +1,38 @@
+- id: '1739915975801'
+  alias: Hjem todo Philips Hue dørsensor
+  description: Kontroller batteri status på Philips Hue dør og vindue sensorer
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.bedroom_door_sensor_battery
+    - sensor.garage_door_sensor_battery
+    below: 10
+    for:
+      minutes: 3
+  - trigger: numeric_state
+    entity_id:
+    - sensor.bedroom_door_sensor_battery
+    - sensor.garage_door_sensor_battery
+    above: 70
+    for:
+      minutes: 3
+  - trigger: time
+    at: 03:13:00
+  conditions: []
+  actions:
+  - variables:
+      sensors:
+      - entity_id: sensor.bedroom_door_sensor_battery
+        battery_type: 1 * CR2
+      - entity_id: sensor.garage_door_sensor_battery
+        battery_type: 1 * CR2
+  - repeat:
+      for_each: '{{ sensors }}'
+      sequence:
+      - action: script.create_todo_battery_task
+        data:
+          entity_id: '{{ repeat.item.entity_id }}'
+          type: '{{ repeat.item.battery_type | default('''') }}'
+  mode: restart
+  trace:
+    stored_traces: 30

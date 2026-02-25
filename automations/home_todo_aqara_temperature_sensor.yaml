@@ -1,0 +1,56 @@
+- id: '1769363385863'
+  alias: Hjem todo Aqara temperatursensor
+  description: Kontroller batteri status på Aqara temperatursensorer
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.bathroom_temperature_sensor_battery
+    - sensor.patio_temperature_sensor_battery
+    - sensor.utility_room_freezer_temperature_sensor_battery
+    below: 10
+    for:
+      minutes: 3
+  - trigger: numeric_state
+    entity_id:
+    - sensor.bathroom_temperature_sensor_battery
+    - sensor.patio_temperature_sensor_battery
+    - sensor.utility_room_freezer_temperature_sensor_battery
+    above: 20
+    for:
+      minutes: 3
+  - trigger: numeric_state
+    entity_id:
+    - sensor.bathroom_temperature_sensor_battery
+    - sensor.patio_temperature_sensor_battery
+    - sensor.utility_room_freezer_temperature_sensor_battery
+    above: 70
+    for:
+      minutes: 3
+  - trigger: time
+    at: 03:04:00
+  conditions: []
+  actions:
+  - variables:
+      sensors:
+      - entity_id: sensor.bathroom_temperature_sensor_battery
+        location: oven på spejlskabet
+        temperature: '{{ states(''sensor.bathroom_temperature_sensor_temperature'')
+          }}'
+      - entity_id: sensor.patio_temperature_sensor_battery
+        location: på kontakten over sofa
+        temperature: '{{ states(''sensor.patio_temperature_sensor_temperature'') }}'
+      - entity_id: sensor.utility_room_freezer_temperature_sensor_battery
+        location: i kummefryseren
+        temperature: '{{ states(''sensor.utility_room_freezer_temperature_sensor_temperature'')
+          }}'
+  - repeat:
+      for_each: '{{ sensors }}'
+      sequence:
+      - action: script.create_todo_battery_task
+        data:
+          entity_id: '{{ repeat.item.entity_id }}'
+          location: '{{ repeat.item.location | default('''') }}'
+          temperature: '{{ repeat.item.temperature | default('''') }}'
+  mode: restart
+  trace:
+    stored_traces: 30

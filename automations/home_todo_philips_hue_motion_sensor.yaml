@@ -1,0 +1,74 @@
+- id: '1739907378753'
+  alias: Hjem todo Philips Hue bevægelsessensor
+  description: Kontroller batteri status på Philips Hue bevægelsessensorer
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.driveway_motion_sensor_entrance_battery
+    - sensor.driveway_motion_sensor_house_south_battery
+    - sensor.driveway_motion_sensor_street_battery
+    - sensor.garden_motion_sensor_house_east_battery
+    - sensor.garden_motion_sensor_house_west_battery
+    - sensor.garden_motion_sensor_house_north_battery
+    - sensor.entrance_motion_sensor_battery
+    - sensor.utility_room_motion_sensor_battery
+    - sensor.toilet_motion_sensor_battery
+    below: 20
+    for:
+      minutes: 3
+  - trigger: numeric_state
+    entity_id:
+    - sensor.driveway_motion_sensor_entrance_battery
+    - sensor.driveway_motion_sensor_house_south_battery
+    - sensor.driveway_motion_sensor_street_battery
+    - sensor.garden_motion_sensor_house_east_battery
+    - sensor.garden_motion_sensor_house_west_battery
+    - sensor.garden_motion_sensor_house_north_battery
+    - sensor.entrance_motion_sensor_battery
+    - sensor.utility_room_motion_sensor_battery
+    - sensor.toilet_motion_sensor_battery
+    above: 70
+    for:
+      minutes: 3
+  - trigger: time
+    at: 03:12:00
+  conditions: []
+  actions:
+  - variables:
+      sensors:
+      - entity_id: sensor.driveway_motion_sensor_entrance_battery
+        battery_type: 2 * AA
+        location: ved hoveddøren
+      - entity_id: sensor.driveway_motion_sensor_house_south_battery
+        battery_type: 2 * AA
+        location: på syd gavlen
+      - entity_id: sensor.driveway_motion_sensor_street_battery
+        battery_type: 2 * AA
+        location: ved vejen
+      - entity_id: sensor.garden_motion_sensor_house_north_battery
+        battery_type: 2 * AA
+        location: på nord gavlen
+      - entity_id: sensor.garden_motion_sensor_house_west_battery
+        battery_type: 2 * AA
+        location: ved soveværelset
+      - entity_id: sensor.garden_motion_sensor_house_east_battery
+        battery_type: 2 * AA
+        location: ved bryggersdøren
+      - entity_id: sensor.entrance_motion_sensor_battery
+        battery_type: 2 * AAA
+      - entity_id: sensor.utility_room_motion_sensor_battery
+        battery_type: 2 * AAA
+      - entity_id: sensor.toilet_motion_sensor_battery
+        battery_type: 2 * AAA
+  - repeat:
+      for_each: '{{ sensors }}'
+      sequence:
+      - action: script.create_todo_battery_task
+        data:
+          entity_id: '{{ repeat.item.entity_id }}'
+          type: '{{ repeat.item.battery_type | default('''') }}'
+          location: '{{ repeat.item.location | default('''') }}'
+          threshold: 20
+  mode: restart
+  trace:
+    stored_traces: 30

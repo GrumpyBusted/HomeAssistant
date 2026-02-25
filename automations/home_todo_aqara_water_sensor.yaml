@@ -1,0 +1,38 @@
+- id: '1769364737572'
+  alias: Hjem todo Aqara vandsensor
+  description: Kontroller batteri status på Aqara vandsensorer
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.kitchen_sink_water_leak_sensor_battery
+    - sensor.utility_room_sink_water_leak_sensor_battery
+    below: 10
+    for:
+      minutes: 3
+  - trigger: numeric_state
+    entity_id:
+    - sensor.kitchen_sink_water_leak_sensor_battery
+    - sensor.utility_room_sink_water_leak_sensor_battery
+    above: 70
+    for:
+      minutes: 3
+  - trigger: time
+    at: 03:05:00
+  conditions: []
+  actions:
+  - variables:
+      sensors:
+      - entity_id: sensor.kitchen_sink_water_leak_sensor_battery
+        location: under opvaskemaskinen
+      - entity_id: sensor.utility_room_sink_water_leak_sensor_battery
+        location: under skabet, mellem rør
+  - repeat:
+      for_each: '{{ sensors }}'
+      sequence:
+      - action: script.create_todo_battery_task
+        data:
+          entity_id: '{{ repeat.item.entity_id }}'
+          location: '{{ repeat.item.location | default('''') }}'
+  mode: restart
+  trace:
+    stored_traces: 30

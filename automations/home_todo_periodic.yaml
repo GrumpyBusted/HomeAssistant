@@ -1,0 +1,31 @@
+- id: '1770064791859'
+  alias: Hjem todo periodevis
+  description: Opret opgave der er styret at tid, f.eks. månedlige
+  triggers:
+  - trigger: time
+    at: 03:11:00
+  conditions: []
+  actions:
+  - if:
+    - condition: template
+      value_template: '{{ now().day == 1 }}'
+    then:
+    - action: script.create_todo_task
+      data:
+        subject: Organisér kvitteringer
+        description: Tøm punge og spid i køkkenet for kvitteringer, og sortér dem
+          i mappen.
+        entity_id: todo.todo_smart_todo
+  - if:
+    - condition: template
+      value_template: '{{ now().day == 1 }}'
+    then:
+    - action: script.create_todo_task
+      data:
+        subject: Afstem budgetkonto
+        description: Træk posteringer fra banken for budgetkontoen, og afstem dem
+          med posterne i budget-regnearket. Ret eventuelle afvigelser.
+        entity_id: todo.todo_smart_todo
+  mode: restart
+  trace:
+    stored_traces: 30
