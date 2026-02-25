@@ -1,0 +1,42 @@
+- id: '1769872343999'
+  alias: Bryggers bevægelsessensor
+  description: Håndtering af bevægelsessensoren i bryggerset
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.utility_room_motion_sensor_motion
+    from: 'off'
+    to: 'on'
+    id: detected
+  - trigger: state
+    entity_id:
+    - binary_sensor.utility_room_motion_sensor_motion
+    from: 'on'
+    to: 'off'
+    id: cleared
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - detected
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.utility_room_motion_sensor_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - cleared
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:02:00
+        target:
+          entity_id: timer.utility_room_motion_sensor_timer
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20

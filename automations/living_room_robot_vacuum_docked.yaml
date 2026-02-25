@@ -1,0 +1,81 @@
+- id: '1768131852214'
+  alias: Stue robotstøvsuger docked
+  description: Automatic til at kontrollere robotstøvsuger
+  triggers:
+  - trigger: state
+    entity_id: vacuum.living_room_robot_vacuum
+    to: docked
+  - trigger: state
+    entity_id: vacuum.living_room_robot_vacuum
+    to: docked
+    for:
+      seconds: 120
+  - trigger: state
+    entity_id: sensor.living_room_robot_vacuum_status
+    to:
+    - idle
+    - charging
+    - charging_complete
+  - trigger: state
+    entity_id: timer.living_room_robot_vacuum_timer
+    to: idle
+    id: timeout
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: vacuum.living_room_robot_vacuum
+        state: docked
+      - condition: state
+        entity_id: sensor.living_room_robot_vacuum_status
+        state:
+        - idle
+        - charging
+        - charging_complete
+      - condition: template
+        value_template: '{{ (now() - states.input_select.living_room_robot_vacuum_current_cleaning.last_updated).total_seconds()
+          > 60 }}
+
+          '
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.living_room_robot_vacuum_timer
+      - action: script.living_room_robot_vacuum_set_current
+        data:
+          option: none
+          started_by: '{{ this.entity_id }}'
+    - conditions:
+      - condition: trigger
+        id: timeout
+      sequence:
+      - action: script.living_room_robot_vacuum_dock
+        metadata: {}
+        data: {}
+      - delay:
+          minutes: 2
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: vacuum.living_room_robot_vacuum
+            state: docked
+          - condition: state
+            entity_id: sensor.living_room_robot_vacuum_status
+            state:
+            - idle
+            - charging
+            - charging_complete
+        then:
+        - action: script.push_notification
+          data:
+            type: critical
+            title: Advarsel
+            id: living_room_robot_vacuum_return_to_dock
+            persistent: true
+            message: Robotstøvsuger kan ikke returnere til docking station
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 100

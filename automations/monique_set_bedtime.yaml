@@ -1,0 +1,20 @@
+- id: '1740422421448'
+  alias: Monique sæt sengetid
+  description: Sæt sengetid input hjælper for Monique, når webhook er kaldt
+  triggers:
+  - trigger: webhook
+    allowed_methods:
+    - POST
+    local_only: false
+    webhook_id: monique-set-bedtime-CNwYS0I0HIbgeRZ1GmGOxxvS
+  conditions: []
+  actions:
+  - action: input_datetime.set_datetime
+    metadata: {}
+    data:
+      datetime: '{{ now() + timedelta(seconds=10) }}'
+    target:
+      entity_id: input_datetime.monique_bedtime_alarm
+  mode: restart
+  trace:
+    stored_traces: 10

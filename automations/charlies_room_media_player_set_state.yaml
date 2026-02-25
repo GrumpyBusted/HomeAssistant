@@ -1,0 +1,94 @@
+- id: '1769856579014'
+  alias: Charlies værelse medieafstiller sæt status
+  description: Automatik til at sætte status helper for medie på Charlies værelse
+  triggers:
+  - trigger: state
+    entity_id: sensor.charlies_room_apple_tv_media_player_safe
+    to: playing
+    id: started
+  - trigger: state
+    entity_id: sensor.charlies_room_apple_tv_media_player_safe
+    to:
+    - buffering
+    - idle
+    - paused
+    id: ended
+  - trigger: state
+    entity_id: sensor.charlies_room_apple_tv_media_player_safe
+    to: 'off'
+    id: 'off'
+    for:
+      seconds: 3
+  - trigger: state
+    entity_id: timer.charlies_room_media_player_timer
+    to: idle
+    id: timeout
+  - trigger: state
+    entity_id: binary_sensor.charlie_home
+    to: 'off'
+    id: away
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - started
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.charlies_room_media_player_timer
+      - action: input_boolean.turn_on
+        metadata: {}
+        target:
+          entity_id: input_boolean.charlies_room_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - ended
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.charlies_room_media_player_timer
+      - action: input_boolean.turn_on
+        metadata: {}
+        target:
+          entity_id: input_boolean.charlies_room_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - timeout
+      - condition: state
+        entity_id: sensor.charlies_room_apple_tv_media_player_safe
+        state:
+        - idle
+        - paused
+      sequence:
+      - action: input_boolean.turn_off
+        metadata: {}
+        target:
+          entity_id: input_boolean.charlies_room_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - away
+        - 'off'
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.charlies_room_media_player_timer
+      - action: input_boolean.turn_off
+        metadata: {}
+        target:
+          entity_id: input_boolean.charlies_room_media_player
+        data: {}
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20

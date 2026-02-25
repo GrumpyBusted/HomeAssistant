@@ -1,0 +1,71 @@
+- id: '1737299093662'
+  alias: Emils værelse varme
+  description: Automatik til at styre varmen på Emils værelse
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.someone_home
+  - trigger: state
+    entity_id: sensor.emils_room_target_temperature
+    id: target_changed
+  - trigger: state
+    entity_id: timer.emils_room_heating_manual_timer
+    to: idle
+  - trigger: state
+    entity_id: sensor.emils_room_desired_temperature
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.someone_home
+        state: 'off'
+      - condition: state
+        entity_id: timer.emils_room_heating_manual_timer
+        state: active
+      sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.emils_room_heating_manual_timer
+    - conditions:
+      - condition: trigger
+        id: target_changed
+      - condition: template
+        value_template: '{{ states(''sensor.emils_room_target_temperature'') | float(0.0)
+          != states(''sensor.emils_room_desired_temperature'') | float(21.0) }}'
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 01:00:00
+        target:
+          entity_id: timer.emils_room_heating_manual_timer
+    - conditions:
+      - condition: template
+        value_template: '{{ states(''sensor.emils_room_target_temperature'') | float(0.0)
+          == states(''sensor.emils_room_desired_temperature'') | float(21.0) }}'
+      - condition: state
+        entity_id: timer.emils_room_heating_manual_timer
+        state: active
+      sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.emils_room_heating_manual_timer
+  - if:
+    - condition: state
+      entity_id: timer.emils_room_heating_manual_timer
+      state: idle
+    then:
+    - action: script.set_climate_temperature
+      data:
+        temperature: '{{ states(''sensor.emils_room_desired_temperature'') | float(21.0)
+          }}'
+        entities:
+        - climate.emils_room_radiator_thermostat
+        target_sensor: sensor.emils_room_target_temperature
+  mode: restart
+  trace:
+    stored_traces: 50

@@ -1,0 +1,371 @@
+- id: '1735603602121'
+  alias: Stue lys
+  description: Automatik til at styre lys i stuen
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_1
+    attribute: event_type
+    to: short_release
+    id: button_1_short
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_1
+    attribute: event_type
+    to: long_release
+    id: button_1_long
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_2
+    attribute: event_type
+    to: short_release
+    id: button_2_short
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_2
+    attribute: event_type
+    to: long_release
+    id: button_2_long
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_3
+    attribute: event_type
+    to: short_release
+    id: button_3_short
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_3
+    attribute: event_type
+    to: long_release
+    id: button_3_long
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_4
+    attribute: event_type
+    to: short_release
+    id: button_4_short
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_4
+    attribute: event_type
+    to: long_release
+    id: button_4_long
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_rotary
+    id: rotary
+  - trigger: state
+    entity_id:
+    - binary_sensor.someone_home
+    from: 'on'
+    to: 'off'
+    id: no_one_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.everyone_sleeping
+    from: 'off'
+    to: 'on'
+    id: sleeping
+  - trigger: state
+    entity_id:
+    - binary_sensor.living_room_light
+    from: 'off'
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+    id: lights_on
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - button_1_short
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2700
+          brightness_pct: 80
+        target:
+          entity_id:
+          - light.living_room_light_bookcase_left
+          - light.living_room_light_bookcase_right
+          - light.living_room_light_cabinet_left
+          - light.living_room_light_cabinet_right
+          - light.living_room_light_tv_left
+          - light.living_room_light_tv_right
+          - light.living_room_light_escher
+          - light.living_room_light_window_left
+          - light.living_room_light_window_right
+          - light.living_room_light_strip_skylight
+      - action: light.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - light.living_room_smart_plug_lamp
+          - light.living_room_smart_plug_christmas_elf_house
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.living_room_light_dining_table_spot_cabinet
+          - light.living_room_light_dining_table_spot_sofa
+          - light.living_room_light_strip_glass_cabinet
+          - light.living_room_light_strip_tv
+          - light.living_room_light_gradient_tube_tv
+          - light.living_room_light_coffee_table_1
+          - light.living_room_light_coffee_table_2
+          - light.living_room_light_table_lamp_cabinet
+          - light.living_room_light_table_lamp_sofa
+    - conditions:
+      - condition: trigger
+        id:
+        - button_2_short
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2700
+          brightness_pct: 100
+        target:
+          entity_id:
+          - light.living_room_light_dining_table_spot_cabinet
+          - light.living_room_light_dining_table_spot_sofa
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2700
+          brightness_pct: 75
+        target:
+          entity_id:
+          - light.living_room_light_strip_skylight
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2300
+          brightness_pct: 75
+        target:
+          entity_id:
+          - light.living_room_light_bookcase_left
+          - light.living_room_light_bookcase_right
+          - light.living_room_light_cabinet_left
+          - light.living_room_light_cabinet_right
+          - light.living_room_light_strip_glass_cabinet
+          - light.living_room_light_table_lamp_cabinet
+          - light.living_room_light_table_lamp_sofa
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2300
+          brightness_pct: 50
+        target:
+          entity_id:
+          - light.living_room_light_tv_left
+      - action: light.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - light.living_room_smart_plug_lamp
+          - light.living_room_smart_plug_christmas_elf_house
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.living_room_light_tv_right
+          - light.living_room_light_escher
+          - light.living_room_light_window_left
+          - light.living_room_light_window_right
+          - light.living_room_light_coffee_table_1
+          - light.living_room_light_coffee_table_2
+          - light.living_room_light_strip_tv
+          - light.living_room_light_gradient_tube_tv
+    - conditions:
+      - condition: trigger
+        id:
+        - button_3_short
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2700
+          brightness_pct: 75
+        target:
+          entity_id:
+          - light.living_room_light_tv_left
+          - light.living_room_light_tv_right
+          - light.living_room_light_escher
+          - light.living_room_light_window_left
+          - light.living_room_light_window_right
+          - light.living_room_light_strip_tv
+          - light.living_room_light_gradient_tube_tv
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2100
+          brightness_pct: 80
+        target:
+          entity_id:
+          - light.living_room_light_coffee_table_1
+          - light.living_room_light_coffee_table_2
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 2300
+          brightness_pct: 50
+        target:
+          entity_id:
+          - light.living_room_light_strip_glass_cabinet
+          - light.living_room_light_strip_skylight
+          - light.living_room_light_table_lamp_cabinet
+          - light.living_room_light_table_lamp_sofa
+      - action: light.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - light.living_room_smart_plug_lamp
+          - light.living_room_smart_plug_christmas_elf_house
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.living_room_light_bookcase_left
+          - light.living_room_light_bookcase_right
+          - light.living_room_light_cabinet_left
+          - light.living_room_light_cabinet_right
+          - light.living_room_light_dining_table_spot_cabinet
+          - light.living_room_light_dining_table_spot_sofa
+    - conditions:
+      - condition: trigger
+        id:
+        - button_4_short
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          transition: 1
+          color_temp_kelvin: 3000
+          brightness_pct: 100
+        target:
+          entity_id:
+          - light.living_room_light_bookcase_left
+          - light.living_room_light_bookcase_right
+          - light.living_room_light_cabinet_left
+          - light.living_room_light_cabinet_right
+          - light.living_room_light_tv_left
+          - light.living_room_light_tv_right
+          - light.living_room_light_escher
+          - light.living_room_light_window_left
+          - light.living_room_light_window_right
+          - light.living_room_light_dining_table_spot_cabinet
+          - light.living_room_light_dining_table_spot_sofa
+          - light.living_room_light_strip_glass_cabinet
+          - light.living_room_light_strip_skylight
+          - light.living_room_light_strip_tv
+          - light.living_room_light_gradient_tube_tv
+          - light.living_room_light_coffee_table_1
+          - light.living_room_light_coffee_table_2
+          - light.living_room_light_table_lamp_cabinet
+          - light.living_room_light_table_lamp_sofa
+      - action: light.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - light.living_room_smart_plug_lamp
+          - light.living_room_smart_plug_christmas_elf_house
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: trigger
+          id:
+          - button_1_long
+          - button_2_long
+          - button_3_long
+          - button_4_long
+          - no_one_home
+        - condition: and
+          conditions:
+          - condition: trigger
+            id:
+            - lights_on
+          - condition: state
+            entity_id: binary_sensor.someone_home
+            state: 'off'
+        - condition: and
+          conditions:
+          - condition: trigger
+            id:
+            - sleeping
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.living_room_light_bookcase_left
+          - light.living_room_light_bookcase_right
+          - light.living_room_light_cabinet_left
+          - light.living_room_light_cabinet_right
+          - light.living_room_light_tv_left
+          - light.living_room_light_tv_right
+          - light.living_room_light_escher
+          - light.living_room_light_window_left
+          - light.living_room_light_window_right
+          - light.living_room_light_dining_table_spot_cabinet
+          - light.living_room_light_dining_table_spot_sofa
+          - light.living_room_light_strip_glass_cabinet
+          - light.living_room_light_strip_skylight
+          - light.living_room_light_strip_tv
+          - light.living_room_light_gradient_tube_tv
+          - light.living_room_smart_plug_lamp
+          - light.living_room_smart_plug_christmas_elf_house
+          - light.living_room_light_coffee_table_1
+          - light.living_room_light_coffee_table_2
+          - light.living_room_light_table_lamp_cabinet
+          - light.living_room_light_table_lamp_sofa
+    - conditions:
+      - condition: trigger
+        id:
+        - rotary
+      sequence:
+      - choose:
+        - conditions:
+          - condition: state
+            entity_id: event.living_room_switch_rotary
+            attribute: event_type
+            state: clock_wise
+          sequence:
+          - action: script.living_room_light_rotary
+            data:
+              step: '{{ (state_attr(''event.living_room_switch_rotary'', ''steps'')|float
+                / 3.60)|round(0) }}'
+        default:
+        - action: script.living_room_light_rotary
+          data:
+            step: '{{ (state_attr(''event.living_room_switch_rotary'', ''steps'')|float
+              / -3.60)|round(0) }}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20

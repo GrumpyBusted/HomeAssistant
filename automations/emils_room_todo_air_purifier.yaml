@@ -1,0 +1,46 @@
+- id: '1771090096437'
+  alias: Emils værelse todo blæser
+  description: Opret todo opgaver vedrørende blæser på Emils værelse
+  triggers:
+  - trigger: numeric_state
+    entity_id: sensor.emils_room_air_purifier_filter_life_percentage
+    below: 5
+    id: low
+  - trigger: time
+    at: 03:01:00
+    id: periodic
+  - trigger: event
+    event_type: todo_item_completed
+    event_data:
+      related: sensor.emils_room_air_purifier_filter_life_percentage
+    id: todo_completed
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - low
+        - periodic
+      sequence:
+      - action: script.create_todo_task
+        data:
+          subject: Skift filter på blæser på Emil værelse
+          description: Luftrenser på Emils værelse skal have skiftet filter, der er
+            {{ states('sensor.emils_room_air_purifier_filter_life_percentage') }}%
+            tilbage.
+          related_entity_id: sensor.emils_room_air_purifier_filter_life_percentage
+          entity_id: todo.todo_smart_todo
+          is_active: '{{ states(''sensor.emils_room_air_purifier_filter_life_percentage'')
+            | int(100) < 5 }}'
+    - conditions:
+      - condition: trigger
+        id: todo_completed
+      sequence:
+      - action: button.press
+        target:
+          entity_id: button.emils_room_air_purifier_reset_filter_life
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30

@@ -1,0 +1,50 @@
+- id: '1739816800938'
+  alias: Stue todo Roborock
+  description: Kontroller status på robostøvsuger
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.living_room_robot_vacuum_dock_error
+    - sensor.living_room_robot_vacuum_error
+  - trigger: time
+    at: 03:23:00
+  conditions: []
+  actions:
+  - action: script.create_todo_task
+    data:
+      subject: Løs problem med Dobbys hus ({{ states('sensor.living_room_robot_vacuum_dock_error')
+        }})
+      description: Advarsel på Roborock docking station. Kode {{ states('sensor.living_room_robot_vacuum_dock_error')
+        }}
+      related_entity_id: sensor.living_room_robot_vacuum_dock_error
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ states(''sensor.living_room_robot_vacuum_dock_error'') != ''ok''
+        }}'
+  - action: script.create_todo_task
+    data:
+      subject: Løs problem med Dobby ({{ states('sensor.living_room_robot_vacuum_error')
+        }})
+      description: Advarsel på Roborock robot støvsuger. Kode {{ states('sensor.living_room_robot_vacuum_error')
+        }}
+      related_entity_id: sensor.living_room_robot_vacuum_error
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ states(''sensor.living_room_robot_vacuum_error'') != ''none''
+        }}'
+  - if:
+    - condition: not
+      conditions:
+      - condition: state
+        entity_id: sensor.living_room_robot_vacuum_error
+        state: none
+    then:
+    - action: script.push_notification
+      data:
+        type: warning
+        recipient: home
+        id: living_room_robot_vacuum_error
+        title: Løs problem med Dobby
+        message: Advarsel på Roborock robot støvsuger. Kode {{ states('sensor.living_room_robot_vacuum_error')
+          }}
+  mode: restart
+  trace:
+    stored_traces: 30

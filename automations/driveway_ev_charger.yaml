@@ -1,0 +1,30 @@
+- id: '1770505461525'
+  alias: Indkørsel billader
+  description: Disable entities på billader
+  triggers:
+  - trigger: state
+    entity_id: sensor.driveway_ev_charger_status_description_safe
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: sensor.driveway_ev_charger_status_description_safe
+        state:
+        - Locked
+        - Locked, car connected
+        - Ready
+        - unavailable
+      sequence:
+      - action: homeassistant.disable_entity
+        data:
+          entity_id:
+          - switch.driveway_ev_charger_pause
+    default:
+    - action: homeassistant.enable_entity
+      data:
+        entity_id:
+        - switch.driveway_ev_charger_pause
+  mode: single
+  trace:
+    stored_traces: 100

@@ -703,6 +703,7 @@ push_notification:
           - charlie
           - emil
           - home
+          - none
       default: home
     persistent:
       name: Vedvarende
@@ -778,16 +779,28 @@ push_notification:
       sequence:
       - variables:
           notify_persons: '{{ persons | map(attribute=''notifier'') | list }}'
+    - conditions:
+      - condition: template
+        value_template: '{{ recipient == ''none'' }}'
+      sequence:
+      - variables:
+          notify_persons: []
     default:
     - variables:
         notify_persons: '{{ persons | map(attribute=''notifier'') | select(''search'',
           ''_'' ~ recipient ~ ''_'') | list }}'
   - action: system_log.write
     data:
-      message: 'Id: {{ notification_id }}
+      message: 'Action: {{ repeat.item }}
+
+        Title: {{ title }}
+
+        Message: {{ message }}
+
+        Id: {{ notification_id }}
 
         Persons: {{ notify_persons }}'
-      level: debug
+      level: info
   - if:
     - condition: template
       value_template: '{{ persistent }}'
@@ -800,16 +813,6 @@ push_notification:
   - repeat:
       for_each: '{{ notify_persons }}'
       sequence:
-      - action: system_log.write
-        data:
-          message: 'Action: {{ repeat.item }}
-
-            Title: {{ title }}
-
-            Message: {{ message }}'
-          level: "{% if type == 'critical' %}\n  warning\n{% elif type == 'warning'
-            %}\n  warning\n{% elif type == 'info' %}\n  info\n{% else %}\n  debug\n{%
-            endif %}\n"
       - choose:
         - conditions:
           - condition: template
@@ -1055,65 +1058,6 @@ set_climate_temperature:
           | round(1) }}'
         timeout: 00:01:00
         continue_on_timeout: true
-exercising_radiator_valves:
-  alias: Motionering af radiatorventiler
-  description: Skru op og ned op thermostater på alle radiator for at motionere radiatorventiler
-  sequence:
-  - variables:
-      tado_entities:
-      - climate.bathroom_radiator_thermostat_floor_tado
-      - climate.bathroom_radiator_thermostat_wall_tado
-      - climate.bedroom_radiator_thermostat_tado
-      - climate.charlies_room_radiator_thermostat_tado
-      - climate.emils_room_radiator_thermostat_tado
-      - climate.hallway_radiator_thermostat_tado
-      - climate.kitchen_radiator_thermostat_tado
-      - climate.living_room_radiator_thermostat_bookcase_tado
-      - climate.living_room_radiator_thermostat_dining_table_tado
-      - climate.living_room_radiator_thermostat_sofa_tado
-      - climate.utility_room_radiator_thermostat_wall_tado
-      - climate.utility_room_radiator_thermostat_floor_tado
-      - climate.toilet_radiator_thermostat_tado
-  - action: automation.turn_off
-    target:
-      entity_id:
-      - automation.bathroom_heating
-      - automation.bedroom_heating
-      - automation.charlies_room_heating
-      - automation.emils_room_heating
-      - automation.hallway_heating
-      - automation.living_room_heating
-      - automation.utility_room_heating
-      - automation.toilet_heating
-  - repeat:
-      count: '{{ tado_entities | length }}'
-      sequence:
-      - variables:
-          tado_index: '{{ repeat.index - 1 }}'
-      - repeat:
-          count: 3
-          sequence:
-          - action: climate.set_temperature
-            data:
-              entity_id: '{{ tado_entities[tado_index] }}'
-              temperature: 30
-          - delay: 00:01:00
-          - action: climate.set_temperature
-            data:
-              entity_id: '{{ tado_entities[tado_index] }}'
-              temperature: 5
-          - delay: 00:01:00
-  - action: automation.turn_on
-    target:
-      entity_id:
-      - automation.bathroom_heating
-      - automation.bedroom_heating
-      - automation.charlies_room_heating
-      - automation.emils_room_heating
-      - automation.hallway_heating
-      - automation.living_room_heating
-      - automation.utility_room_heating
-      - automation.toilet_heating
 create_todo_task:
   alias: Opret todo opgave
   description: Kontroller om samme opgave allerede findes – hvis ikke, opret den i

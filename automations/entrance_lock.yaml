@@ -1,0 +1,167 @@
+- id: '1735842629315'
+  alias: Entre lås
+  description: Automatik til at låse hoveddøren op og i baseret på hvem der er hjemme
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.anders_home
+    from: 'off'
+    to: 'on'
+    id: anders_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.monique_home
+    from: 'off'
+    to: 'on'
+    id: monique_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.emil_home
+    from: 'off'
+    to: 'on'
+    id: emil_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.charlie_home
+    from: 'off'
+    to: 'on'
+    id: charlie_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.someone_home
+    from: 'on'
+    to: 'off'
+    id: no_one_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.everyone_sleeping
+    from: 'off'
+    to: 'on'
+    id: sleeping
+  - trigger: numeric_state
+    entity_id: input_number.bedroom_blind_position
+    below: 1
+    id: bedroom_blind_down
+  - trigger: state
+    entity_id:
+    - timer.entrance_lock_timer
+    to: idle
+    id: auto_locking_expired
+  conditions: []
+  actions:
+  - action: homeassistant.update_entity
+    data:
+      entity_id: lock.entrance_lock
+  - delay:
+      seconds: 3
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - anders_home
+      - condition: state
+        entity_id: lock.entrance_lock
+        state: locked
+      sequence:
+      - action: lock.unlock
+        metadata: {}
+        data:
+          code: '{{ states(''sensor.yale_code_anders'') }}'
+        target:
+          entity_id: lock.entrance_lock
+    - conditions:
+      - condition: trigger
+        id:
+        - monique_home
+      - condition: state
+        entity_id: lock.entrance_lock
+        state: locked
+      sequence:
+      - action: lock.unlock
+        metadata: {}
+        data:
+          code: '{{ states(''sensor.yale_code_monique'') }}'
+        target:
+          entity_id: lock.entrance_lock
+    - conditions:
+      - condition: trigger
+        id:
+        - emil_home
+      - condition: state
+        entity_id: lock.entrance_lock
+        state: locked
+      sequence:
+      - action: lock.unlock
+        metadata: {}
+        data:
+          code: '{{ states(''sensor.yale_code_emil'') }}'
+        target:
+          entity_id: lock.entrance_lock
+    - conditions:
+      - condition: trigger
+        id:
+        - charlie_home
+      - condition: state
+        entity_id: lock.entrance_lock
+        state: locked
+      sequence:
+      - action: lock.unlock
+        metadata: {}
+        data:
+          code: '{{ states(''sensor.yale_code_charlie'') }}'
+        target:
+          entity_id: lock.entrance_lock
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: trigger
+          id:
+          - no_one_home
+          - sleeping
+      - condition: and
+        conditions:
+        - condition: trigger
+          id:
+          - bedroom_blind_down
+        - condition: time
+          after: '20:00:00'
+      - condition: state
+        entity_id: lock.entrance_lock
+        state:
+        - unlocked
+      sequence:
+      - action: lock.lock
+        metadata: {}
+        data: {}
+        target:
+          entity_id: lock.entrance_lock
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:00:10
+        target:
+          entity_id: timer.entrance_lock_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - auto_locking_expired
+      - condition: state
+        entity_id: lock.entrance_lock
+        state:
+        - unlocked
+      - condition: state
+        entity_id: binary_sensor.house_sitter_home
+        state: 'off'
+      sequence:
+      - action: script.push_notification
+        data:
+          type: critical
+          title: Advarsel
+          message: Hoveddøren kunne ikke låses automatisk!
+          id: entrance_lock_auto_warning
+          recipient: home
+          persistent: false
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 100

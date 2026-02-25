@@ -1,0 +1,20 @@
+- id: '1769344314831'
+  alias: Bryggers todo tørretumbler
+  description: Opret todo opgaver vedrørende tørretumbler
+  triggers:
+  - trigger: state
+    entity_id: input_select.utility_room_dryer_state
+  conditions: []
+  actions:
+  - action: script.create_todo_task
+    data:
+      subject: Tøm tørretumbler
+      description: Tørretumbleren er færdig, tøm den og læg tøjet på plads
+      related_entity_id: input_select.utility_room_dryer_state
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ is_state(''input_select.utility_room_dryer_state'', ''finished'')
+        }}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30

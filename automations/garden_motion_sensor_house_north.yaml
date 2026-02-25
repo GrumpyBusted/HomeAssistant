@@ -1,0 +1,42 @@
+- id: '1760878885972'
+  alias: Have bevægelsessensor hus nord
+  description: Håndtering af bevægelsessensoren i haven på nord siden af huset
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_north_occupancy
+    from: 'off'
+    to: 'on'
+    id: detected
+  - trigger: state
+    entity_id:
+    - binary_sensor.garden_motion_sensor_house_north_occupancy
+    from: 'on'
+    to: 'off'
+    id: cleared
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - detected
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.garden_motion_sensor_house_north_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - cleared
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:03:00
+        target:
+          entity_id: timer.garden_motion_sensor_house_north_timer
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 5

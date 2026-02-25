@@ -1,0 +1,45 @@
+- id: '1769930000823'
+  alias: Emils værelse medieafspiller
+  description: Styring af tilbehør til medie afspilning på Emils værelse
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.emils_room_media_player
+    to: 'off'
+    id: 'off'
+  - trigger: state
+    entity_id: binary_sensor.emil_home
+    to: 'off'
+    id: not_home
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - not_home
+      sequence:
+      - action: media_player.turn_off
+        metadata: {}
+        target:
+          entity_id: media_player.emils_room_apple_tv_media_player
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - 'off'
+      - condition: state
+        entity_id: binary_sensor.emils_room_light
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.emils_room_blind
+        state: 'off'
+      sequence:
+      - action: media_player.turn_off
+        metadata: {}
+        target:
+          entity_id: media_player.emils_room_apple_tv_media_player
+        data: {}
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 50

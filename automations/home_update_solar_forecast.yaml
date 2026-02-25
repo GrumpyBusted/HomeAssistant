@@ -1,0 +1,17 @@
+- id: '1737796089950'
+  alias: Hjem opdater soludsigt
+  description: Opdater sol produktion udsigten i Solcast PV Forecast
+  triggers:
+  - trigger: time
+    at: 00:00:00
+  - trigger: sun
+    event: sunrise
+    offset: 0
+  conditions: []
+  actions:
+  - action: solcast_solar.update_forecasts
+    metadata: {}
+    data: {}
+  mode: single
+  trace:
+    stored_traces: 10

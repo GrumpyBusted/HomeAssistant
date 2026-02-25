@@ -1,0 +1,20 @@
+- id: '1740423776035'
+  alias: Charlie sæt sengetid
+  description: Sæt sengetid input hjælper for Charlie, når webhook er kaldt
+  triggers:
+  - trigger: webhook
+    allowed_methods:
+    - POST
+    local_only: false
+    webhook_id: charlie-set-bedtime-o80tZ1S3giYimCOs0ZQ4Xloc
+  conditions: []
+  actions:
+  - action: input_datetime.set_datetime
+    metadata: {}
+    data:
+      datetime: '{{ now() + timedelta(seconds=10) }}'
+    target:
+      entity_id: input_datetime.charlie_bedtime_alarm
+  mode: restart
+  trace:
+    stored_traces: 10

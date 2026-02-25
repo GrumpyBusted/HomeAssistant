@@ -1,0 +1,24 @@
+- id: '1771090242421'
+  alias: Soveværelse todo blæser
+  description: Opret todo opgaver vedrørende blæser på soveværelse
+  triggers:
+  - trigger: numeric_state
+    entity_id: sensor.bedroom_air_purifier_filter_life
+    below: 5
+  - trigger: time
+    at: 03:20:00
+  conditions: []
+  actions:
+  - action: script.create_todo_task
+    data:
+      subject: Skift filter på blæser i soveværelset
+      description: Luftrenser på soveværelset skal have skiftet filter, der er {{
+        states('sensor.bedroom_air_purifier_filter_life') }}% tilbage.
+      related_entity_id: sensor.bedroom_air_purifier_filter_life
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ states(''sensor.bedroom_air_purifier_filter_life'') | int(100)
+        < 5 }}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30

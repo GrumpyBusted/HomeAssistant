@@ -1,0 +1,136 @@
+- id: '1770323072575'
+  alias: Køkken todo køleskab
+  description: Opret todo opgaver vedrørende køleskab
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.kitchen_fridge_filter_status
+    id: status_changed
+  - trigger: event
+    event_type: todo_item_completed
+    event_data:
+      related: binary_sensor.kitchen_fridge_filter_status
+    id: todo_completed
+  - trigger: state
+    entity_id: binary_sensor.kitchen_fridge_fridge_door
+    to: 'on'
+    for:
+      seconds: 180
+    id: fridge_door_open
+  - trigger: state
+    entity_id: binary_sensor.kitchen_fridge_freezer_door
+    to: 'on'
+    for:
+      seconds: 60
+    id: freezer_door_open
+  - trigger: numeric_state
+    entity_id: sensor.kitchen_fridge_fridge_temperature
+    above: 6
+    id: fridge_to_warm
+  - trigger: numeric_state
+    entity_id: sensor.kitchen_fridge_freezer_temperature
+    above: -17
+    id: freezer_to_warm
+  - trigger: time_pattern
+    hours: /1
+    id: periodic
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: status_changed
+      sequence:
+      - action: script.create_todo_task
+        data:
+          subject: Skift køleskabsfilter
+          description: Skift vandfilteret til køleskabet, det er pladseret under bryggersvasken.
+          related_entity_id: binary_sensor.kitchen_fridge_filter_status
+          entity_id: todo.todo_smart_todo
+          is_active: '{{ is_state(''binary_sensor.kitchen_fridge_filter_status'',
+            ''on'') }}'
+    - conditions:
+      - condition: trigger
+        id: todo_completed
+      sequence:
+      - action: button.press
+        metadata: {}
+        target:
+          entity_id: button.kitchen_fridge_reset_water_filter
+        data: {}
+    - conditions:
+      - condition: trigger
+        id: fridge_door_open
+      sequence:
+      - action: script.push_notification
+        data:
+          type: critical
+          title: Advarsel
+          id: kitchen_fridge_door_open
+          persistent: false
+          recipient: home
+          message: Døren på køleskabet i køkkenet har været åben længe
+    - conditions:
+      - condition: trigger
+        id: freezer_door_open
+      sequence:
+      - action: script.push_notification
+        data:
+          type: critical
+          title: Advarsel
+          id: kitchen_freezer_door_open
+          persistent: false
+          recipient: home
+          message: Døren på fryseren i køkkenet har været åben længe
+    - conditions:
+      - condition: trigger
+        id: fridge_to_warm
+      sequence:
+      - action: script.push_notification
+        data:
+          type: critical
+          title: Advarsel
+          id: kitchen_fridge_temperature
+          persistent: false
+          recipient: home
+          message: Køleskabet i køkkenet er for varmt, temperaturen er {{ states('sensor.kitchen_fridge_fridge_temperature')
+            | round(1) }} °C, skal være under 6 °C
+    - conditions:
+      - condition: trigger
+        id: freezer_to_warm
+      sequence:
+      - action: script.push_notification
+        data:
+          type: critical
+          title: Advarsel
+          id: kitchen_freezer_temperature
+          persistent: false
+          recipient: home
+          message: Fryseren i køkkenet er for varmt, temperaturen er {{ states('sensor.kitchen_fridge_freezer_temperature')
+            | round(1) }} °C, skal være under -17 °C
+    - conditions:
+      - condition: trigger
+        id: periodic
+      sequence:
+      - action: script.create_todo_task
+        data:
+          subject: Indstil temperatur på køleskabet i køkkenet
+          entity_id: todo.todo_smart_todo
+          description: Køleskabet i køkkenets temperaturen er {{ states('sensor.kitchen_fridge_fridge_temperature')
+            | round(1) }} °C, bør være 3 °C
+          related_entity_id: sensor.kitchen_fridge_fridge_temperature
+          is_active: '{{ not (2 <= (states(''sensor.kitchen_fridge_fridge_temperature'')
+            | float(0)) <= 5) }}'
+      - action: script.create_todo_task
+        data:
+          subject: Indstil temperatur på fryseren i køkkenet
+          entity_id: todo.todo_smart_todo
+          description: Fryseren i køkkenets temperaturen er {{ states('sensor.kitchen_fridge_freezer_temperature')
+            | round(1) }} °C, bør være -18 °C
+          related_entity_id: sensor.kitchen_fridge_freezer_temperature
+          is_active: '{{ not (-22 <= (states(''sensor.kitchen_fridge_freezer_temperature'')
+            | float(0)) <= -17) }}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30

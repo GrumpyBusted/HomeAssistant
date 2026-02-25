@@ -1,0 +1,83 @@
+- id: '1737757884659'
+  alias: Hjem varme motioner radiatorventiler
+  description: Automatik til at motionere radiator ventiler når varmepumpe er slukket.
+  mode: single
+  triggers:
+  - trigger: time
+    at: 01:00:00
+  conditions: []
+  actions:
+  - if:
+    - condition: time
+      weekday:
+      - mon
+    then:
+      - variables:
+          tado_entities:
+            - climate.bathroom_radiator_thermostat_floor_tado
+            - climate.bathroom_radiator_thermostat_wall_tado
+            - climate.bedroom_radiator_thermostat_tado
+            - climate.charlies_room_radiator_thermostat_tado
+            - climate.emils_room_radiator_thermostat_tado
+            - climate.hallway_radiator_thermostat_tado
+            - climate.kitchen_radiator_thermostat_tado
+            - climate.living_room_radiator_thermostat_bookcase_tado
+            - climate.living_room_radiator_thermostat_dining_table_tado
+            - climate.living_room_radiator_thermostat_sofa_tado
+            - climate.utility_room_radiator_thermostat_wall_tado
+            - climate.utility_room_radiator_thermostat_floor_tado
+            - climate.toilet_radiator_thermostat_tado
+      - action: automation.turn_off
+        target:
+          entity_id:
+            - automation.bathroom_heating
+            - automation.bedroom_heating
+            - automation.charlies_room_heating
+            - automation.emils_room_heating
+            - automation.hallway_heating
+            - automation.living_room_heating
+            - automation.utility_room_heating
+            - automation.toilet_heating
+      - repeat:
+          count: "{{ tado_entities | length }}"
+          sequence:
+            - variables:
+                tado_index: "{{ repeat.index - 1 }}"
+            - repeat:
+                count: 3
+                sequence:
+                  - action: climate.set_temperature
+                    data:
+                      entity_id: "{{ tado_entities[tado_index] }}"
+                      temperature: 30
+                  - delay: "00:01:00"
+                  - action: climate.set_temperature
+                    data:
+                      entity_id: "{{ tado_entities[tado_index] }}"
+                      temperature: 5
+                  - delay: "00:01:00"
+      - action: automation.turn_on
+        target:
+          entity_id:
+            - automation.bathroom_heating
+            - automation.bedroom_heating
+            - automation.charlies_room_heating
+            - automation.emils_room_heating
+            - automation.hallway_heating
+            - automation.living_room_heating
+            - automation.utility_room_heating
+            - automation.toilet_heating
+      - action: automation.trigger
+        metadata: {}
+        target:
+          entity_id:
+            - automation.bathroom_heating
+            - automation.bedroom_heating
+            - automation.charlies_room_heating
+            - automation.emils_room_heating
+            - automation.hallway_heating
+            - automation.living_room_heating
+            - automation.utility_room_heating
+            - automation.toilet_heating
+        data:
+          skip_condition: true

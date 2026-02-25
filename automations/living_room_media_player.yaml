@@ -1,0 +1,244 @@
+- id: '1769257682123'
+  alias: Stue medieafspiller
+  description: Styring af tilbehør til medie afspilning i Stuen
+  triggers:
+  - trigger: state
+    entity_id: sensor.living_room_apple_tv_media_player_safe
+    to: 'off'
+    id: 'off'
+    for:
+      seconds: 3
+  - trigger: state
+    entity_id: sensor.living_room_apple_tv_media_player_safe
+    to: idle
+    id: waiting
+  - trigger: state
+    entity_id: sensor.living_room_apple_tv_media_player_safe
+    to:
+    - playing
+    - buffering
+    id: playing
+  - trigger: state
+    entity_id: sensor.living_room_apple_tv_media_player_safe
+    to: paused
+    id: paused
+  - trigger: state
+    entity_id: binary_sensor.someone_home
+    from: 'on'
+    to: 'off'
+    id: no_one_home
+  - trigger: state
+    entity_id:
+    - event.living_room_switch_button_1
+    - event.living_room_switch_button_2
+    - event.living_room_switch_button_3
+    - event.living_room_switch_button_4
+    attribute: event_type
+    to: long_release
+    id: living_room_button_long_press
+  - trigger: state
+    entity_id: binary_sensor.living_room_media_player
+    to: 'off'
+    id: media_off
+  conditions: []
+  actions:
+  - variables:
+      command: pause
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - living_room_button_long_press
+        - no_one_home
+      sequence:
+      - variables:
+          command: 'off'
+    - conditions:
+      - condition: trigger
+        id:
+        - media_off
+      - condition: state
+        entity_id: binary_sensor.living_room_light
+        state: 'off'
+      sequence:
+      - variables:
+          command: 'off'
+    - conditions:
+      - condition: trigger
+        id:
+        - 'off'
+      - condition: template
+        value_template: '{{ state_attr(''media_player.living_room_apple_tv_media_player'',
+          ''source_list'') != none }}'
+      sequence:
+      - variables:
+          command: 'off'
+    - conditions:
+      - condition: trigger
+        id:
+        - waiting
+        - paused
+      sequence:
+      - variables:
+          command: pause
+    - conditions:
+      - condition: trigger
+        id: playing
+      sequence:
+      - variables:
+          command: playing
+  - if:
+    - condition: template
+      value_template: '{{ command == ''off'' }}'
+    then:
+    - parallel:
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: sensor.living_room_apple_tv_media_player_safe
+            state: 'off'
+        then:
+        - action: media_player.turn_off
+          metadata: {}
+          target:
+            entity_id: media_player.living_room_apple_tv_media_player
+          data: {}
+      - if:
+        - condition: state
+          entity_id: light.living_room_light_strip_receiver
+          state: 'on'
+        then:
+        - action: light.turn_off
+          data:
+            transition: 1
+          target:
+            entity_id:
+            - light.living_room_light_strip_receiver
+      - if:
+        - condition: state
+          entity_id: light.living_room_smart_plug_receiver_accessories
+          state: 'on'
+        then:
+        - action: light.turn_off
+          target:
+            entity_id: light.living_room_smart_plug_receiver_accessories
+      - if:
+        - condition: state
+          entity_id: media_player.living_room_receiver
+          state: 'on'
+        then:
+        - action: media_player.turn_off
+          target:
+            entity_id: media_player.living_room_receiver
+      - if:
+        - condition: state
+          entity_id: switch.living_room_tv_sync_box_power
+          state: 'on'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.living_room_tv_sync_box_power
+    else:
+    - if:
+      - condition: state
+        entity_id: sensor.living_room_apple_tv_media_player_safe
+        state: 'off'
+      then:
+      - action: media_player.turn_on
+        metadata: {}
+        target:
+          entity_id: media_player.living_room_apple_tv_media_player
+        data: {}
+      - delay:
+          seconds: 30
+    - parallel:
+      - if:
+        - condition: state
+          entity_id: light.living_room_light_strip_receiver
+          state: 'off'
+        then:
+        - action: light.turn_on
+          metadata: {}
+          data:
+            transition: 1
+            color_temp_kelvin: 2700
+            brightness_pct: 100
+          target:
+            entity_id:
+            - light.living_room_light_strip_receiver
+      - if:
+        - condition: state
+          entity_id: light.living_room_smart_plug_receiver_accessories
+          state: 'off'
+        then:
+        - action: light.turn_on
+          target:
+            entity_id: light.living_room_smart_plug_receiver_accessories
+      - if:
+        - condition: state
+          entity_id: media_player.living_room_receiver
+          state: 'off'
+        then:
+        - action: media_player.turn_on
+          target:
+            entity_id: media_player.living_room_receiver
+        - delay:
+            seconds: 3
+        - action: media_player.select_source
+          target:
+            entity_id:
+            - media_player.living_room_receiver
+          data:
+            source: Apple TV
+        - action: media_player.select_sound_mode
+          target:
+            entity_id: media_player.living_room_receiver
+          data:
+            sound_mode: DOLBY DIGITAL
+        - action: media_player.volume_set
+          target:
+            entity_id: media_player.living_room_receiver
+          data:
+            volume_level: 0.27
+      - if:
+        - condition: state
+          entity_id: switch.living_room_tv_sync_box_power
+          state: 'off'
+        then:
+        - action: switch.turn_on
+          target:
+            entity_id: switch.living_room_tv_sync_box_power
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: '{{ command == ''playing'' }}'
+        sequence:
+        - action: huesyncbox.set_sync_state
+          data:
+            device_id: 1cf95a14183d127c38d2f6af89ed61c5
+            power: true
+            sync: true
+            brightness: 100
+            input: input1
+            entertainment_area: TV-område
+            mode: video
+            intensity: moderate
+        - action: switch.turn_on
+          metadata: {}
+          data: {}
+          target:
+            entity_id:
+            - switch.living_room_tv_sync_box_light_sync
+      - conditions:
+        - condition: template
+          value_template: '{{ command == ''pause'' }}'
+        sequence:
+        - action: huesyncbox.set_sync_state
+          data:
+            device_id: 1cf95a14183d127c38d2f6af89ed61c5
+            sync: false
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 50

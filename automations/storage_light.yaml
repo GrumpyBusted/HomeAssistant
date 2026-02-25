@@ -1,0 +1,43 @@
+- id: '1770546802021'
+  alias: Loftrum lys
+  description: Automatik til at styre lys i loftrummet
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.storage_door_sensor_door
+    to: 'on'
+    id: opened
+  - trigger: state
+    entity_id: binary_sensor.storage_door_sensor_door
+    to: 'off'
+    id: closed
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: opened
+      sequence:
+      - action: light.turn_on
+        target:
+          entity_id:
+          - light.storage_light_1
+          - light.storage_light_2
+        data:
+          transition: 1
+          brightness_pct: 100
+          color_temp_kelvin: 3000
+    - conditions:
+      - condition: trigger
+        id: closed
+      sequence:
+      - action: light.turn_off
+        target:
+          entity_id:
+          - light.storage_light_1
+          - light.storage_light_2
+        data:
+          transition: 1
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30

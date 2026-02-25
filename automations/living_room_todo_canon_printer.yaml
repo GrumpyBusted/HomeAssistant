@@ -1,0 +1,76 @@
+- id: '1741115279443'
+  alias: Stue todo Canon printer
+  description: Kontroller blæk status på Canon printer
+  triggers:
+  - entity_id:
+    - sensor.living_room_printer_black_bk
+    - sensor.living_room_printer_black_pgbk
+    - sensor.living_room_printer_cyan
+    - sensor.living_room_printer_magenta
+    - sensor.living_room_printer_photo_blue
+    - sensor.living_room_printer_yellow
+    below: 15
+    trigger: numeric_state
+  - entity_id:
+    - sensor.living_room_printer_black_bk
+    - sensor.living_room_printer_black_pgbk
+    - sensor.living_room_printer_cyan
+    - sensor.living_room_printer_magenta
+    - sensor.living_room_printer_photo_blue
+    - sensor.living_room_printer_yellow
+    above: 20
+    trigger: numeric_state
+  - entity_id: sensor.living_room_printer
+    trigger: state
+    from: printing
+    to: idle
+  - at: 03:21:00
+    trigger: time
+  conditions: []
+  actions:
+  - repeat:
+      for_each:
+      - entity: sensor.living_room_printer_black_pgbk
+        name: sort (PGBK)
+        ink: Canon Pixma 580 PGBK (Black)
+      - entity: sensor.living_room_printer_black_bk
+        name: sort (BK)
+        ink: Canon Pixma 581 BK (Black)
+      - entity: sensor.living_room_printer_cyan
+        name: cyan
+        ink: Canon Pixma 581 C (Cyan)
+      - entity: sensor.living_room_printer_magenta
+        name: magenta
+        ink: Canon Pixma 581 M (Magenta)
+      - entity: sensor.living_room_printer_photo_blue
+        name: foto blå
+        ink: Canon Pixma 581 PB (Photo blå)
+      - entity: sensor.living_room_printer_yellow
+        name: gul
+        ink: Canon Pixma 581 Y (Yellow)
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ states(repeat.item.entity) not in [''unknown'', ''unavailable'']
+            }}'
+        then:
+        - action: script.create_todo_task
+          data:
+            subject: Skift {{ repeat.item.name }} blæk på printer
+            description: 'Blæk niveau for {{ repeat.item.name }} er {{ states(repeat.item.entity)
+              }}% på Canon TS8300 printer.<br> Blæk type: {{ repeat.item.ink }}'
+            related_entity_id: '{{ repeat.item.entity }}'
+            entity_id: todo.todo_smart_todo
+            is_active: '{{ states(repeat.item.entity)|int(100) < state_attr(repeat.item.entity,
+              ''marker_low_level'')|int(15) }}'
+  - action: script.create_todo_task
+    data:
+      subject: Løs problem med printer
+      description: 'Der er registreret et problem med Canon TS8300 printer.<br> Message:
+        {{ state_attr(''sensor.living_room_printer'', ''state_message'') }}<br> Reason:
+        {{ state_attr(''sensor.living_room_printer'', ''state_reason'') }}'
+      related_entity_id: sensor.living_room_printer
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ states(''sensor.living_room_printer'') not in [''printing'',
+        ''idle''] }}'
+  mode: restart

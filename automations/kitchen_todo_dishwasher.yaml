@@ -1,0 +1,112 @@
+- id: '1769369132822'
+  alias: Køkken todo opvaskemaskine
+  description: Opret todo opgaver vedrørende opvaskemaskine
+  triggers:
+  - trigger: state
+    entity_id: sensor.kitchen_dishwasher_safe
+    to: program_ended
+    id: done
+  - trigger: state
+    entity_id: sensor.kitchen_dishwasher_safe
+    to:
+    - waiting_to_start
+    - in_use
+    - programmed
+    id: started
+  - trigger: state
+    entity_id: binary_sensor.kitchen_dishwasher_notification_active_safe
+    id: notification
+  - trigger: state
+    entity_id: binary_sensor.kitchen_dishwasher_problem_safe
+    id: problem
+  - trigger: numeric_state
+    entity_id: sensor.kitchen_dishwasher_powerdisk_level_safe
+    below: 3
+  - trigger: numeric_state
+    entity_id: sensor.kitchen_dishwasher_powerdisk_level_safe
+    above: 80
+  - trigger: numeric_state
+    entity_id: sensor.kitchen_dishwasher_salt_level_safe
+    below: 15
+  - trigger: numeric_state
+    entity_id: sensor.kitchen_dishwasher_salt_level_safe
+    above: 80
+  - trigger: numeric_state
+    entity_id: sensor.kitchen_dishwasher_rinse_aid_level_safe
+    below: 15
+  - trigger: numeric_state
+    entity_id: sensor.kitchen_dishwasher_rinse_aid_level_safe
+    above: 80
+  conditions: []
+  actions:
+  - if:
+    - condition: state
+      entity_id: sensor.kitchen_dishwasher_safe
+      state:
+      - program_ended
+      - waiting_to_start
+      - in_use
+      - programmed
+    then:
+    - action: script.create_todo_task
+      data:
+        subject: Tøm opvaskemaskinen
+        description: Opvaskemaskine er færdig, tøm og sæt service væk
+        related_entity_id: sensor.kitchen_dishwasher_safe
+        entity_id: todo.todo_smart_todo
+        is_active: '{{ states(''sensor.kitchen_dishwasher_safe'') == ''program_ended''
+          }}'
+  - variables:
+      supply_tasks:
+      - subject: PowerDisk
+        entity_id: sensor.kitchen_dishwasher_powerdisk_level_safe
+        threshold: 3
+      - subject: Salt
+        entity_id: sensor.kitchen_dishwasher_salt_level_safe
+        threshold: 15
+      - subject: Afspændingsmiddel
+        entity_id: sensor.kitchen_dishwasher_rinse_aid_level_safe
+        threshold: 15
+      supply_todos: "{% set ns = namespace(count=0) %} {% for item in supply_tasks
+        %}\n  {% if states(item.entity_id) | float(100) < item.threshold | float(10)
+        %}\n    {% set ns.count = ns.count + 1 %}\n  {% endif %}\n{% endfor %} {{
+        ns.count }}"
+  - repeat:
+      for_each: '{{ supply_tasks }}'
+      sequence:
+      - action: script.create_todo_task
+        data:
+          subject: Fyld {{ repeat.item.subject }} på (opvaskemaskine)
+          description: '{{ repeat.item.subject }}-niveauet i opvaskemaskinen er {{
+            states(repeat.item.entity_id) | float(100) | round(0) }}%.'
+          related_entity_id: '{{ repeat.item.entity_id }}'
+          entity_id: todo.todo_smart_todo
+          is_active: '{{ states(repeat.item.entity_id) | float(100) < repeat.item.threshold
+            | float(10) }}'
+  - action: script.create_todo_task
+    data:
+      subject: Besked fra opvaskemaskinen
+      description: Kontroller opvaskemaskinen der er en aktiv notifikation
+      related_entity_id: binary_sensor.kitchen_dishwasher_notification_active_safe
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ is_state(''binary_sensor.kitchen_dishwasher_notification_active_safe'',
+        ''on'') and supply_todos | int(0) == 0 }}'
+  - action: script.create_todo_task
+    data:
+      subject: Problem med opvaskemaskinen
+      description: Kontroller opvaskemaskinen der er registreret et problem
+      related_entity_id: binary_sensor.kitchen_dishwasher_problem_safe
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ is_state(''binary_sensor.kitchen_dishwasher_problem_safe'', ''on'')
+        }}'
+  - action: script.create_todo_task
+    data:
+      subject: Opvaskermaskinens program er fejlet
+      description: Opvaskemaskinens program er i fejl status, kontroller opvaske maskinen
+      related_entity_id: sensor.kitchen_dishwasher_safe_problem
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ is_state(''sensor.kitchen_dishwasher_safe'', ''failure'') }}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 300

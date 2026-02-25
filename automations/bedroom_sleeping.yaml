@@ -1,0 +1,42 @@
+- id: '1771522267634'
+  alias: Soveværelse sover
+  description: Styring af timer til soveværelse sover
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_sleeping
+    from: 'off'
+    to: 'on'
+    id: sleeping
+  - trigger: state
+    entity_id:
+    - binary_sensor.bedroom_sleeping
+    from: 'on'
+    to: 'off'
+    id: waking
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - sleeping
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:30:00
+        target:
+          entity_id: timer.bedroom_sleeping_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - waking
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.bedroom_sleeping_timer
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20

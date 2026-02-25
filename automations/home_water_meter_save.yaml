@@ -1,0 +1,17 @@
+- id: '1764966963610'
+  alias: Hjem vand måler aflæs
+  description: Aflæs vand forbrug og gem i CSV fil
+  triggers:
+  - at: 01:00:00
+    trigger: time
+  conditions:
+  - condition: template
+    value_template: '{{ now().day == 1 }}'
+  actions:
+  - action: shell_command.append_to_file
+    metadata: {}
+    data:
+      line: '{{ (state_attr(''sensor.home_water_meter'', ''timestamp'') | as_datetime).strftime(''%Y-%m-%dT%H:%M:%S'')
+        }},{{ state_attr(''sensor.home_water_meter'', ''total_m3'') }}'
+      file: /config/data/meter_reading_water.csv
+  mode: single

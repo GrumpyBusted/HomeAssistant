@@ -1,0 +1,128 @@
+- id: '1735738251165'
+  alias: Stue varmepumpe
+  description: Styring af varmepumpe i stuen, for at varme hurtigere op hvis den ønskede
+    temperatur er væsentligt koldere end den aktuelle.
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.living_room_heat_pump_mode
+  - trigger: state
+    entity_id:
+    - binary_sensor.living_room_window
+  - trigger: state
+    entity_id:
+    - binary_sensor.patio_door_long_open
+  - trigger: state
+    entity_id:
+    - binary_sensor.kitchen_window
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: sensor.living_room_heat_pump_mode
+        state: boost
+      - condition: state
+        entity_id: binary_sensor.living_room_window
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.patio_door_long_open
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.kitchen_window
+        state: 'off'
+      sequence:
+      - action: climate.turn_on
+        target:
+          entity_id: climate.living_room_heat_pump
+      - action: climate.set_temperature
+        target:
+          entity_id: climate.living_room_heat_pump
+        data:
+          temperature: '{{ states(''sensor.living_room_target_temperature'') | float(0)
+            + 1 }}'
+      - action: climate.set_hvac_mode
+        target:
+          entity_id: climate.living_room_heat_pump
+        data:
+          hvac_mode: heat
+      - action: climate.set_fan_mode
+        target:
+          entity_id: climate.living_room_heat_pump
+        data:
+          fan_mode: Auto
+      - action: climate.set_swing_mode
+        target:
+          entity_id: climate.living_room_heat_pump
+        data:
+          swing_mode: Auto
+      - action: climate.set_preset_mode
+        metadata: {}
+        data:
+          preset_mode: boost
+        target:
+          entity_id: climate.living_room_heat_pump
+    - conditions:
+      - condition: state
+        entity_id: sensor.living_room_heat_pump_mode
+        state: heat
+      - condition: state
+        entity_id: binary_sensor.living_room_window
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.patio_door_long_open
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.kitchen_window
+        state: 'off'
+      sequence:
+      - action: climate.turn_on
+        target:
+          entity_id: climate.living_room_heat_pump
+      - action: climate.set_temperature
+        target:
+          entity_id: climate.living_room_heat_pump
+        data:
+          temperature: '{{ states(''sensor.living_room_target_temperature'') | float(0)
+            + 1 }}'
+      - action: climate.set_hvac_mode
+        target:
+          entity_id: climate.living_room_heat_pump
+        data:
+          hvac_mode: heat
+      - action: climate.set_fan_mode
+        target:
+          entity_id: climate.living_room_heat_pump
+        data:
+          fan_mode: Auto
+      - action: climate.set_swing_mode
+        target:
+          entity_id: climate.living_room_heat_pump
+        data:
+          swing_mode: Auto
+      - action: climate.set_preset_mode
+        metadata: {}
+        data:
+          preset_mode: none
+        target:
+          entity_id: climate.living_room_heat_pump
+    - conditions:
+      - condition: state
+        entity_id: sensor.living_room_heat_pump_mode
+        state: 'off'
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: climate.living_room_heat_pump
+          state: 'off'
+      sequence:
+      - action: climate.turn_off
+        target:
+          entity_id: climate.living_room_heat_pump
+      - action: climate.set_preset_mode
+        data:
+          preset_mode: none
+        target:
+          entity_id: climate.living_room_heat_pump
+  mode: restart
+  trace:
+    stored_traces: 100

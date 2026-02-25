@@ -1,0 +1,86 @@
+- id: '1771697802150'
+  alias: Bryggers tørretumbler
+  description: Skaber tørretumbler status udfra strømforbrug
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_dryer_power
+    below: 3
+    for:
+      seconds: 5
+    id: nothing
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_dryer_power
+    above: 3
+    for:
+      seconds: 3
+    id: turned_on
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_dryer_power
+    above: 4
+    for:
+      seconds: 10
+    id: planning
+  - trigger: numeric_state
+    entity_id:
+    - sensor.utility_room_smart_plug_dryer_power
+    above: 50
+    for:
+      seconds: 3
+    id: running
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: running
+      sequence:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.utility_room_dryer_state
+        data:
+          option: started
+    - conditions:
+      - condition: trigger
+        id: nothing
+      - condition: state
+        entity_id: input_select.utility_room_dryer_state
+        state: started
+      sequence:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.utility_room_dryer_state
+        data:
+          option: finished
+    - conditions:
+      - condition: trigger
+        id: turned_on
+      - condition: state
+        entity_id: input_select.utility_room_dryer_state
+        state: finished
+      sequence:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.utility_room_dryer_state
+        data:
+          option: emptied
+    - conditions:
+      - condition: trigger
+        id: planning
+      - condition: state
+        entity_id: input_select.utility_room_dryer_state
+        state:
+        - finished
+        - emptied
+      sequence:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.utility_room_dryer_state
+        data:
+          option: planned
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30

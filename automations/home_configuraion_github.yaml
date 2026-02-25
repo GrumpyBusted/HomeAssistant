@@ -1,0 +1,19 @@
+- id: '1739480121158'
+  alias: Hjem konfiguration GitHub
+  description: Automatik til at sende configuration filer etc til GitHub repository
+  triggers:
+  - trigger: time
+    at: '23:00:00'
+  - trigger: event
+    event_type: event_homeassistant_restarted
+  - trigger: event
+    event_type: homeassistant_close
+  - trigger: event
+    event_type: homeassistant_stop
+  conditions: []
+  actions:
+  - action: shell_command.pushupdates_to_github
+    data: {}
+  mode: single
+  trace:
+    stored_traces: 20

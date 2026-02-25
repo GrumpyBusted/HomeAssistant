@@ -1,0 +1,65 @@
+- id: '1763801218547'
+  alias: Hjem ventilation forvarme
+  description: Styring af forvarme til Nilan ventilationsanlæg
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.everyone_sleeping
+  - trigger: state
+    entity_id: binary_sensor.someone_home
+  - trigger: numeric_state
+    entity_id: sensor.home_outside_current_temperature
+    below: 1
+  - trigger: numeric_state
+    entity_id: sensor.home_outside_current_temperature
+    above: 3
+  - trigger: state
+    entity_id: climate.storage_ventilation_system_ventilation
+    attribute: fan_mode
+    to:
+    - 'off'
+  - trigger: state
+    entity_id: climate.storage_ventilation_system_ventilation
+    attribute: fan_mode
+    from:
+    - 'off'
+  actions:
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.home_outside_current_temperature
+        below: 1
+      - condition: state
+        entity_id: binary_sensor.someone_home
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.everyone_sleeping
+        state: 'off'
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: climate.storage_ventilation_system_ventilation
+          attribute: fan_mode
+          state: 'off'
+      sequence:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.storage_smart_plug_ventilation_preheating
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: numeric_state
+          entity_id: sensor.home_outside_current_temperature
+          above: 3
+        - condition: state
+          entity_id: binary_sensor.someone_home
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.everyone_sleeping
+          state: 'on'
+      sequence:
+      - action: switch.turn_off
+        target:
+          entity_id: switch.storage_smart_plug_ventilation_preheating
+  mode: restart
+  trace:
+    stored_traces: 30

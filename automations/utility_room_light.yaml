@@ -1,0 +1,78 @@
+- id: '1748709891445'
+  alias: Bryggers lys
+  description: Automatik til at styre lys i bryggerset
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.utility_room_presence
+    to: 'on'
+    id: detected
+  - trigger: state
+    entity_id:
+    - binary_sensor.utility_room_presence
+    to: 'off'
+    id: cleared
+  - trigger: state
+    entity_id:
+    - binary_sensor.someone_home
+    from: 'on'
+    to: 'off'
+    id: no_one_home
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - detected
+      - condition: numeric_state
+        entity_id: sensor.utility_room_motion_sensor_illuminance
+        below: 400
+      - condition: numeric_state
+        entity_id: light.kitchen_lights
+        attribute: brightness
+        below: 60
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          color_temp_kelvin: 2700
+          brightness_pct: 30
+          transition: 1
+        target:
+          entity_id:
+          - light.utility_room_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - detected
+      - condition: numeric_state
+        entity_id: sensor.utility_room_motion_sensor_illuminance
+        below: 400
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        data:
+          color_temp_kelvin: 2700
+          brightness_pct: 80
+          transition: 1
+        target:
+          entity_id:
+          - light.utility_room_lights
+    - conditions:
+      - condition: trigger
+        id:
+        - no_one_home
+        - cleared
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id:
+          - light.utility_room_lights
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20

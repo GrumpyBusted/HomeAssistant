@@ -1,0 +1,20 @@
+- id: '1739714838791'
+  alias: Hjem Todo oprydning opgaver
+  description: Automatik der sletter afsluttede opgaver fra smart todo listen
+  triggers:
+  - trigger: time
+    at: 03:24:00
+  conditions: []
+  actions:
+  - action: script.cleanup_todo_tasks
+    data:
+      entity_id: todo.todo_smart_todo
+      date: '{{ (now() - timedelta(days=2)).date() }}'
+    response_variable: response
+  - action: system_log.write
+    data:
+      level: info
+      message: 'Deleted: {{ response.deleted }} '
+  mode: restart
+  trace:
+    stored_traces: 30

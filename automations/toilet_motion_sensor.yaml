@@ -1,0 +1,55 @@
+- id: '1769872488563'
+  alias: Toilet bevægelsessensor
+  description: Håndtering af bevægelsessensoren på toilettet
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.toilet_motion_sensor_motion
+    from: 'off'
+    to: 'on'
+    id: detected
+  - trigger: state
+    entity_id:
+    - binary_sensor.toilet_motion_sensor_motion
+    from: 'on'
+    to: 'off'
+    id: cleared
+  - trigger: state
+    entity_id:
+    - timer.toilet_motion_sensor_timer
+    to: idle
+    id: timeout
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - detected
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.toilet_motion_sensor_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - cleared
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:02:00
+        target:
+          entity_id: timer.toilet_motion_sensor_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - timeout
+      sequence:
+      - action: counter.increment
+        target:
+          entity_id: counter.toilet_motion_sensor_count
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20

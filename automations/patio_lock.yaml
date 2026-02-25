@@ -1,0 +1,100 @@
+- id: '1761840992462'
+  alias: Terrasse lås
+  description: Automatik til at styre terrasse dør låsen
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.someone_home
+    from: 'on'
+    to: 'off'
+    id: no_one_home
+  - trigger: state
+    entity_id:
+    - binary_sensor.everyone_sleeping
+    from: 'off'
+    to: 'on'
+    id: sleeping
+  - trigger: numeric_state
+    entity_id: input_number.bedroom_blind_position
+    below: 1
+    id: bedroom_blind_down
+  - trigger: state
+    entity_id:
+    - timer.patio_lock_timer
+    to:
+    - idle
+    id: auto_locking_expired
+  conditions: []
+  actions:
+  - action: homeassistant.update_entity
+    data:
+      entity_id: lock.patio_lock
+  - delay:
+      seconds: 3
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: trigger
+          id:
+          - no_one_home
+          - sleeping
+      - condition: and
+        conditions:
+        - condition: trigger
+          id:
+          - bedroom_blind_down
+        - condition: time
+          after: '20:00:00'
+      - condition: state
+        entity_id: lock.patio_lock
+        state: unlocked
+      sequence:
+      - action: lock.lock
+        metadata: {}
+        data: {}
+        target:
+          entity_id: lock.patio_lock
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: 00:01:00
+        target:
+          entity_id: timer.patio_lock_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - auto_locking_expired
+      - condition: state
+        entity_id: lock.patio_lock
+        state:
+        - unlocked
+      sequence:
+      - action: lock.lock
+        metadata: {}
+        data: {}
+        target:
+          entity_id: lock.patio_lock
+      - delay: 00:00:01
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: lock.patio_lock
+            state: locked
+        - condition: state
+          entity_id: binary_sensor.house_sitter_home
+          state: 'off'
+        then:
+        - action: script.push_notification
+          data:
+            type: critical
+            title: Advarsel
+            message: Terrassedøren kunne ikke låses automatisk!
+            id: patio_lock_auto_warning
+            recipient: home
+            persistent: false
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 50

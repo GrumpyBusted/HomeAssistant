@@ -1,0 +1,20 @@
+- id: '1742241186159'
+  alias: Bryggers todo vaskemaskine
+  description: Opret todo opgaver vedrørende vaskemaskine
+  triggers:
+  - trigger: state
+    entity_id: input_select.utility_room_washer_state
+  conditions: []
+  actions:
+  - action: script.create_todo_task
+    data:
+      subject: Tøm vaskemaskinen
+      description: Vaskemaskinen er færdig, tøm og tør tøjet
+      related_entity_id: input_select.utility_room_washer_state
+      entity_id: todo.todo_smart_todo
+      is_active: '{{ is_state(''input_select.utility_room_washer_state'', ''finished'')
+        }}'
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
