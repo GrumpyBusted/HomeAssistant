@@ -33,7 +33,7 @@
     above: 80
   - trigger: numeric_state
     entity_id: sensor.kitchen_dishwasher_rinse_aid_level_safe
-    below: 15
+    below: 33
   - trigger: numeric_state
     entity_id: sensor.kitchen_dishwasher_rinse_aid_level_safe
     above: 80
@@ -66,7 +66,7 @@
         threshold: 15
       - subject: Afspændingsmiddel
         entity_id: sensor.kitchen_dishwasher_rinse_aid_level_safe
-        threshold: 15
+        threshold: 33
       supply_todos: "{% set ns = namespace(count=0) %} {% for item in supply_tasks
         %}\n  {% if states(item.entity_id) | float(100) < item.threshold | float(10)
         %}\n    {% set ns.count = ns.count + 1 %}\n  {% endif %}\n{% endfor %} {{
