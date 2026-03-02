@@ -791,9 +791,7 @@ push_notification:
           ''_'' ~ recipient ~ ''_'') | list }}'
   - action: system_log.write
     data:
-      message: 'Action: {{ repeat.item }}
-
-        Title: {{ title }}
+      message: 'Title: {{ title }}
 
         Message: {{ message }}
 
