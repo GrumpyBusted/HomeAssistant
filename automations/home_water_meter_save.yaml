@@ -2,7 +2,7 @@
   alias: Hjem vand måler aflæs
   description: Aflæs vand forbrug og gem i CSV fil
   triggers:
-  - at: 01:00:00
+  - at: 02:00:00
     trigger: time
   conditions:
   - condition: template
