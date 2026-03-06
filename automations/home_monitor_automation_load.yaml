@@ -32,6 +32,8 @@
         automation.garden_motion_sensor_house_east: 200
         automation.entrance_light: 150
         automation.living_room_media_player_set_status: 150
+        automation.utility_room_washer: 150
+        automation.storage_light: 32
       offenders: "{% set res = sql_result.result if sql_result is defined else []
         %}  {% set ns = namespace(offenders=[]) %} {% for row in res %}\n  {% set
         automation_id = row.automation_id %}\n  {% set count = row.trigger_count |
