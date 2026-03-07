@@ -21,6 +21,7 @@
         automation.kitchen_fridge: 9999
         automation.living_room_tv: 9999
         automation.home_monitor_system: 9999
+        automation.storage_light: 999
       offenders: "{% set ns = namespace(offenders=[]) %}\n{% for a in states.automation
         | list %}\n  {% set days = custom_days.get(a.entity_id, default_days) | int
         %}\n  {% set cutoff = now() - timedelta(days=days) %}\n  {% set last = state_attr(a.entity_id,
