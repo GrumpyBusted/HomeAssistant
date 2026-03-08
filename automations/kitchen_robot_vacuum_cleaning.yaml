@@ -12,8 +12,11 @@
     entity_id: binary_sensor.living_room_media_player
     to: 'off'
   - trigger: state
-    entity_id: binary_sensor.bedroom_sleeping
-    to: 'off'
+    entity_id: select.bedroom_state
+    to: 
+      - away
+      - occupied
+      - empty
     for: 00:02:00
   - trigger: state
     entity_id: binary_sensor.monique_sleep_window
@@ -50,11 +53,11 @@
         entity_id: binary_sensor.living_room_media_player
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'off'
-      - condition: numeric_state
-        entity_id: input_number.bedroom_blind_position
-        above: 1
+        entity_id: select.bedroom_state
+        state: 
+          - away
+          - occupied
+          - empty
       - condition: state
         entity_id: binary_sensor.monique_sleep_window
         state: 'off'

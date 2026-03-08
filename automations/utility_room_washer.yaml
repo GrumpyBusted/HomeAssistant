@@ -5,36 +5,38 @@
   max: 10
   trace:
     stored_traces: 30
+
   triggers:
     - trigger: numeric_state
-      entity_id:
-        - sensor.utility_room_smart_plug_washer_power
+      entity_id: sensor.utility_room_smart_plug_washer_power
       below: 2
       for:
         seconds: 10
       id: nothing
+
     - trigger: numeric_state
-      entity_id:
-        - sensor.utility_room_smart_plug_washer_power
+      entity_id: sensor.utility_room_smart_plug_washer_power
       above: 2
       for:
         seconds: 3
       id: turned_on
+
     - trigger: numeric_state
-      entity_id:
-        - sensor.utility_room_smart_plug_washer_power
+      entity_id: sensor.utility_room_smart_plug_washer_power
       above: 3
       for:
         seconds: 10
       id: planning
+
     - trigger: numeric_state
-      entity_id:
-        - sensor.utility_room_smart_plug_washer_power
+      entity_id: sensor.utility_room_smart_plug_washer_power
       above: 50
       for:
         seconds: 10
       id: running
+
   conditions: []
+
   actions:
     - choose:
         - conditions:
@@ -46,6 +48,7 @@
                 entity_id: input_select.utility_room_washer_state
               data:
                 option: started
+
         - conditions:
             - condition: trigger
               id: nothing
@@ -58,6 +61,7 @@
                 entity_id: input_select.utility_room_washer_state
               data:
                 option: finished
+
         - conditions:
             - condition: trigger
               id: turned_on
@@ -70,6 +74,7 @@
                 entity_id: input_select.utility_room_washer_state
               data:
                 option: emptied
+
         - conditions:
             - condition: trigger
               id: planning

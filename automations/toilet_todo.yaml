@@ -1,62 +1,68 @@
-- id: '1770464713887'
+- id: "1770464713887"
   alias: Toilet todo
   description: Opret todo opgaver vedrørende sæbe og duft påfyldning på toilet
-  triggers:
-  - entity_id: counter.toilet_motion_sensor_count
-    id: counter_changed
-    trigger: state
-  - trigger: event
-    event_type: todo_item_completed
-    event_data:
-      related: input_number.toilet_freshener_last_count
-    id: freshener_completed
-  - trigger: event
-    event_type: todo_item_completed
-    event_data:
-      related: input_number.toilet_soap_last_count
-    id: soap_completed
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id: counter_changed
-      sequence:
-      - action: script.create_todo_task
-        data:
-          subject: Tilføj WC-duft på toilettet
-          description: Indsæt en ny WC-duftpind i gæste-toilettet.
-          related_entity_id: input_number.toilet_freshener_last_count
-          entity_id: todo.todo_smart_todo
-          is_active: '{{ states(''counter.toilet_motion_sensor_count'') | int(0) >
-            states(''input_number.toilet_freshener_last_count'') | int(0) + 400 }}'
-      - action: script.create_todo_task
-        data:
-          subject: Fyld sæbe på dispenser på toilettet
-          description: Hæld mere sæbe på sæbedispenser på gæste-toilettet.
-          related_entity_id: input_number.toilet_soap_last_count
-          entity_id: todo.todo_smart_todo
-          is_active: '{{ states(''counter.toilet_motion_sensor_count'') | int(0) >
-            states(''input_number.toilet_soap_last_count'') | int(0) + 500 }}'
-    - conditions:
-      - condition: trigger
-        id: freshener_completed
-      sequence:
-      - action: input_number.set_value
-        target:
-          entity_id: input_number.toilet_freshener_last_count
-        data:
-          value: '{{ states(''counter.toilet_motion_sensor_count'') | int(0) }}'
-    - conditions:
-      - condition: trigger
-        id: soap_completed
-      sequence:
-      - action: input_number.set_value
-        target:
-          entity_id: input_number.toilet_soap_last_count
-        data:
-          value: '{{ states(''counter.toilet_motion_sensor_count'') | int(0) }}'
   mode: queued
   max: 10
   trace:
     stored_traces: 30
+
+  triggers:
+    - trigger: state
+      entity_id: counter.toilet_motion_sensor_count
+      id: counter_changed
+
+    - trigger: event
+      event_type: todo_item_completed
+      event_data:
+        related: input_number.toilet_freshener_last_count
+      id: freshener_completed
+
+    - trigger: event
+      event_type: todo_item_completed
+      event_data:
+        related: input_number.toilet_soap_last_count
+      id: soap_completed
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: counter_changed
+          sequence:
+            - action: script.create_todo_task
+              data:
+                subject: Tilføj WC-duft på toilettet
+                description: Indsæt en ny WC-duftpind i gæste-toilettet.
+                related_entity_id: input_number.toilet_freshener_last_count
+                entity_id: todo.todo_smart_todo
+                is_active: "{{ states('counter.toilet_motion_sensor_count') | int(0) > states('input_number.toilet_freshener_last_count') | int(0) + 200 }}"
+
+            - action: script.create_todo_task
+              data:
+                subject: Fyld sæbe på dispenser på toilettet
+                description: Hæld mere sæbe på sæbedispenser på gæste-toilettet.
+                related_entity_id: input_number.toilet_soap_last_count
+                entity_id: todo.todo_smart_todo
+                is_active: "{{ states('counter.toilet_motion_sensor_count') | int(0) > states('input_number.toilet_soap_last_count') | int(0) + 500 }}"
+
+        - conditions:
+            - condition: trigger
+              id: freshener_completed
+          sequence:
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.toilet_freshener_last_count
+              data:
+                value: "{{ states('counter.toilet_motion_sensor_count') | int(0) }}"
+
+        - conditions:
+            - condition: trigger
+              id: soap_completed
+          sequence:
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.toilet_soap_last_count
+              data:
+                value: "{{ states('counter.toilet_motion_sensor_count') | int(0) }}"

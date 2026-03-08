@@ -1,35 +1,41 @@
-- id: '1769854798414'
+- id: "1769854798414"
   alias: Stue dør
   description: Automatik til at styre timer til stue dør
-  triggers:
-  - trigger: state
-    entity_id: binary_sensor.living_room_door
-    to: 'off'
-    id: closed
-  - trigger: state
-    entity_id: binary_sensor.living_room_door
-    to: 'on'
-    id: opened
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id: closed
-      sequence:
-      - action: timer.cancel
-        target:
-          entity_id: timer.living_room_door_timer
-    - conditions:
-      - condition: trigger
-        id: opened
-      sequence:
-      - action: timer.start
-        target:
-          entity_id: timer.living_room_door_timer
-        data:
-          duration: 00:02:00
   mode: queued
   max: 10
   trace:
     stored_traces: 50
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.living_room_door
+      to: "off"
+      id: closed
+
+    - trigger: state
+      entity_id: binary_sensor.living_room_door
+      to: "on"
+      id: opened
+
+  conditions: []
+
+  actions:
+    - choose:
+
+        - conditions:
+            - condition: trigger
+              id: closed
+          sequence:
+            - action: timer.cancel
+              target:
+                entity_id: timer.living_room_door_timer
+
+        - conditions:
+            - condition: trigger
+              id: opened
+          sequence:
+            - action: timer.start
+              target:
+                entity_id: timer.living_room_door_timer
+              data:
+                duration: 00:02:00

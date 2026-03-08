@@ -1,163 +1,179 @@
-- id: '1760968576162'
+- id: "1760968576162"
   alias: Soveværelse tilstedeværelsessensor
   description: Automatik til at styre soveværelse tilstedeværelsessensor
-  triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_presence_sensor_occupancy
-    from: 'off'
-    to: 'on'
-    id: detected
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_presence_sensor_occupancy
-    from: 'on'
-    to: 'off'
-    id: cleared
-  - trigger: state
-    entity_id: timer.bedroom_presence_sensor_timer
-    to: idle
-    id: timeout
-  - trigger: state
-    entity_id: binary_sensor.bedroom_door
-    from: 'on'
-    to: 'off'
-    id: closed
-  - trigger: state
-    entity_id: binary_sensor.bedroom_door
-    from: 'off'
-    to: 'on'
-    id: opened
-  - trigger: state
-    entity_id: binary_sensor.bedroom_sleeping
-    to: 'on'
-    id: sleeping
-  - trigger: state
-    entity_id: binary_sensor.bedroom_sleeping
-    to: 'off'
-    id: wake
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id: detected
-      - condition: state
-        entity_id: binary_sensor.bedroom_door
-        state: 'off'
-      - condition: state
-        entity_id: input_boolean.bedroom_presence
-        state: 'off'
-      sequence:
-      - action: timer.cancel
-        target:
-          entity_id: timer.bedroom_presence_sensor_timer
-    - conditions:
-      - condition: trigger
-        id: detected
-      sequence:
-      - action: input_boolean.turn_on
-        target:
-          entity_id: input_boolean.bedroom_presence
-      - action: timer.pause
-        target:
-          entity_id: timer.bedroom_presence_sensor_timer
-    - conditions:
-      - condition: trigger
-        id: cleared
-      - condition: state
-        entity_id: binary_sensor.bedroom_door
-        state: 'off'
-      - condition: template
-        value_template: '{{ states.binary_sensor.bedroom_door.last_changed | as_local
-          > now() - timedelta(seconds=30) }}'
-      sequence: []
-    - conditions:
-      - condition: trigger
-        id: cleared
-      - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'on'
-      sequence:
-      - action: timer.start
-        data:
-          duration: 00:10:00
-        target:
-          entity_id: timer.bedroom_presence_sensor_timer
-    - conditions:
-      - condition: trigger
-        id: cleared
-      sequence:
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:02:00
-        target:
-          entity_id: timer.bedroom_presence_sensor_timer
-    - conditions:
-      - condition: trigger
-        id: timeout
-      sequence:
-      - action: input_boolean.turn_off
-        target:
-          entity_id: input_boolean.bedroom_presence
-    - conditions:
-      - condition: trigger
-        id:
-        - opened
-        - closed
-      - condition: state
-        entity_id: binary_sensor.bedroom_presence_sensor_occupancy
-        state: 'on'
-      sequence:
-      - action: input_boolean.turn_on
-        target:
-          entity_id: input_boolean.bedroom_presence
-    - conditions:
-      - condition: trigger
-        id: opened
-      - condition: state
-        entity_id: binary_sensor.bedroom_presence_sensor_occupancy
-        state: 'off'
-      sequence:
-      - action: input_boolean.turn_on
-        target:
-          entity_id: input_boolean.bedroom_presence
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:00:30
-        target:
-          entity_id: timer.bedroom_presence_sensor_timer
-    - conditions:
-      - condition: trigger
-        id: closed
-      - condition: state
-        entity_id: binary_sensor.bedroom_presence_sensor_occupancy
-        state: 'off'
-      sequence:
-      - action: input_boolean.turn_off
-        target:
-          entity_id: input_boolean.bedroom_presence
-    - conditions:
-      - condition: trigger
-        id: sleeping
-      sequence:
-      - action: select.select_option
-        target:
-          entity_id: select.bedroom_presence_sensor_detection_sensitivity
-        data:
-          option: High
-    - conditions:
-      - condition: trigger
-        id: wake
-      sequence:
-      - action: select.select_option
-        target:
-          entity_id: select.bedroom_presence_sensor_detection_sensitivity
-        data:
-          option: Low
   mode: queued
   max: 10
   trace:
     stored_traces: 50
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.bedroom_presence_sensor_occupancy
+      from: "off"
+      to: "on"
+      id: detected
+
+    - trigger: state
+      entity_id: binary_sensor.bedroom_presence_sensor_occupancy
+      from: "on"
+      to: "off"
+      id: cleared
+
+    - trigger: state
+      entity_id: timer.bedroom_presence_sensor_timer
+      to: idle
+      id: timeout
+
+    - trigger: state
+      entity_id: binary_sensor.bedroom_door
+      from: "on"
+      to: "off"
+      id: closed
+
+    - trigger: state
+      entity_id: binary_sensor.bedroom_door
+      from: "off"
+      to: "on"
+      id: opened
+
+    - trigger: state
+      entity_id: binary_sensor.bedroom_sleeping
+      to: "on"
+      id: sleeping
+
+    - trigger: state
+      entity_id: binary_sensor.bedroom_sleeping
+      to: "off"
+      id: wake
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: detected
+            - condition: state
+              entity_id: binary_sensor.bedroom_door
+              state: "off"
+            - condition: state
+              entity_id: input_boolean.bedroom_presence
+              state: "off"
+          sequence:
+            - action: timer.cancel
+              target:
+                entity_id: timer.bedroom_presence_sensor_timer
+
+        - conditions:
+            - condition: trigger
+              id: detected
+          sequence:
+            - action: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.bedroom_presence
+
+            - action: timer.pause
+              target:
+                entity_id: timer.bedroom_presence_sensor_timer
+
+        - conditions:
+            - condition: trigger
+              id: cleared
+            - condition: state
+              entity_id: binary_sensor.bedroom_door
+              state: "off"
+            - condition: template
+              value_template: "{{ states.binary_sensor.bedroom_door.last_changed | as_local > now() - timedelta(seconds=30) }}"
+          sequence: []
+
+        - conditions:
+            - condition: trigger
+              id: cleared
+            - condition: state
+              entity_id: binary_sensor.bedroom_sleeping
+              state: "on"
+          sequence:
+            - action: timer.start
+              target:
+                entity_id: timer.bedroom_presence_sensor_timer
+              data:
+                duration: "00:10:00"
+
+        - conditions:
+            - condition: trigger
+              id: cleared
+          sequence:
+            - action: timer.start
+              target:
+                entity_id: timer.bedroom_presence_sensor_timer
+              data:
+                duration: "00:02:00"
+
+        - conditions:
+            - condition: trigger
+              id: timeout
+          sequence:
+            - action: input_boolean.turn_off
+              target:
+                entity_id: input_boolean.bedroom_presence
+
+        - conditions:
+            - condition: trigger
+              id:
+                - opened
+                - closed
+            - condition: state
+              entity_id: binary_sensor.bedroom_presence_sensor_occupancy
+              state: "on"
+          sequence:
+            - action: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.bedroom_presence
+
+        - conditions:
+            - condition: trigger
+              id: opened
+            - condition: state
+              entity_id: binary_sensor.bedroom_presence_sensor_occupancy
+              state: "off"
+          sequence:
+            - action: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.bedroom_presence
+
+            - action: timer.start
+              target:
+                entity_id: timer.bedroom_presence_sensor_timer
+              data:
+                duration: "00:00:30"
+
+        - conditions:
+            - condition: trigger
+              id: closed
+            - condition: state
+              entity_id: binary_sensor.bedroom_presence_sensor_occupancy
+              state: "off"
+          sequence:
+            - action: input_boolean.turn_off
+              target:
+                entity_id: input_boolean.bedroom_presence
+
+        - conditions:
+            - condition: trigger
+              id: sleeping
+          sequence:
+            - action: select.select_option
+              target:
+                entity_id: select.bedroom_presence_sensor_detection_sensitivity
+              data:
+                option: High
+
+        - conditions:
+            - condition: trigger
+              id: wake
+          sequence:
+            - action: select.select_option
+              target:
+                entity_id: select.bedroom_presence_sensor_detection_sensitivity
+              data:
+                option: Low

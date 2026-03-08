@@ -1,30 +1,40 @@
-- id: '1770918500447'
+- id: "1770918500447"
   alias: Teknik todo temperatur
   description: Overvåg temperaturen i teknik rummet
-  triggers:
-  - trigger: numeric_state
-    entity_id: sensor.technic_room_current_temperature
-    below: 10
-  - trigger: numeric_state
-    entity_id: sensor.technic_room_current_temperature
-    above: 30
-  - trigger: time
-    at: 01:00:00
-  - trigger: time
-    at: '13:00:00'
-  conditions: []
-  actions:
-  - action: script.create_todo_task
-    data:
-      subject: Der er {% if states('sensor.technic_room_current_temperature') | float
-        <= 20 -%} koldt {%- else -%} varmt {%- endif %} i teknik rummet
-      description: Temperaturen i teknik rummet er  {{ states('sensor.technic_room_current_temperature')
-        }} °C, kontroller om døren er lukket eller der er et andet problem.
-      entity_id: todo.todo_smart_todo
-      related_entity_id: sensor.technic_room_current_temperature
-      is_active: '{{ not (10.0 <= states(''sensor.technic_room_current_temperature'')
-        | float(20.0) <= 30.0) }}'
   mode: queued
   max: 10
   trace:
     stored_traces: 30
+
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_current_temperature
+      below: 10
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_current_temperature
+      above: 30
+
+    - trigger: time
+      at: "01:00:00"
+
+    - trigger: time
+      at: "13:00:00"
+
+  conditions: []
+
+  actions:
+    - action: script.create_todo_task
+      data:
+        subject: >
+          Der er {% if states('sensor.technic_room_current_temperature') | float <= 20 -%}
+          koldt
+          {%- else -%}
+          varmt
+          {%- endif %} i teknik rummet
+        description: >
+          Temperaturen i teknik rummet er {{ states('sensor.technic_room_current_temperature') }}
+          °C, kontroller om døren er lukket eller der er et andet problem.
+        entity_id: todo.todo_smart_todo
+        related_entity_id: sensor.technic_room_current_temperature
+        is_active: "{{ not (10.0 <= states('sensor.technic_room_current_temperature') | float(20.0) <= 30.0) }}"

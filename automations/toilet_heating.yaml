@@ -1,71 +1,72 @@
-- id: '1737310628140'
+- id: "1737310628140"
   alias: Toilet varme
   description: Automatik til at styre varmen på toilettet
-  triggers:
-  - trigger: state
-    entity_id: binary_sensor.someone_home
-  - trigger: state
-    entity_id: sensor.toilet_target_temperature
-    id: target_changed
-  - trigger: state
-    entity_id: timer.toilet_heating_manual_timer
-    to: idle
-  - trigger: state
-    entity_id: sensor.toilet_desired_temperature
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.someone_home
-        state: 'off'
-      - condition: state
-        entity_id: timer.toilet_heating_manual_timer
-        state: active
-      sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.toilet_heating_manual_timer
-    - conditions:
-      - condition: trigger
-        id: target_changed
-      - condition: template
-        value_template: '{{ states(''sensor.toilet_target_temperature'') | float(0.0)
-          != states(''sensor.toilet_desired_temperature'') | float(21.0) }}'
-      sequence:
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:15:00
-        target:
-          entity_id: timer.toilet_heating_manual_timer
-    - conditions:
-      - condition: template
-        value_template: '{{ states(''sensor.toilet_target_temperature'') | float(0.0)
-          == states(''sensor.toilet_desired_temperature'') | float(21.0) }}'
-      - condition: state
-        entity_id: timer.toilet_heating_manual_timer
-        state: active
-      sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.toilet_heating_manual_timer
-  - if:
-    - condition: state
-      entity_id: timer.toilet_heating_manual_timer
-      state: idle
-    then:
-    - action: script.set_climate_temperature
-      data:
-        temperature: '{{ states(''sensor.toilet_desired_temperature'') | float(21.0)
-          }}'
-        entities:
-        - climate.toilet_radiator_thermostat
-        target_sensor: sensor.toilet_target_temperature
   mode: restart
   trace:
     stored_traces: 50
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.someone_home
+
+    - trigger: state
+      entity_id: sensor.toilet_target_temperature
+      id: target_changed
+
+    - trigger: state
+      entity_id: timer.toilet_heating_manual_timer
+      to: idle
+
+    - trigger: state
+      entity_id: sensor.toilet_desired_temperature
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.someone_home
+              state: "off"
+            - condition: state
+              entity_id: timer.toilet_heating_manual_timer
+              state: active
+          sequence:
+            - action: timer.cancel
+              target:
+                entity_id: timer.toilet_heating_manual_timer
+
+        - conditions:
+            - condition: trigger
+              id: target_changed
+            - condition: template
+              value_template: "{{ states('sensor.toilet_target_temperature') | float(0.0) != states('sensor.toilet_desired_temperature') | float(21.0) }}"
+          sequence:
+            - action: timer.start
+              target:
+                entity_id: timer.toilet_heating_manual_timer
+              data:
+                duration: "00:15:00"
+
+        - conditions:
+            - condition: template
+              value_template: "{{ states('sensor.toilet_target_temperature') | float(0.0) == states('sensor.toilet_desired_temperature') | float(21.0) }}"
+            - condition: state
+              entity_id: timer.toilet_heating_manual_timer
+              state: active
+          sequence:
+            - action: timer.cancel
+              target:
+                entity_id: timer.toilet_heating_manual_timer
+
+    - if:
+        - condition: state
+          entity_id: timer.toilet_heating_manual_timer
+          state: idle
+      then:
+        - action: script.set_climate_temperature
+          data:
+            temperature: "{{ states('sensor.toilet_desired_temperature') | float(21.0) }}"
+            entities:
+              - climate.toilet_radiator_thermostat
+            target_sensor: sensor.toilet_target_temperature

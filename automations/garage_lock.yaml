@@ -14,10 +14,10 @@
     from: 'off'
     to: 'on'
     id: sleeping
-  - trigger: numeric_state
-    entity_id: input_number.bedroom_blind_position
-    below: 1
-    id: bedroom_blind_down
+  - trigger: state
+    entity_id: select.bedroom_state
+    to: wind_down
+    id: bedroom_going_to_sleep
   - trigger: state
     entity_id:
     - timer.garage_lock_timer
@@ -38,13 +38,7 @@
           id:
           - no_one_home
           - sleeping
-      - condition: and
-        conditions:
-        - condition: trigger
-          id:
-          - bedroom_blind_down
-        - condition: time
-          after: '20:00:00'
+          - bedroom_going_to_sleep
       - condition: state
         entity_id: lock.garage_lock
         state: unlocked

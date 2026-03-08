@@ -1,71 +1,69 @@
-- id: '1747340588102'
+- id: "1747340588102"
   alias: Toilet lys
   description: Automatik til at styre lys på toilettet
-  triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.toilet_presence
-    from: 'off'
-    to: 'on'
-    id: detected
-  - trigger: state
-    entity_id:
-    - binary_sensor.toilet_presence
-    from: 'on'
-    to: 'off'
-    id: cleared
-  - trigger: state
-    entity_id:
-    - binary_sensor.someone_home
-    from: 'on'
-    to: 'off'
-    id: no_one_home
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id:
-        - detected
-      - condition: state
-        entity_id: binary_sensor.everyone_sleeping
-        state: 'on'
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          brightness_pct: 10
-          transition: 1
-        target:
-          entity_id:
-          - light.toilet_light
-    - conditions:
-      - condition: trigger
-        id:
-        - detected
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          brightness_pct: 100
-          transition: 1
-        target:
-          entity_id:
-          - light.toilet_light
-    - conditions:
-      - condition: trigger
-        id:
-        - cleared
-        - no_one_home
-      sequence:
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 1
-        target:
-          entity_id:
-          - light.toilet_light
   mode: queued
   max: 10
   trace:
     stored_traces: 20
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.toilet_presence
+      from: "off"
+      to: "on"
+      id: detected
+
+    - trigger: state
+      entity_id: binary_sensor.toilet_presence
+      from: "on"
+      to: "off"
+      id: cleared
+
+    - trigger: state
+      entity_id: binary_sensor.someone_home
+      from: "on"
+      to: "off"
+      id: no_one_home
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id:
+                - detected
+            - condition: state
+              entity_id: binary_sensor.everyone_sleeping
+              state: "on"
+          sequence:
+            - action: light.turn_on
+              target:
+                entity_id: light.toilet_light
+              data:
+                brightness_pct: 10
+                transition: 1
+
+        - conditions:
+            - condition: trigger
+              id:
+                - detected
+          sequence:
+            - action: light.turn_on
+              target:
+                entity_id: light.toilet_light
+              data:
+                brightness_pct: 100
+                transition: 1
+
+        - conditions:
+            - condition: trigger
+              id:
+                - cleared
+                - no_one_home
+          sequence:
+            - action: light.turn_off
+              target:
+                entity_id: light.toilet_light
+              data:
+                transition: 1

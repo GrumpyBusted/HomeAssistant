@@ -1,32 +1,35 @@
-- id: '1770568204317'
+- id: "1770568204317"
   alias: Stue TV
   description: Disable entities på TV
-  triggers:
-  - trigger: state
-    entity_id: media_player.living_room_tv_bravia_media_player
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: state
-        entity_id: media_player.living_room_tv_bravia_media_player
-        state: 'off'
-      sequence:
-      - action: homeassistant.disable_entity
-        data:
-          entity_id:
-          - media_player.living_room_tv_dlna_media_player
-          - media_player.living_room_tv_cast_media_player
-          - media_player.living_room_android_tv_media_player
-          - remote.living_room_android_tv_remote
-    default:
-    - action: homeassistant.enable_entity
-      data:
-        entity_id:
-        - media_player.living_room_tv_dlna_media_player
-        - media_player.living_room_tv_cast_media_player
-        - media_player.living_room_android_tv_media_player
-        - remote.living_room_android_tv_remote
   mode: single
   trace:
     stored_traces: 10
+
+  triggers:
+    - trigger: state
+      entity_id: media_player.living_room_tv_bravia_media_player
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: media_player.living_room_tv_bravia_media_player
+              state: "off"
+          sequence:
+            - action: homeassistant.disable_entity
+              data:
+                entity_id:
+                  - media_player.living_room_tv_dlna_media_player
+                  - media_player.living_room_tv_cast_media_player
+                  - media_player.living_room_android_tv_media_player
+                  - remote.living_room_android_tv_remote
+      default:
+        - action: homeassistant.enable_entity
+          data:
+            entity_id:
+              - media_player.living_room_tv_dlna_media_player
+              - media_player.living_room_tv_cast_media_player
+              - media_player.living_room_android_tv_media_player
+              - remote.living_room_android_tv_remote

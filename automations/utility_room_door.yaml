@@ -1,35 +1,40 @@
-- id: '1770410133642'
+- id: "1770410133642"
   alias: Bryggers dør
   description: Automatik til at styre timer til bryggers dør
-  triggers:
-  - trigger: state
-    entity_id: binary_sensor.utility_room_door
-    to: 'off'
-    id: closed
-  - trigger: state
-    entity_id: binary_sensor.utility_room_door
-    to: 'on'
-    id: opened
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id: closed
-      sequence:
-      - action: timer.cancel
-        target:
-          entity_id: timer.utility_room_door_timer
-    - conditions:
-      - condition: trigger
-        id: opened
-      sequence:
-      - action: timer.start
-        target:
-          entity_id: timer.utility_room_door_timer
-        data:
-          duration: 00:00:15
   mode: queued
   max: 10
   trace:
     stored_traces: 50
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.utility_room_door
+      to: "off"
+      id: closed
+
+    - trigger: state
+      entity_id: binary_sensor.utility_room_door
+      to: "on"
+      id: opened
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: closed
+          sequence:
+            - action: timer.cancel
+              target:
+                entity_id: timer.utility_room_door_timer
+
+        - conditions:
+            - condition: trigger
+              id: opened
+          sequence:
+            - action: timer.start
+              target:
+                entity_id: timer.utility_room_door_timer
+              data:
+                duration: "00:00:15"

@@ -53,15 +53,9 @@
     to: 'on'
     id: person_detected
   - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_sleeping
-    to: 'on'
-    id: bedroom_sleeping
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_sleeping
-    to: 'off'
-    id: bedroom_waking
+    entity_id: select.bedroom_state
+    to: sleeping
+    id: sleeping
   - trigger: state
     entity_id: binary_sensor.bedroom_door
     to: 'on'
@@ -124,8 +118,13 @@
         entity_id: binary_sensor.bedroom_door
         state: 'on'
       - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'on'
+        entity_id: select.bedroom_state
+        state: 
+          - wind_down
+          - sleeping
+          - quiet_time
+          - wake_up_soon
+          - wake_up
       - condition: state
         entity_id: binary_sensor.hallway_light
         state: 'off'
@@ -153,8 +152,11 @@
         id:
         - bedroom_door_opened
       - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'on'
+        entity_id: select.bedroom_state
+        state: 
+          - sleeping
+          - quiet_time
+          - wake_up_soon
       - condition: state
         entity_id: binary_sensor.hallway_light
         state: 'on'
@@ -181,8 +183,11 @@
         entity_id: binary_sensor.hallway_presence
         state: 'on'
       - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'on'
+        entity_id: select.bedroom_state
+        state: 
+          - sleeping
+          - quiet_time
+          - wake_up_soon
       - condition: state
         entity_id: binary_sensor.hallway_light
         state: 'off'
@@ -205,7 +210,7 @@
     - conditions:
       - condition: trigger
         id:
-        - bedroom_sleeping
+        - sleeping
       - condition: state
         entity_id: binary_sensor.bedroom_door
         state: 'on'
@@ -242,8 +247,11 @@
         entity_id: binary_sensor.bedroom_door
         state: 'on'
       - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'on'
+        entity_id: select.bedroom_state
+        state: 
+          - sleeping
+          - quiet_time
+          - wake_up_soon
       sequence:
       - variables:
           brightness: 0
@@ -258,8 +266,11 @@
         entity_id: binary_sensor.hallway_light
         state: 'off'
       - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'on'
+        entity_id: select.bedroom_state
+        state: 
+          - sleeping
+          - quiet_time
+          - wake_up_soon
       - condition: state
         entity_id: binary_sensor.monique_sleep_window
         state: 'on'

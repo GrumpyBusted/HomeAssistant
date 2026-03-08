@@ -1,40 +1,46 @@
-- id: '1736106304486'
+- id: "1736106304486"
   alias: Charlies værelse rullegardin stop
   description: Automatik for at stoppe rullegardin på Charlies værelse
-  triggers:
-  - trigger: device
-    device_id: 937baa924ab8fff3bfbd80513dde21d2
-    domain: zha
-    type: remote_button_long_release
-    subtype: open
-    id: open_long_pressed
-  - trigger: device
-    device_id: 937baa924ab8fff3bfbd80513dde21d2
-    domain: zha
-    type: remote_button_long_release
-    subtype: close
-    id: close_long_pressed
-  conditions: []
-  actions:
-  - target:
-      entity_id: automation.charlies_room_blind
-    action: automation.turn_off
-  - action: cover.stop_cover
-    metadata: {}
-    data: {}
-    target:
-      entity_id: cover.charlies_room_blind
-  - delay:
-      seconds: 1
-  - action: input_number.set_value
-    target:
-      entity_id: input_number.charlies_room_blind_position
-    data:
-      value: '{{ state_attr(''cover.charlies_room_blind'', ''current_position'') }}'
-  - target:
-      entity_id: automation.charlies_room_blind
-    action: automation.turn_on
   mode: queued
   max: 10
   trace:
     stored_traces: 20
+
+  triggers:
+    - trigger: device
+      device_id: 937baa924ab8fff3bfbd80513dde21d2
+      domain: zha
+      type: remote_button_long_release
+      subtype: open
+      id: open_long_pressed
+
+    - trigger: device
+      device_id: 937baa924ab8fff3bfbd80513dde21d2
+      domain: zha
+      type: remote_button_long_release
+      subtype: close
+      id: close_long_pressed
+
+  conditions: []
+
+  actions:
+    - action: automation.turn_off
+      target:
+        entity_id: automation.charlies_room_blind
+
+    - action: cover.stop_cover
+      target:
+        entity_id: cover.charlies_room_blind
+
+    - delay:
+        seconds: 1
+
+    - action: input_number.set_value
+      target:
+        entity_id: input_number.charlies_room_blind_position
+      data:
+        value: "{{ state_attr('cover.charlies_room_blind', 'current_position') }}"
+
+    - action: automation.turn_on
+      target:
+        entity_id: automation.charlies_room_blind

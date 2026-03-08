@@ -28,7 +28,7 @@
     to: 'off'
     id: no_one_home
   - trigger: state
-    entity_id: binary_sensor.bedroom_sleeping
+    entity_id: select.bedroom_state
   conditions: []
   actions:
   - variables:
@@ -78,12 +78,16 @@
   - choose:
     - conditions:
       - condition: template
-        value_template: '{{ light == "on" }}
-
-          '
+        value_template: |
+          {{ light == "on" }}
       - condition: state
-        entity_id: binary_sensor.bedroom_sleeping
-        state: 'on'
+        entity_id: select.bedroom_state
+        state: 
+          - wind_down
+          - sleeping
+          - quiet_time
+          - wake_up_soon
+          - wake_up
       sequence:
       - action: light.turn_on
         metadata: {}
@@ -96,9 +100,8 @@
           - light.entrance_lights
     - conditions:
       - condition: template
-        value_template: '{{ light == "on" }}
-
-          '
+        value_template: |
+          {{ light == "on" }}
       sequence:
       - action: light.turn_on
         metadata: {}

@@ -1,73 +1,74 @@
-- id: '1737311656075'
+- id: "1737311656075"
   alias: Bryggers varme
   description: Automatik til at styre varmen på bryggers
-  triggers:
-  - trigger: state
-    entity_id: binary_sensor.someone_home
-  - trigger: state
-    entity_id: sensor.utility_room_target_temperature
-    id: target_changed
-  - trigger: state
-    entity_id: timer.utility_room_heating_manual_timer
-    to: idle
-  - trigger: state
-    entity_id: sensor.utility_room_desired_temperature
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.someone_home
-        state: 'off'
-      - condition: state
-        entity_id: timer.utility_room_heating_manual_timer
-        state: active
-      sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.utility_room_heating_manual_timer
-    - conditions:
-      - condition: trigger
-        id: target_changed
-      - condition: template
-        value_template: '{{ states(''sensor.utility_room_target_temperature'') | float(0.0)
-          != states(''sensor.utility_room_desired_temperature'') | float(21.0) }}'
-      sequence:
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:30:00
-        target:
-          entity_id: timer.utility_room_heating_manual_timer
-    - conditions:
-      - condition: template
-        value_template: '{{ states(''sensor.utility_room_target_temperature'') | float(0.0)
-          == states(''sensor.utility_room_desired_temperature'') | float(21.0) }}'
-      - condition: state
-        entity_id: timer.utility_room_heating_manual_timer
-        state: active
-      sequence:
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.utility_room_heating_manual_timer
-  - if:
-    - condition: state
-      entity_id: timer.utility_room_heating_manual_timer
-      state: idle
-    then:
-    - action: script.set_climate_temperature
-      data:
-        temperature: '{{ states(''sensor.utility_room_desired_temperature'') | float(21.0)
-          }}'
-        entities:
-        - climate.utility_room_radiator_thermostat_wall
-        - climate.utility_room_radiator_thermostat_floor
-        - climate.utility_room_temperature_sensor
-        target_sensor: sensor.utility_room_target_temperature
   mode: restart
   trace:
     stored_traces: 50
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.someone_home
+
+    - trigger: state
+      entity_id: sensor.utility_room_target_temperature
+      id: target_changed
+
+    - trigger: state
+      entity_id: timer.utility_room_heating_manual_timer
+      to: idle
+
+    - trigger: state
+      entity_id: sensor.utility_room_desired_temperature
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.someone_home
+              state: "off"
+            - condition: state
+              entity_id: timer.utility_room_heating_manual_timer
+              state: active
+          sequence:
+            - action: timer.cancel
+              target:
+                entity_id: timer.utility_room_heating_manual_timer
+
+        - conditions:
+            - condition: trigger
+              id: target_changed
+            - condition: template
+              value_template: "{{ states('sensor.utility_room_target_temperature') | float(0.0) != states('sensor.utility_room_desired_temperature') | float(21.0) }}"
+          sequence:
+            - action: timer.start
+              target:
+                entity_id: timer.utility_room_heating_manual_timer
+              data:
+                duration: "00:30:00"
+
+        - conditions:
+            - condition: template
+              value_template: "{{ states('sensor.utility_room_target_temperature') | float(0.0) == states('sensor.utility_room_desired_temperature') | float(21.0) }}"
+            - condition: state
+              entity_id: timer.utility_room_heating_manual_timer
+              state: active
+          sequence:
+            - action: timer.cancel
+              target:
+                entity_id: timer.utility_room_heating_manual_timer
+
+    - if:
+        - condition: state
+          entity_id: timer.utility_room_heating_manual_timer
+          state: idle
+      then:
+        - action: script.set_climate_temperature
+          data:
+            temperature: "{{ states('sensor.utility_room_desired_temperature') | float(21.0) }}"
+            entities:
+              - climate.utility_room_radiator_thermostat_wall
+              - climate.utility_room_radiator_thermostat_floor
+              - climate.utility_room_temperature_sensor
+            target_sensor: sensor.utility_room_target_temperature

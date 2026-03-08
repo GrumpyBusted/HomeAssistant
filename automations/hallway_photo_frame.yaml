@@ -6,8 +6,7 @@
     entity_id:
     - binary_sensor.someone_home
   - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_sleeping
+    entity_id: select.bedroom_state
   - trigger: state
     entity_id:
     - binary_sensor.bedroom_door
@@ -53,8 +52,11 @@
       - condition: and
         conditions:
         - condition: state
-          entity_id: binary_sensor.bedroom_sleeping
-          state: 'on'
+          entity_id: select.bedroom_state
+          state: 
+            - sleeping
+            - quiet_time
+            - wake_up_soon
         - condition: state
           entity_id: binary_sensor.bedroom_door
           state: 'on'
