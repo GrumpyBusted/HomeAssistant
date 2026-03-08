@@ -29,6 +29,12 @@
     entity_id: timer.bedroom_air_purifier_timer
     to: idle
     id: timeout
+  - trigger: numeric_state
+    entity_id: input_number.bedroom_blind_position
+    above: 1
+  - trigger: numeric_state
+    entity_id: input_number.bedroom_blind_position
+    below: 1
   conditions: []
   actions:
   - variables:
