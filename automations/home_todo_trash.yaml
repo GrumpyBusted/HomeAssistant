@@ -14,7 +14,6 @@
 
   actions:
     - action: rest_command.perfect_waste_get_next_address_collection
-      metadata: {}
       data:
         addressID: "17545"
         municipality: 253
@@ -29,7 +28,6 @@
         description_text:
           "Følgende affaldscontainere skal køres op til vejen i dag: <ul> {% for c in containers %}\n  <li>{{ c }}</li>\n{% endfor %} </ul>"
     - action: system_log.write
-      metadata: {}
       data:
         level: debug
         message: '"Pickup date: {{ pickup_date }}"
@@ -41,7 +39,6 @@
               value_template: "{{ status != 200 }}"
           sequence:
             - action: persistent_notification.create
-              metadata: {}
               data:
                 message: "Status: {{ status }}
 
@@ -53,7 +50,6 @@
               value_template: "{{ pickup_date == tomorrow }}"
           sequence:
             - action: input_datetime.set_datetime
-              metadata: {}
               data:
                 date: "{{ pickup_date }}"
               target:

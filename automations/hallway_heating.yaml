@@ -33,8 +33,6 @@
               state: active
           sequence:
             - action: timer.cancel
-              metadata: {}
-              data: {}
               target:
                 entity_id: timer.hallway_heating_manual_timer
 
@@ -45,7 +43,6 @@
               value_template: "{{ states('sensor.hallway_target_temperature') | float(0.0) != states('sensor.hallway_desired_temperature') | float(21.0) }}"
           sequence:
             - action: timer.start
-              metadata: {}
               data:
                 duration: 00:30:00
               target:
@@ -59,8 +56,6 @@
               state: active
           sequence:
             - action: timer.cancel
-              metadata: {}
-              data: {}
               target:
                 entity_id: timer.hallway_heating_manual_timer
 

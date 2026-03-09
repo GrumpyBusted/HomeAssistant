@@ -22,4 +22,3 @@
 
   actions:
     - action: shell_command.pushupdates_to_github
-      data: {}

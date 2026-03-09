@@ -84,8 +84,6 @@
                 - button_1
           sequence:
             - action: light.turn_off
-              metadata: {}
-              data: {}
               target:
                 entity_id:
                   - light.garage_lights
@@ -96,8 +94,6 @@
                 - button_2
           sequence:
             - action: light.toggle
-              metadata: {}
-              data: {}
               target:
                 entity_id: light.garage_light_main
 
@@ -107,8 +103,6 @@
                 - button_3
           sequence:
             - action: light.toggle
-              metadata: {}
-              data: {}
               target:
                 entity_id: light.garage_light_spots
 
@@ -118,8 +112,6 @@
                 - button_4
           sequence:
             - action: light.toggle
-              metadata: {}
-              data: {}
               target:
                 entity_id: light.garage_light_projector
 
@@ -130,8 +122,6 @@
                 - unlocked
           sequence:
             - action: light.turn_on
-              metadata: {}
-              data: {}
               target:
                 entity_id: light.garage_light_main
 
@@ -143,8 +133,6 @@
                 - sleeping
           sequence:
             - action: light.turn_off
-              metadata: {}
-              data: {}
               target:
                 entity_id:
                   - light.garage_lights
@@ -158,8 +146,6 @@
               state: locked
           sequence:
             - action: light.turn_off
-              metadata: {}
-              data: {}
               target:
                 entity_id:
                   - light.garage_lights

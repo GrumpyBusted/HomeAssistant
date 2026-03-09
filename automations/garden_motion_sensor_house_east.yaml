@@ -40,7 +40,6 @@
                 - cleared
           sequence:
             - action: timer.start
-              metadata: {}
               data:
                 duration: 00:03:00
               target:

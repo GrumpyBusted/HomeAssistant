@@ -23,12 +23,10 @@
 
   actions:
     - action: shell_command.csv_to_json
-      metadata: {}
       data:
         csvfile: /config/data/meter_reading_electricity.csv
         jsonfile: /config/data/meter_reading_electricity.json
     - action: file.read_file
-      metadata: {}
       data:
         file_name: /config/data/meter_reading_electricity.json
         file_encoding: JSON

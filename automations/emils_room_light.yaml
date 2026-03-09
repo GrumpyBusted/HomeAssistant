@@ -82,7 +82,6 @@
                 - emil_home
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2700
@@ -97,7 +96,6 @@
                 - button_1_long
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 3000
@@ -116,7 +114,6 @@
                 - button_3
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 60
                 color_temp_kelvin: 2300
@@ -131,7 +128,6 @@
                 - button_2
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 0.5
                 brightness_step_pct: 10
@@ -145,7 +141,6 @@
                 - button_3
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 0.5
                 brightness_step_pct: -10
@@ -159,7 +154,6 @@
                 - button_4
           sequence:
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:
@@ -179,7 +173,6 @@
               state: "off"
           sequence:
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:
@@ -198,7 +191,6 @@
               state: "off"
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 60
                 color_temp_kelvin: 2700
@@ -220,7 +212,6 @@
               above: 30
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 10
                 brightness: 30

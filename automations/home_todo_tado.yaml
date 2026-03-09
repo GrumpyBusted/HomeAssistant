@@ -78,7 +78,6 @@
         count: "{{ devices | length }}"
         sequence:
           - action: system_log.write
-            metadata: {}
             data:
               level: debug
               message: "{{ devices[repeat.index - 1] }}"

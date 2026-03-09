@@ -73,7 +73,6 @@
               - automation.utility_room_heating
               - automation.toilet_heating
         - action: automation.trigger
-          metadata: {}
           target:
             entity_id:
               - automation.bathroom_heating

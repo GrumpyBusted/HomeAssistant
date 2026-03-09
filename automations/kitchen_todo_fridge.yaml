@@ -59,15 +59,15 @@
                 related_entity_id: binary_sensor.kitchen_fridge_filter_status
                 entity_id: todo.todo_smart_todo
                 is_active: "{{ is_state('binary_sensor.kitchen_fridge_filter_status', 'on') }}"
+
         - conditions:
             - condition: trigger
               id: todo_completed
           sequence:
             - action: button.press
-              metadata: {}
               target:
                 entity_id: button.kitchen_fridge_reset_water_filter
-              data: {}
+
         - conditions:
             - condition: trigger
               id: fridge_door_open
@@ -80,6 +80,7 @@
                 persistent: false
                 recipient: home
                 message: Døren på køleskabet i køkkenet har været åben længe
+
         - conditions:
             - condition: trigger
               id: freezer_door_open
@@ -92,6 +93,7 @@
                 persistent: false
                 recipient: home
                 message: Døren på fryseren i køkkenet har været åben længe
+
         - conditions:
             - condition: trigger
               id: fridge_to_warm
@@ -104,6 +106,7 @@
                 persistent: false
                 recipient: home
                 message: Køleskabet i køkkenet er for varmt, temperaturen er {{ states('sensor.kitchen_fridge_fridge_temperature') | round(1) }} °C, skal være under 6 °C
+
         - conditions:
             - condition: trigger
               id: freezer_to_warm
@@ -116,6 +119,7 @@
                 persistent: false
                 recipient: home
                 message: Fryseren i køkkenet er for varmt, temperaturen er {{ states('sensor.kitchen_fridge_freezer_temperature') | round(1) }} °C, skal være under -17 °C
+
         - conditions:
             - condition: trigger
               id: periodic

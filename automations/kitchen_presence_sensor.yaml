@@ -50,7 +50,6 @@
                 value: "{% set start = states('input_datetime.kitchen_presence_sensor_start') | as_datetime | as_local %} {% set seconds = states('input_number.kitchen_presence_sensor_seconds') | float(0.0) %} {% set duration = (as_timestamp(now()) - as_timestamp(start)) | round(1) %} {{ seconds + duration }}"
               action: input_number.set_value
             - action: timer.start
-              metadata: {}
               data:
                 duration: 00:03:00
               target:

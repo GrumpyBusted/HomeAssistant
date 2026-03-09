@@ -79,7 +79,6 @@
               state: locked
           sequence:
             - action: lock.unlock
-              metadata: {}
               data:
                 code: "{{ states('sensor.yale_code_anders') }}"
               target:
@@ -94,7 +93,6 @@
               state: locked
           sequence:
             - action: lock.unlock
-              metadata: {}
               data:
                 code: "{{ states('sensor.yale_code_monique') }}"
               target:
@@ -109,7 +107,6 @@
               state: locked
           sequence:
             - action: lock.unlock
-              metadata: {}
               data:
                 code: "{{ states('sensor.yale_code_emil') }}"
               target:
@@ -124,7 +121,6 @@
               state: locked
           sequence:
             - action: lock.unlock
-              metadata: {}
               data:
                 code: "{{ states('sensor.yale_code_charlie') }}"
               target:
@@ -144,12 +140,9 @@
                 - unlocked
           sequence:
             - action: lock.lock
-              metadata: {}
-              data: {}
               target:
                 entity_id: lock.entrance_lock
             - action: timer.start
-              metadata: {}
               data:
                 duration: 00:00:10
               target:

@@ -27,10 +27,8 @@
                 - not_home
           sequence:
             - action: media_player.turn_off
-              metadata: {}
               target:
                 entity_id: media_player.emils_room_apple_tv_media_player
-              data: {}
 
         - conditions:
             - condition: trigger
@@ -44,7 +42,5 @@
               state: "off"
           sequence:
             - action: media_player.turn_off
-              metadata: {}
               target:
                 entity_id: media_player.emils_room_apple_tv_media_player
-              data: {}

@@ -16,7 +16,6 @@
 
   actions:
     - action: input_datetime.set_datetime
-      metadata: {}
       data:
         datetime: "{{ now() + timedelta(seconds=10) }}"
       target:

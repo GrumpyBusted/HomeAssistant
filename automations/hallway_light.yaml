@@ -400,7 +400,6 @@
                 - button_4
           sequence:
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:

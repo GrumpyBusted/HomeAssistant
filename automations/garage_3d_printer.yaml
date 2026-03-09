@@ -63,7 +63,6 @@
               id: finished
           sequence:
             - action: timer.start
-              metadata: {}
               target:
                 entity_id: timer.garage_3d_printer_timer
               data:
@@ -163,7 +162,6 @@
             - delay:
                 seconds: 3
             - action: timer.start
-              metadata: {}
               target:
                 entity_id: timer.garage_3d_printer_timer
               data:

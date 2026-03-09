@@ -115,7 +115,6 @@
                 - thu
           sequence:
             - action: script.living_room_robot_vacuum_start_cleaning
-              metadata: {}
               data:
                 type: vac_mop
                 timeout: 30
@@ -135,7 +134,6 @@
               state: hallway_cleaning
           sequence:
             - action: script.living_room_robot_vacuum_start_cleaning
-              metadata: {}
               data:
                 type: vac_mop_low
                 timeout: 30

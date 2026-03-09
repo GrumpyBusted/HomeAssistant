@@ -122,7 +122,6 @@
                 - button_1_short
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2700
@@ -135,7 +134,6 @@
                   - light.kitchen_light_pendant_sink_left
                   - light.kitchen_light_pendant_sink_right
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:
@@ -153,7 +151,6 @@
                 - button_2_short
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2300
@@ -162,7 +159,6 @@
                 entity_id:
                   - light.kitchen_light_strip_countertop
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2300
@@ -174,7 +170,6 @@
                   - light.kitchen_light_pendant_sink_left
                   - light.kitchen_light_pendant_sink_right
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:
@@ -192,7 +187,6 @@
                 - button_3_short
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2700
@@ -205,7 +199,6 @@
                   - light.kitchen_light_pendant_sink_right
                   - light.kitchen_light_strip_countertop
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2700
@@ -225,7 +218,6 @@
                 - button_4_short
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 3000
@@ -245,7 +237,6 @@
                 - living_room_light_off
           sequence:
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:
@@ -270,7 +261,6 @@
               state: "off"
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2300
@@ -294,7 +284,6 @@
               state: "off"
           sequence:
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:
@@ -307,7 +296,6 @@
                 - person_detected
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2700
@@ -320,7 +308,6 @@
                   - light.kitchen_light_pendant_sink_left
                   - light.kitchen_light_pendant_sink_right
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:
@@ -341,7 +328,6 @@
               state: "on"
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2300
@@ -350,7 +336,6 @@
                 entity_id:
                   - light.kitchen_light_strip_countertop
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2300
@@ -362,7 +347,6 @@
                   - light.kitchen_light_pendant_sink_left
                   - light.kitchen_light_pendant_sink_right
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:
@@ -383,7 +367,6 @@
               state: "on"
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2700
@@ -396,7 +379,6 @@
                   - light.kitchen_light_pendant_sink_left
                   - light.kitchen_light_pendant_sink_right
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:
@@ -414,7 +396,6 @@
                 - living_room_light_on
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2300
@@ -423,7 +404,6 @@
                 entity_id:
                   - light.kitchen_light_strip_countertop
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2300
@@ -435,7 +415,6 @@
                   - light.kitchen_light_pendant_sink_left
                   - light.kitchen_light_pendant_sink_right
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:
@@ -456,7 +435,6 @@
               state: "off"
           sequence:
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:
@@ -479,7 +457,6 @@
                       state: "off"
                   sequence:
                     - action: light.turn_on
-                      metadata: {}
                       data:
                         brightness_pct: "{{ (state_attr('event.kitchen_switch_rotary', 'steps')|float / 3.60)|round(0) }}"
                       target:
@@ -491,14 +468,12 @@
                       state: clock_wise
                   sequence:
                     - action: light.turn_on
-                      metadata: {}
                       data:
                         brightness_step_pct: "{{ (state_attr('event.kitchen_switch_rotary', 'steps')|float / 3.60)|round(0) }}"
                       target:
                         entity_id: "{{ state_attr('light.kitchen_lights', 'entity_id') |  expand() | selectattr('state', 'eq', 'on') |  map(attribute='entity_id') | list }}"
               default:
                 - action: light.turn_on
-                  metadata: {}
                   data:
                     brightness_step_pct: "{{ (state_attr('event.kitchen_switch_rotary', 'steps')|float / -3.60)|round(0) }}"
                   target:

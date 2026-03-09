@@ -46,8 +46,7 @@
 
   actions:
     - variables:
-        mode: "off"
-
+        mode: 'off' 
     - choose:
         - conditions:
             - condition: state

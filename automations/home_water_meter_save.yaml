@@ -15,7 +15,6 @@
 
   actions:
     - action: shell_command.append_to_file
-      metadata: {}
       data:
         line: "{{ (state_attr('sensor.home_water_meter', 'timestamp') | as_datetime).strftime('%Y-%m-%dT%H:%M:%S') }},{{ state_attr('sensor.home_water_meter', 'total_m3') }}"
         file: /config/data/meter_reading_water.csv

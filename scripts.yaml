@@ -4,325 +4,319 @@ charlies_room_light_desk_adjust:
   mode: queued
   max: 10
   sequence:
-  - variables:
-      light_entity: light.charlies_room_light_desk_mid
-      step: '{{ brightness_step | int }}'
-  - action: light.turn_on
-    target:
-      entity_id:
-      - light.charlies_room_light_desk_left
-      - light.charlies_room_light_desk_mid
-      - light.charlies_room_light_desk_right
-    data:
-      transition: 0.5
-      brightness: "{% set current_brightness = state_attr(light_entity, 'brightness')
-        | int(0) %} {% if is_state('input_boolean.charlies_room_light_desk_brightness_up',
-        'on') %}\n  {% set new_brightness = current_brightness + step %}\n  {% if
-        new_brightness > 255 %}\n    {{ 255 }}\n  {% else %}\n    {{ new_brightness
-        }}\n  {% endif %}\n{% else %}\n  {% set new_brightness = current_brightness
-        - step %}\n  {% if new_brightness < 0 %}\n    {{ 0 }}\n  {% else %}\n    {{
-        new_brightness }}\n  {% endif %}\n{% endif %}\n"
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ is_state(''input_boolean.charlies_room_light_desk_brightness_up'',
-          ''on'') and state_attr(light_entity, ''brightness'') | int(0) >= 255 }}
+    - variables:
+        light_entity: light.charlies_room_light_desk_mid
+        step: "{{ brightness_step | int }}"
+    - action: light.turn_on
+      target:
+        entity_id:
+          - light.charlies_room_light_desk_left
+          - light.charlies_room_light_desk_mid
+          - light.charlies_room_light_desk_right
+      data:
+        transition: 0.5
+        brightness:
+          "{% set current_brightness = state_attr(light_entity, 'brightness') | int(0) %} {% if is_state('input_boolean.charlies_room_light_desk_brightness_up', 'on') %}\n  {% set new_brightness = current_brightness + step %}\n  {% if new_brightness > 255 %}\n    {{ 255 }}\n  {% else %}\n    {{ new_brightness }}\n  {% endif %}\n{% else %}\n  {% set new_brightness = current_brightness - step %}\n  {% if new_brightness < 0 %}\n    {{ 0 }}\n  {% else %}\n    {{ new_brightness }}\n  {% endif %}\n{% endif %}\n"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template:
+                "{{ is_state('input_boolean.charlies_room_light_desk_brightness_up', 'on') and state_attr(light_entity, 'brightness') | int(0) >= 255 }}
 
-          '
-      sequence:
-      - action: input_boolean.turn_off
-        target:
-          entity_id: input_boolean.charlies_room_light_desk_brightness_up
-    - conditions:
-      - condition: template
-        value_template: '{{ is_state(''input_boolean.charlies_room_light_desk_brightness_up'',
-          ''off'') and state_attr(light_entity, ''brightness'') | int(0) <= 0 }}
+                "
+          sequence:
+            - action: input_boolean.turn_off
+              target:
+                entity_id: input_boolean.charlies_room_light_desk_brightness_up
+        - conditions:
+            - condition: template
+              value_template:
+                "{{ is_state('input_boolean.charlies_room_light_desk_brightness_up', 'off') and state_attr(light_entity, 'brightness') | int(0) <= 0 }}
 
-          '
-      sequence:
-      - action: input_boolean.turn_on
-        target:
-          entity_id: input_boolean.charlies_room_light_desk_brightness_up
+                "
+          sequence:
+            - action: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.charlies_room_light_desk_brightness_up
 bedroom_light_sunrise:
   alias: Soveværelse lys solopgang scene
   description: Lys scene til soveværelse til vågn op
   mode: restart
   sequence:
-  - event: bedroom_light_sunrise_script
-  - choose:
-    - conditions:
-      - condition: state
-        entity_id: light.bedroom_lights
-        state: 'off'
-      sequence:
-      - action: light.turn_on
-        data:
-          transition: 240
-          brightness: 100
-          rgb_color:
-          - 102
-          - 102
-          - 255
-        target:
-          entity_id:
-          - light.bedroom_light_anders
-      - action: timer.start
-        data:
-          duration: 60
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
-    - conditions:
-      - condition: state
-        entity_id: light.bedroom_light_monique
-        state: 'off'
-      - condition: numeric_state
-        entity_id: light.bedroom_light_anders
-        attribute: brightness
-        above: 1
-        below: 170
-      sequence:
-      - action: light.turn_on
-        data:
-          transition: 180
-          brightness: 100
-          rgb_color:
-          - 204
-          - 153
-          - 255
-        target:
-          entity_id:
-          - light.bedroom_light_monique
-      - action: timer.start
-        data:
-          duration: 60
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
-    - conditions:
-      - condition: state
-        entity_id: light.bedroom_light_window
-        state: 'off'
-      - condition: numeric_state
-        entity_id:
-        - light.bedroom_light_anders
-        - light.bedroom_light_monique
-        attribute: brightness
-        above: 1
-        below: 170
-      sequence:
-      - action: light.turn_on
-        data:
-          transition: 120
-          brightness: 100
-          rgb_color:
-          - 255
-          - 183
-          - 94
-        target:
-          entity_id:
-          - light.bedroom_light_window
-      - action: timer.start
-        data:
-          duration: 60
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
-    - conditions:
-      - condition: state
-        entity_id: light.bedroom_light_closet
-        state: 'off'
-      - condition: numeric_state
-        entity_id:
-        - light.bedroom_light_anders
-        - light.bedroom_light_monique
-        - light.bedroom_light_window
-        attribute: brightness
-        above: 1
-        below: 170
-      sequence:
-      - action: light.turn_on
-        data:
-          transition: 60
-          brightness: 100
-          rgb_color:
-          - 255
-          - 128
-          - 128
-        target:
-          entity_id:
-          - light.bedroom_light_closet
-      - action: timer.start
-        data:
-          duration: 60
-        target:
-          entity_id: timer.bedroom_light_sunrise_delay_timer
-    default:
-    - action: light.turn_on
-      data:
-        transition: 60
-        color_temp_kelvin: 2700
-        brightness_pct: 80
-      target:
-        entity_id: light.bedroom_lights
+    - event: bedroom_light_sunrise_script
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: light.bedroom_lights
+              state: "off"
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 240
+                brightness: 100
+                rgb_color:
+                  - 102
+                  - 102
+                  - 255
+              target:
+                entity_id:
+                  - light.bedroom_light_anders
+            - action: timer.start
+              data:
+                duration: 60
+              target:
+                entity_id: timer.bedroom_light_sunrise_delay_timer
+        - conditions:
+            - condition: state
+              entity_id: light.bedroom_light_monique
+              state: "off"
+            - condition: numeric_state
+              entity_id: light.bedroom_light_anders
+              attribute: brightness
+              above: 1
+              below: 170
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 180
+                brightness: 100
+                rgb_color:
+                  - 204
+                  - 153
+                  - 255
+              target:
+                entity_id:
+                  - light.bedroom_light_monique
+            - action: timer.start
+              data:
+                duration: 60
+              target:
+                entity_id: timer.bedroom_light_sunrise_delay_timer
+        - conditions:
+            - condition: state
+              entity_id: light.bedroom_light_window
+              state: "off"
+            - condition: numeric_state
+              entity_id:
+                - light.bedroom_light_anders
+                - light.bedroom_light_monique
+              attribute: brightness
+              above: 1
+              below: 170
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 120
+                brightness: 100
+                rgb_color:
+                  - 255
+                  - 183
+                  - 94
+              target:
+                entity_id:
+                  - light.bedroom_light_window
+            - action: timer.start
+              data:
+                duration: 60
+              target:
+                entity_id: timer.bedroom_light_sunrise_delay_timer
+        - conditions:
+            - condition: state
+              entity_id: light.bedroom_light_closet
+              state: "off"
+            - condition: numeric_state
+              entity_id:
+                - light.bedroom_light_anders
+                - light.bedroom_light_monique
+                - light.bedroom_light_window
+              attribute: brightness
+              above: 1
+              below: 170
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 60
+                brightness: 100
+                rgb_color:
+                  - 255
+                  - 128
+                  - 128
+              target:
+                entity_id:
+                  - light.bedroom_light_closet
+            - action: timer.start
+              data:
+                duration: 60
+              target:
+                entity_id: timer.bedroom_light_sunrise_delay_timer
+      default:
+        - action: light.turn_on
+          data:
+            transition: 60
+            color_temp_kelvin: 2700
+            brightness_pct: 80
+          target:
+            entity_id: light.bedroom_lights
 bedroom_light_sunset:
   alias: Soveværelse lys solnedgang scene
   description: Lys scene til soveværelse til gå i seng
   mode: single
   sequence:
-  - if:
-    - condition: state
-      entity_id: binary_sensor.bedroom_light
-      state: 'off'
-    then:
-    - action: light.turn_on
-      data:
-        transition: 1
-        brightness_pct: 80
-        color_temp_kelvin: 2700
-      target:
-        entity_id: light.bedroom_lights
-  - parallel:
-    - action: light.turn_on
-      data:
-        transition: 5
-        brightness: '{{ brightness_from }}'
-        rgb_color:
-        - 204
-        - 51
-        - 63
-      target:
-        entity_id:
-        - light.bedroom_light_anders
-    - action: light.turn_on
-      data:
-        transition: 5
-        brightness: '{{ brightness_from }}'
-        rgb_color:
-        - 153
-        - 102
-        - 204
-      target:
-        entity_id:
-        - light.bedroom_light_monique
-    - action: light.turn_on
-      data:
-        transition: 5
-        brightness: '{{ brightness_from }}'
-        rgb_color:
-        - 255
-        - 94
-        - 77
-      target:
-        entity_id:
-        - light.bedroom_light_closet
-    - action: light.turn_on
-      data:
-        transition: 5
-        brightness: '{{ brightness_from }}'
-        rgb_color:
-        - 255
-        - 140
-        - 148
-      target:
-        entity_id:
-        - light.bedroom_light_window
-  - delay:
-      seconds: 5
-  - parallel:
-    - action: light.turn_on
-      data:
-        transition: '{{ transition }}'
-        brightness: '{{ brightness_to }}'
-        rgb_color:
-        - 204
-        - 51
-        - 63
-      target:
-        entity_id:
-        - light.bedroom_light_anders
-    - action: light.turn_on
-      data:
-        transition: '{{ transition }}'
-        brightness: '{{ brightness_to }}'
-        rgb_color:
-        - 153
-        - 102
-        - 204
-      target:
-        entity_id:
-        - light.bedroom_light_monique
-    - action: light.turn_on
-      data:
-        transition: '{{ transition }}'
-        brightness: '{{ [brightness_to, 128] | max }}'
-        rgb_color:
-        - 255
-        - 214
-        - 170
-      target:
-        entity_id:
-        - light.bedroom_light_closet
-    - action: light.turn_on
-      data:
-        transition: '{{ transition }}'
-        brightness: '{{ brightness_to }}'
-        rgb_color:
-        - 255
-        - 140
-        - 148
-      target:
-        entity_id:
-        - light.bedroom_light_window
+    - if:
+        - condition: state
+          entity_id: binary_sensor.bedroom_light
+          state: "off"
+      then:
+        - action: light.turn_on
+          data:
+            transition: 1
+            brightness_pct: 80
+            color_temp_kelvin: 2700
+          target:
+            entity_id: light.bedroom_lights
+    - parallel:
+        - action: light.turn_on
+          data:
+            transition: 5
+            brightness: "{{ brightness_from }}"
+            rgb_color:
+              - 204
+              - 51
+              - 63
+          target:
+            entity_id:
+              - light.bedroom_light_anders
+        - action: light.turn_on
+          data:
+            transition: 5
+            brightness: "{{ brightness_from }}"
+            rgb_color:
+              - 153
+              - 102
+              - 204
+          target:
+            entity_id:
+              - light.bedroom_light_monique
+        - action: light.turn_on
+          data:
+            transition: 5
+            brightness: "{{ brightness_from }}"
+            rgb_color:
+              - 255
+              - 94
+              - 77
+          target:
+            entity_id:
+              - light.bedroom_light_closet
+        - action: light.turn_on
+          data:
+            transition: 5
+            brightness: "{{ brightness_from }}"
+            rgb_color:
+              - 255
+              - 140
+              - 148
+          target:
+            entity_id:
+              - light.bedroom_light_window
+    - delay:
+        seconds: 5
+    - parallel:
+        - action: light.turn_on
+          data:
+            transition: "{{ transition }}"
+            brightness: "{{ brightness_to }}"
+            rgb_color:
+              - 204
+              - 51
+              - 63
+          target:
+            entity_id:
+              - light.bedroom_light_anders
+        - action: light.turn_on
+          data:
+            transition: "{{ transition }}"
+            brightness: "{{ brightness_to }}"
+            rgb_color:
+              - 153
+              - 102
+              - 204
+          target:
+            entity_id:
+              - light.bedroom_light_monique
+        - action: light.turn_on
+          data:
+            transition: "{{ transition }}"
+            brightness: "{{ [brightness_to, 128] | max }}"
+            rgb_color:
+              - 255
+              - 214
+              - 170
+          target:
+            entity_id:
+              - light.bedroom_light_closet
+        - action: light.turn_on
+          data:
+            transition: "{{ transition }}"
+            brightness: "{{ brightness_to }}"
+            rgb_color:
+              - 255
+              - 140
+              - 148
+          target:
+            entity_id:
+              - light.bedroom_light_window
 living_room_robot_vacuum_dock:
   alias: Stue robotstøvsuger dock
   description: Returner robotstøvsuger til docking station
   sequence:
-  - action: timer.cancel
-    target:
-      entity_id: timer.living_room_robot_vacuum_timer
-  - action: switch.turn_on
-    target:
-      entity_id: switch.living_room_robot_vacuum_do_not_disturb
-  - action: time.set_value
-    target:
-      entity_id: time.living_room_robot_vacuum_do_not_disturb_begin
-    data:
-      time: 00:00:00
-  - action: time.set_value
-    target:
-      entity_id: time.living_room_robot_vacuum_do_not_disturb_end
-    data:
-      time: '23:59:59'
-  - if:
-    - condition: not
-      conditions:
-      - condition: state
-        entity_id: vacuum.living_room_robot_vacuum
-        state: docked
-    then:
-    - action: vacuum.return_to_base
+    - action: timer.cancel
       target:
-        entity_id: vacuum.living_room_robot_vacuum
+        entity_id: timer.living_room_robot_vacuum_timer
+    - action: switch.turn_on
+      target:
+        entity_id: switch.living_room_robot_vacuum_do_not_disturb
+    - action: time.set_value
+      target:
+        entity_id: time.living_room_robot_vacuum_do_not_disturb_begin
+      data:
+        time: 00:00:00
+    - action: time.set_value
+      target:
+        entity_id: time.living_room_robot_vacuum_do_not_disturb_end
+      data:
+        time: "23:59:59"
+    - if:
+        - condition: not
+          conditions:
+            - condition: state
+              entity_id: vacuum.living_room_robot_vacuum
+              state: docked
+      then:
+        - action: vacuum.return_to_base
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
 living_room_robot_vacuum_empty_dust_bin:
   alias: Stue robotstøvsuger tøm støvbeholder
   description: Tøm støvbeholder i robotstøvsuger over i docking station
   sequence:
-  - if:
-    - condition: state
-      entity_id: vacuum.living_room_robot_vacuum
-      state: docked
-    then:
-    - action: vacuum.send_command
-      data:
-        command: app_start_collect_dust
-      target:
-        entity_id: vacuum.living_room_robot_vacuum
-    - delay:
-        seconds: 60
-    - action: input_number.set_value
-      data:
-        value: '{{ states(''sensor.living_room_robot_vacuum_total_cleaning_time'')|int
-          }}'
-      target:
-        entity_id: input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin
+    - if:
+        - condition: state
+          entity_id: vacuum.living_room_robot_vacuum
+          state: docked
+      then:
+        - action: vacuum.send_command
+          data:
+            command: app_start_collect_dust
+          target:
+            entity_id: vacuum.living_room_robot_vacuum
+        - delay:
+            seconds: 60
+        - action: input_number.set_value
+          data:
+            value: "{{ states('sensor.living_room_robot_vacuum_total_cleaning_time')|int }}"
+          target:
+            entity_id: input_number.living_room_robot_vacuum_total_cleaning_time_last_empty_dust_bin
 living_room_robot_vacuum_start_cleaning:
   alias: Stue robotstøvsuger start rengøring
   description: Start robotstøvsuger med at gøre rent i et bestemt rum
@@ -337,12 +331,12 @@ living_room_robot_vacuum_start_cleaning:
       selector:
         select:
           options:
-          - vac
-          - vac_low
-          - mop
-          - mop_low
-          - vac_mop
-          - vac_mop_low
+            - vac
+            - vac_low
+            - mop
+            - mop_low
+            - vac_mop
+            - vac_mop_low
       default: vac
     timeout:
       name: Tidsgrænse
@@ -362,298 +356,287 @@ living_room_robot_vacuum_start_cleaning:
       selector:
         object: {}
       default:
-      - Gang
+        - Gang
   sequence:
-  - action: system_log.write
-    data:
-      message: 'Type: {{ type }} - Timeout: {{ timeout }} - Rooms: {{ rooms }}'
-      level: debug
-  - action: roborock.get_maps
-    target:
-      entity_id: vacuum.living_room_robot_vacuum
-    response_variable: response
-  - variables:
-      room_ids: "{% set all_rooms = response['vacuum.living_room_robot_vacuum']['maps'][0]['rooms']
-        %} {% set wanted_rooms = rooms %}  {% set room_ids = namespace(value=[]) %}
-        {% for key, value in all_rooms.items() %}\n    {% if value in wanted_rooms
-        %}\n        {% set room_ids.value = room_ids.value + [key] %}\n    {% endif
-        %}\n{% endfor %} {{ room_ids.value }}        "
-  - action: system_log.write
-    data:
-      message: 'Room ids: {{ room_ids }}'
-      level: debug
-  - action: switch.turn_on
-    target:
-      entity_id: switch.living_room_robot_vacuum_do_not_disturb
-  - action: time.set_value
-    target:
-      entity_id: time.living_room_robot_vacuum_do_not_disturb_begin
-    data:
-      time: 00:00:00
-  - action: time.set_value
-    metadata: {}
-    target:
-      entity_id: time.living_room_robot_vacuum_do_not_disturb_end
-    data:
-      time: '23:59:59'
-  - if:
-    - condition: state
-      entity_id: vacuum.living_room_robot_vacuum
-      state: docked
-    then:
-    - action: timer.start
+    - action: system_log.write
       data:
-        duration: '{{ (timeout | int * 60) | timestamp_custom(''%H:%M:%S'', false)
-          }}
-
-          '
+        message: "Type: {{ type }} - Timeout: {{ timeout }} - Rooms: {{ rooms }}"
+        level: debug
+    - action: roborock.get_maps
       target:
-        entity_id: timer.living_room_robot_vacuum_timer
-    - choose:
-      - conditions:
-        - condition: template
-          value_template: '{{ type == ''vac'' }}'
-        sequence:
-        - action: vacuum.send_command
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
+        entity_id: vacuum.living_room_robot_vacuum
+      response_variable: response
+    - variables:
+        room_ids:
+          "{% set all_rooms = response['vacuum.living_room_robot_vacuum']['maps'][0]['rooms'] %} {% set wanted_rooms = rooms %}  {% set room_ids = namespace(value=[]) %} {% for key, value in all_rooms.items() %}\n    {% if value in wanted_rooms %}\n        {% set room_ids.value = room_ids.value + [key] %}\n    {% endif %}\n{% endfor %} {{ room_ids.value }}        "
+    - action: system_log.write
+      data:
+        message: "Room ids: {{ room_ids }}"
+        level: debug
+    - action: switch.turn_on
+      target:
+        entity_id: switch.living_room_robot_vacuum_do_not_disturb
+    - action: time.set_value
+      target:
+        entity_id: time.living_room_robot_vacuum_do_not_disturb_begin
+      data:
+        time: 00:00:00
+    - action: time.set_value
+      target:
+        entity_id: time.living_room_robot_vacuum_do_not_disturb_end
+      data:
+        time: "23:59:59"
+    - if:
+        - condition: state
+          entity_id: vacuum.living_room_robot_vacuum
+          state: docked
+      then:
+        - action: timer.start
           data:
-            command: set_water_box_custom_mode
-            params:
-              water_box_mode: 200
-        - action: vacuum.set_fan_speed
-          metadata: {}
-          data:
-            fan_speed: max_plus
+            duration: "{{ (timeout | int * 60) | timestamp_custom('%H:%M:%S', false) }}
+
+              "
           target:
-            entity_id: vacuum.living_room_robot_vacuum
-        - action: select.select_option
-          target:
-            entity_id: select.living_room_robot_vacuum_mop_intensity
-          data:
-            option: 'off'
-        - action: select.select_option
-          target:
-            entity_id: select.living_room_robot_vacuum_mop_mode
-          data:
-            option: standard
-        - action: vacuum.send_command
-          data:
-            command: app_segment_clean
-            params:
-            - segments: '{{ room_ids }}'
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-      - conditions:
-        - condition: template
-          value_template: '{{ type == ''vac_low'' }}'
-        sequence:
-        - action: vacuum.send_command
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-          data:
-            command: set_water_box_custom_mode
-            params:
-              water_box_mode: 200
-        - action: vacuum.set_fan_speed
-          metadata: {}
-          data:
-            fan_speed: quiet
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-        - action: select.select_option
-          target:
-            entity_id: select.living_room_robot_vacuum_mop_intensity
-          data:
-            option: 'off'
-        - action: select.select_option
-          target:
-            entity_id: select.living_room_robot_vacuum_mop_mode
-          data:
-            option: standard
-        - action: vacuum.send_command
-          data:
-            command: app_segment_clean
-            params:
-            - segments: '{{ room_ids }}'
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-      - conditions:
-        - condition: template
-          value_template: '{{ type == ''mop'' }}'
-        sequence:
-        - action: vacuum.send_command
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-          data:
-            command: set_water_box_custom_mode
-            params:
-              water_box_mode: 203
-        - action: vacuum.send_command
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-          data:
-            command: app_start_wash
-        - action: vacuum.set_fan_speed
-          metadata: {}
-          data:
-            fan_speed: 'off'
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-        - action: select.select_option
-          target:
-            entity_id: select.living_room_robot_vacuum_mop_intensity
-          data:
-            option: intense
-        - action: select.select_option
-          target:
-            entity_id: select.living_room_robot_vacuum_mop_mode
-          data:
-            option: deep_plus
-        - action: vacuum.send_command
-          data:
-            command: app_segment_clean
-            params:
-            - segments: '{{ room_ids }}'
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-        - action: vacuum.send_command
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-          data:
-            command: app_start_wash
-      - conditions:
-        - condition: template
-          value_template: '{{ type == ''mop_low'' }}'
-        sequence:
-        - action: vacuum.send_command
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-          data:
-            command: set_water_box_custom_mode
-            params:
-              water_box_mode: 203
-        - action: vacuum.send_command
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-          data:
-            command: app_start_wash
-        - action: vacuum.set_fan_speed
-          metadata: {}
-          data:
-            fan_speed: 'off'
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-        - action: select.select_option
-          target:
-            entity_id: select.living_room_robot_vacuum_mop_intensity
-          data:
-            option: mild
-        - action: select.select_option
-          target:
-            entity_id: select.living_room_robot_vacuum_mop_mode
-          data:
-            option: standard
-        - action: vacuum.send_command
-          data:
-            command: app_segment_clean
-            params:
-            - segments: '{{ room_ids }}'
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-        - action: vacuum.send_command
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-          data:
-            command: app_start_wash
-      - conditions:
-        - condition: template
-          value_template: '{{ type == ''vac_mop'' }}'
-        sequence:
-        - action: vacuum.send_command
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-          data:
-            command: set_water_box_custom_mode
-            params:
-              water_box_mode: 201
-        - action: vacuum.send_command
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-          data:
-            command: app_start_wash
-        - action: vacuum.set_fan_speed
-          metadata: {}
-          data:
-            fan_speed: max
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-        - action: select.select_option
-          target:
-            entity_id: select.living_room_robot_vacuum_mop_intensity
-          data:
-            option: moderate
-        - action: select.select_option
-          target:
-            entity_id: select.living_room_robot_vacuum_mop_mode
-          data:
-            option: standard
-        - action: vacuum.send_command
-          data:
-            command: app_segment_clean
-            params:
-            - segments: '{{ room_ids }}'
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-        - action: vacuum.send_command
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-          data:
-            command: app_start_wash
-      - conditions:
-        - condition: template
-          value_template: '{{ type == ''vac_mop_low'' }}'
-        sequence:
-        - action: vacuum.send_command
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-          data:
-            command: set_water_box_custom_mode
-            params:
-              water_box_mode: 201
-        - action: vacuum.send_command
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-          data:
-            command: app_start_wash
-        - action: vacuum.set_fan_speed
-          metadata: {}
-          data:
-            fan_speed: balanced
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-        - action: select.select_option
-          target:
-            entity_id: select.living_room_robot_vacuum_mop_intensity
-          data:
-            option: mild
-        - action: select.select_option
-          target:
-            entity_id: select.living_room_robot_vacuum_mop_mode
-          data:
-            option: standard
-        - action: vacuum.send_command
-          data:
-            command: app_segment_clean
-            params:
-            - segments: '{{ room_ids }}'
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-        - action: vacuum.send_command
-          target:
-            entity_id: vacuum.living_room_robot_vacuum
-          data:
-            command: app_start_wash
+            entity_id: timer.living_room_robot_vacuum_timer
+        - choose:
+            - conditions:
+                - condition: template
+                  value_template: "{{ type == 'vac' }}"
+              sequence:
+                - action: vacuum.send_command
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                  data:
+                    command: set_water_box_custom_mode
+                    params:
+                      water_box_mode: 200
+                - action: vacuum.set_fan_speed
+                  data:
+                    fan_speed: max_plus
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_robot_vacuum_mop_intensity
+                  data:
+                    option: "off"
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_robot_vacuum_mop_mode
+                  data:
+                    option: standard
+                - action: vacuum.send_command
+                  data:
+                    command: app_segment_clean
+                    params:
+                      - segments: "{{ room_ids }}"
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+            - conditions:
+                - condition: template
+                  value_template: "{{ type == 'vac_low' }}"
+              sequence:
+                - action: vacuum.send_command
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                  data:
+                    command: set_water_box_custom_mode
+                    params:
+                      water_box_mode: 200
+                - action: vacuum.set_fan_speed
+                  data:
+                    fan_speed: quiet
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_robot_vacuum_mop_intensity
+                  data:
+                    option: "off"
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_robot_vacuum_mop_mode
+                  data:
+                    option: standard
+                - action: vacuum.send_command
+                  data:
+                    command: app_segment_clean
+                    params:
+                      - segments: "{{ room_ids }}"
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+            - conditions:
+                - condition: template
+                  value_template: "{{ type == 'mop' }}"
+              sequence:
+                - action: vacuum.send_command
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                  data:
+                    command: set_water_box_custom_mode
+                    params:
+                      water_box_mode: 203
+                - action: vacuum.send_command
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                  data:
+                    command: app_start_wash
+                - action: vacuum.set_fan_speed
+                  data:
+                    fan_speed: "off"
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_robot_vacuum_mop_intensity
+                  data:
+                    option: intense
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_robot_vacuum_mop_mode
+                  data:
+                    option: deep_plus
+                - action: vacuum.send_command
+                  data:
+                    command: app_segment_clean
+                    params:
+                      - segments: "{{ room_ids }}"
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                - action: vacuum.send_command
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                  data:
+                    command: app_start_wash
+            - conditions:
+                - condition: template
+                  value_template: "{{ type == 'mop_low' }}"
+              sequence:
+                - action: vacuum.send_command
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                  data:
+                    command: set_water_box_custom_mode
+                    params:
+                      water_box_mode: 203
+                - action: vacuum.send_command
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                  data:
+                    command: app_start_wash
+                - action: vacuum.set_fan_speed
+                  data:
+                    fan_speed: "off"
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_robot_vacuum_mop_intensity
+                  data:
+                    option: mild
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_robot_vacuum_mop_mode
+                  data:
+                    option: standard
+                - action: vacuum.send_command
+                  data:
+                    command: app_segment_clean
+                    params:
+                      - segments: "{{ room_ids }}"
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                - action: vacuum.send_command
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                  data:
+                    command: app_start_wash
+            - conditions:
+                - condition: template
+                  value_template: "{{ type == 'vac_mop' }}"
+              sequence:
+                - action: vacuum.send_command
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                  data:
+                    command: set_water_box_custom_mode
+                    params:
+                      water_box_mode: 201
+                - action: vacuum.send_command
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                  data:
+                    command: app_start_wash
+                - action: vacuum.set_fan_speed
+                  data:
+                    fan_speed: max
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_robot_vacuum_mop_intensity
+                  data:
+                    option: moderate
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_robot_vacuum_mop_mode
+                  data:
+                    option: standard
+                - action: vacuum.send_command
+                  data:
+                    command: app_segment_clean
+                    params:
+                      - segments: "{{ room_ids }}"
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                - action: vacuum.send_command
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                  data:
+                    command: app_start_wash
+            - conditions:
+                - condition: template
+                  value_template: "{{ type == 'vac_mop_low' }}"
+              sequence:
+                - action: vacuum.send_command
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                  data:
+                    command: set_water_box_custom_mode
+                    params:
+                      water_box_mode: 201
+                - action: vacuum.send_command
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                  data:
+                    command: app_start_wash
+                - action: vacuum.set_fan_speed
+                  data:
+                    fan_speed: balanced
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_robot_vacuum_mop_intensity
+                  data:
+                    option: mild
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_robot_vacuum_mop_mode
+                  data:
+                    option: standard
+                - action: vacuum.send_command
+                  data:
+                    command: app_segment_clean
+                    params:
+                      - segments: "{{ room_ids }}"
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                - action: vacuum.send_command
+                  target:
+                    entity_id: vacuum.living_room_robot_vacuum
+                  data:
+                    command: app_start_wash
 push_notification:
   alias: Send besked
   description: Send push notication til nærmeste personer
@@ -667,10 +650,10 @@ push_notification:
       selector:
         select:
           options:
-          - critical
-          - warning
-          - info
-          - log
+            - critical
+            - warning
+            - info
+            - log
       default: log
     title:
       name: Title
@@ -697,13 +680,13 @@ push_notification:
       selector:
         select:
           options:
-          - all
-          - anders
-          - monique
-          - charlie
-          - emil
-          - home
-          - none
+            - all
+            - anders
+            - monique
+            - charlie
+            - emil
+            - home
+            - none
       default: home
     persistent:
       name: Vedvarende
@@ -731,189 +714,174 @@ push_notification:
       selector:
         text: {}
   sequence:
-  - action: system_log.write
-    data:
-      message: "Type: {{ type }} \nTitle: {{ title }} \nMessage: {{ message }} \nPersistent:
-        {{ persistent }}"
-      level: debug
-  - variables:
-      persons:
-      - notifier: notify.mobile_app_anders_iphone
-        distance: sensor.anders_distance_home
-        sleeping: binary_sensor.anders_sleeping
-      - notifier: notify.mobile_app_monique_iphone
-        distance: sensor.monique_distance_home
-        sleeping: binary_sensor.monique_sleeping
-      - notifier: notify.mobile_app_emil_iphone
-        distance: sensor.emil_distance_home
-        sleeping: binary_sensor.emil_sleeping
-      - notifier: notify.mobile_app_charlie_iphone
-        distance: sensor.charlie_distance_home
-        sleeping: binary_sensor.charlie_sleeping
-      notification_id: "{% if id is not defined or not id %}\n  {{ now().strftime('%Y-%m-%d-%H-%M-%S')
-        }}-{{ range(0, 100000) | random }}\n{% else %}\n  {{ id }}\n{% endif %}"
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ recipient == ''home'' }}'
-      sequence:
-      - variables:
-          notify_persons: "{% set ns = namespace(list=[]) %}\n{% for person in persons
-            %}\n  {% set distance = states(person.distance) | float(99999) %}\n  {%
-            set sleeping = is_state(person.sleeping, 'on') %}\n  {% set ns.list =
-            ns.list + [{\n      'notifier': person.notifier,\n      'distance': distance,\n
-            \     'sleeping': sleeping\n  }] %}\n{% endfor %}\n{% set nearby = ns.list
-            | selectattr('distance', 'lt', 0.2) | list %}\n{% if nearby | count ==
-            0 %}\n  {% set first_distance = (ns.list | sort(attribute='distance'))[0].distance
-            | float(0) %}\n  {% set nearby = ns.list | selectattr('distance', 'lt',
-            first_distance + 2.0) | list %}\n{% endif %}\n{% if notify_persons | count
-            == 0 %}\n  {% set first_distance = ((ns.list | sort(attribute='distance'))[0]).distance
-            | float(0) %}\n  {% set notify_persons = ns.list | selectattr('distance',
-            'lt', first_distance + 2.0) | list %}\n{% endif %}\n{% set awake = nearby
-            | selectattr('sleeping', 'eq', false) | list %}\n{% if awake | count >
-            0 %}\n  {{ awake | map(attribute='notifier') | list }}\n{% else %}\n  {{
-            nearby | map(attribute='notifier') | list }}\n{% endif %}"
-    - conditions:
-      - condition: template
-        value_template: '{{ recipient == ''all'' }}'
-      sequence:
-      - variables:
-          notify_persons: '{{ persons | map(attribute=''notifier'') | list }}'
-    - conditions:
-      - condition: template
-        value_template: '{{ recipient == ''none'' }}'
-      sequence:
-      - variables:
-          notify_persons: []
-    default:
-    - variables:
-        notify_persons: '{{ persons | map(attribute=''notifier'') | select(''search'',
-          ''_'' ~ recipient ~ ''_'') | list }}'
-  - action: system_log.write
-    data:
-      message: 'Title: {{ title }}
-
-        Message: {{ message }}
-
-        Id: {{ notification_id }}
-
-        Persons: {{ notify_persons }}'
-      level: info
-  - if:
-    - condition: template
-      value_template: '{{ persistent }}'
-    then:
-    - action: persistent_notification.create
+    - action: system_log.write
       data:
-        title: '{{ title }}'
-        message: '{{ message }}'
-        notification_id: '{{ notification_id }}'
-  - repeat:
-      for_each: '{{ notify_persons }}'
-      sequence:
-      - choose:
+        message: "Type: {{ type }} \nTitle: {{ title }} \nMessage: {{ message }} \nPersistent: {{ persistent }}"
+        level: debug
+    - variables:
+        persons:
+          - notifier: notify.mobile_app_anders_iphone
+            distance: sensor.anders_distance_home
+            sleeping: binary_sensor.anders_sleeping
+          - notifier: notify.mobile_app_monique_iphone
+            distance: sensor.monique_distance_home
+            sleeping: binary_sensor.monique_sleeping
+          - notifier: notify.mobile_app_emil_iphone
+            distance: sensor.emil_distance_home
+            sleeping: binary_sensor.emil_sleeping
+          - notifier: notify.mobile_app_charlie_iphone
+            distance: sensor.charlie_distance_home
+            sleeping: binary_sensor.charlie_sleeping
+        notification_id:
+          "{% if id is not defined or not id %}\n  {{ now().strftime('%Y-%m-%d-%H-%M-%S') }}-{{ range(0, 100000) | random }}\n{% else %}\n  {{ id }}\n{% endif %}"
+    - choose:
         - conditions:
-          - condition: template
-            value_template: '{{ type == ''info'' }}'
-          - condition: template
-            value_template: '{{ category is not defined or category == '''' }}'
+            - condition: template
+              value_template: "{{ recipient == 'home' }}"
           sequence:
-          - action: '{{ repeat.item }}'
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              data:
-                push:
-                  sound:
-                    name: default
-                    critical: 0
-                    volume: 0
+            - variables:
+                notify_persons:
+                  "{% set ns = namespace(list=[]) %}\n{% for person in persons %}\n  {% set distance = states(person.distance) | float(99999) %}\n  {% set sleeping = is_state(person.sleeping, 'on') %}\n  {% set ns.list = ns.list + [{\n      'notifier': person.notifier,\n      'distance': distance,\n \     'sleeping': sleeping\n  }] %}\n{% endfor %}\n{% set nearby = ns.list | selectattr('distance', 'lt', 0.2) | list %}\n{% if nearby | count == 0 %}\n  {% set first_distance = (ns.list | sort(attribute='distance'))[0].distance | float(0) %}\n  {% set nearby = ns.list | selectattr('distance', 'lt', first_distance + 2.0) | list %}\n{% endif %}\n{% if notify_persons | count == 0 %}\n  {% set first_distance = ((ns.list | sort(attribute='distance'))[0]).distance | float(0) %}\n  {% set notify_persons = ns.list | selectattr('distance', 'lt', first_distance + 2.0) | list %}\n{% endif %}\n{% set awake = nearby | selectattr('sleeping', 'eq', false) | list %}\n{% if awake | count > 0 %}\n  {{ awake | map(attribute='notifier') | list }}\n{% else %}\n  {{ nearby | map(attribute='notifier') | list }}\n{% endif %}"
         - conditions:
-          - condition: template
-            value_template: '{{ type == ''info'' }}'
+            - condition: template
+              value_template: "{{ recipient == 'all' }}"
           sequence:
-          - action: '{{ repeat.item }}'
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              data:
-                push:
-                  category: '{{ category }}'
-                  actions:
-                  - action: '{{ action }}'
-                    title: '{{ action_title }}'
-                  sound:
-                    name: default
-                    critical: 0
-                    volume: 0
+            - variables:
+                notify_persons: "{{ persons | map(attribute='notifier') | list }}"
         - conditions:
-          - condition: template
-            value_template: '{{ type == ''warning'' }}'
-          - condition: template
-            value_template: '{{ category is not defined or category == '''' }}'
+            - condition: template
+              value_template: "{{ recipient == 'none' }}"
           sequence:
-          - action: '{{ repeat.item }}'
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              data:
-                push:
-                  sound:
-                    name: default
-                    critical: 1
-                    volume: 0.3
-        - conditions:
-          - condition: template
-            value_template: '{{ type == ''warning'' }}'
-          sequence:
-          - action: '{{ repeat.item }}'
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              data:
-                push:
-                  category: '{{ category }}'
-                  actions:
-                  - action: '{{ action }}'
-                    title: '{{ action_title }}'
-                  sound:
-                    name: default
-                    critical: 1
-                    volume: 0.3
-        - conditions:
-          - condition: template
-            value_template: '{{ type == ''critical'' }}'
-          - condition: template
-            value_template: '{{ category is not defined or category == '''' }}'
-          sequence:
-          - action: '{{ repeat.item }}'
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              data:
-                push:
-                  sound:
-                    name: default
-                    critical: 1
-                    volume: 1
-        - conditions:
-          - condition: template
-            value_template: '{{ type == ''critical'' }}'
-          sequence:
-          - action: '{{ repeat.item }}'
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              data:
-                push:
-                  category: '{{ category }}'
-                  actions:
-                  - action: '{{ action }}'
-                    title: '{{ action_title }}'
-                  sound:
-                    name: default
-                    critical: 1
-                    volume: 1
+            - variables:
+                notify_persons: []
+      default:
+        - variables:
+            notify_persons: "{{ persons | map(attribute='notifier') | select('search', '_' ~ recipient ~ '_') | list }}"
+    - action: system_log.write
+      data:
+        message: "Title: {{ title }}
+
+          Message: {{ message }}
+
+          Id: {{ notification_id }}
+
+          Persons: {{ notify_persons }}"
+        level: info
+    - if:
+        - condition: template
+          value_template: "{{ persistent }}"
+      then:
+        - action: persistent_notification.create
+          data:
+            title: "{{ title }}"
+            message: "{{ message }}"
+            notification_id: "{{ notification_id }}"
+    - repeat:
+        for_each: "{{ notify_persons }}"
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ type == 'info' }}"
+                  - condition: template
+                    value_template: "{{ category is not defined or category == '' }}"
+                sequence:
+                  - action: "{{ repeat.item }}"
+                    data:
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      data:
+                        push:
+                          sound:
+                            name: default
+                            critical: 0
+                            volume: 0
+              - conditions:
+                  - condition: template
+                    value_template: "{{ type == 'info' }}"
+                sequence:
+                  - action: "{{ repeat.item }}"
+                    data:
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      data:
+                        push:
+                          category: "{{ category }}"
+                          actions:
+                            - action: "{{ action }}"
+                              title: "{{ action_title }}"
+                          sound:
+                            name: default
+                            critical: 0
+                            volume: 0
+              - conditions:
+                  - condition: template
+                    value_template: "{{ type == 'warning' }}"
+                  - condition: template
+                    value_template: "{{ category is not defined or category == '' }}"
+                sequence:
+                  - action: "{{ repeat.item }}"
+                    data:
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      data:
+                        push:
+                          sound:
+                            name: default
+                            critical: 1
+                            volume: 0.3
+              - conditions:
+                  - condition: template
+                    value_template: "{{ type == 'warning' }}"
+                sequence:
+                  - action: "{{ repeat.item }}"
+                    data:
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      data:
+                        push:
+                          category: "{{ category }}"
+                          actions:
+                            - action: "{{ action }}"
+                              title: "{{ action_title }}"
+                          sound:
+                            name: default
+                            critical: 1
+                            volume: 0.3
+              - conditions:
+                  - condition: template
+                    value_template: "{{ type == 'critical' }}"
+                  - condition: template
+                    value_template: "{{ category is not defined or category == '' }}"
+                sequence:
+                  - action: "{{ repeat.item }}"
+                    data:
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      data:
+                        push:
+                          sound:
+                            name: default
+                            critical: 1
+                            volume: 1
+              - conditions:
+                  - condition: template
+                    value_template: "{{ type == 'critical' }}"
+                sequence:
+                  - action: "{{ repeat.item }}"
+                    data:
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      data:
+                        push:
+                          category: "{{ category }}"
+                          actions:
+                            - action: "{{ action }}"
+                              title: "{{ action_title }}"
+                          sound:
+                            name: default
+                            critical: 1
+                            volume: 1
 living_room_robot_vacuum_set_current:
   alias: Stue robotstøvsuger sæt aktuel
   description: Sæt aktuel rengøring for robotstøvsuger
@@ -929,11 +897,11 @@ living_room_robot_vacuum_set_current:
       selector:
         select:
           options:
-          - none
-          - kitchen_cleaning
-          - utility_room_cleaning
-          - hallway_cleaning
-          - living_room_cleaning
+            - none
+            - kitchen_cleaning
+            - utility_room_cleaning
+            - hallway_cleaning
+            - living_room_cleaning
       default: none
     started_by:
       name: Automation
@@ -943,57 +911,52 @@ living_room_robot_vacuum_set_current:
         entity:
           domain: automation
   sequence:
-  - action: system_log.write
-    data:
-      level: debug
-      message: 'New: {{ option }}
+    - action: system_log.write
+      data:
+        level: debug
+        message: "New: {{ option }}
 
-        Old: {{ states(''input_select.living_room_robot_vacuum_current_cleaning'')
-        }}
+          Old: {{ states('input_select.living_room_robot_vacuum_current_cleaning') }}
 
-        Automation: {{ started_by }}'
-  - delay:
-      milliseconds: '{{ range(0, 2000) | random }}'
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ states(''input_select.living_room_robot_vacuum_current_cleaning'')
-          == option }}'
-      sequence: []
-    - conditions:
-      - condition: template
-        value_template: '{{ option == ''none'' }}'
-      sequence:
-      - action: input_select.select_option
-        metadata: {}
-        target:
-          entity_id: input_select.living_room_robot_vacuum_current_cleaning
-        data:
-          option: none
-    - conditions:
-      - condition: template
-        value_template: '{{ state_attr(''script.living_room_robot_vacuum_set_current'',
-          ''current'') | int(0) > 1 }}'
-      sequence: []
-    - conditions:
-      - condition: state
-        entity_id: input_select.living_room_robot_vacuum_current_cleaning
-        state: none
-      sequence:
-      - action: input_select.select_option
-        metadata: {}
-        target:
-          entity_id: input_select.living_room_robot_vacuum_current_cleaning
-        data:
-          option: '{{ option }}'
-  - delay:
-      milliseconds: '{{ range(0, 2000) | random }}'
+          Automation: {{ started_by }}"
+    - delay:
+        milliseconds: "{{ range(0, 2000) | random }}"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ states('input_select.living_room_robot_vacuum_current_cleaning') == option }}"
+          sequence: []
+        - conditions:
+            - condition: template
+              value_template: "{{ option == 'none' }}"
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.living_room_robot_vacuum_current_cleaning
+              data:
+                option: none
+        - conditions:
+            - condition: template
+              value_template: "{{ state_attr('script.living_room_robot_vacuum_set_current', 'current') | int(0) > 1 }}"
+          sequence: []
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_robot_vacuum_current_cleaning
+              state: none
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.living_room_robot_vacuum_current_cleaning
+              data:
+                option: "{{ option }}"
+    - delay:
+        milliseconds: "{{ range(0, 2000) | random }}"
 set_climate_temperature:
   alias: Sæt radiator temperatur
-  description: 'Sæt temperaturen på flere Tado radiator-termostater, men kun hvis
-    setpunktet er anderledes for at undgå unødige kald
+  description:
+    "Sæt temperaturen på flere Tado radiator-termostater, men kun hvis setpunktet er anderledes for at undgå unødige kald
 
-    '
+    "
   mode: queued
   max: 20
   fields:
@@ -1024,42 +987,37 @@ set_climate_temperature:
           domain: sensor
           device_class: temperature
   sequence:
-  - variables:
-      entities_to_update: "{% set ns = namespace(result=[]) %} {% for entity in entities
-        %}\n  {% set current =\n    state_attr(entity, 'temperature') | float(-100)\n
-        \ %}\n  {% if (current | round(1)) != (temperature | round(1)) %}\n    {%
-        set ns.result = ns.result + [entity] %}\n  {% endif %}\n{% endfor %} {{ ns.result
-        }}\n"
-  - if:
-    - condition: template
-      value_template: '{{ entities_to_update | count > 0 }}'
-    then:
-    - action: system_log.write
-      data:
-        level: info
-        message: 'Entities: {{ entities_to_update }}
-
-          Temperature: {{ temperature }}
-
-          '
-    - action: climate.set_temperature
-      target:
-        entity_id: '{{ entities_to_update }}'
-      data:
-        temperature: '{{ temperature }}'
-    - delay: 00:00:02
+    - variables:
+        entities_to_update:
+          "{% set ns = namespace(result=[]) %} {% for entity in entities %}\n  {% set current =\n    state_attr(entity, 'temperature') | float(-100)\n \ %}\n  {% if (current | round(1)) != (temperature | round(1)) %}\n    {% set ns.result = ns.result + [entity] %}\n  {% endif %}\n{% endfor %} {{ ns.result }}\n"
     - if:
-      - condition: template
-        value_template: '{{ target_sensor is defined and target_sensor != none }}'
+        - condition: template
+          value_template: "{{ entities_to_update | count > 0 }}"
       then:
-      - wait_template: '{{ states(target_sensor) | float(-999) | round(1) == temperature
-          | round(1) }}'
-        timeout: 00:01:00
-        continue_on_timeout: true
+        - action: system_log.write
+          data:
+            level: info
+            message: "Entities: {{ entities_to_update }}
+
+              Temperature: {{ temperature }}
+
+              "
+        - action: climate.set_temperature
+          target:
+            entity_id: "{{ entities_to_update }}"
+          data:
+            temperature: "{{ temperature }}"
+        - delay: 00:00:02
+        - if:
+            - condition: template
+              value_template: "{{ target_sensor is defined and target_sensor != none }}"
+          then:
+            - wait_template: "{{ states(target_sensor) | float(-999) | round(1) == temperature | round(1) }}"
+              timeout: 00:01:00
+              continue_on_timeout: true
 create_todo_task:
   alias: Opret todo opgave
-  description: Kontroller om samme opgave allerede findes – hvis ikke, opret den i
-    Smart ToDo
+  description: Kontroller om samme opgave allerede findes – hvis ikke, opret den i Smart ToDo
   fields:
     subject:
       name: Emne
@@ -1085,13 +1043,13 @@ create_todo_task:
       selector:
         entity:
           domain:
-          - sensor
-          - binary_sensor
-          - light
-          - switch
-          - rest_command
-          - device_tracker
-          - automation
+            - sensor
+            - binary_sensor
+            - light
+            - switch
+            - rest_command
+            - device_tracker
+            - automation
     entity_id:
       name: ToDo liste
       description: ToDo listen
@@ -1117,56 +1075,52 @@ create_todo_task:
         boolean:
       default: false
   sequence:
-  - variables:
-      todo_entity_id: '{{ related_entity_id | default(none) }}'
-      active: '{{ is_active | default(true) | bool }}'
-      must_replace: '{{ must_replace | default(false) | bool }}'
-      existing: "{% set todos = state_attr(entity_id, 'all_todos') | default([]) |
-        rejectattr('status', 'equalto', 'completed') | list %} {% if todo_entity_id
-        is not none %}\n  {{ todos\n     | selectattr('description', 'search', todo_entity_id
-        | trim)\n     | map(attribute='todo_id')\n     | list }}\n{% else %}\n  {{
-        todos\n     | selectattr('subject', 'equalto', subject | trim)\n     | map(attribute='todo_id')\n
-        \    | list }}\n{% endif %}"
-      existing_count: '{{ existing | length }}'
-      todo_description: "<html>\n  {{ description }}\n  {% if todo_entity_id is not
-        none %}\n    <br><br><i>Relateret: {{ todo_entity_id }}</i>\n  {% endif %}\n</html>"
-  - action: system_log.write
-    data:
-      level: info
-      message: 'Subject: {{ subject }}
-
-        Entity: {{ entity_id }}
-
-        Related entity: {{ todo_entity_id }}
-
-        Active: {{ active }}
-
-        Must replace: {{ must_replace }}
-
-        Existing: {{ existing_count }}'
-  - if:
-    - condition: template
-      value_template: '{{ existing_count > 0 and (must_replace or not active) }}'
-    then:
-    - repeat:
-        for_each: '{{ existing }}'
-        sequence:
-        - action: ms365_todo.complete_todo
-          data:
-            entity_id: '{{ entity_id }}'
-            todo_id: '{{ repeat.item }}'
-            completed: true
-  - if:
-    - condition: template
-      value_template: '{{ active and (existing_count == 0 or must_replace) }}'
-    then:
-    - action: ms365_todo.new_todo
+    - variables:
+        todo_entity_id: "{{ related_entity_id | default(none) }}"
+        active: "{{ is_active | default(true) | bool }}"
+        must_replace: "{{ must_replace | default(false) | bool }}"
+        existing:
+          "{% set todos = state_attr(entity_id, 'all_todos') | default([]) | rejectattr('status', 'equalto', 'completed') | list %} {% if todo_entity_id is not none %}\n  {{ todos\n     | selectattr('description', 'search', todo_entity_id | trim)\n     | map(attribute='todo_id')\n     | list }}\n{% else %}\n  {{ todos\n     | selectattr('subject', 'equalto', subject | trim)\n     | map(attribute='todo_id')\n \    | list }}\n{% endif %}"
+        existing_count: "{{ existing | length }}"
+        todo_description:
+          "<html>\n  {{ description }}\n  {% if todo_entity_id is not none %}\n    <br><br><i>Relateret: {{ todo_entity_id }}</i>\n  {% endif %}\n</html>"
+    - action: system_log.write
       data:
-        entity_id: '{{ entity_id }}'
-        subject: '{{ subject }}'
-        description: '{{ todo_description }}'
-        due: '{{ utcnow().date().isoformat() }}'
-        reminder: '{{ (utcnow() + timedelta(minutes=1)).isoformat() }}'
+        level: info
+        message: "Subject: {{ subject }}
+
+          Entity: {{ entity_id }}
+
+          Related entity: {{ todo_entity_id }}
+
+          Active: {{ active }}
+
+          Must replace: {{ must_replace }}
+
+          Existing: {{ existing_count }}"
+    - if:
+        - condition: template
+          value_template: "{{ existing_count > 0 and (must_replace or not active) }}"
+      then:
+        - repeat:
+            for_each: "{{ existing }}"
+            sequence:
+              - action: ms365_todo.complete_todo
+                data:
+                  entity_id: "{{ entity_id }}"
+                  todo_id: "{{ repeat.item }}"
+                  completed: true
+    - if:
+        - condition: template
+          value_template: "{{ active and (existing_count == 0 or must_replace) }}"
+      then:
+        - action: ms365_todo.new_todo
+          data:
+            entity_id: "{{ entity_id }}"
+            subject: "{{ subject }}"
+            description: "{{ todo_description }}"
+            due: "{{ utcnow().date().isoformat() }}"
+            reminder: "{{ (utcnow() + timedelta(minutes=1)).isoformat() }}"
   mode: queued
   max: 20
 living_room_light_rotary:
@@ -1186,37 +1140,33 @@ living_room_light_rotary:
           min: -100
           max: 100
           step: 1
-          unit_of_measurement: '%'
+          unit_of_measurement: "%"
           mode: slider
       default: 5
   sequence:
-  - action: system_log.write
-    data:
-      message: 'Step: {{ step }}'
-      level: debug
-  - variables:
-      include:
-      - light.living_room_light_coffee_table_1
-      - light.living_room_light_coffee_table_2
-      exclude:
-      - light.living_room_smart_plug_christmas_elf_house
-      - light.living_room_smart_plug_receiver_accessories
-      - light.living_room_light_strip_receiver
-      lights: "{% \n  set lights = \n    state_attr('light.living_room_lights', 'entity_id')
-        | list\n%} \n{% \n  set a = (lights + include) \n    | reject('in', exclude)
-        \n    | unique \n    | list \n    | expand() \n%} \n{% set o = a | selectattr('state',
-        'eq', 'on') | list %} \n{% if not o %}\n  {{ a | map(attribute='entity_id')
-        | list }}\n{% else %}\n  {{ o | map(attribute='entity_id') | list }}\n{% endif
-        %}"
-  - action: system_log.write
-    data:
-      message: 'Lights: {{ lights }}'
-      level: debug
-  - action: light.turn_on
-    data:
-      brightness_step_pct: '{{ step }}'
-    target:
-      entity_id: '{{ lights }}'
+    - action: system_log.write
+      data:
+        message: "Step: {{ step }}"
+        level: debug
+    - variables:
+        include:
+          - light.living_room_light_coffee_table_1
+          - light.living_room_light_coffee_table_2
+        exclude:
+          - light.living_room_smart_plug_christmas_elf_house
+          - light.living_room_smart_plug_receiver_accessories
+          - light.living_room_light_strip_receiver
+        lights:
+          "{% \n  set lights = \n    state_attr('light.living_room_lights', 'entity_id') | list\n%} \n{% \n  set a = (lights + include) \n    | reject('in', exclude) \n    | unique \n    | list \n    | expand() \n%} \n{% set o = a | selectattr('state', 'eq', 'on') | list %} \n{% if not o %}\n  {{ a | map(attribute='entity_id') | list }}\n{% else %}\n  {{ o | map(attribute='entity_id') | list }}\n{% endif %}"
+    - action: system_log.write
+      data:
+        message: "Lights: {{ lights }}"
+        level: debug
+    - action: light.turn_on
+      data:
+        brightness_step_pct: "{{ step }}"
+      target:
+        entity_id: "{{ lights }}"
 cleanup_todo_tasks:
   alias: Opryd todo opgaver
   description: Sletter færdiggjorte todo-opgaver, evt. før et givent tidspunkt
@@ -1232,63 +1182,58 @@ cleanup_todo_tasks:
           domain: todo
     date:
       name: Afsluttet dato
-      description: 'Slet kun opgaver færdiggjort før eller på denne dag, udelad for
-        at slette alle færdiggjorte.
+      description: "Slet kun opgaver færdiggjort før eller på denne dag, udelad for at slette alle færdiggjorte.
 
-        '
-      example: '2025-01-20'
+        "
+      example: "2025-01-20"
       required: false
       selector:
         date: {}
   sequence:
-  - variables:
-      cutoff: "{% if date is defined %}\n  {{ (date | as_datetime).strftime('%Y-%m-%dT%H:%M:%S+0000')
-        }}\n{% else %}\n  none\n{% endif %}"
-      delete: "{% set ns = namespace(ids=[]) %} \n{% for todo in state_attr(entity_id,
-        'all_todos') | default([]) %}\n  {% if todo.status == 'completed' and (cutoff
-        == 'none' or todo.completed <= cutoff) %}\n    {% set ns.ids = ns.ids + [todo.todo_id]
-        %}\n  {% endif %}\n{% endfor %} {{ ns.ids }}"
-      output: '{{ {''deleted'': delete | length} }}    '
-  - action: system_log.write
-    data:
-      level: info
-      message: "List: {{ entity_id }} \nCutoff: {{ cutoff }} \nDelete: {{ delete |
-        length }}"
-  - repeat:
-      count: '{{ delete | length }}'
-      sequence:
-      - action: ms365_todo.delete_todo
-        data:
-          entity_id: '{{ entity_id }}'
-          todo_id: '{{ delete[repeat.index - 1] }}'
-  - stop: All Done
-    response_variable: output
+    - variables:
+        cutoff:
+          "{% if date is defined %}\n  {{ (date | as_datetime).strftime('%Y-%m-%dT%H:%M:%S+0000') }}\n{% else %}\n  none\n{% endif %}"
+        delete:
+          "{% set ns = namespace(ids=[]) %} \n{% for todo in state_attr(entity_id, 'all_todos') | default([]) %}\n  {% if todo.status == 'completed' and (cutoff == 'none' or todo.completed <= cutoff) %}\n    {% set ns.ids = ns.ids + [todo.todo_id] %}\n  {% endif %}\n{% endfor %} {{ ns.ids }}"
+        output: "{{ {'deleted': delete | length} }}    "
+    - action: system_log.write
+      data:
+        level: info
+        message: "List: {{ entity_id }} \nCutoff: {{ cutoff }} \nDelete: {{ delete | length }}"
+    - repeat:
+        count: "{{ delete | length }}"
+        sequence:
+          - action: ms365_todo.delete_todo
+            data:
+              entity_id: "{{ entity_id }}"
+              todo_id: "{{ delete[repeat.index - 1] }}"
+    - stop: All Done
+      response_variable: output
 emils_varelse_tand_og_sluk_lys:
   alias: Emils værelse lys tænd og sluk
-  description: Tænd og slut lys på Emils værelse, script til at blive brugt i iPhone
-    widget
+  description: Tænd og slut lys på Emils værelse, script til at blive brugt i iPhone widget
   mode: queued
   max: 10
   sequence:
-  - if:
-    - condition: state
-      entity_id: binary_sensor.emils_room_light
-      state: 'on'
-    then:
-    - action: light.turn_off
-      data:
-        transition: 1
-      target:
-        entity_id: light.emils_room_lights
-    else:
-    - action: light.turn_on
-      data:
-        transition: 1
-        color_temp_kelvin: 2700
-        brightness_pct: 80
-      target:
-        entity_id:
-        - light.emils_room_lights
+    - if:
+        - condition: state
+          entity_id: binary_sensor.emils_room_light
+          state: "on"
+      then:
+        - action: light.turn_off
+          data:
+            transition: 1
+          target:
+            entity_id: light.emils_room_lights
+      else:
+        - action: light.turn_on
+          data:
+            transition: 1
+            color_temp_kelvin: 2700
+            brightness_pct: 80
+          target:
+            entity_id:
+              - light.emils_room_lights
 create_todo_battery_task:
   alias: Opret todo batteri opgave
   description: Kontroller batteri niveau og opret evt opgave
@@ -1302,7 +1247,7 @@ create_todo_battery_task:
       selector:
         entity:
           domain:
-          - sensor
+            - sensor
     device:
       name: Enhed
       description: Enhedsnavn
@@ -1339,7 +1284,7 @@ create_todo_battery_task:
       selector:
         entity:
           domain:
-          - sensor
+            - sensor
     threshold:
       name: Grænseværdi
       description: Grænse for hvornår batteri skal skiftes
@@ -1354,8 +1299,7 @@ create_todo_battery_task:
           mode: box
     temperature:
       name: Temperatur
-      description: Sensorens temperatur, skipper check hvis temperaturen er uder 1
-        °C
+      description: Sensorens temperatur, skipper check hvis temperaturen er uder 1 °C
       example: -3
       required: false
       selector:
@@ -1365,130 +1309,109 @@ create_todo_battery_task:
           step: 1
           mode: box
   sequence:
-  - variables:
-      _device_name: "{% set i = device_id(entity_id) %}\n{% if device is defined and
-        device %}\n  {{ device }}\n{% else %}\n  {% set n = device_attr(i, 'name_by_user')
-        %}\n  {% if n %}\n    {{ n }}\n  {% else %}\n    {% set n = device_attr(i,
-        'name') %}\n    {% if n %}\n      {{ n }}\n    {% else %}\n      {{ entity_id
-        }}\n    {% endif %}\n  {% endif %}\n{% endif %}"
-      _area: "{% if area is defined and area %}\n  {{ area }}\n{% else %}\n  {% set
-        n = area_name(entity_id) %}\n  {% if n %}\n    {{ n }}\n  {% else %}\n    {{
-        '' }}\n  {% endif %}\n{% endif %}"
-      _location: "{% if location is defined and location %}\n  {{ location }}\n{%
-        else %}\n  {{ '' }}\n{% endif %}"
-      _type: "{% if type is defined and type %}\n  {{ type }}\n{% else %}\n  {% if
-        type_entity_id is defined and type_entity_id %}\n    {% set t = states(type_entity_id)
-        %}\n    {% if t not in ['unknown','unavailable','none'] %}\n      {{ t }}\n
-        \   {% else %}\n      {{ '' }}\n    {% endif %}\n  {% else %}\n    {% set
-        q = state_attr(entity_id, 'battery_quantity') %}\n    {% set s = state_attr(entity_id,
-        'battery_size') %}\n    {% if s %}\n      {% if q %}\n        {{ q ~ ' x '
-        ~ s }}\n      {% else %}\n        {{ s }}\n      {% endif %}\n    {% else
-        %}\n      {% set t = states(entity_id | replace('_battery', '_battery_type'))
-        %}\n      {% if t not in ['unknown','unavailable','none'] %}\n        {{ t
-        }}\n      {% else %}\n        {{ '' }}\n      {% endif %}\n    {% endif %}\n
-        \ {% endif %}\n{% endif %}"
-      _level: '{{ states(entity_id) | int(-1) | round(0) }}'
-      _threshold: "{% if threshold is defined and threshold %}\n  {{ threshold | round(0)
-        }}\n{% else %}\n  10\n{% endif %}"
-      _temperature: "{% if temperature is defined and temperature not in [none, 'unknown',
-        'unavailable'] %}\n  {{ temperature | float }}\n{% else %}\n  20.0\n{% endif
-        %}        "
-  - action: system_log.write
-    data:
-      level: debug
-      message: 'Entity id: {{ entity_id }}
-
-        Device name: {{ _device_name }}
-
-        Area: {{ _area }}
-
-        Location: {{ _location }}
-
-        Battery type: {{ _type }}
-
-        Level: {{ _level }}
-
-        Threshold: {{ _threshold }}
-
-        Temperature: {{ temperature | default(''Ukendt'') }}'
-  - if:
-    - condition: template
-      value_template: '{{ _level | int(100) >= 0 and _temperature | float > 2.0 }}'
-    then:
-    - action: script.create_todo_task
+    - variables:
+        _device_name:
+          "{% set i = device_id(entity_id) %}\n{% if device is defined and device %}\n  {{ device }}\n{% else %}\n  {% set n = device_attr(i, 'name_by_user') %}\n  {% if n %}\n    {{ n }}\n  {% else %}\n    {% set n = device_attr(i, 'name') %}\n    {% if n %}\n      {{ n }}\n    {% else %}\n      {{ entity_id }}\n    {% endif %}\n  {% endif %}\n{% endif %}"
+        _area:
+          "{% if area is defined and area %}\n  {{ area }}\n{% else %}\n  {% set n = area_name(entity_id) %}\n  {% if n %}\n    {{ n }}\n  {% else %}\n    {{ '' }}\n  {% endif %}\n{% endif %}"
+        _location: "{% if location is defined and location %}\n  {{ location }}\n{% else %}\n  {{ '' }}\n{% endif %}"
+        _type:
+          "{% if type is defined and type %}\n  {{ type }}\n{% else %}\n  {% if type_entity_id is defined and type_entity_id %}\n    {% set t = states(type_entity_id) %}\n    {% if t not in ['unknown','unavailable','none'] %}\n      {{ t }}\n \   {% else %}\n      {{ '' }}\n    {% endif %}\n  {% else %}\n    {% set q = state_attr(entity_id, 'battery_quantity') %}\n    {% set s = state_attr(entity_id, 'battery_size') %}\n    {% if s %}\n      {% if q %}\n        {{ q ~ ' x ' ~ s }}\n      {% else %}\n        {{ s }}\n      {% endif %}\n    {% else %}\n      {% set t = states(entity_id | replace('_battery', '_battery_type')) %}\n      {% if t not in ['unknown','unavailable','none'] %}\n        {{ t }}\n      {% else %}\n        {{ '' }}\n      {% endif %}\n    {% endif %}\n \ {% endif %}\n{% endif %}"
+        _level: "{{ states(entity_id) | int(-1) | round(0) }}"
+        _threshold:
+          "{% if threshold is defined and threshold %}\n  {{ threshold | round(0) }}\n{% else %}\n  10\n{% endif %}"
+        _temperature:
+          "{% if temperature is defined and temperature not in [none, 'unknown', 'unavailable'] %}\n  {{ temperature | float }}\n{% else %}\n  20.0\n{% endif %}        "
+    - action: system_log.write
       data:
-        subject: Skift batteri på {{ _device_name }}
-        description: '{% set clean_name = (_device_name | replace(_area, '''')).strip()
-          %} Batteriet på {{ clean_name }} i {{ _area }}{% if _location %}, placeret
-          {{ _location }}{% endif %}, er på {{ _level }}%. Den bruger {{ _type }}.'
-        related_entity_id: '{{ entity_id }}'
-        entity_id: todo.todo_smart_todo
-        is_active: '{{ _level <= _threshold }}'
+        level: debug
+        message: "Entity id: {{ entity_id }}
+
+          Device name: {{ _device_name }}
+
+          Area: {{ _area }}
+
+          Location: {{ _location }}
+
+          Battery type: {{ _type }}
+
+          Level: {{ _level }}
+
+          Threshold: {{ _threshold }}
+
+          Temperature: {{ temperature | default('Ukendt') }}"
+    - if:
+        - condition: template
+          value_template: "{{ _level | int(100) >= 0 and _temperature | float > 2.0 }}"
+      then:
+        - action: script.create_todo_task
+          data:
+            subject: Skift batteri på {{ _device_name }}
+            description: "{% set clean_name = (_device_name | replace(_area, '')).strip() %} Batteriet på {{ clean_name }} i {{ _area }}{% if _location %}, placeret {{ _location }}{% endif %}, er på {{ _level }}%. Den bruger {{ _type }}."
+            related_entity_id: "{{ entity_id }}"
+            entity_id: todo.todo_smart_todo
+            is_active: "{{ _level <= _threshold }}"
   trace:
     stored_traces: 100
 living_room_light_sofa_toggle:
   alias: Stue lys sofa tænd og sluk
-  description: Tænd og slut lys over sofa i stuen, script til at blive brugt i iPhone
-    widget
+  description: Tænd og slut lys over sofa i stuen, script til at blive brugt i iPhone widget
   sequence:
-  - choose:
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.monique_home
-        state: 'off'
-      sequence: []
-    - conditions:
-      - condition: state
-        entity_id: light.living_room_light_coffee_table_1
-        state: 'on'
-      sequence:
-      - action: light.turn_off
-        data:
-          transition: 1
-        target:
-          entity_id:
-          - light.living_room_light_coffee_table_1
-          - light.living_room_light_coffee_table_2
-    default:
-    - action: light.turn_on
-      metadata: {}
-      data:
-        transition: 1
-        color_temp_kelvin: 2100
-        brightness_pct: 80
-      target:
-        entity_id:
-        - light.living_room_light_coffee_table_1
-        - light.living_room_light_coffee_table_2
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.monique_home
+              state: "off"
+          sequence: []
+        - conditions:
+            - condition: state
+              entity_id: light.living_room_light_coffee_table_1
+              state: "on"
+          sequence:
+            - action: light.turn_off
+              data:
+                transition: 1
+              target:
+                entity_id:
+                  - light.living_room_light_coffee_table_1
+                  - light.living_room_light_coffee_table_2
+      default:
+        - action: light.turn_on
+          data:
+            transition: 1
+            color_temp_kelvin: 2100
+            brightness_pct: 80
+          target:
+            entity_id:
+              - light.living_room_light_coffee_table_1
+              - light.living_room_light_coffee_table_2
   mode: queued
   max: 10
 bedroom_blind_up:
   alias: Soveværelse rullegardin op
-  description: Kør rullegardinet i soveværelse op, script til at blive brugt i iPhone
-    widget
+  description: Kør rullegardinet i soveværelse op, script til at blive brugt i iPhone widget
   sequence:
-  - if:
-    - condition: state
-      entity_id: binary_sensor.monique_home
-      state: 'on'
-    then:
-    - event: bedroom_blind
-      event_data:
-        command: open
+    - if:
+        - condition: state
+          entity_id: binary_sensor.monique_home
+          state: "on"
+      then:
+        - event: bedroom_blind
+          event_data:
+            command: open
   mode: queued
   max: 10
 bedroom_blind_down:
   alias: Soveværelse rullegardin ned
-  description: Kør rullegardinet i soveværelse ned, script til at blive brugt i iPhone
-    widget
+  description: Kør rullegardinet i soveværelse ned, script til at blive brugt i iPhone widget
   sequence:
-  - if:
-    - condition: state
-      entity_id: binary_sensor.monique_home
-      state: 'on'
-    then:
-    - event: bedroom_blind
-      event_data:
-        command: close
+    - if:
+        - condition: state
+          entity_id: binary_sensor.monique_home
+          state: "on"
+      then:
+        - event: bedroom_blind
+          event_data:
+            command: close
   mode: queued
   max: 10

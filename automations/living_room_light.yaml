@@ -103,7 +103,6 @@
                 - button_1_short
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2700
@@ -121,14 +120,11 @@
                   - light.living_room_light_window_right
                   - light.living_room_light_strip_skylight
             - action: light.turn_on
-              metadata: {}
-              data: {}
               target:
                 entity_id:
                   - light.living_room_smart_plug_lamp
                   - light.living_room_smart_plug_christmas_elf_house
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:
@@ -149,7 +145,6 @@
                 - button_2_short
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2700
@@ -159,7 +154,6 @@
                   - light.living_room_light_dining_table_spot_cabinet
                   - light.living_room_light_dining_table_spot_sofa
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2700
@@ -168,7 +162,6 @@
                 entity_id:
                   - light.living_room_light_strip_skylight
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2300
@@ -183,7 +176,6 @@
                   - light.living_room_light_table_lamp_cabinet
                   - light.living_room_light_table_lamp_sofa
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2300
@@ -192,14 +184,11 @@
                 entity_id:
                   - light.living_room_light_tv_left
             - action: light.turn_on
-              metadata: {}
-              data: {}
               target:
                 entity_id:
                   - light.living_room_smart_plug_lamp
                   - light.living_room_smart_plug_christmas_elf_house
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:
@@ -219,7 +208,6 @@
                 - button_3_short
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2700
@@ -234,7 +222,6 @@
                   - light.living_room_light_strip_tv
                   - light.living_room_light_gradient_tube_tv
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2100
@@ -244,7 +231,6 @@
                   - light.living_room_light_coffee_table_1
                   - light.living_room_light_coffee_table_2
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 2300
@@ -256,14 +242,11 @@
                   - light.living_room_light_table_lamp_cabinet
                   - light.living_room_light_table_lamp_sofa
             - action: light.turn_on
-              metadata: {}
-              data: {}
               target:
                 entity_id:
                   - light.living_room_smart_plug_lamp
                   - light.living_room_smart_plug_christmas_elf_house
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:
@@ -281,7 +264,6 @@
                 - button_4_short
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 transition: 1
                 color_temp_kelvin: 3000
@@ -308,8 +290,6 @@
                   - light.living_room_light_table_lamp_cabinet
                   - light.living_room_light_table_lamp_sofa
             - action: light.turn_on
-              metadata: {}
-              data: {}
               target:
                 entity_id:
                   - light.living_room_smart_plug_lamp
@@ -340,7 +320,6 @@
                         - sleeping
           sequence:
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:

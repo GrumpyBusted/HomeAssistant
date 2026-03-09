@@ -79,7 +79,6 @@
               state: "off"
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 brightness_pct: 100
                 color_temp_kelvin: 2700
@@ -111,7 +110,6 @@
                   state: "off"
           sequence:
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:

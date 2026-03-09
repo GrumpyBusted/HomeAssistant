@@ -34,7 +34,6 @@
               state: "off"
           sequence:
             - action: light.turn_on
-              metadata: {}
               data:
                 brightness_pct: 70
                 transition: 1
@@ -51,7 +50,6 @@
                 - cleared_entrance
           sequence:
             - action: light.turn_off
-              metadata: {}
               data:
                 transition: 1
               target:

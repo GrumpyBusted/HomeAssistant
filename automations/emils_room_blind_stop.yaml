@@ -28,8 +28,6 @@
         entity_id: automation.emils_room_blind
       action: automation.turn_off
     - action: cover.stop_cover
-      metadata: {}
-      data: {}
       target:
         entity_id: cover.emils_room_blind
     - delay:
