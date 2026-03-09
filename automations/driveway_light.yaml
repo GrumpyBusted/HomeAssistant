@@ -1,6 +1,7 @@
 - id: "1737916297775"
   alias: Indkørsel lys
-  description: Automatik til at styre lys i indkørsel
+  description: |
+    Automatik til at styre lys i indkørsel
   mode: queued
   max: 10
   trace:
@@ -8,64 +9,55 @@
 
   triggers:
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_street_presence
+      entity_id: binary_sensor.driveway_street_presence
       from: "off"
       to: "on"
       id: detected_street
 
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_street_presence
+      entity_id: binary_sensor.driveway_street_presence
       from: "on"
       to: "off"
       id: cleared_street
 
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_house_south_presence
+      entity_id: binary_sensor.driveway_house_south_presence
       from: "off"
       to: "on"
       id: detected_south
 
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_house_south_presence
+      entity_id: binary_sensor.driveway_house_south_presence
       from: "on"
       to: "off"
       id: cleared_south
 
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_entrance_presence
+      entity_id: binary_sensor.driveway_entrance_presence
       from: "off"
       to: "on"
       id: detected_entrance
 
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_entrance_presence
+      entity_id: binary_sensor.driveway_entrance_presence
       from: "on"
       to: "off"
       id: cleared_entrance
 
     - trigger: state
-      entity_id:
-        - binary_sensor.garden_house_east_presence
+      entity_id: binary_sensor.garden_house_east_presence
       from: "off"
       to: "on"
       id: detected_east
 
     - trigger: state
-      entity_id:
-        - binary_sensor.garden_house_east_presence
+      entity_id: binary_sensor.garden_house_east_presence
       from: "on"
       to: "off"
       id: cleared_east
 
     - trigger: state
-      entity_id:
-        - binary_sensor.home_outside_light
+      entity_id: binary_sensor.home_outside_light
       from: "on"
       to: "off"
       id: twilight
@@ -80,8 +72,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - detected_south
+              id: detected_south
             - condition: state
               entity_id: binary_sensor.home_outside_light
               state: "off"
@@ -100,8 +91,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - detected_street
+              id: detected_street
             - condition: state
               entity_id: binary_sensor.home_outside_light
               state: "off"
@@ -120,8 +110,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - detected_entrance
+              id: detected_entrance
             - condition: state
               entity_id: binary_sensor.home_outside_light
               state: "off"
@@ -129,8 +118,7 @@
             - action: light.turn_on
               continue_on_error: true
               target:
-                entity_id:
-                  - light.driveway_lights_group
+                entity_id: light.driveway_lights_group
               data:
                 brightness_pct: 100
                 color_temp_kelvin: 3000
@@ -138,8 +126,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - detected_east
+              id: detected_east
             - condition: state
               entity_id: binary_sensor.home_outside_light
               state: "off"
@@ -177,14 +164,20 @@
               entity_id: binary_sensor.home_outside_light
               state: "off"
             - condition: template
-              value_template: "{% set wd = now().weekday() %} {% set h = now().hour %} {% set d = now().day %} {% set m = now().month %} {{ (wd in [4,5] and h < 23) or (m == 12 and d == 31 and h < 24) or (h < 22) }}"
+              value_template: |-
+                {% set wd = now().weekday() %}
+                {% set h = now().hour %}
+                {% set d = now().day %}
+                {% set m = now().month %}
+                {{ (wd in [4,5] and h < 23) or (m == 12 and d == 31 and h < 24) or (h < 22) }}
             - condition: time
               after: "12:00:00"
           sequence:
             - choose:
                 - conditions:
                     - condition: template
-                      value_template: "{{ now().month == 12 and now().day >= 1 and now().day <= 26 }}"
+                      value_template: |-
+                        {{ now().month == 12 and now().day >= 1 and now().day <= 26 }}
                   sequence:
                     - action: scene.turn_on
                       target:
@@ -193,7 +186,8 @@
                         transition: 1
                 - conditions:
                     - condition: template
-                      value_template: "{{ (now().month == 12 and now().day >= 30) or (now().month == 1 and now().day == 1) }}"
+                      value_template: |-
+                        {{ (now().month == 12 and now().day >= 30) or (now().month == 1 and now().day == 1) }}
                   sequence:
                     - action: scene.turn_on
                       target:
@@ -202,7 +196,8 @@
                         transition: 1
                 - conditions:
                     - condition: template
-                      value_template: "{{ now().month == 10 and now().day >= 15 and now().day <= 31 }}"
+                      value_template: |-
+                        {{ now().month == 10 and now().day >= 15 and now().day <= 31 }}
                   sequence:
                     - action: scene.turn_on
                       target:
@@ -211,7 +206,8 @@
                         transition: 1
                 - conditions:
                     - condition: template
-                      value_template: "{{ now().month == 3 and now().day == 17 }}"
+                      value_template: |-
+                        {{ now().month == 3 and now().day == 17 }}
                   sequence:
                     - action: scene.turn_on
                       target:
@@ -220,7 +216,8 @@
                         transition: 1
                 - conditions:
                     - condition: template
-                      value_template: "{{ now().month == 2 and now().day == 14 }}"
+                      value_template: |-
+                        {{ now().month == 2 and now().day == 14 }}
                   sequence:
                     - action: scene.turn_on
                       target:

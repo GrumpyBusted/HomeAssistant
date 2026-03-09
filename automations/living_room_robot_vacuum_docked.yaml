@@ -1,6 +1,7 @@
 - id: "1768131852214"
   alias: Stue robotstøvsuger docked
-  description: Automatic til at kontrollere robotstøvsuger
+  description: |
+    Automatic til at kontrollere robotstøvsuger
   mode: queued
   max: 10
   trace:
@@ -14,8 +15,7 @@
     - trigger: state
       entity_id: vacuum.living_room_robot_vacuum
       to: docked
-      for:
-        seconds: 120
+      for: 00:03:00
 
     - trigger: state
       entity_id: sensor.living_room_robot_vacuum_status
@@ -37,16 +37,15 @@
             - condition: state
               entity_id: vacuum.living_room_robot_vacuum
               state: docked
-
             - condition: state
               entity_id: sensor.living_room_robot_vacuum_status
               state:
                 - idle
                 - charging
                 - charging_complete
-
             - condition: template
-              value_template: "{{ (now() - states.input_select.living_room_robot_vacuum_current_cleaning.last_updated).total_seconds() > 60 }}"
+              value_template: |-
+                {{ (now() - states.input_select.living_room_robot_vacuum_current_cleaning.last_updated).total_seconds() > 60 }}
           sequence:
             - action: timer.cancel
               target:

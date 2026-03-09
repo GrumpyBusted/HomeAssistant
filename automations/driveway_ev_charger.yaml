@@ -1,6 +1,7 @@
 - id: "1770505461525"
   alias: Indkørsel billader
-  description: Disable entities på billader
+  description: |
+    Disable entities på billader
   mode: single
   trace:
     stored_traces: 100
@@ -24,11 +25,9 @@
           sequence:
             - action: homeassistant.disable_entity
               data:
-                entity_id:
-                  - switch.driveway_ev_charger_pause
+                entity_id: switch.driveway_ev_charger_pause
 
       default:
         - action: homeassistant.enable_entity
           data:
-            entity_id:
-              - switch.driveway_ev_charger_pause
+            entity_id: switch.driveway_ev_charger_pause

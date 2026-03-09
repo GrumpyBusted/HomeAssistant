@@ -1,6 +1,7 @@
 - id: "1770323072575"
   alias: Køkken todo køleskab
-  description: Opret todo opgaver vedrørende køleskab
+  description: |
+    Opret todo opgaver vedrørende køleskab
   mode: queued
   max: 10
   trace:
@@ -8,8 +9,7 @@
 
   triggers:
     - trigger: state
-      entity_id:
-        - binary_sensor.kitchen_fridge_filter_status
+      entity_id: binary_sensor.kitchen_fridge_filter_status
       id: status_changed
 
     - trigger: event
@@ -21,15 +21,13 @@
     - trigger: state
       entity_id: binary_sensor.kitchen_fridge_fridge_door
       to: "on"
-      for:
-        seconds: 180
+      for: 00:03:00
       id: fridge_door_open
 
     - trigger: state
       entity_id: binary_sensor.kitchen_fridge_freezer_door
       to: "on"
-      for:
-        seconds: 60
+      for: 00:01:00
       id: freezer_door_open
 
     - trigger: numeric_state
@@ -45,7 +43,9 @@
     - trigger: time_pattern
       hours: /1
       id: periodic
+
   conditions: []
+
   actions:
     - choose:
         - conditions:
@@ -105,8 +105,10 @@
                 id: kitchen_fridge_temperature
                 persistent: false
                 recipient: home
-                message: Køleskabet i køkkenet er for varmt, temperaturen er {{ states('sensor.kitchen_fridge_fridge_temperature') | round(1) }} °C, skal være under 6 °C
-
+                message: |-
+                  Køleskabet i køkkenet er for varmt, temperaturen er 
+                  {{ states('sensor.kitchen_fridge_fridge_temperature') | round(1) }} °C, 
+                  skal være under 6 °C
         - conditions:
             - condition: trigger
               id: freezer_to_warm
@@ -118,8 +120,10 @@
                 id: kitchen_freezer_temperature
                 persistent: false
                 recipient: home
-                message: Fryseren i køkkenet er for varmt, temperaturen er {{ states('sensor.kitchen_fridge_freezer_temperature') | round(1) }} °C, skal være under -17 °C
-
+                message: |-
+                  Fryseren i køkkenet er for varmt, 
+                  temperaturen er {{ states('sensor.kitchen_fridge_freezer_temperature') | round(1) }} °C, 
+                  skal være under -17 °C
         - conditions:
             - condition: trigger
               id: periodic

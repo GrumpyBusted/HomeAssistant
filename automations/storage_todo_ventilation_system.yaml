@@ -1,6 +1,7 @@
 - id: "1771357000655"
   alias: Loftrum todo ventilationsanlæg
-  description: Opret todo opgaver vedrørende filter m.m. på ventilationsanlæget i loftrummet
+  description: |
+    Opret todo opgaver vedrørende filter m.m. på ventilationsanlæget i loftrummet
   mode: queued
   max: 10
   trace:
@@ -18,14 +19,12 @@
     - trigger: state
       entity_id: climate.storage_ventilation_system_ventilation
       attribute: fan_mode
-      to:
-        - "off"
+      to: "off"
 
     - trigger: state
       entity_id: climate.storage_ventilation_system_ventilation
       attribute: fan_mode
-      from:
-        - "off"
+      from: "off"
 
     - trigger: time
       at: "03:19:00"
@@ -55,20 +54,19 @@
           data:
             subject: Udskift filter på ventilationsanlægget
             description: >
-              Udskift
-              {% if is_state('input_boolean.storage_ventilation_system_replace_pollen_filter_next','on') %}
+              Udskift {% if is_state('input_boolean.storage_ventilation_system_replace_pollen_filter_next','on') %}
                 både Standardfilter (tynde blå) og Pollenfilter (tykke hvide)
               {% else %}
                 Standardfilter (tynde blå)
-              {% endif %}
-              på ventilationsanlægget på loftet.
-              Husk at nulstille filter alarm til 90 dage.
+              {% endif %} på ventilationsanlægget på loftet. Husk at nulstille filter alarm til 90 dage.
+
+
             related_entity_id: sensor.storage_ventilation_system_days_left_until_filter_change
             entity_id: todo.todo_smart_todo
             is_active: "{{ states('sensor.storage_ventilation_system_days_left_until_filter_change') | int(99) < 1 }}"
 
     - variables:
-        message: >
+        message: |-
           {% set raw_list = states('sensor.storage_ventilation_system_active_alarm_list') %}
           {% set raw_count = states('sensor.storage_ventilation_system_active_alarm_count') | int(0) %}
           {% set alarms = raw_list.split('\n') | map('trim') | reject('equalto','') | list %}
@@ -77,8 +75,7 @@
           {% set new_count = raw_count - removed %}
           {% if new_count < 0 %}
             {% set new_count = 0 %}
-          {% endif %}
-          {% if new_count > 0 and filtered | length > 0 %}
+          {% endif %} {% if new_count > 0 and filtered | length > 0 %}
             Antal alarmer: {{ new_count }} Liste: {{ filtered | join('\n') }}
           {% endif %}
 
@@ -86,8 +83,9 @@
       data:
         subject: Alarm på ventilationsanlægget
         description: >
-          Der er en eller flere alarmer på ventilationsanlægget.
-          {{ message }}
+          Der er en eller flere alarmer på ventilationsanlægget. {{ message }}
+
+
         related_entity_id: sensor.storage_ventilation_system_days_left_until_filter_change
         entity_id: todo.todo_smart_todo
         is_active: "{{ message | trim | length > 0 }}"

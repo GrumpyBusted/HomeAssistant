@@ -1,6 +1,7 @@
 - id: "1739904709484"
   alias: Hjem todo Netatmo
-  description: Kontroller batteri status på Netatmo enheder
+  description: |
+    Kontroller batteri status på Netatmo enheder
   mode: restart
   trace:
     stored_traces: 30
@@ -15,8 +16,7 @@
         - sensor.greenhouse_weather_station_battery
         - sensor.technic_room_weather_station_battery
       below: 5
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: numeric_state
       entity_id:
@@ -27,8 +27,7 @@
         - sensor.greenhouse_weather_station_battery
         - sensor.technic_room_weather_station_battery
       above: 70
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: time
       at: 03:10:00

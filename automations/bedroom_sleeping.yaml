@@ -1,6 +1,7 @@
 - id: "1771522267634"
   alias: Soveværelse sover
-  description: Styring af timer til soveværelse sover
+  description: |
+    Styring af timer til soveværelse sover
   mode: queued
   max: 10
   trace:
@@ -25,8 +26,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - sleeping
+              id: sleeping
           sequence:
             - action: timer.start
               target:
@@ -36,8 +36,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - waking
+              id: waking
           sequence:
             - action: timer.cancel
               target:

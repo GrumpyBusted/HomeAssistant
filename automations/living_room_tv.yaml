@@ -1,6 +1,7 @@
 - id: "1770568204317"
   alias: Stue TV
-  description: Disable entities på TV
+  description: |
+    Disable entities på TV
   mode: single
   trace:
     stored_traces: 10
@@ -25,6 +26,7 @@
                   - media_player.living_room_tv_cast_media_player
                   - media_player.living_room_android_tv_media_player
                   - remote.living_room_android_tv_remote
+
       default:
         - action: homeassistant.enable_entity
           data:

@@ -1,6 +1,7 @@
 - id: "1768136225501"
   alias: Stue robotstøvsuger tøm støvbeholder
-  description: Tøm støvbeholder på robotstøvsuger
+  description: |
+    Tøm støvbeholder på robotstøvsuger
   mode: queued
   max: 10
   trace:
@@ -47,7 +48,8 @@
     - choose:
         - conditions:
             - condition: template
-              value_template: "{{ states('sensor.living_room_robot_vacuum_time_since_empty_dust_bin') | int > 10 }}"
+              value_template: |-
+                {{ states('sensor.living_room_robot_vacuum_time_since_empty_dust_bin') | int > 10 }}
             - condition: state
               entity_id: vacuum.living_room_robot_vacuum
               state: docked
@@ -71,7 +73,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ states('sensor.living_room_robot_vacuum_time_since_empty_dust_bin') | int > 10 }}"
+              value_template: |-
+                {{ states('sensor.living_room_robot_vacuum_time_since_empty_dust_bin') | int > 10 }}
             - condition: state
               entity_id: vacuum.living_room_robot_vacuum
               state: docked
@@ -95,7 +98,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ states('sensor.living_room_robot_vacuum_time_since_empty_dust_bin') | int > 30 }}"
+              value_template: |-
+                {{ states('sensor.living_room_robot_vacuum_time_since_empty_dust_bin') | int > 30 }}
             - condition: state
               entity_id: vacuum.living_room_robot_vacuum
               state: docked

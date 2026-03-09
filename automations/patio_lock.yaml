@@ -1,6 +1,7 @@
 - id: "1761840992462"
   alias: Terrasse lås
-  description: Automatik til at styre terrasse dør låsen
+  description: |
+    Automatik til at styre terrasse dør låsen
   mode: queued
   max: 10
   trace:
@@ -64,8 +65,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - auto_locking_expired
+              id: auto_locking_expired
             - condition: state
               entity_id: lock.patio_lock
               state: unlocked

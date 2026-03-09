@@ -1,17 +1,19 @@
 - id: "1764615121152"
   alias: Hjem iPhone opdater lokation
-  description: Opdater iPhone location hvis iPhone-sensorer er mere end 1 time gamle.
+  description: |
+    Opdater iPhone location hvis iPhone-sensorer er mere end 1 time gamle.
   mode: single
   trace:
     stored_traces: 20
 
   triggers:
-    - minutes: /10
-      trigger: time_pattern
+    - trigger: time_pattern
+      minutes: /10
 
   conditions:
     - condition: template
-      value_template: "{{ stale_locations | count > 0 }}"
+      value_template: |-
+        {{ stale_locations | count > 0 }}
 
   actions:
     - repeat:
@@ -20,32 +22,40 @@
           - choose:
               - conditions:
                   - condition: template
-                    value_template: "{{ repeat.item == 'sensor.anders_iphone_location_last_updated' }}"
+                    value_template: |-
+                      {{ repeat.item == 'sensor.anders_iphone_location_last_updated' }}
                 sequence:
-                  - data:
+                  - action: notify.mobile_app_anders_iphone
+                    data:
                       message: request_location_update
-                    action: notify.mobile_app_anders_iphone
+
               - conditions:
                   - condition: template
-                    value_template: "{{ repeat.item == 'sensor.monique_iphone_location_last_updated' }}"
+                    value_template: |-
+                      {{ repeat.item == 'sensor.monique_iphone_location_last_updated' }}
                 sequence:
-                  - data:
+                  - action: notify.mobile_app_monique_iphone
+                    data:
                       message: request_location_update
-                    action: notify.mobile_app_monique_iphone
+
               - conditions:
                   - condition: template
-                    value_template: "{{ repeat.item == 'sensor.emil_iphone_location_last_updated' }}"
+                    value_template: |-
+                      {{ repeat.item == 'sensor.emil_iphone_location_last_updated' }}
                 sequence:
-                  - data:
+                  - action: notify.mobile_app_emil_iphone
+                    data:
                       message: request_location_update
-                    action: notify.mobile_app_emil_iphone
+
               - conditions:
                   - condition: template
-                    value_template: "{{ repeat.item == 'sensor.charlie_iphone_location_last_updated' }}"
+                    value_template: |-
+                      {{ repeat.item == 'sensor.charlie_iphone_location_last_updated' }}
                 sequence:
-                  - data:
+                  - action: notify.mobile_app_charlie_iphone
+                    data:
                       message: request_location_update
-                    action: notify.mobile_app_charlie_iphone
+
   variables:
     iphone_sensors:
       - sensor.anders_iphone_location_last_updated

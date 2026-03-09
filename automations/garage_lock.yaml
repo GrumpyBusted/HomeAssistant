@@ -1,6 +1,7 @@
 - id: "1763847410643"
   alias: Garage lås
-  description: Automatik til at låse garage døren op og i baseret på hvem der er hjemme
+  description: |
+    Automatik til at låse garage døren op og i baseret på hvem der er hjemme
   mode: queued
   max: 10
   trace:
@@ -8,15 +9,13 @@
 
   triggers:
     - trigger: state
-      entity_id:
-        - binary_sensor.someone_home
+      entity_id: binary_sensor.someone_home
       from: "on"
       to: "off"
       id: no_one_home
 
     - trigger: state
-      entity_id:
-        - binary_sensor.everyone_sleeping
+      entity_id: binary_sensor.everyone_sleeping
       from: "off"
       to: "on"
       id: sleeping
@@ -27,8 +26,7 @@
       id: bedroom_going_to_sleep
 
     - trigger: state
-      entity_id:
-        - timer.garage_lock_timer
+      entity_id: timer.garage_lock_timer
       to: idle
       id: auto_locking_expired
 
@@ -65,12 +63,10 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - auto_locking_expired
+              id: auto_locking_expired
             - condition: state
               entity_id: lock.garage_lock
-              state:
-                - unlocked
+              state: unlocked
             - condition: state
               entity_id: binary_sensor.house_sitter_home
               state: "off"

@@ -1,17 +1,19 @@
 - id: "1764364029434"
   alias: Hjem elektricitet måler aflæs
-  description: Aflæs elektricitets forbrug og gem i CSV fil
+  description: |
+    Aflæs elektricitets forbrug og gem i CSV fil
   mode: single
   trace:
     stored_traces: 20
 
   triggers:
-    - at: 01:00:00
-      trigger: time
+    - trigger: time
+      at: 01:00:00
 
   conditions:
     - condition: template
-      value_template: "{{ now().day == 1 }}"
+      value_template: |-
+        {{ now().day == 1 }}
 
   actions:
     - action: shell_command.append_to_file

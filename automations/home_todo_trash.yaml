@@ -1,6 +1,7 @@
 - id: "1740779558756"
   alias: Hjem todo affald
-  description: Automation til at oprette todo for at tømme affald og tage affaldscontainer på til vejen
+  description: |
+    Automation til at oprette todo for at tømme affald og tage affaldscontainer på til vejen
   mode: queued
   max: 10
   trace:
@@ -30,24 +31,26 @@
     - action: system_log.write
       data:
         level: debug
-        message: '"Pickup date: {{ pickup_date }}"
-
-          "Tomorrow: {{ tomorrow }}"'
+        message: |-
+          Pickup date: {{ pickup_date }}
+          Tomorrow: {{ tomorrow }}
     - choose:
         - conditions:
             - condition: template
-              value_template: "{{ status != 200 }}"
+              value_template: |-
+                {{ status != 200 }}
           sequence:
             - action: persistent_notification.create
               data:
-                message: "Status: {{ status }}
-
-                  Response: {{ response }}              "
+                message: |-
+                  Status: {{ status }}
+                  Response: {{ response }}
                 title: Unable to find next trash pickup
 
         - conditions:
             - condition: template
-              value_template: "{{ pickup_date == tomorrow }}"
+              value_template: |-
+                {{ pickup_date == tomorrow }}
           sequence:
             - action: input_datetime.set_datetime
               data:
@@ -64,7 +67,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ states('input_datetime.home_trash_pickup_date') == today }}"
+              value_template: |-
+                {{ states('input_datetime.home_trash_pickup_date') == today }}
           sequence:
             - action: script.create_todo_task
               data:
@@ -75,7 +79,8 @@
 
     - if:
         - condition: template
-          value_template: "{{ now().weekday() == 1 }}"
+          value_template: |-
+            {{ now().weekday() == 1 }}
       then:
         - action: script.create_todo_task
           data:

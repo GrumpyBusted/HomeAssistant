@@ -1,6 +1,7 @@
 - id: "1760882975403"
   alias: Indkørsel lys hus syd
-  description: Automatik til at styre lys i indkørslen på syd siden af huset
+  description: |
+    Automatik til at styre lys i indkørslen på syd siden af huset
   mode: queued
   max: 10
   trace:
@@ -8,57 +9,49 @@
 
   triggers:
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_house_south_presence
+      entity_id: binary_sensor.driveway_house_south_presence
       from: "off"
       to: "on"
       id: detected_south
 
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_house_south_presence
+      entity_id: binary_sensor.driveway_house_south_presence
       from: "on"
       to: "off"
       id: cleared_south
 
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_entrance_presence
+      entity_id: binary_sensor.driveway_entrance_presence
       from: "off"
       to: "on"
       id: detected_entrance
 
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_entrance_presence
+      entity_id: binary_sensor.driveway_entrance_presence
       from: "on"
       to: "off"
       id: cleared_entrance
 
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_street_presence
+      entity_id: binary_sensor.driveway_street_presence
       from: "off"
       to: "on"
       id: detected_street
 
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_street_presence
+      entity_id: binary_sensor.driveway_street_presence
       from: "on"
       to: "off"
       id: cleared_street
 
     - trigger: state
-      entity_id:
-        - binary_sensor.garden_house_west_presence
+      entity_id: binary_sensor.garden_house_west_presence
       from: "off"
       to: "on"
       id: detected_west
 
     - trigger: state
-      entity_id:
-        - binary_sensor.garden_house_west_presence
+      entity_id: binary_sensor.garden_house_west_presence
       from: "on"
       to: "off"
       id: cleared_west
@@ -84,8 +77,7 @@
                 color_temp_kelvin: 2700
                 transition: 1
               target:
-                entity_id:
-                  - light.driveway_light_house_south
+                entity_id: light.driveway_light_house_south
 
         - conditions:
             - condition: and
@@ -113,5 +105,4 @@
               data:
                 transition: 1
               target:
-                entity_id:
-                  - light.driveway_light_house_south
+                entity_id: light.driveway_light_house_south

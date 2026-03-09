@@ -1,6 +1,7 @@
 - id: "1737312016227"
   alias: Stue varme
-  description: Automatik til at styre varmen i stuen
+  description: |
+    Automatik til at styre varmen i stuen
   mode: queued
   max: 10
   trace:
@@ -25,12 +26,10 @@
 
   actions:
     - choose:
-
         - conditions:
             - condition: state
               entity_id: binary_sensor.someone_home
               state: "off"
-
             - condition: state
               entity_id: timer.living_room_heating_manual_timer
               state: active
@@ -42,9 +41,9 @@
         - conditions:
             - condition: trigger
               id: target_changed
-
             - condition: template
-              value_template: "{{ states('sensor.living_room_target_temperature') | float(0.0) != states('sensor.living_room_desired_temperature') | float(21.0) }}"
+              value_template: |-
+                {{ states('sensor.living_room_target_temperature') | float(0.0) != states('sensor.living_room_desired_temperature') | float(21.0) }}
           sequence:
             - action: timer.start
               data:
@@ -54,8 +53,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ states('sensor.living_room_target_temperature') | float(0.0) == states('sensor.living_room_desired_temperature') | float(21.0) }}"
-
+              value_template: |-
+                {{ states('sensor.living_room_target_temperature') | float(0.0) == states('sensor.living_room_desired_temperature') | float(21.0) }}
             - condition: state
               entity_id: timer.living_room_heating_manual_timer
               state: active

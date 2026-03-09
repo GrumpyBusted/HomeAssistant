@@ -1,6 +1,7 @@
 - id: "1770546802021"
   alias: Loftrum lys
-  description: Automatik til at styre lys i loftrummet
+  description: |
+    Automatik til at styre lys i loftrummet
   mode: queued
   max: 10
   trace:

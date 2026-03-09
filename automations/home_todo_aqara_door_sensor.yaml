@@ -1,6 +1,7 @@
 - id: C1620AD8-C4E4-426E-9D86-EC3415479F1B
   alias: Hjem todo Aqara dørsensor
-  description: Kontroller batteri status på Aqara dør og vindue sensorer
+  description: |
+    Kontroller batteri status på Aqara dør og vindue sensorer
   mode: restart
   trace:
     stored_traces: 30
@@ -17,8 +18,7 @@
         - sensor.kitchen_window_sensor_battery
         - sensor.living_room_window_sensor_sofa_battery
       below: 10
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: numeric_state
       entity_id:
@@ -31,8 +31,7 @@
         - sensor.kitchen_window_sensor_battery
         - sensor.living_room_window_sensor_sofa_battery
       above: 20
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: time
       at: 03:24:00

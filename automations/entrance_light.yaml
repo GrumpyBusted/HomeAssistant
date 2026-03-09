@@ -1,6 +1,7 @@
 - id: "1747337340117"
   alias: Entre lys
-  description: Automatik til at styre lys i entreen
+  description: |
+    Automatik til at styre lys i entreen
   mode: queued
   max: 10
   trace:
@@ -8,32 +9,27 @@
 
   triggers:
     - trigger: state
-      entity_id:
-        - binary_sensor.entrance_presence
+      entity_id: binary_sensor.entrance_presence
       to: "on"
       id: detected_inside
 
     - trigger: state
-      entity_id:
-        - binary_sensor.entrance_presence
+      entity_id: binary_sensor.entrance_presence
       to: "off"
       id: cleared_inside
 
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_entrance_presence
+      entity_id: binary_sensor.driveway_entrance_presence
       to: "on"
       id: detected_outside
 
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_entrance_presence
+      entity_id: binary_sensor.driveway_entrance_presence
       to: "off"
       id: cleared_outside
 
     - trigger: state
-      entity_id:
-        - binary_sensor.someone_home
+      entity_id: binary_sensor.someone_home
       to: "off"
       id: no_one_home
 
@@ -49,8 +45,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - detected_inside
+              id: detected_inside
             - condition: numeric_state
               entity_id: sensor.entrance_motion_sensor_illuminance
               below: 200
@@ -60,8 +55,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - detected_outside
+              id: detected_outside
             - condition: state
               entity_id: binary_sensor.home_outside_light
               state: "off"
@@ -86,8 +80,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - no_one_home
+              id: no_one_home
           sequence:
             - variables:
                 light: "off"
@@ -95,8 +88,8 @@
     - choose:
         - conditions:
             - condition: template
-              value_template: |
-                {{ light == "on" }}
+              value_template: |-
+                {{ light == 'on' }}
             - condition: state
               entity_id: select.bedroom_state
               state:
@@ -112,13 +105,12 @@
                 brightness_pct: 30
                 transition: 1
               target:
-                entity_id:
-                  - light.entrance_lights
+                entity_id: light.entrance_lights
 
         - conditions:
             - condition: template
-              value_template: |
-                {{ light == "on" }}
+              value_template: |-
+                {{ light == 'on' }}
           sequence:
             - action: light.turn_on
               data:
@@ -126,18 +118,15 @@
                 brightness_pct: 80
                 transition: 1
               target:
-                entity_id:
-                  - light.entrance_lights
+                entity_id: light.entrance_lights
 
         - conditions:
             - condition: template
-              value_template: '{{ light == "off" }}
-
-                '
+              value_template: |-
+                {{ light == 'off' }}
           sequence:
             - action: light.turn_off
               data:
                 transition: 1
               target:
-                entity_id:
-                  - light.entrance_lights
+                entity_id: light.entrance_lights

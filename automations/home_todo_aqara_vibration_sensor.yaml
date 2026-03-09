@@ -1,24 +1,21 @@
 - id: "1740337167224"
   alias: Hjem todo Aqara vibrationsensor
-  description: Kontroller batteri status på Aqara vibrationsensorer
+  description: |
+    Kontroller batteri status på Aqara vibrationsensorer
   mode: restart
   trace:
     stored_traces: 30
 
   triggers:
     - trigger: numeric_state
-      entity_id:
-        - sensor.driveway_mailbox_vibration_sensor_battery
+      entity_id: sensor.driveway_mailbox_vibration_sensor_battery
       below: 20
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: numeric_state
-      entity_id:
-        - sensor.driveway_mailbox_vibration_sensor_battery
+      entity_id: sensor.driveway_mailbox_vibration_sensor_battery
       above: 70
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: time
       at: 03:06:00

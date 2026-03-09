@@ -1,6 +1,7 @@
 - id: "1769930000823"
   alias: Emils værelse medieafspiller
-  description: Styring af tilbehør til medie afspilning på Emils værelse
+  description: |
+    Styring af tilbehør til medie afspilning på Emils værelse
   mode: queued
   max: 10
   trace:
@@ -23,8 +24,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - not_home
+              id: not_home
           sequence:
             - action: media_player.turn_off
               target:
@@ -32,8 +32,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - "off"
+              id: "off"
             - condition: state
               entity_id: binary_sensor.emils_room_light
               state: "off"

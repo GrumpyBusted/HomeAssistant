@@ -1,6 +1,7 @@
 - id: "1769208997346"
   alias: Gang fotorammer
-  description: Automatik for at styre fotorammer i gangen
+  description: |
+    Automatik for at styre fotorammer i gangen
   mode: queued
   max: 10
   trace:
@@ -8,15 +9,13 @@
 
   triggers:
     - trigger: state
-      entity_id:
-        - binary_sensor.someone_home
+      entity_id: binary_sensor.someone_home
 
     - trigger: state
       entity_id: select.bedroom_state
 
     - trigger: state
-      entity_id:
-        - binary_sensor.bedroom_door
+      entity_id: binary_sensor.bedroom_door
 
     - trigger: state
       entity_id:

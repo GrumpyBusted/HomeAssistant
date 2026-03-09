@@ -1,6 +1,7 @@
 - id: "1769872488563"
   alias: Toilet bevægelsessensor
-  description: Håndtering af bevægelsessensoren på toilettet
+  description: |
+    Håndtering af bevægelsessensoren på toilettet
   mode: queued
   max: 10
   trace:
@@ -30,8 +31,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - detected
+              id: detected
           sequence:
             - action: timer.cancel
               target:
@@ -39,8 +39,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - cleared
+              id: cleared
           sequence:
             - action: timer.start
               target:
@@ -50,8 +49,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - timeout
+              id: timeout
           sequence:
             - action: counter.increment
               target:

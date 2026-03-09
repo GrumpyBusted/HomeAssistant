@@ -1,6 +1,7 @@
 - id: "1764974327446"
   alias: Hjem vand måler indlæs
-  description: Indlæs vand måler aflæsninger og opdater sensor
+  description: |
+    Indlæs vand måler aflæsninger og opdater sensor
   mode: queued
   max: 10
   trace:

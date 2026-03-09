@@ -1,6 +1,7 @@
 - id: "1735603602121"
   alias: Stue lys
-  description: Automatik til at styre lys i stuen
+  description: |
+    Automatik til at styre lys i stuen
   mode: queued
   max: 10
   trace:
@@ -8,89 +9,74 @@
 
   triggers:
     - trigger: state
-      entity_id:
-        - event.living_room_switch_button_1
+      entity_id: event.living_room_switch_button_1
       attribute: event_type
       to: short_release
       id: button_1_short
 
     - trigger: state
-      entity_id:
-        - event.living_room_switch_button_1
+      entity_id: event.living_room_switch_button_1
       attribute: event_type
       to: long_release
       id: button_1_long
 
     - trigger: state
-      entity_id:
-        - event.living_room_switch_button_2
+      entity_id: event.living_room_switch_button_2
       attribute: event_type
       to: short_release
       id: button_2_short
 
     - trigger: state
-      entity_id:
-        - event.living_room_switch_button_2
+      entity_id: event.living_room_switch_button_2
       attribute: event_type
       to: long_release
       id: button_2_long
 
     - trigger: state
-      entity_id:
-        - event.living_room_switch_button_3
+      entity_id: event.living_room_switch_button_3
       attribute: event_type
       to: short_release
       id: button_3_short
 
     - trigger: state
-      entity_id:
-        - event.living_room_switch_button_3
+      entity_id: event.living_room_switch_button_3
       attribute: event_type
       to: long_release
       id: button_3_long
 
     - trigger: state
-      entity_id:
-        - event.living_room_switch_button_4
+      entity_id: event.living_room_switch_button_4
       attribute: event_type
       to: short_release
       id: button_4_short
 
     - trigger: state
-      entity_id:
-        - event.living_room_switch_button_4
+      entity_id: event.living_room_switch_button_4
       attribute: event_type
       to: long_release
       id: button_4_long
 
     - trigger: state
-      entity_id:
-        - event.living_room_switch_rotary
+      entity_id: event.living_room_switch_rotary
       id: rotary
 
     - trigger: state
-      entity_id:
-        - binary_sensor.someone_home
+      entity_id: binary_sensor.someone_home
       from: "on"
       to: "off"
       id: no_one_home
 
     - trigger: state
-      entity_id:
-        - binary_sensor.everyone_sleeping
+      entity_id: binary_sensor.everyone_sleeping
       from: "off"
       to: "on"
       id: sleeping
 
     - trigger: state
-      entity_id:
-        - binary_sensor.living_room_light
+      entity_id: binary_sensor.living_room_light
       from: "off"
       to: "on"
-      for:
-        hours: 0
-        minutes: 15
-        seconds: 0
+      for: 00:15:00
       id: lights_on
 
   conditions: []
@@ -99,8 +85,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - button_1_short
+              id: button_1_short
           sequence:
             - action: light.turn_on
               data:
@@ -141,8 +126,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - button_2_short
+              id: button_2_short
           sequence:
             - action: light.turn_on
               data:
@@ -159,8 +143,7 @@
                 color_temp_kelvin: 2700
                 brightness_pct: 75
               target:
-                entity_id:
-                  - light.living_room_light_strip_skylight
+                entity_id: light.living_room_light_strip_skylight
             - action: light.turn_on
               data:
                 transition: 1
@@ -181,8 +164,7 @@
                 color_temp_kelvin: 2300
                 brightness_pct: 50
               target:
-                entity_id:
-                  - light.living_room_light_tv_left
+                entity_id: light.living_room_light_tv_left
             - action: light.turn_on
               target:
                 entity_id:
@@ -204,8 +186,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - button_3_short
+              id: button_3_short
           sequence:
             - action: light.turn_on
               data:
@@ -260,8 +241,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - button_4_short
+              id: button_4_short
           sequence:
             - action: light.turn_on
               data:
@@ -308,16 +288,14 @@
                 - condition: and
                   conditions:
                     - condition: trigger
-                      id:
-                        - lights_on
+                      id: lights_on
                     - condition: state
                       entity_id: binary_sensor.someone_home
                       state: "off"
                 - condition: and
                   conditions:
                     - condition: trigger
-                      id:
-                        - sleeping
+                      id: sleeping
           sequence:
             - action: light.turn_off
               data:
@@ -348,8 +326,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - rotary
+              id: rotary
           sequence:
             - choose:
                 - conditions:

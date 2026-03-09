@@ -1,6 +1,7 @@
 - id: "1735842629315"
   alias: Entre lås
-  description: Automatik til at låse hoveddøren op og i baseret på hvem der er hjemme
+  description: |
+    Automatik til at låse hoveddøren op og i baseret på hvem der er hjemme
   mode: queued
   max: 10
   trace:
@@ -8,43 +9,37 @@
 
   triggers:
     - trigger: state
-      entity_id:
-        - binary_sensor.anders_home
+      entity_id: binary_sensor.anders_home
       from: "off"
       to: "on"
       id: anders_home
 
     - trigger: state
-      entity_id:
-        - binary_sensor.monique_home
+      entity_id: binary_sensor.monique_home
       from: "off"
       to: "on"
       id: monique_home
 
     - trigger: state
-      entity_id:
-        - binary_sensor.emil_home
+      entity_id: binary_sensor.emil_home
       from: "off"
       to: "on"
       id: emil_home
 
     - trigger: state
-      entity_id:
-        - binary_sensor.charlie_home
+      entity_id: binary_sensor.charlie_home
       from: "off"
       to: "on"
       id: charlie_home
 
     - trigger: state
-      entity_id:
-        - binary_sensor.someone_home
+      entity_id: binary_sensor.someone_home
       from: "on"
       to: "off"
       id: no_one_home
 
     - trigger: state
-      entity_id:
-        - binary_sensor.everyone_sleeping
+      entity_id: binary_sensor.everyone_sleeping
       from: "off"
       to: "on"
       id: sleeping
@@ -55,8 +50,7 @@
       id: bedroom_going_to_sleep
 
     - trigger: state
-      entity_id:
-        - timer.entrance_lock_timer
+      entity_id: timer.entrance_lock_timer
       to: idle
       id: auto_locking_expired
 
@@ -72,8 +66,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - anders_home
+              id: anders_home
             - condition: state
               entity_id: lock.entrance_lock
               state: locked
@@ -86,8 +79,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - monique_home
+              id: monique_home
             - condition: state
               entity_id: lock.entrance_lock
               state: locked
@@ -100,8 +92,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - emil_home
+              id: emil_home
             - condition: state
               entity_id: lock.entrance_lock
               state: locked
@@ -114,8 +105,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - charlie_home
+              id: charlie_home
             - condition: state
               entity_id: lock.entrance_lock
               state: locked
@@ -136,8 +126,7 @@
                     - bedroom_going_to_sleep
             - condition: state
               entity_id: lock.entrance_lock
-              state:
-                - unlocked
+              state: unlocked
           sequence:
             - action: lock.lock
               target:
@@ -150,12 +139,10 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - auto_locking_expired
+              id: auto_locking_expired
             - condition: state
               entity_id: lock.entrance_lock
-              state:
-                - unlocked
+              state: unlocked
             - condition: state
               entity_id: binary_sensor.house_sitter_home
               state: "off"

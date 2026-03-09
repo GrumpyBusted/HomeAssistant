@@ -1,6 +1,7 @@
 - id: "1760883022741"
   alias: Indkørsel lys entre
-  description: Automatik til at styre lys i indkørslen ved hoveddøren
+  description: |
+    Automatik til at styre lys i indkørslen ved hoveddøren
   mode: queued
   max: 10
   trace:
@@ -8,15 +9,13 @@
 
   triggers:
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_entrance_presence
+      entity_id: binary_sensor.driveway_entrance_presence
       from: "off"
       to: "on"
       id: detected_entrance
 
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_entrance_presence
+      entity_id: binary_sensor.driveway_entrance_presence
       from: "on"
       to: "off"
       id: cleared_entrance
@@ -27,8 +26,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - detected_entrance
+              id: detected_entrance
             - condition: state
               entity_id: binary_sensor.home_outside_light
               state: "off"
@@ -46,8 +44,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - cleared_entrance
+              id: cleared_entrance
           sequence:
             - action: light.turn_off
               data:

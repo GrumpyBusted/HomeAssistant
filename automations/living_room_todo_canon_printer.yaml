@@ -1,6 +1,7 @@
 - id: "1741115279443"
   alias: Stue todo Canon printer
-  description: Kontroller blæk status på Canon printer
+  description: |
+    Kontroller blæk status på Canon printer
   mode: restart
   trace:
     stored_traces: 20
@@ -66,13 +67,15 @@
         sequence:
           - if:
               - condition: template
-                value_template: "{{ states(repeat.item.entity) not in ['unknown','unavailable'] }}"
+                value_template: |-
+                  {{ states(repeat.item.entity) not in ['unknown','unavailable'] }}
             then:
               - action: script.create_todo_task
                 data:
                   subject: "Skift {{ repeat.item.name }} blæk på printer"
                   description: >
                     Blæk niveau for {{ states(repeat.item.entity) }}% på Canon TS8300 printer.<br> Blæk type: {{ repeat.item.ink }}
+
 
                   related_entity_id: "{{ repeat.item.entity }}"
                   entity_id: todo.todo_smart_todo
@@ -81,9 +84,10 @@
     - action: script.create_todo_task
       data:
         subject: Løs problem med printer
-        description: >
-          Der er registreret et problem med Canon TS8300 printer.<br> Message: {{ state_attr('sensor.living_room_printer','state_message') }}<br> Reason: {{ state_attr('sensor.living_room_printer','state_reason') }}
-
+        description: |-
+          Der er registreret et problem med Canon TS8300 printer.<br> 
+          Message: {{ state_attr('sensor.living_room_printer','state_message') }}<br> 
+          Reason: {{ state_attr('sensor.living_room_printer','state_reason') }}
         related_entity_id: sensor.living_room_printer
         entity_id: todo.todo_smart_todo
         is_active: "{{ states('sensor.living_room_printer') not in ['printing','idle'] }}"

@@ -1,6 +1,7 @@
 - id: "1737796089950"
   alias: Hjem opdater soludsigt
-  description: Opdater sol produktion udsigten i Solcast PV Forecast
+  description: |
+    Opdater sol produktion udsigten i Solcast PV Forecast
   mode: single
   trace:
     stored_traces: 10

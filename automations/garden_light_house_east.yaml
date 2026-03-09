@@ -1,6 +1,7 @@
 - id: "1760882456215"
   alias: Have lys hus øst
-  description: Automatik til at styre lys i haven på øst siden af huset
+  description: |
+    Automatik til at styre lys i haven på øst siden af huset
   mode: queued
   max: 10
   trace:
@@ -8,29 +9,25 @@
 
   triggers:
     - trigger: state
-      entity_id:
-        - binary_sensor.garden_house_east_presence
+      entity_id: binary_sensor.garden_house_east_presence
       from: "off"
       to: "on"
       id: detected_east
 
     - trigger: state
-      entity_id:
-        - binary_sensor.garden_house_east_presence
+      entity_id: binary_sensor.garden_house_east_presence
       from: "on"
       to: "off"
       id: cleared_east
 
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_entrance_presence
+      entity_id: binary_sensor.driveway_entrance_presence
       from: "off"
       to: "on"
       id: detected_entrance
 
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_entrance_presence
+      entity_id: binary_sensor.driveway_entrance_presence
       from: "on"
       to: "off"
       id: cleared_entrance
@@ -54,8 +51,7 @@
                 color_temp_kelvin: 2700
                 transition: 1
               target:
-                entity_id:
-                  - light.garden_light_house_east
+                entity_id: light.garden_light_house_east
 
         - conditions:
             - condition: and
@@ -75,5 +71,4 @@
               data:
                 transition: 1
               target:
-                entity_id:
-                  - light.garden_light_house_east
+                entity_id: light.garden_light_house_east

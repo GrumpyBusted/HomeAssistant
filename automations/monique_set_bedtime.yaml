@@ -1,6 +1,7 @@
 - id: "1740422421448"
   alias: Monique sæt sengetid
-  description: Sæt sengetid input hjælper for Monique, når webhook er kaldt
+  description: |
+    Sæt sengetid input hjælper for Monique, når webhook er kaldt
   mode: restart
   trace:
     stored_traces: 10

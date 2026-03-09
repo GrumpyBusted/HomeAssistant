@@ -1,6 +1,7 @@
 - id: "1748709891445"
   alias: Bryggers lys
-  description: Automatik til at styre lys i bryggerset
+  description: |
+    Automatik til at styre lys i bryggerset
   mode: queued
   max: 10
   trace:
@@ -29,8 +30,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - detected
+              id: detected
             - condition: numeric_state
               entity_id: sensor.utility_room_motion_sensor_illuminance
               below: 400
@@ -49,8 +49,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - detected
+              id: detected
             - condition: numeric_state
               entity_id: sensor.utility_room_motion_sensor_illuminance
               below: 400

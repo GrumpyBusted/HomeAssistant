@@ -1,6 +1,7 @@
 - id: "1736106304486"
   alias: Charlies værelse rullegardin stop
-  description: Automatik for at stoppe rullegardin på Charlies værelse
+  description: |
+    Automatik for at stoppe rullegardin på Charlies værelse
   mode: queued
   max: 10
   trace:

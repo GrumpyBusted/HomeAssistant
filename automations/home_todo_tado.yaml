@@ -1,6 +1,7 @@
 - id: "1770581923900"
   alias: Hjem todo Tado
-  description: Kontroller batteri status på Tado enheder
+  description: |
+    Kontroller batteri status på Tado enheder
   mode: restart
   trace:
     stored_traces: 10
@@ -18,7 +19,8 @@
       response_variable: response
     - if:
         - condition: template
-          value_template: "{{ response.status != 200 }}"
+          value_template: |-
+            {{ response.status != 200 }}
       then:
         - action: script.push_notification
           data:
@@ -34,14 +36,13 @@
         refresh_token: "{{ response.content.refresh_token }}"
     - if:
         - condition: template
-          value_template: "{{ refresh_token == '' or access_token == '' }}"
+          value_template: |-
+            {{ refresh_token == '' or access_token == '' }}
       then:
         - action: system_log.write
           data:
             level: debug
-            message: "Response: {{ response }}
-
-              "
+            message: "Response: {{ response }}"
         - stop: Ingen token fra get_access_token fra Tado
     - action: input_text.set_value
       target:
@@ -55,9 +56,7 @@
     - action: system_log.write
       data:
         level: debug
-        message: "Response: {{ response }}
-
-          "
+        message: "Response: {{ response }}"
     - variables:
         home_id: "{{ response.content.homes[0].id }}"
     - action: rest_command.tado_get_rooms_and_devices
@@ -68,9 +67,7 @@
     - action: system_log.write
       data:
         level: debug
-        message: "Response: {{ response }}
-
-          "
+        message: "Response: {{ response }}"
     - variables:
         devices:
           "[\n  {% for room in response.content.rooms %}\n    {% for device in room.devices %}\n      {\n        \"roomName\": \"{{ room.roomName }}\",\n \       \"deviceSerialNo\": \"{{ device.serialNumber }}\",\n        \"batteryState\": \"{{ device.batteryState }}\",\n        \"mountingState\": \"{{ device.mountingState | default('') }}\",\n        \"type\": \"{{ state_attr('sensor.tado_device_types', 'types').get(device.type, device.type) }}\",\n        \"location\": \"{{ state_attr('sensor.tado_device_locations', 'locations').get(device.serialNumber, device.serialNumber) }}\",\n        \"entity_id\": \"{{ state_attr('sensor.tado_device_ids', 'ids').get(device.serialNumber, device.serialNumber) }}\",\n        \"battery\": \"{{ state_attr('sensor.tado_device_batterys', 'batterys').get(device.type, device.type) }}\",\n      }{% if not loop.last %}, {% endif %}\n    {% endfor %}\n  {% if not loop.last %}, {% endif %}\n \ {% endfor %}\n]"

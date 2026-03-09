@@ -1,6 +1,7 @@
 - id: "1739615474729"
   alias: Stue medieafspiller sæt status
-  description: Automatik til at sætte status helper for medie i stuen
+  description: |
+    Automatik til at sætte status helper for medie i stuen
   mode: queued
   max: 10
   trace:
@@ -25,8 +26,7 @@
       entity_id: sensor.living_room_apple_tv_media_player_safe
       to: "off"
       id: "off"
-      for:
-        seconds: 3
+      for: 00:00:03
 
     - trigger: state
       entity_id: timer.living_room_media_player_timer
@@ -44,8 +44,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - started
+              id: started
           sequence:
             - action: timer.cancel
               target:
@@ -57,8 +56,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - ended
+              id: ended
           sequence:
             - action: timer.start
               data:
@@ -72,8 +70,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - timeout
+              id: timeout
             - condition: state
               entity_id: sensor.living_room_apple_tv_media_player_safe
               state:

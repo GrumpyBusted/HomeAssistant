@@ -1,6 +1,7 @@
 - id: "1770410173949"
   alias: Terrasse dør
-  description: Automatik til at styre timer til terrasse dør
+  description: |
+    Automatik til at styre timer til terrasse dør
   mode: queued
   max: 10
   trace:

@@ -1,6 +1,7 @@
 - id: "1768143802884"
   alias: Gang robotstøvsuger rengøring
-  description: Styring af robotstøvsuger for at gør rent i gangen
+  description: |
+    Styring af robotstøvsuger for at gør rent i gangen
   mode: queued
   max: 10
   trace:
@@ -52,10 +53,8 @@
     - choose:
         - conditions:
             - condition: template
-              value_template:
-                "{{ (states('input_datetime.hallway_robot_vacuum_last_cleaning_time') | as_datetime).date() != now().date() }}
-
-                "
+              value_template: |-
+                {{ (states('input_datetime.hallway_robot_vacuum_last_cleaning_time') | as_datetime).date() != now().date() }}
             - condition: numeric_state
               entity_id: sensor.living_room_robot_vacuum_battery
               above: 30
@@ -75,9 +74,8 @@
               entity_id: binary_sensor.living_room_door_long_open
               state: "on"
             - condition: template
-              value_template: "{{ states('sensor.living_room_robot_vacuum_time_since_empty_dust_bin')|int < 20 }}
-
-                "
+              value_template: |-
+                {{ states('sensor.living_room_robot_vacuum_time_since_empty_dust_bin')|int < 20 }}
           sequence:
             - action: script.living_room_robot_vacuum_set_current
               data:
@@ -86,10 +84,8 @@
 
         - conditions:
             - condition: template
-              value_template:
-                "{{ (states('input_datetime.hallway_robot_vacuum_last_cleaning_time') | as_datetime | as_local).date() < (now().date() - timedelta(days=1)) }}
-
-                "
+              value_template: |-
+                {{ (states('input_datetime.hallway_robot_vacuum_last_cleaning_time') | as_datetime | as_local).date() < (now().date() - timedelta(days=1)) }}
             - condition: time
               after: "12:00:00"
             - condition: state

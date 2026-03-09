@@ -1,6 +1,7 @@
 - id: "1769257682123"
   alias: Stue medieafspiller
-  description: Styring af tilbehør til medie afspilning i Stuen
+  description: |
+    Styring af tilbehør til medie afspilning i Stuen
   mode: queued
   max: 10
   trace:
@@ -11,8 +12,7 @@
       entity_id: sensor.living_room_apple_tv_media_player_safe
       to: "off"
       id: "off"
-      for:
-        seconds: 3
+      for: 00:00:03
 
     - trigger: state
       entity_id: sensor.living_room_apple_tv_media_player_safe
@@ -70,8 +70,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - media_off
+              id: media_off
             - condition: state
               entity_id: binary_sensor.living_room_light
               state: "off"
@@ -81,10 +80,10 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - "off"
+              id: "off"
             - condition: template
-              value_template: "{{ state_attr('media_player.living_room_apple_tv_media_player','source_list') != none }}"
+              value_template: |-
+                {{ state_attr('media_player.living_room_apple_tv_media_player','source_list') != none }}
           sequence:
             - variables:
                 command: "off"
@@ -107,7 +106,8 @@
 
     - if:
         - condition: template
-          value_template: "{{ command == 'off' }}"
+          value_template: |-
+            {{ command == 'off' }}
       then:
         - parallel:
             - if:
@@ -232,7 +232,8 @@
         - choose:
             - conditions:
                 - condition: template
-                  value_template: "{{ command == 'playing' }}"
+                  value_template: |-
+                    {{ command == 'playing' }}
               sequence:
                 - action: huesyncbox.set_sync_state
                   data:
@@ -256,7 +257,8 @@
 
             - conditions:
                 - condition: template
-                  value_template: "{{ command == 'pause' }}"
+                  value_template: |-
+                    {{ command == 'pause' }}
               sequence:
                 - action: huesyncbox.set_sync_state
                   data:

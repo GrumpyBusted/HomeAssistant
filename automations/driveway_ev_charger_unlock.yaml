@@ -1,6 +1,7 @@
 - id: "1735658670560"
   alias: Indkørsel billader lås op
-  description: Hvis en af bilerne er hjemme og tilsluttet, lås billaderen op
+  description: |
+    Hvis en af bilerne er hjemme og tilsluttet, lås billaderen op
   mode: queued
   max: 10
   trace:
@@ -8,27 +9,24 @@
 
   triggers:
     - trigger: state
-      entity_id:
-        - sensor.driveway_ev_charger_status_description_safe
+      entity_id: sensor.driveway_ev_charger_status_description_safe
       to: Locked, car connected
+
     - trigger: state
-      entity_id:
-        - device_tracker.volvo_ex30_location
+      entity_id: device_tracker.volvo_ex30_location
       to: home
+
     - trigger: state
-      entity_id:
-        - device_tracker.volvo_xc40_location
+      entity_id: device_tracker.volvo_xc40_location
       to: home
+
     - trigger: state
-      entity_id:
-        - sensor.volvo_ex30_charging_connection_status
-      to:
-        - connected
+      entity_id: sensor.volvo_ex30_charging_connection_status
+      to: connected
+
     - trigger: state
-      entity_id:
-        - sensor.volvo_xc40_charging_connection_status
-      to:
-        - connected
+      entity_id: sensor.volvo_xc40_charging_connection_status
+      to: connected
 
   conditions:
     - condition: state

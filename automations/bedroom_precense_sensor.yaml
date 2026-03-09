@@ -1,6 +1,7 @@
 - id: "1760968576162"
   alias: Soveværelse tilstedeværelsessensor
-  description: Automatik til at styre soveværelse tilstedeværelsessensor
+  description: |
+    Automatik til at styre soveværelse tilstedeværelsessensor
   mode: queued
   max: 10
   trace:
@@ -83,7 +84,8 @@
               entity_id: binary_sensor.bedroom_door
               state: "off"
             - condition: template
-              value_template: "{{ states.binary_sensor.bedroom_door.last_changed | as_local > now() - timedelta(seconds=30) }}"
+              value_template: |-
+                {{ states.binary_sensor.bedroom_door.last_changed | as_local > now() - timedelta(seconds=30) }}
           sequence: []
 
         - conditions:

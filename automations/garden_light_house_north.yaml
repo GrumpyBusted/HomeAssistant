@@ -1,6 +1,7 @@
 - id: "1760825733513"
   alias: Have lys hus nord
-  description: Automatik til at styre lys i haven på nord siden af huset
+  description: |
+    Automatik til at styre lys i haven på nord siden af huset
   mode: queued
   max: 10
   trace:
@@ -8,29 +9,25 @@
 
   triggers:
     - trigger: state
-      entity_id:
-        - binary_sensor.garden_house_north_presence
+      entity_id: binary_sensor.garden_house_north_presence
       from: "off"
       to: "on"
       id: detected_north
 
     - trigger: state
-      entity_id:
-        - binary_sensor.garden_house_north_presence
+      entity_id: binary_sensor.garden_house_north_presence
       from: "on"
       to: "off"
       id: cleared_north
 
     - trigger: state
-      entity_id:
-        - binary_sensor.garden_house_east_presence
+      entity_id: binary_sensor.garden_house_east_presence
       from: "off"
       to: "on"
       id: detected_east
 
     - trigger: state
-      entity_id:
-        - binary_sensor.garden_house_east_presence
+      entity_id: binary_sensor.garden_house_east_presence
       from: "on"
       to: "off"
       id: cleared_east
@@ -54,8 +51,7 @@
                 color_temp_kelvin: 2700
                 transition: 1
               target:
-                entity_id:
-                  - light.garden_light_house_north
+                entity_id: light.garden_light_house_north
 
         - conditions:
             - condition: and
@@ -75,5 +71,4 @@
               data:
                 transition: 1
               target:
-                entity_id:
-                  - light.garden_light_house_north
+                entity_id: light.garden_light_house_north

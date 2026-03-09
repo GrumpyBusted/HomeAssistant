@@ -1,6 +1,7 @@
 - id: "1770064791859"
   alias: Hjem todo periodevis
-  description: Opret opgave der er styret at tid, f.eks. månedlige
+  description: |
+    Opret opgave der er styret at tid, f.eks. månedlige
   mode: restart
   trace:
     stored_traces: 30
@@ -14,7 +15,8 @@
   actions:
     - if:
         - condition: template
-          value_template: "{{ now().day == 1 }}"
+          value_template: |-
+            {{ now().day == 1 }}
       then:
         - action: script.create_todo_task
           data:
@@ -23,7 +25,8 @@
             entity_id: todo.todo_smart_todo
     - if:
         - condition: template
-          value_template: "{{ now().day == 1 }}"
+          value_template: |-
+            {{ now().day == 1 }}
       then:
         - action: script.create_todo_task
           data:

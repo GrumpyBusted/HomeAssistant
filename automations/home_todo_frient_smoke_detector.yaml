@@ -1,6 +1,7 @@
 - id: "1740170480608"
   alias: Hjem todo Frient røgalarm
-  description: Kontroller batteri status på Frient røgalarm
+  description: |
+    Kontroller batteri status på Frient røgalarm
   mode: restart
   trace:
     stored_traces: 30
@@ -15,8 +16,7 @@
         - sensor.storage_smoke_alarm_battery
         - sensor.technic_room_smoke_alarm_battery
       below: 10
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: numeric_state
       entity_id:
@@ -27,8 +27,7 @@
         - sensor.storage_smoke_alarm_battery
         - sensor.technic_room_smoke_alarm_battery
       above: 70
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: time
       at: 03:07:00

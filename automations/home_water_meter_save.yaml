@@ -1,17 +1,19 @@
 - id: "1764966963610"
   alias: Hjem vand måler aflæs
-  description: Aflæs vand forbrug og gem i CSV fil
+  description: |
+    Aflæs vand forbrug og gem i CSV fil
   mode: single
   trace:
     stored_traces: 30
 
   triggers:
-    - at: 02:00:00
-      trigger: time
+    - trigger: time
+      at: 02:00:00
 
   conditions:
     - condition: template
-      value_template: "{{ now().day == 1 }}"
+      value_template: |-
+        {{ now().day == 1 }}
 
   actions:
     - action: shell_command.append_to_file

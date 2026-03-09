@@ -1,6 +1,7 @@
 - id: "1760878828758"
   alias: Indkørsel bevægelsessensor entre
-  description: Håndtering af bevægelsessensoren i indkørslen ved hoveddøren
+  description: |
+    Håndtering af bevægelsessensoren i indkørslen ved hoveddøren
   mode: queued
   max: 10
   trace:
@@ -8,15 +9,13 @@
 
   triggers:
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_motion_sensor_entrance_occupancy
+      entity_id: binary_sensor.driveway_motion_sensor_entrance_occupancy
       from: "off"
       to: "on"
       id: detected
 
     - trigger: state
-      entity_id:
-        - binary_sensor.driveway_motion_sensor_entrance_occupancy
+      entity_id: binary_sensor.driveway_motion_sensor_entrance_occupancy
       from: "on"
       to: "off"
       id: cleared
@@ -27,8 +26,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - detected
+              id: detected
           sequence:
             - action: timer.cancel
               target:
@@ -36,8 +34,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - cleared
+              id: cleared
           sequence:
             - action: timer.start
               data:

@@ -1,6 +1,7 @@
 - id: "1770410133642"
   alias: Bryggers dør
-  description: Automatik til at styre timer til bryggers dør
+  description: |
+    Automatik til at styre timer til bryggers dør
   mode: queued
   max: 10
   trace:

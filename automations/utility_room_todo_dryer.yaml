@@ -1,6 +1,7 @@
 - id: "1769344314831"
   alias: Bryggers todo tørretumbler
-  description: Opret todo opgaver vedrørende tørretumbler
+  description: |
+    Opret todo opgaver vedrørende tørretumbler
   mode: queued
   max: 10
   trace:

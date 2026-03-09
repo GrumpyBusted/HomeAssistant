@@ -1,6 +1,7 @@
 - id: "1770918254782"
   alias: Garage todo temperatur
-  description: Overvåg temperaturen i garagen
+  description: |
+    Overvåg temperaturen i garagen
   mode: queued
   max: 10
   trace:

@@ -1,6 +1,7 @@
 - id: "1740423776035"
   alias: Charlie sæt sengetid
-  description: Sæt sengetid input hjælper for Charlie, når webhook er kaldt
+  description: |
+    Sæt sengetid input hjælper for Charlie, når webhook er kaldt
   mode: restart
   trace:
     stored_traces: 10

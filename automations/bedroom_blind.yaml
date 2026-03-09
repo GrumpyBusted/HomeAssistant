@@ -1,6 +1,7 @@
 - id: "1770235218775"
   alias: Soveværelse rullegardin
-  description: Automatik for rullegardin på soveværelse
+  description: |
+    Automatik for rullegardin på soveværelse
   mode: queued
   max: 10
   trace:
@@ -218,7 +219,8 @@
               data:
                 value: 100
 
-    - wait_template: "{{ states('cover.bedroom_blind') not in ['opening', 'closing'] }}"
+    - wait_template: |-
+        {{ states('cover.bedroom_blind') not in ['opening', 'closing'] }}
       timeout: "00:00:30"
       continue_on_timeout: true
 
@@ -230,7 +232,8 @@
           entity_id: binary_sensor.bedroom_window
           state: "on"
         - condition: template
-          value_template: "{{ not(trigger.id in ['close_short_pressed', 'button_3'] and (state_attr('cover.bedroom_blind', 'current_position') | float(999)) <= 20) }}"
+          value_template: |-
+            {{ not(trigger.id in ['close_short_pressed', 'button_3'] and (state_attr('cover.bedroom_blind', 'current_position') | float(999)) <= 20) }}
       then:
         - variables:
             position: "{{ [position | int, 20] | max }}"
@@ -240,7 +243,8 @@
           entity_id: binary_sensor.bedroom_sun_overheat
           state: "on"
         - condition: template
-          value_template: "{{ not(trigger.id in ['open_short_pressed', 'button_2', 'open_event'] and (state_attr('cover.bedroom_blind', 'current_position') | float(999)) >= 50) }}"
+          value_template: |-
+            {{ not(trigger.id in ['open_short_pressed', 'button_2', 'open_event'] and (state_attr('cover.bedroom_blind', 'current_position') | float(999)) >= 50) }}
       then:
         - variables:
             position: "{{ [position | int, 50] | min }}"
@@ -250,7 +254,8 @@
           entity_id: fan.bedroom_air_purifier_fan
           state: "on"
         - condition: template
-          value_template: "{{ not(trigger.id in ['close_short_pressed', 'button_3', 'close_event'] and (state_attr('cover.bedroom_blind', 'current_position') | float(999)) <= 60) }}"
+          value_template: |-
+            {{ not(trigger.id in ['close_short_pressed', 'button_3', 'close_event'] and (state_attr('cover.bedroom_blind', 'current_position') | float(999)) <= 60) }}
       then:
         - variables:
             position: "{{ [position | int, 60] | max }}"
@@ -258,7 +263,7 @@
     - action: system_log.write
       data:
         level: debug
-        message: |
+        message: |-
           Trigger: {{ trigger.id }}
           Current position: {{ state_attr('cover.bedroom_blind', 'current_position') }}
           Desired position: {{ states('input_number.bedroom_blind_position') }}
@@ -267,7 +272,8 @@
     - choose:
         - conditions:
             - condition: template
-              value_template: "{{ position | int(0) == 100 }}"
+              value_template: |-
+                {{ position | int(0) == 100 }}
             - condition: numeric_state
               entity_id: cover.bedroom_blind
               attribute: current_position
@@ -279,7 +285,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ position | int(0) == 0 }}"
+              value_template: |-
+                {{ position | int(0) == 0 }}
             - condition: numeric_state
               entity_id: cover.bedroom_blind
               attribute: current_position
@@ -291,7 +298,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ position | int(0) != state_attr('cover.bedroom_blind', 'current_position') }}"
+              value_template: |-
+                {{ position | int(0) != state_attr('cover.bedroom_blind', 'current_position') }}
           sequence:
             - action: cover.set_cover_position
               target:
@@ -299,6 +307,7 @@
               data:
                 position: "{{ position | int(0) }}"
 
-    - wait_template: "{{ states('cover.bedroom_blind') not in ['opening', 'closing'] }}"
+    - wait_template: |-
+        {{ states('cover.bedroom_blind') not in ['opening', 'closing'] }}
       timeout: "00:00:30"
       continue_on_timeout: true

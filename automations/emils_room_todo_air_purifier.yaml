@@ -1,6 +1,7 @@
 - id: "1771090096437"
   alias: Emils værelse todo blæser
-  description: Opret todo opgaver vedrørende blæser på Emils værelse
+  description: |
+    Opret todo opgaver vedrørende blæser på Emils værelse
   mode: queued
   max: 10
   trace:

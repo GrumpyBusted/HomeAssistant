@@ -1,6 +1,7 @@
 - id: "1769854798414"
   alias: Stue dør
-  description: Automatik til at styre timer til stue dør
+  description: |
+    Automatik til at styre timer til stue dør
   mode: queued
   max: 10
   trace:
@@ -21,7 +22,6 @@
 
   actions:
     - choose:
-
         - conditions:
             - condition: trigger
               id: closed

@@ -1,6 +1,7 @@
 - id: "1770324301195"
   alias: Hjem todo overvåg afsluttede
-  description: Send event når et item bliver afsluttet
+  description: |
+    Send event når et item bliver afsluttet
   mode: queued
   max: 10
   trace:

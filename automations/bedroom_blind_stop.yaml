@@ -1,6 +1,7 @@
 - id: "1736106591926"
   alias: Soveværelse rullegardin stop
-  description: Automatik for at stoppe rullegardin på soveværelse
+  description: |
+    Automatik for at stoppe rullegardin på soveværelse
   mode: queued
   max: 10
   trace:

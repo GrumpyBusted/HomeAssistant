@@ -1,6 +1,7 @@
 - id: "1737201831964"
   alias: Indkørsel billader sæt pris
-  description: Sæt elektricitets prisen på billader
+  description: |
+    Sæt elektricitets prisen på billader
   mode: single
   trace:
     stored_traces: 10
@@ -10,7 +11,7 @@
       entity_id: sensor.energy_price
 
     - trigger: template
-      value_template: |
+      value_template: |-
         {% set last = state_attr('automation.driveway_ev_charger_set_price', 'last_triggered') %} 
         {{ last is none or ( now() - last ).total_seconds() > 3600 }}
 

@@ -1,6 +1,7 @@
 - id: "1737757884659"
   alias: Hjem varme motioner radiatorventiler
-  description: Automatik til at motionere radiator ventiler når varmepumpe er slukket.
+  description: |
+    Automatik til at motionere radiator ventiler når varmepumpe er slukket.
   mode: single
   trace:
     stored_traces: 20

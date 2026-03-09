@@ -1,6 +1,7 @@
 - id: "1735738251165"
   alias: Stue varmepumpe
-  description: Styring af varmepumpe i stuen, for at varme hurtigere op hvis den ønskede temperatur er væsentligt koldere end den aktuelle.
+  description: |
+    Styring af varmepumpe i stuen, for at varme hurtigere op hvis den ønskede temperatur er væsentligt koldere end den aktuelle.
   mode: restart
   trace:
     stored_traces: 100
@@ -20,7 +21,6 @@
 
   actions:
     - choose:
-
         - conditions:
             - condition: state
               entity_id: sensor.living_room_heat_pump_mode

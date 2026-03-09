@@ -1,6 +1,7 @@
 - id: "1770991959858"
   alias: Hjem todo vanding indendørs
-  description: Opret todo opgaver vedrørende jordfugtighed måler og vanding af blomster indendørs
+  description: |
+    Opret todo opgaver vedrørende jordfugtighed måler og vanding af blomster indendørs
   mode: queued
   max: 10
   trace:
@@ -13,8 +14,7 @@
         - sensor.charlies_room_soil_moisture_sensor_moisture
         - sensor.living_room_soil_moisture_sensor_moisture
       below: 40
-      for:
-        seconds: 180
+      for: 00:03:00
 
     - trigger: numeric_state
       entity_id:

@@ -1,31 +1,32 @@
 - id: "1740941401019"
   alias: Hjem todo iPhone indstillinger
-  description: Automatik til at kontrollere iPhone-status
+  description: |
+    Automatik til at kontrollere iPhone-status
   mode: single
   trace:
     stored_traces: 20
 
   triggers:
-    - entity_id:
+    - trigger: state
+      entity_id:
         - sensor.anders_iphone_location_permission
         - sensor.monique_iphone_location_permission
         - sensor.emil_iphone_location_permission
         - sensor.charlie_iphone_location_permission
       id: permission_changed
-      trigger: state
 
-    - entity_id:
+    - trigger: state
+      entity_id:
         - sensor.anders_iphone_connection_type
         - sensor.monique_iphone_connection_type
         - sensor.emil_iphone_connection_type
         - sensor.charlie_iphone_connection_type
       to: Wi-Fi
       id: wifi_connected
-      trigger: state
 
-    - at: 03:22:00
+    - trigger: time
+      at: 03:22:00
       id: periodic
-      trigger: time
 
   conditions: []
 
@@ -81,7 +82,8 @@
             sequence:
               - if:
                   - condition: template
-                    value_template: "{{ states(repeat.item.connection_type) == 'Wi-Fi' }}"
+                    value_template: |-
+                      {{ states(repeat.item.connection_type) == 'Wi-Fi' }}
                 then:
                   - action: homeassistant.update_entity
                     data:
@@ -95,7 +97,8 @@
             sequence:
               - if:
                   - condition: template
-                    value_template: "{{ states(repeat.item.connection_type) == 'Wi-Fi' }}"
+                    value_template: |-
+                      {{ states(repeat.item.connection_type) == 'Wi-Fi' }}
                 then:
                   - action: script.create_todo_task
                     data:

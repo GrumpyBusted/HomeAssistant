@@ -1,6 +1,7 @@
 - id: "1763801218547"
   alias: Hjem ventilation forvarme
-  description: Styring af forvarme til Nilan ventilationsanlæg
+  description: |
+    Styring af forvarme til Nilan ventilationsanlæg
   mode: restart
   trace:
     stored_traces: 30
@@ -23,14 +24,12 @@
     - trigger: state
       entity_id: climate.storage_ventilation_system_ventilation
       attribute: fan_mode
-      to:
-        - "off"
+      to: "off"
 
     - trigger: state
       entity_id: climate.storage_ventilation_system_ventilation
       attribute: fan_mode
-      from:
-        - "off"
+      from: "off"
 
   conditions: []
 

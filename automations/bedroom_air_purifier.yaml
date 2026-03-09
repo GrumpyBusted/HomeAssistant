@@ -1,6 +1,7 @@
 - id: "1739647490572"
   alias: Soveværelse blæser
-  description: Tænder for Dyson Hot+Cool i soveværelset, for at varme hurtigere op hvis den ønskede temperatur er væsentligt koldere end den aktuelle.
+  description: |
+    Tænder for Dyson Hot+Cool i soveværelset, for at varme hurtigere op hvis den ønskede temperatur er væsentligt koldere end den aktuelle.
   mode: queued
   max: 10
   trace:
@@ -46,7 +47,7 @@
 
   actions:
     - variables:
-        mode: 'off' 
+        mode: "off"
     - choose:
         - conditions:
             - condition: state
@@ -137,7 +138,8 @@
     - choose:
         - conditions:
             - condition: template
-              value_template: "{{ mode == 'off' }}"
+              value_template: |-
+                {{ mode == 'off' }}
           sequence: []
 
         - conditions:
@@ -161,13 +163,13 @@
     - choose:
         - conditions:
             - condition: template
-              value_template: "{{ mode == 'off' }}"
+              value_template: |-
+                {{ mode == 'off' }}
             - condition: not
               conditions:
                 - condition: state
                   entity_id: climate.bedroom_air_purifier
-                  state:
-                    - "off"
+                  state: "off"
           sequence:
             - action: dyson_local.set_angle
               data:
@@ -185,7 +187,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ mode == 'heat' }}"
+              value_template: |-
+                {{ mode == 'heat' }}
           sequence:
             - action: climate.turn_on
               target:
@@ -228,7 +231,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ mode == 'cool' }}"
+              value_template: |-
+                {{ mode == 'cool' }}
           sequence:
             - action: climate.turn_on
               target:
@@ -271,7 +275,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ mode == 'fan' }}"
+              value_template: |-
+                {{ mode == 'fan' }}
           sequence:
             - action: climate.turn_on
               target:
@@ -320,7 +325,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ mode == 'filter' }}"
+              value_template: |-
+                {{ mode == 'filter' }}
           sequence:
             - action: climate.turn_on
               target:

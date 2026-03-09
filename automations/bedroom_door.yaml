@@ -1,6 +1,7 @@
 - id: "1769101770558"
   alias: Soveværelse dør
-  description: Automatik til at styre timer til soveværelse dør
+  description: |
+    Automatik til at styre timer til soveværelse dør
   mode: queued
   max: 10
   trace:

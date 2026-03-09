@@ -1,6 +1,7 @@
 - id: "1769369132822"
   alias: Køkken todo opvaskemaskine
-  description: Opret todo opgaver vedrørende opvaskemaskine
+  description: |
+    Opret todo opgaver vedrørende opvaskemaskine
   mode: queued
   max: 10
   trace:

@@ -1,6 +1,7 @@
 - id: "1771090242421"
   alias: Soveværelse todo blæser
-  description: Opret todo opgaver vedrørende blæser på soveværelse
+  description: |
+    Opret todo opgaver vedrørende blæser på soveværelse
   mode: queued
   max: 10
   trace:

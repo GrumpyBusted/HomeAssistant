@@ -1,6 +1,7 @@
 - id: "1770459627394"
   alias: Todo køkken affald filter
-  description: Opret todo opgaver vedrørende skift af biofilter på affald
+  description: |
+    Opret todo opgaver vedrørende skift af biofilter på affald
   mode: queued
   max: 10
   trace:
@@ -11,9 +12,9 @@
       at: input_datetime.kitchen_trash_biofilter_next_change
       id: deadline
 
-    - at: 03:18:00
+    - trigger: time
+      at: 03:18:00
       id: periodic
-      trigger: time
 
     - trigger: event
       event_type: todo_item_completed

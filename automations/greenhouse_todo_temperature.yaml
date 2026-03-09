@@ -1,6 +1,7 @@
 - id: "1770917834825"
   alias: Drivhus todo temperatur
-  description: Overvåg temperaturen i drivhuset
+  description: |
+    Overvåg temperaturen i drivhuset
   mode: queued
   max: 10
   trace:

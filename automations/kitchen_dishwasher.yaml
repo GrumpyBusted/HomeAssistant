@@ -1,6 +1,7 @@
 - id: "1770507087346"
   alias: Køkken opvaskemaskine
-  description: Disable entities på opvaskemaskine
+  description: |
+    Disable entities på opvaskemaskine
   mode: single
   trace:
     stored_traces: 30

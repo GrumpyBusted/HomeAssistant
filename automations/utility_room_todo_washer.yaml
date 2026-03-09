@@ -1,6 +1,7 @@
 - id: "1742241186159"
   alias: Bryggers todo vaskemaskine
-  description: Opret todo opgaver vedrørende vaskemaskine
+  description: |
+    Opret todo opgaver vedrørende vaskemaskine
   mode: queued
   max: 10
   trace:

@@ -1,6 +1,7 @@
 - id: "1771697802150"
   alias: Bryggers tørretumbler
-  description: Skaber tørretumbler status udfra strømforbrug
+  description: |
+    Skaber tørretumbler status udfra strømforbrug
   mode: queued
   max: 10
   trace:
@@ -10,22 +11,19 @@
     - trigger: numeric_state
       entity_id: sensor.utility_room_smart_plug_dryer_power
       below: 3
-      for:
-        seconds: 5
+      for: 00:00:05
       id: nothing
 
     - trigger: numeric_state
       entity_id: sensor.utility_room_smart_plug_dryer_power
       above: 3
-      for:
-        seconds: 3
+      for: 00:00:03
       id: turned_on
 
     - trigger: numeric_state
       entity_id: sensor.utility_room_smart_plug_dryer_power
       above: 4
-      for:
-        seconds: 10
+      for: 00:00:10
       id: planning
 
     - trigger: numeric_state

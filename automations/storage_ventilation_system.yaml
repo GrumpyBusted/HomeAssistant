@@ -1,6 +1,7 @@
 - id: "1768156511533"
   alias: Loftrum ventilationsanlæg
-  description: Styring af varme genveks ventilationsanlæg
+  description: |
+    Styring af varme genveks ventilationsanlæg
   mode: queued
   max: 10
   trace:
@@ -25,8 +26,7 @@
         - condition: state
           entity_id: climate.storage_ventilation_system_ventilation
           attribute: fan_mode
-          state:
-            - "off"
+          state: "off"
 
   actions:
     - action: number.set_value

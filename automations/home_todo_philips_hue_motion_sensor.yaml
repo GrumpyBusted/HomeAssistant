@@ -1,6 +1,7 @@
 - id: "1739907378753"
   alias: Hjem todo Philips Hue bevægelsessensor
-  description: Kontroller batteri status på Philips Hue bevægelsessensorer
+  description: |
+    Kontroller batteri status på Philips Hue bevægelsessensorer
   mode: restart
   trace:
     stored_traces: 30
@@ -18,8 +19,7 @@
         - sensor.utility_room_motion_sensor_battery
         - sensor.toilet_motion_sensor_battery
       below: 20
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: numeric_state
       entity_id:
@@ -33,8 +33,7 @@
         - sensor.utility_room_motion_sensor_battery
         - sensor.toilet_motion_sensor_battery
       above: 70
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: time
       at: 03:12:00

@@ -1,6 +1,7 @@
 - id: "1770311389520"
   alias: Todo strømpriser
-  description: Overvåg om strømpriser er tilgængelige og valide
+  description: |
+    Overvåg om strømpriser er tilgængelige og valide
   mode: restart
   trace:
     stored_traces: 50
@@ -16,7 +17,8 @@
     - choose:
         - conditions:
             - condition: template
-              value_template: "{{ states('sensor.energy_data_service') in ['unknown', 'unavailable', 'none', ''] }}"
+              value_template: |-
+                {{ states('sensor.energy_data_service') in ['unknown', 'unavailable', 'none', ''] }}
           sequence:
             - action: script.push_notification
               data:
@@ -28,7 +30,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ state_attr('sensor.energy_data_service', 'raw_today') is none }}"
+              value_template: |-
+                {{ state_attr('sensor.energy_data_service', 'raw_today') is none }}
           sequence:
             - action: script.push_notification
               data:

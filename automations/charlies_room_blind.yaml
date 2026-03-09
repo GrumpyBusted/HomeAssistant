@@ -1,6 +1,7 @@
 - id: "1770229021068"
   alias: Charlies værelse rullegardin
-  description: Automatik for rullegardin på Charlies værelse
+  description: |
+    Automatik for rullegardin på Charlies værelse
   mode: queued
   max: 10
   trace:
@@ -70,8 +71,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - open_short_pressed
+              id: open_short_pressed
           sequence:
             - action: input_number.set_value
               target:
@@ -81,8 +81,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - close_short_pressed
+              id: close_short_pressed
           sequence:
             - action: input_number.set_value
               target:
@@ -114,8 +113,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - wake_up
+              id: wake_up
             - condition: state
               entity_id: binary_sensor.home_outside_light
               state: "on"
@@ -128,12 +126,11 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - light_outside
+              id: light_outside
             - condition: template
-              value_template: >
+              value_template: |-
                 {% set n = now() %}
-                {% set w = states('input_datetime.charlie_wake_up_alarm') | as_datetime | as_local + timedelta(hours=1) %}
+                {% set w = states('input_datetime.charlie_wake_up_alarm') | as_datetime | as_local + timedelta(hours=1) %} 
                 {{ n.date() == w.date() and n.time() >= w.time() }}
           sequence:
             - action: input_number.set_value
@@ -164,24 +161,25 @@
           entity_id: binary_sensor.charlies_room_window
           state: "on"
         - condition: template
-          value_template: "{{ not(trigger.id == 'close_short_pressed' and (state_attr('cover.charlies_room_blind','current_position') | float(999)) <= 20) }}"
+          value_template: |-
+            {{ not(trigger.id == 'close_short_pressed' and (state_attr('cover.charlies_room_blind','current_position') | float(999)) <= 20) }}
       then:
         - variables:
             position: "{{ [position | int, 20] | max }}"
 
-    - wait_template: "{{ states('cover.charlies_room_blind') not in ['opening', 'closing'] }}"
+    - wait_template: |-
+        {{ states('cover.charlies_room_blind') not in ['opening', 'closing'] }}
       timeout: "00:00:30"
       continue_on_timeout: true
 
     - action: system_log.write
       data:
         level: debug
-        message: |
+        message: |-
           Trigger: {{ trigger.id }}
           Current position: {{ state_attr('cover.charlies_room_blind', 'current_position') }}
           Desired position: {{ states('input_number.charlies_room_blind_position') }}
           New position: {{ position }}
-
     - choose:
         - conditions:
             - condition: trigger
@@ -192,7 +190,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ position | int(0) == 100 }}"
+              value_template: |-
+                {{ position | int(0) == 100 }}
             - condition: numeric_state
               entity_id: cover.charlies_room_blind
               attribute: current_position
@@ -204,7 +203,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ position | int(0) == 0 }}"
+              value_template: |-
+                {{ position | int(0) == 0 }}
             - condition: numeric_state
               entity_id: cover.charlies_room_blind
               attribute: current_position
@@ -216,7 +216,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ state_attr('cover.charlies_room_blind', 'current_position') | int(0) != position | int(0) }}"
+              value_template: |-
+                {{ state_attr('cover.charlies_room_blind', 'current_position') | int(0) != position | int(0) }}
           sequence:
             - action: cover.set_cover_position
               target:
@@ -224,6 +225,7 @@
               data:
                 position: "{{ position }}"
 
-    - wait_template: "{{ states('cover.charlies_room_blind') not in ['opening', 'closing'] }}"
+    - wait_template: |-
+        {{ states('cover.charlies_room_blind') not in ['opening', 'closing'] }}
       timeout: "00:00:30"
       continue_on_timeout: true

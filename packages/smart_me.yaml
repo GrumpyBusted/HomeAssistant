@@ -16,7 +16,8 @@ rest:
         unit_of_measurement: "kWh"
         device_class: "energy"
         state_class: "total_increasing"
-        value_template: "{{ value_json.CounterReading | round(2) }}"
+        value_template: |-
+          {{ value_json.CounterReading | round(2) }}
         json_attributes:
           - "Name"
           - "Serial"

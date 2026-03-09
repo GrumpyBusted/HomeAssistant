@@ -1,6 +1,7 @@
 - id: "1735847242174"
   alias: Terrasse lys
-  description: Automatik til at styre lys på terrassen
+  description: |
+    Automatik til at styre lys på terrassen
   mode: queued
   max: 10
   trace:
@@ -60,10 +61,7 @@
       entity_id: binary_sensor.patio_light
       from: "off"
       to: "on"
-      for:
-        hours: 0
-        minutes: 10
-        seconds: 0
+      for: 00:10:00
       id: lights_on
 
     - trigger: state
@@ -82,8 +80,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - button_1_short
+              id: button_1_short
           sequence:
             - action: light.toggle
               target:
@@ -95,8 +92,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - button_1_long
+              id: button_1_long
           sequence:
             - action: light.toggle
               target:
@@ -108,8 +104,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - button_2
+              id: button_2
           sequence:
             - action: light.turn_on
               target:
@@ -120,8 +115,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - button_3
+              id: button_3
           sequence:
             - action: light.turn_on
               target:
@@ -132,8 +126,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - button_4
+              id: button_4
           sequence:
             - action: light.turn_on
               target:
@@ -163,8 +156,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - opened
+              id: opened
             - condition: state
               entity_id: binary_sensor.patio_light
               state: "off"
@@ -196,8 +188,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - lights_on
+              id: lights_on
             - condition: or
               conditions:
                 - condition: numeric_state
@@ -215,8 +206,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - christmas_scene
+              id: christmas_scene
           sequence:
             - action: scene.turn_on
               target:

@@ -1,6 +1,7 @@
 - id: "1736082177257"
   alias: Charlies værelse lys
-  description: Automatik til at styre lys på Charlies værelse
+  description: |
+    Automatik til at styre lys på Charlies værelse
   mode: queued
   max: 10
   trace:
@@ -57,10 +58,7 @@
       entity_id: binary_sensor.charlies_room_light
       from: "off"
       to: "on"
-      for:
-        hours: 0
-        minutes: 15
-        seconds: 0
+      for: 00:15:00
       id: lights_on
 
     - trigger: time
@@ -77,8 +75,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - button_1_short
+              id: button_1_short
           sequence:
             - parallel:
                 - action: light.turn_on
@@ -97,8 +94,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - button_1_long
+              id: button_1_long
           sequence:
             - parallel:
                 - action: light.turn_on
@@ -127,8 +123,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - button_2_short
+              id: button_2_short
           sequence:
             - action: light.toggle
               target:
@@ -142,8 +137,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - button_2
+              id: button_2
             - condition: state
               entity_id: event.charlies_room_switch_button_2
               attribute: event_type
@@ -155,8 +149,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - button_3
+              id: button_3
           sequence:
             - action: light.toggle
               target:
@@ -164,8 +157,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - button_4
+              id: button_4
           sequence:
             - action: light.turn_off
               target:
@@ -206,8 +198,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - bedtime
+              id: bedtime
             - condition: state
               entity_id: binary_sensor.charlie_home
               state: "on"

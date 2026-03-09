@@ -1,17 +1,18 @@
 - id: "1770236661641"
   alias: Emils værelse rullegardin
-  description: Automatik for rullegardin på Emils værelse
+  description: |
+    Automatik for rullegardin på Emils værelse
   mode: queued
   max: 10
   trace:
     stored_traces: 20
 
   triggers:
-    - device_id: 1dd2442d9e607d9f290aebbb666cef43
+    - trigger: device
+      device_id: 1dd2442d9e607d9f290aebbb666cef43
       domain: zha
       type: remote_button_short_press
       subtype: open
-      trigger: device
       id: open_short_pressed
 
     - trigger: device
@@ -22,15 +23,13 @@
       id: close_short_pressed
 
     - trigger: state
-      entity_id:
-        - binary_sensor.emil_home
+      entity_id: binary_sensor.emil_home
       from: "on"
       to: "off"
       id: emil_leaving
 
     - trigger: state
-      entity_id:
-        - binary_sensor.emil_home
+      entity_id: binary_sensor.emil_home
       from: "off"
       to: "on"
       id: emil_home
@@ -51,29 +50,25 @@
       id: wake_up
 
     - trigger: state
-      entity_id:
-        - binary_sensor.home_outside_light
+      entity_id: binary_sensor.home_outside_light
       from: "on"
       to: "off"
       id: dark_outside
 
     - trigger: state
-      entity_id:
-        - binary_sensor.home_outside_light
+      entity_id: binary_sensor.home_outside_light
       from: "off"
       to: "on"
       id: light_outside
 
     - trigger: state
-      entity_id:
-        - binary_sensor.emils_room_window_sensor_door
+      entity_id: binary_sensor.emils_room_window_sensor_door
       from: "on"
       to: "off"
       id: window_closed
 
     - trigger: state
-      entity_id:
-        - binary_sensor.emils_room_window_sensor_door
+      entity_id: binary_sensor.emils_room_window_sensor_door
       from: "off"
       to: "on"
       id: window_opened
@@ -84,8 +79,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - open_short_pressed
+              id: open_short_pressed
           sequence:
             - action: input_number.set_value
               target:
@@ -95,8 +89,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - close_short_pressed
+              id: close_short_pressed
           sequence:
             - action: input_number.set_value
               target:
@@ -124,8 +117,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - emil_leaving
+              id: emil_leaving
             - condition: state
               entity_id: binary_sensor.home_outside_light
               state: "off"
@@ -192,29 +184,25 @@
           entity_id: binary_sensor.emils_room_window
           state: "on"
         - condition: template
-          value_template:
-            "{{ not(trigger.id == 'close_short_pressed'\n   and (state_attr('cover.emils_room_blind','current_position') | float(999)) <= 20) }}\n"
+          value_template: |-
+            {{ not(trigger.id == 'close_short_pressed' and (state_attr('cover.emils_room_blind','current_position') | float(999)) <= 20) }}
       then:
         - variables:
             position: "{{ [position | int, 20] | max }}"
 
-    - wait_template: "{{ states('cover.emils_room_blind') not in ['opening', 'closing'] }}
-
-        "
+    - wait_template: |-
+        {{ states('cover.emils_room_blind') not in ['opening', 'closing'] }}
       timeout: 00:00:30
       continue_on_timeout: true
 
     - action: system_log.write
       data:
         level: debug
-        message: "Trigger: {{ trigger.id }}
-
+        message: |-
+          Trigger: {{ trigger.id }}
           Current position: {{ state_attr('cover.emils_room_blind', 'current_position') }}
-
           Desired position: {{ states('input_number.emils_room_blind_position') }}
-
-          New position: {{ position }}"
-
+          New position: {{ position }}
     - choose:
         - conditions:
             - condition: trigger
@@ -225,7 +213,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ position | int(0) == 100 }}"
+              value_template: |-
+                {{ position | int(0) == 100 }}
             - condition: numeric_state
               entity_id: cover.emils_room_blind
               attribute: current_position
@@ -237,7 +226,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ position | int(0) == 0 }}"
+              value_template: |-
+                {{ position | int(0) == 0 }}
             - condition: numeric_state
               entity_id: cover.emils_room_blind
               attribute: current_position
@@ -249,7 +239,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ position | int(0) != state_attr('cover.emils_room_blind', 'current_position') | int(0) }}"
+              value_template: |-
+                {{ position | int(0) != state_attr('cover.emils_room_blind', 'current_position') | int(0) }}
           sequence:
             - action: cover.set_cover_position
               data:
@@ -257,8 +248,7 @@
               target:
                 entity_id: cover.emils_room_blind
 
-    - wait_template: "{{ states('cover.emils_room_blind') not in ['opening', 'closing'] }}
-
-        "
+    - wait_template: |-
+        {{ states('cover.emils_room_blind') not in ['opening', 'closing'] }}
       timeout: 00:00:30
       continue_on_timeout: true

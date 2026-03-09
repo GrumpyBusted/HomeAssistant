@@ -1,11 +1,18 @@
 - id: "1769856539505"
   alias: Emils værelse medieafstiller sæt status
-  description: Automatik til at sætte status helper for medie på Emils værelse
+  description: |
+    Automatik til at sætte status helper for medie på Emils værelse
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
+
   triggers:
     - trigger: state
       entity_id: sensor.emils_room_apple_tv_media_player_safe
       to: playing
       id: started
+
     - trigger: state
       entity_id: sensor.emils_room_apple_tv_media_player_safe
       to:
@@ -13,27 +20,30 @@
         - idle
         - paused
       id: ended
+
     - trigger: state
       entity_id: sensor.emils_room_apple_tv_media_player_safe
       to: "off"
       id: "off"
-      for:
-        seconds: 3
+      for: 00:00:03
+
     - trigger: state
       entity_id: timer.emils_room_media_player_timer
       to: idle
       id: timeout
+
     - trigger: state
       entity_id: binary_sensor.emil_home
       to: "off"
       id: away
+
   conditions: []
+
   actions:
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - started
+              id: started
           sequence:
             - action: timer.cancel
               target:
@@ -41,10 +51,10 @@
             - action: input_boolean.turn_on
               target:
                 entity_id: input_boolean.emils_room_media_player
+
         - conditions:
             - condition: trigger
-              id:
-                - ended
+              id: ended
           sequence:
             - action: timer.start
               data:
@@ -54,10 +64,10 @@
             - action: input_boolean.turn_on
               target:
                 entity_id: input_boolean.emils_room_media_player
+
         - conditions:
             - condition: trigger
-              id:
-                - timeout
+              id: timeout
             - condition: state
               entity_id: sensor.charlies_room_apple_tv_media_player_safe
               state:
@@ -67,6 +77,7 @@
             - action: input_boolean.turn_off
               target:
                 entity_id: input_boolean.emils_room_media_player
+
         - conditions:
             - condition: trigger
               id:
@@ -79,7 +90,3 @@
             - action: input_boolean.turn_off
               target:
                 entity_id: input_boolean.emils_room_media_player
-  mode: queued
-  max: 10
-  trace:
-    stored_traces: 20

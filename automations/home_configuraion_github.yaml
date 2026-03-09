@@ -1,6 +1,7 @@
 - id: "1739480121158"
   alias: Hjem konfiguration GitHub
-  description: Automatik til at sende configuration filer etc til GitHub repository
+  description: |
+    Automatik til at sende configuration filer etc til GitHub repository
   mode: single
   trace:
     stored_traces: 20

@@ -1,6 +1,7 @@
 - id: "1736083584615"
   alias: Soveværelse lys
-  description: Automatik til at styre lys på soveværelset
+  description: |
+    Automatik til at styre lys på soveværelset
   mode: queued
   max: 10
   trace:
@@ -77,10 +78,7 @@
       entity_id: binary_sensor.bedroom_light
       from: "off"
       to: "on"
-      for:
-        hours: 0
-        minutes: 15
-        seconds: 0
+      for: 00:15:00
       id: lights_on
 
   conditions: []
@@ -98,8 +96,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - button_1
+              id: button_1
           sequence:
             - action: light.turn_on
               target:
@@ -111,15 +108,13 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - button_2
+              id: button_2
           sequence:
             - action: script.bedroom_light_sunrise
 
         - conditions:
             - condition: trigger
-              id:
-                - button_3
+              id: button_3
           sequence:
             - action: script.bedroom_light_sunset
               data:
@@ -129,8 +124,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - button_4
+              id: button_4
           sequence:
             - action: light.turn_off
               target:
@@ -140,8 +134,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - detected
+              id: detected
             - condition: state
               entity_id: select.bedroom_state
               state: occupied
@@ -159,8 +152,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - cleared
+              id: cleared
           sequence:
             - action: light.turn_off
               target:
@@ -170,8 +162,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - blind_opened
+              id: blind_opened
             - condition: state
               entity_id: binary_sensor.bedroom_presence
               state: "on"
@@ -189,8 +180,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - blind_closed
+              id: blind_closed
             - condition: state
               entity_id: binary_sensor.bedroom_light
               state: "on"
@@ -203,8 +193,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - wake_up
+              id: wake_up
             - condition: state
               entity_id: binary_sensor.bedroom_light
               state: "off"
@@ -216,8 +205,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - sunrise_script
+              id: sunrise_script
           sequence:
             - action: script.bedroom_light_sunrise
 
@@ -241,8 +229,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - lights_on
+              id: lights_on
             - condition: state
               entity_id: binary_sensor.parent_home
               state: "off"
@@ -258,8 +245,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - charging
+              id: charging
             - condition: or
               conditions:
                 - condition: state

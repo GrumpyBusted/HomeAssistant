@@ -1,6 +1,7 @@
 - id: "1770996223230"
   alias: Køkken todo vand
-  description: Overvåg om der er vand under vasken i køkkenet, send beskeder hvis der opstår lækage
+  description: |
+    Overvåg om der er vand under vasken i køkkenet, send beskeder hvis der opstår lækage
   mode: queued
   max: 10
   trace:
@@ -10,15 +11,13 @@
     - trigger: state
       entity_id: binary_sensor.kitchen_sink_water_leak_sensor
       to: "on"
-      for:
-        seconds: 30
+      for: 00:00:30
       id: leak
 
     - trigger: state
       entity_id: binary_sensor.kitchen_sink_water_leak_sensor
       to: "off"
-      for:
-        seconds: 30
+      for: 00:30:00
 
     - trigger: time_pattern
       hours: /1

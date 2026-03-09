@@ -1,6 +1,7 @@
 - id: "1747340588102"
   alias: Toilet lys
-  description: Automatik til at styre lys på toilettet
+  description: |
+    Automatik til at styre lys på toilettet
   mode: queued
   max: 10
   trace:
@@ -31,8 +32,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - detected
+              id: detected
             - condition: state
               entity_id: binary_sensor.everyone_sleeping
               state: "on"
@@ -46,8 +46,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - detected
+              id: detected
           sequence:
             - action: light.turn_on
               target:

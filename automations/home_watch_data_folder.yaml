@@ -1,6 +1,7 @@
 - id: "1764973371100"
   alias: Hjem overvåg data folder
-  description: Overvågning af data folder
+  description: |
+    Overvågning af data folder
   mode: queued
   max: 10
   trace:
@@ -8,8 +9,7 @@
 
   triggers:
     - trigger: state
-      entity_id:
-        - event.folder_watcher_config_data
+      entity_id: event.folder_watcher_config_data
 
   conditions: []
 
@@ -18,8 +18,7 @@
         - conditions:
             - condition: state
               entity_id: event.folder_watcher_config_data
-              state:
-                - meter_reading_electricity.csv
+              state: meter_reading_electricity.csv
               attribute: file
           sequence:
             - event: folder_data_csv
@@ -29,8 +28,7 @@
         - conditions:
             - condition: state
               entity_id: event.folder_watcher_config_data
-              state:
-                - meter_reading_water.csv
+              state: meter_reading_water.csv
               attribute: file
           sequence:
             - event: folder_data_csv

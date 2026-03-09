@@ -1,6 +1,7 @@
 - id: "1738962148356"
   alias: Garage 3D Printer
-  description: Automatik til at slukke for 3D printer
+  description: |
+    Automatik til at slukke for 3D printer
   mode: queued
   max: 10
   trace:
@@ -8,8 +9,7 @@
 
   triggers:
     - trigger: state
-      entity_id:
-        - sensor.garage_3d_printer
+      entity_id: sensor.garage_3d_printer
       from:
         - busy
         - printing
@@ -20,16 +20,14 @@
       id: finished
 
     - trigger: state
-      entity_id:
-        - sensor.garage_3d_printer
+      entity_id: sensor.garage_3d_printer
       to:
         - busy
         - printing
       id: started
 
     - trigger: state
-      entity_id:
-        - sensor.garage_3d_printer
+      entity_id: sensor.garage_3d_printer
       to:
         - stopped
         - error
@@ -110,7 +108,7 @@
                 persistent: false
                 id: 3d_printer_failed
                 title: 3D-print er fejlet
-                message: 3D-printeren i garagen er stoppet med status [{{states('sensor.garage_3d_printer') }}]
+                message: 3D-printeren i garagen er stoppet med status [{{ states('sensor.garage_3d_printer') }}]
 
         - conditions:
             - condition: trigger
@@ -131,8 +129,7 @@
           sequence:
             - action: homeassistant.disable_device
               data:
-                device_id:
-                  - 5120a1d4206d34361feb88c4094a20de
+                device_id: 5120a1d4206d34361feb88c4094a20de
             - delay:
                 seconds: 3
             - action: homeassistant.disable_config_entry
@@ -152,8 +149,7 @@
                 seconds: 3
             - action: homeassistant.enable_device
               data:
-                device_id:
-                  - 5120a1d4206d34361feb88c4094a20de
+                device_id: 5120a1d4206d34361feb88c4094a20de
             - delay:
                 seconds: 3
             - action: homeassistant.reload_config_entry

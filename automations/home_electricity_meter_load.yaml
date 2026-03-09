@@ -1,6 +1,7 @@
 - id: "1764365776080"
   alias: Hjem elektricitet måler indlæs
-  description: Indlæs elektricitet måler aflæsninger og opdater sensor
+  description: |
+    Indlæs elektricitet måler aflæsninger og opdater sensor
   mode: queued
   max: 10
   trace:

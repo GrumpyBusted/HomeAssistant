@@ -1,6 +1,7 @@
 - id: "1769856579014"
   alias: Charlies værelse medieafstiller sæt status
-  description: Automatik til at sætte status helper for medie på Charlies værelse
+  description: |
+    Automatik til at sætte status helper for medie på Charlies værelse
   mode: queued
   max: 10
   trace:
@@ -23,8 +24,7 @@
     - trigger: state
       entity_id: sensor.charlies_room_apple_tv_media_player_safe
       to: "off"
-      for:
-        seconds: 3
+      for: 00:00:03
       id: "off"
 
     - trigger: state
@@ -43,8 +43,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id:
-                - started
+              id: started
           sequence:
             - action: timer.cancel
               target:
@@ -56,8 +55,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - ended
+              id: ended
           sequence:
             - action: timer.start
               target:
@@ -71,8 +69,7 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - timeout
+              id: timeout
             - condition: state
               entity_id: sensor.charlies_room_apple_tv_media_player_safe
               state:

@@ -1,6 +1,7 @@
 - id: "1769363385863"
   alias: Hjem todo Aqara temperatursensor
-  description: Kontroller batteri status på Aqara temperatursensorer
+  description: |
+    Kontroller batteri status på Aqara temperatursensorer
   mode: restart
   trace:
     stored_traces: 30
@@ -12,8 +13,7 @@
         - sensor.patio_temperature_sensor_battery
         - sensor.utility_room_freezer_temperature_sensor_battery
       below: 10
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: numeric_state
       entity_id:
@@ -21,8 +21,7 @@
         - sensor.patio_temperature_sensor_battery
         - sensor.utility_room_freezer_temperature_sensor_battery
       above: 20
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: numeric_state
       entity_id:
@@ -30,8 +29,7 @@
         - sensor.patio_temperature_sensor_battery
         - sensor.utility_room_freezer_temperature_sensor_battery
       above: 70
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: time
       at: 03:04:00

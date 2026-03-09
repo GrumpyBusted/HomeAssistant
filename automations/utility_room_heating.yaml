@@ -1,6 +1,7 @@
 - id: "1737311656075"
   alias: Bryggers varme
-  description: Automatik til at styre varmen på bryggers
+  description: |
+    Automatik til at styre varmen på bryggers
   mode: restart
   trace:
     stored_traces: 50
@@ -40,7 +41,8 @@
             - condition: trigger
               id: target_changed
             - condition: template
-              value_template: "{{ states('sensor.utility_room_target_temperature') | float(0.0) != states('sensor.utility_room_desired_temperature') | float(21.0) }}"
+              value_template: |-
+                {{ states('sensor.utility_room_target_temperature') | float(0.0) != states('sensor.utility_room_desired_temperature') | float(21.0) }}
           sequence:
             - action: timer.start
               target:
@@ -50,7 +52,8 @@
 
         - conditions:
             - condition: template
-              value_template: "{{ states('sensor.utility_room_target_temperature') | float(0.0) == states('sensor.utility_room_desired_temperature') | float(21.0) }}"
+              value_template: |-
+                {{ states('sensor.utility_room_target_temperature') | float(0.0) == states('sensor.utility_room_desired_temperature') | float(21.0) }}
             - condition: state
               entity_id: timer.utility_room_heating_manual_timer
               state: active

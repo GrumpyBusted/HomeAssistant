@@ -1,6 +1,7 @@
 - id: "1769452207183"
   alias: Hjem todo Yale
-  description: Kontroller batteri status på Yale låse
+  description: |
+    Kontroller batteri status på Yale låse
   mode: restart
   trace:
     stored_traces: 30
@@ -14,8 +15,7 @@
         - sensor.patio_lock_battery
         - sensor.patio_keypad_battery
       below: 15
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: numeric_state
       entity_id:
@@ -25,8 +25,7 @@
         - sensor.patio_lock_battery
         - sensor.patio_keypad_battery
       above: 70
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: time
       at: 03:17:00

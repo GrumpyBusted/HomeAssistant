@@ -1,6 +1,7 @@
 - id: "1739744093398"
   alias: Hjem todo IKEA rullegardiner
-  description: Kontroller batteri status på IKEA rullegardiner
+  description: |
+    Kontroller batteri status på IKEA rullegardiner
   mode: restart
   trace:
     stored_traces: 30
@@ -15,8 +16,7 @@
         - sensor.emils_room_blind_open_close_remote_battery
         - sensor.charlies_room_blind_open_close_remote_battery
       below: 5
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: numeric_state
       entity_id:
@@ -27,8 +27,7 @@
         - sensor.emils_room_blind_open_close_remote_battery
         - sensor.charlies_room_blind_open_close_remote_battery
       above: 70
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: time
       at: 03:09:00

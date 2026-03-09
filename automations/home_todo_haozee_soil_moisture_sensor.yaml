@@ -1,6 +1,7 @@
 - id: "1769704796507"
   alias: Hjem todo Haozee jordfugtighedssensor
-  description: Kontroller batteri status på aozee Jordfugtighedssensor
+  description: |
+    Kontroller batteri status på aozee Jordfugtighedssensor
   mode: restart
   trace:
     stored_traces: 30
@@ -12,8 +13,7 @@
         - sensor.bedroom_soil_moisture_sensor_battery
         - sensor.charlies_room_soil_moisture_sensor_battery
       below: 10
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: numeric_state
       entity_id:
@@ -21,8 +21,7 @@
         - sensor.bedroom_soil_moisture_sensor_battery
         - sensor.charlies_room_soil_moisture_sensor_battery
       above: 70
-      for:
-        minutes: 3
+      for: 00:03:00
 
     - trigger: time
       at: 03:08:00
