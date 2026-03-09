@@ -1,131 +1,146 @@
-- id: '1747337340117'
+- id: "1747337340117"
   alias: Entre lys
   description: Automatik til at styre lys i entreen
-  triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.entrance_presence
-    to: 'on'
-    id: detected_inside
-  - trigger: state
-    entity_id:
-    - binary_sensor.entrance_presence
-    to: 'off'
-    id: cleared_inside
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_entrance_presence
-    to: 'on'
-    id: detected_outside
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_entrance_presence
-    to: 'off'
-    id: cleared_outside
-  - trigger: state
-    entity_id:
-    - binary_sensor.someone_home
-    to: 'off'
-    id: no_one_home
-  - trigger: state
-    entity_id: select.bedroom_state
-  conditions: []
-  actions:
-  - variables:
-      light: '{{ states(''binary_sensor.entrance_light'') }}'
-  - choose:
-    - conditions:
-      - condition: trigger
-        id:
-        - detected_inside
-      - condition: numeric_state
-        entity_id: sensor.entrance_motion_sensor_illuminance
-        below: 200
-      sequence:
-      - variables:
-          light: 'on'
-    - conditions:
-      - condition: trigger
-        id:
-        - detected_outside
-      - condition: state
-        entity_id: binary_sensor.home_outside_light
-        state: 'off'
-      sequence:
-      - variables:
-          light: 'on'
-    - conditions:
-      - condition: trigger
-        id:
-        - cleared_inside
-        - cleared_outside
-      - condition: state
-        entity_id: binary_sensor.entrance_presence
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.driveway_entrance_presence
-        state: 'off'
-      sequence:
-      - variables:
-          light: 'off'
-    - conditions:
-      - condition: trigger
-        id:
-        - no_one_home
-      sequence:
-      - variables:
-          light: 'off'
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: |
-          {{ light == "on" }}
-      - condition: state
-        entity_id: select.bedroom_state
-        state: 
-          - wind_down
-          - sleeping
-          - quiet_time
-          - wake_up_soon
-          - wake_up
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          color_temp_kelvin: 2700
-          brightness_pct: 30
-          transition: 1
-        target:
-          entity_id:
-          - light.entrance_lights
-    - conditions:
-      - condition: template
-        value_template: |
-          {{ light == "on" }}
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          color_temp_kelvin: 2700
-          brightness_pct: 80
-          transition: 1
-        target:
-          entity_id:
-          - light.entrance_lights
-    - conditions:
-      - condition: template
-        value_template: '{{ light == "off" }}
-
-          '
-      sequence:
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 1
-        target:
-          entity_id:
-          - light.entrance_lights
   mode: queued
   max: 10
   trace:
     stored_traces: 20
+
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.entrance_presence
+      to: "on"
+      id: detected_inside
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.entrance_presence
+      to: "off"
+      id: cleared_inside
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.driveway_entrance_presence
+      to: "on"
+      id: detected_outside
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.driveway_entrance_presence
+      to: "off"
+      id: cleared_outside
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.someone_home
+      to: "off"
+      id: no_one_home
+
+    - trigger: state
+      entity_id: select.bedroom_state
+
+  conditions: []
+
+  actions:
+    - variables:
+        light: "{{ states('binary_sensor.entrance_light') }}"
+
+    - choose:
+        - conditions:
+            - condition: trigger
+              id:
+                - detected_inside
+            - condition: numeric_state
+              entity_id: sensor.entrance_motion_sensor_illuminance
+              below: 200
+          sequence:
+            - variables:
+                light: "on"
+
+        - conditions:
+            - condition: trigger
+              id:
+                - detected_outside
+            - condition: state
+              entity_id: binary_sensor.home_outside_light
+              state: "off"
+          sequence:
+            - variables:
+                light: "on"
+
+        - conditions:
+            - condition: trigger
+              id:
+                - cleared_inside
+                - cleared_outside
+            - condition: state
+              entity_id: binary_sensor.entrance_presence
+              state: "off"
+            - condition: state
+              entity_id: binary_sensor.driveway_entrance_presence
+              state: "off"
+          sequence:
+            - variables:
+                light: "off"
+
+        - conditions:
+            - condition: trigger
+              id:
+                - no_one_home
+          sequence:
+            - variables:
+                light: "off"
+
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: |
+                {{ light == "on" }}
+            - condition: state
+              entity_id: select.bedroom_state
+              state:
+                - wind_down
+                - sleeping
+                - quiet_time
+                - wake_up_soon
+                - wake_up
+          sequence:
+            - action: light.turn_on
+              metadata: {}
+              data:
+                color_temp_kelvin: 2700
+                brightness_pct: 30
+                transition: 1
+              target:
+                entity_id:
+                  - light.entrance_lights
+
+        - conditions:
+            - condition: template
+              value_template: |
+                {{ light == "on" }}
+          sequence:
+            - action: light.turn_on
+              metadata: {}
+              data:
+                color_temp_kelvin: 2700
+                brightness_pct: 80
+                transition: 1
+              target:
+                entity_id:
+                  - light.entrance_lights
+
+        - conditions:
+            - condition: template
+              value_template: '{{ light == "off" }}
+
+                '
+          sequence:
+            - action: light.turn_off
+              metadata: {}
+              data:
+                transition: 1
+              target:
+                entity_id:
+                  - light.entrance_lights

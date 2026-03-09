@@ -1,42 +1,47 @@
-- id: '1769872044331'
+- id: "1769872044331"
   alias: Gang tilstedeværelsessensor
   description: Automatik til at styre gang tilstedeværelsessensor
-  triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.hallway_presence_sensor_occupancy
-    from: 'off'
-    to: 'on'
-    id: detected
-  - trigger: state
-    entity_id:
-    - binary_sensor.hallway_presence_sensor_occupancy
-    from: 'on'
-    to: 'off'
-    id: cleared
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id:
-        - detected
-      sequence:
-      - action: timer.cancel
-        target:
-          entity_id: timer.hallway_presence_sensor_timer
-    - conditions:
-      - condition: trigger
-        id:
-        - cleared
-      sequence:
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:03:00
-        target:
-          entity_id: timer.hallway_presence_sensor_timer
   mode: queued
   max: 10
   trace:
     stored_traces: 20
+
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.hallway_presence_sensor_occupancy
+      from: "off"
+      to: "on"
+      id: detected
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.hallway_presence_sensor_occupancy
+      from: "on"
+      to: "off"
+      id: cleared
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id:
+                - detected
+          sequence:
+            - action: timer.cancel
+              target:
+                entity_id: timer.hallway_presence_sensor_timer
+
+        - conditions:
+            - condition: trigger
+              id:
+                - cleared
+          sequence:
+            - action: timer.start
+              metadata: {}
+              data:
+                duration: 00:03:00
+              target:
+                entity_id: timer.hallway_presence_sensor_timer

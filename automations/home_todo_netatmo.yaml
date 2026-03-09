@@ -1,86 +1,91 @@
-- id: '1739904709484'
+- id: "1739904709484"
   alias: Hjem todo Netatmo
   description: Kontroller batteri status på Netatmo enheder
-  triggers:
-  - trigger: numeric_state
-    entity_id:
-    - sensor.garage_weather_station_battery
-    - sensor.garden_anemometer_battery
-    - sensor.garden_rain_gauge_battery
-    - sensor.garden_weather_station_battery
-    - sensor.greenhouse_weather_station_battery
-    - sensor.technic_room_weather_station_battery
-    below: 5
-    for:
-      minutes: 3
-  - trigger: numeric_state
-    entity_id:
-    - sensor.garage_weather_station_battery
-    - sensor.garden_anemometer_battery
-    - sensor.garden_rain_gauge_battery
-    - sensor.garden_weather_station_battery
-    - sensor.greenhouse_weather_station_battery
-    - sensor.technic_room_weather_station_battery
-    above: 70
-    for:
-      minutes: 3
-  - trigger: time
-    at: 03:10:00
-  conditions: []
-  actions:
-  - variables:
-      sensors:
-      - entity_id: sensor.garage_weather_station_battery
-        location: over køleskabet
-        battery_type: 4 * AAA
-      - entity_id: sensor.garden_anemometer_battery
-        location: teknik rummet
-        battery_type: strøm tilslutning
-      - entity_id: sensor.garden_rain_gauge_battery
-        location: på terrassen
-        battery_type: 2 * AAA
-      - entity_id: sensor.garden_weather_station_battery
-        location: på garagen
-        battery_type: 2 * AAA
-      - entity_id: sensor.greenhouse_weather_station_battery
-        battery_type: 4 * AAA
-      - entity_id: sensor.technic_room_weather_station_battery
-        location: på vandvarmer
-        battery_type: 4 * AAA
-  - repeat:
-      for_each: '{{ sensors }}'
-      sequence:
-      - action: script.create_todo_battery_task
-        data:
-          entity_id: '{{ repeat.item.entity_id }}'
-          type: '{{ repeat.item.battery_type | default('''') }}'
-          location: '{{ repeat.item.location | default('''') }}'
-          threshold: 5
-  - variables:
-      entities:
-      - binary_sensor.greenhouse_weather_station_connectivity
-      - binary_sensor.garage_weather_station_connectivity
-      - binary_sensor.garden_rain_gauge_connectivity
-      - binary_sensor.garden_weather_station_connectivity
-      - binary_sensor.garden_anemometer_connectivity
-      - binary_sensor.bedroom_weather_station_connectivity
-      - binary_sensor.technic_room_weather_station_connectivity
-  - repeat:
-      for_each: '{{ entities }}'
-      sequence:
-      - variables:
-          device_name: '{% set i = device_id(repeat.item) %}
-
-            {% set n = device_attr(i, ''name_by_user'') %}
-
-            {{ n }}'
-      - action: script.create_todo_task
-        data:
-          subject: Genetabler forbindelse til {{ device_name }}
-          description: Forbindelsen til {{ device_name }} er afbrydt.
-          related_entity_id: '{{ repeat.item }}'
-          entity_id: todo.todo_smart_todo
-          is_active: '{{ is_state(repeat.item, ''off'') }}'
   mode: restart
   trace:
     stored_traces: 30
+
+  triggers:
+    - trigger: numeric_state
+      entity_id:
+        - sensor.garage_weather_station_battery
+        - sensor.garden_anemometer_battery
+        - sensor.garden_rain_gauge_battery
+        - sensor.garden_weather_station_battery
+        - sensor.greenhouse_weather_station_battery
+        - sensor.technic_room_weather_station_battery
+      below: 5
+      for:
+        minutes: 3
+
+    - trigger: numeric_state
+      entity_id:
+        - sensor.garage_weather_station_battery
+        - sensor.garden_anemometer_battery
+        - sensor.garden_rain_gauge_battery
+        - sensor.garden_weather_station_battery
+        - sensor.greenhouse_weather_station_battery
+        - sensor.technic_room_weather_station_battery
+      above: 70
+      for:
+        minutes: 3
+
+    - trigger: time
+      at: 03:10:00
+
+  conditions: []
+
+  actions:
+    - variables:
+        sensors:
+          - entity_id: sensor.garage_weather_station_battery
+            location: over køleskabet
+            battery_type: 4 * AAA
+          - entity_id: sensor.garden_anemometer_battery
+            location: teknik rummet
+            battery_type: strøm tilslutning
+          - entity_id: sensor.garden_rain_gauge_battery
+            location: på terrassen
+            battery_type: 2 * AAA
+          - entity_id: sensor.garden_weather_station_battery
+            location: på garagen
+            battery_type: 2 * AAA
+          - entity_id: sensor.greenhouse_weather_station_battery
+            battery_type: 4 * AAA
+          - entity_id: sensor.technic_room_weather_station_battery
+            location: på vandvarmer
+            battery_type: 4 * AAA
+    - repeat:
+        for_each: "{{ sensors }}"
+        sequence:
+          - action: script.create_todo_battery_task
+            data:
+              entity_id: "{{ repeat.item.entity_id }}"
+              type: "{{ repeat.item.battery_type | default('') }}"
+              location: "{{ repeat.item.location | default('') }}"
+              threshold: 5
+    - variables:
+        entities:
+          - binary_sensor.greenhouse_weather_station_connectivity
+          - binary_sensor.garage_weather_station_connectivity
+          - binary_sensor.garden_rain_gauge_connectivity
+          - binary_sensor.garden_weather_station_connectivity
+          - binary_sensor.garden_anemometer_connectivity
+          - binary_sensor.bedroom_weather_station_connectivity
+          - binary_sensor.technic_room_weather_station_connectivity
+    - repeat:
+        for_each: "{{ entities }}"
+        sequence:
+          - variables:
+              device_name: "{% set i = device_id(repeat.item) %}
+
+                {% set n = device_attr(i, 'name_by_user') %}
+
+                {{ n }}"
+          - action: script.create_todo_task
+            data:
+              subject: Genetabler forbindelse til {{ device_name }}
+              description: Forbindelsen til {{ device_name }} er afbrydt.
+              related_entity_id: "{{ repeat.item }}"
+              entity_id: todo.todo_smart_todo
+              is_active: "{{ is_state(repeat.item, 'off') }}"

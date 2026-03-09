@@ -1,64 +1,61 @@
-- id: '1770922045690'
+- id: "1770922045690"
   alias: Hjem overvåg automation med højt forbrug
   description: Overvåg automations som trigger for meget inden for 24 timer
-  triggers:
-  - at: 04:00:00
-    trigger: time
-  conditions: []
-  actions:
-  - action: sql.query
-    data:
-      query: "SELECT\n  json_extract(ed.shared_data, '$.entity_id') AS automation_id,\n
-        \ COUNT(*) AS trigger_count\nFROM events e\nJOIN event_types et\n  ON e.event_type_id
-        = et.event_type_id\nJOIN event_data ed\n  ON e.data_id = ed.data_id\nWHERE
-        et.event_type = 'automation_triggered'\n  AND e.time_fired_ts > strftime('%s','now','-24
-        hours')\nGROUP BY automation_id\nORDER BY trigger_count DESC;\n"
-    response_variable: sql_result
-  - variables:
-      default_limit: 100
-      custom_limits:
-        automation.home_monitor_log: 2000
-        automation.utility_room_motion_sensor: 1000
-        automation.utility_room_light: 200
-        automation.hallway_light: 200
-        automation.hallway_presence_sensor: 200
-        automation.living_room_heat_pump: 200
-        automation.driveway_light_house_south: 200
-        automation.driveway_light: 200
-        automation.kitchen_presence_sensor: 200
-        automation.driveway_motion_sensor_entrance: 200
-        automation.toilet_motion_sensor: 200
-        automation.driveway_motion_sensor_house_south: 200
-        automation.garden_motion_sensor_house_east: 200
-        automation.entrance_light: 150
-        automation.living_room_media_player_set_status: 150
-        automation.utility_room_washer: 150
-        automation.storage_light: 32
-      offenders: "{% set res = sql_result.result if sql_result is defined else []
-        %}  {% set ns = namespace(offenders=[]) %} {% for row in res %}\n  {% set
-        automation_id = row.automation_id %}\n  {% set count = row.trigger_count |
-        int %}\n  {% set limit = custom_limits.get(automation_id, default_limit) |
-        int %}\n  {% if count > limit %}\n    {% set ns.offenders = ns.offenders +
-        [dict(row, limit=limit)] %}\n  {% endif %}\n{% endfor %} {{ ns.offenders }}\n"
-      message: "count: {{ offenders | count }} automations: {% for row in offenders
-        %}\n  - automation_id: \"{{ row.automation_id }}\"\n    trigger_count: {{
-        row.trigger_count }}\n    limit: {{ row.limit }}\n{% endfor %}"
-  - if:
-    - condition: template
-      value_template: '{{ offenders | length > 0 }}'
-    then:
-    - action: system_log.write
-      data:
-        level: warning
-        message: 'Automations over trigger limit: {{ message }}'
-    - action: script.push_notification
-      data:
-        type: warning
-        recipient: none
-        persistent: true
-        id: home_assistant_monitor_automation_trigger_spam
-        title: '{{ offenders | length }} automations trigger for meget (24 timer)'
-        message: '{{ message }}'
   mode: single
   trace:
     stored_traces: 50
+
+  triggers:
+    - at: 04:00:00
+      trigger: time
+
+  conditions: []
+
+  actions:
+    - action: sql.query
+      data:
+        query:
+          "SELECT\n  json_extract(ed.shared_data, '$.entity_id') AS automation_id,\n \ COUNT(*) AS trigger_count\nFROM events e\nJOIN event_types et\n  ON e.event_type_id = et.event_type_id\nJOIN event_data ed\n  ON e.data_id = ed.data_id\nWHERE et.event_type = 'automation_triggered'\n  AND e.time_fired_ts > strftime('%s','now','-24 hours')\nGROUP BY automation_id\nORDER BY trigger_count DESC;\n"
+      response_variable: sql_result
+
+    - variables:
+        default_limit: 100
+        custom_limits:
+          automation.home_monitor_log: 2000
+          automation.utility_room_motion_sensor: 1000
+          automation.utility_room_light: 200
+          automation.hallway_light: 200
+          automation.hallway_presence_sensor: 200
+          automation.living_room_heat_pump: 200
+          automation.driveway_light_house_south: 200
+          automation.driveway_light: 200
+          automation.kitchen_presence_sensor: 200
+          automation.driveway_motion_sensor_entrance: 200
+          automation.toilet_motion_sensor: 200
+          automation.driveway_motion_sensor_house_south: 200
+          automation.garden_motion_sensor_house_east: 200
+          automation.entrance_light: 150
+          automation.living_room_media_player_set_status: 150
+          automation.utility_room_washer: 150
+          automation.storage_light: 32
+        offenders:
+          "{% set res = sql_result.result if sql_result is defined else [] %}  {% set ns = namespace(offenders=[]) %} {% for row in res %}\n  {% set automation_id = row.automation_id %}\n  {% set count = row.trigger_count | int %}\n  {% set limit = custom_limits.get(automation_id, default_limit) | int %}\n  {% if count > limit %}\n    {% set ns.offenders = ns.offenders + [dict(row, limit=limit)] %}\n  {% endif %}\n{% endfor %} {{ ns.offenders }}\n"
+        message:
+          "count: {{ offenders | count }} automations: {% for row in offenders %}\n  - automation_id: \"{{ row.automation_id }}\"\n    trigger_count: {{ row.trigger_count }}\n    limit: {{ row.limit }}\n{% endfor %}"
+
+    - if:
+        - condition: template
+          value_template: "{{ offenders | length > 0 }}"
+      then:
+        - action: system_log.write
+          data:
+            level: warning
+            message: "Automations over trigger limit: {{ message }}"
+        - action: script.push_notification
+          data:
+            type: warning
+            recipient: none
+            persistent: true
+            id: home_assistant_monitor_automation_trigger_spam
+            title: "{{ offenders | length }} automations trigger for meget (24 timer)"
+            message: "{{ message }}"

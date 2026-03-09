@@ -1,61 +1,66 @@
-- id: '1739906369450'
+- id: "1739906369450"
   alias: Hjem todo Philips Hue kontakter
   description: Kontroller batteri status på Philips Hue kontakter
-  triggers:
-  - trigger: numeric_state
-    entity_id:
-    - sensor.living_room_switch_battery
-    - sensor.kitchen_switch_battery
-    - sensor.bedroom_switch_battery
-    - sensor.hallway_switch_battery
-    - sensor.patio_switch_battery
-    - sensor.emils_room_switch_battery
-    - sensor.charlies_room_switch_battery
-    below: 5
-    for:
-      minutes: 3
-  - trigger: numeric_state
-    entity_id:
-    - sensor.living_room_switch_battery
-    - sensor.kitchen_switch_battery
-    - sensor.bedroom_switch_battery
-    - sensor.hallway_switch_battery
-    - sensor.patio_switch_battery
-    - sensor.emils_room_switch_battery
-    - sensor.charlies_room_switch_battery
-    above: 70
-    for:
-      minutes: 3
-  - trigger: time
-    at: 03:14:00
-  conditions: []
-  actions:
-  - variables:
-      sensors:
-      - entity_id: sensor.living_room_switch_battery
-        battery_type: 1 * CR2032
-      - entity_id: sensor.kitchen_switch_battery
-        battery_type: 1 * CR2032
-      - entity_id: sensor.bedroom_switch_battery
-        battery_type: 1 * CR2450
-      - entity_id: sensor.hallway_switch_battery
-        battery_type: 1 * CR2450
-      - entity_id: sensor.kitchen_switch_battery
-        battery_type: 1 * CR2450
-      - entity_id: sensor.patio_switch_battery
-        battery_type: 1 * CR2450
-      - entity_id: sensor.emils_room_switch_battery
-        battery_type: 1 * CR2450
-      - entity_id: sensor.charlies_room_switch_battery
-        battery_type: 1 * CR2450
-  - repeat:
-      for_each: '{{ sensors }}'
-      sequence:
-      - action: script.create_todo_battery_task
-        data:
-          entity_id: '{{ repeat.item.entity_id }}'
-          type: '{{ repeat.item.battery_type | default('''') }}'
-          threshold: 5
   mode: restart
   trace:
     stored_traces: 30
+
+  triggers:
+    - trigger: numeric_state
+      entity_id:
+        - sensor.living_room_switch_battery
+        - sensor.kitchen_switch_battery
+        - sensor.bedroom_switch_battery
+        - sensor.hallway_switch_battery
+        - sensor.patio_switch_battery
+        - sensor.emils_room_switch_battery
+        - sensor.charlies_room_switch_battery
+      below: 5
+      for:
+        minutes: 3
+
+    - trigger: numeric_state
+      entity_id:
+        - sensor.living_room_switch_battery
+        - sensor.kitchen_switch_battery
+        - sensor.bedroom_switch_battery
+        - sensor.hallway_switch_battery
+        - sensor.patio_switch_battery
+        - sensor.emils_room_switch_battery
+        - sensor.charlies_room_switch_battery
+      above: 70
+      for:
+        minutes: 3
+
+    - trigger: time
+      at: 03:14:00
+
+  conditions: []
+
+  actions:
+    - variables:
+        sensors:
+          - entity_id: sensor.living_room_switch_battery
+            battery_type: 1 * CR2032
+          - entity_id: sensor.kitchen_switch_battery
+            battery_type: 1 * CR2032
+          - entity_id: sensor.bedroom_switch_battery
+            battery_type: 1 * CR2450
+          - entity_id: sensor.hallway_switch_battery
+            battery_type: 1 * CR2450
+          - entity_id: sensor.kitchen_switch_battery
+            battery_type: 1 * CR2450
+          - entity_id: sensor.patio_switch_battery
+            battery_type: 1 * CR2450
+          - entity_id: sensor.emils_room_switch_battery
+            battery_type: 1 * CR2450
+          - entity_id: sensor.charlies_room_switch_battery
+            battery_type: 1 * CR2450
+    - repeat:
+        for_each: "{{ sensors }}"
+        sequence:
+          - action: script.create_todo_battery_task
+            data:
+              entity_id: "{{ repeat.item.entity_id }}"
+              type: "{{ repeat.item.battery_type | default('') }}"
+              threshold: 5

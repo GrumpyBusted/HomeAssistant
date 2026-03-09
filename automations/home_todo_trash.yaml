@@ -1,86 +1,88 @@
-- id: '1740779558756'
+- id: "1740779558756"
   alias: Hjem todo affald
-  description: Automation til at oprette todo for at tømme affald og tage affaldscontainer
-    på til vejen
-  triggers:
-  - trigger: time
-    at: 09:00:00
-  conditions: []
-  actions:
-  - action: rest_command.perfect_waste_get_next_address_collection
-    metadata: {}
-    data:
-      addressID: '17545'
-      municipality: 253
-    response_variable: response
-  - variables:
-      pickup_date: '{{ as_datetime(response.content.result.date).date() }}'
-      tomorrow: '{{ now().date() + timedelta(days=1) }}'
-      today: '{{ now().date() }}'
-      status: '{{ response.status }}'
-      containers: "{% set ns = namespace(fractions=[]) %}\n{% for fraction in response.content.result.fractions
-        %}\n  {% set ns.fractions = ns.fractions + [fraction.fractionName] %}\n{%
-        endfor %}\n{{ ns.fractions }}"
-      description_text: "Følgende affaldscontainere skal køres op til vejen i dag:
-        <ul> {% for c in containers %}\n  <li>{{ c }}</li>\n{% endfor %} </ul>"
-  - action: system_log.write
-    metadata: {}
-    data:
-      level: debug
-      message: '"Pickup date: {{ pickup_date }}"
-
-        "Tomorrow: {{ tomorrow }}"'
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ status != 200 }}'
-      sequence:
-      - action: persistent_notification.create
-        metadata: {}
-        data:
-          message: 'Status: {{ status }}
-
-            Response: {{ response }}              '
-          title: Unable to find next trash pickup
-    - conditions:
-      - condition: template
-        value_template: '{{ pickup_date == tomorrow }}'
-      sequence:
-      - action: input_datetime.set_datetime
-        metadata: {}
-        data:
-          date: '{{ pickup_date }}'
-        target:
-          entity_id: input_datetime.home_trash_pickup_date
-      - action: script.create_todo_task
-        data:
-          subject: Kør affaldscontainer op til vejen
-          description: '{{ description_text }}'
-          related_entity_id: rest_command.perfect_waste_get_next_address_collection
-          entity_id: todo.todo_smart_todo
-          is_active: 'true'
-    - conditions:
-      - condition: template
-        value_template: '{{ states(''input_datetime.home_trash_pickup_date'') == today
-          }}'
-      sequence:
-      - action: script.create_todo_task
-        data:
-          subject: Hent affaldscontainer ved vejen
-          description: Hent affaldscontainere ved vejen og sæt tilbage bag garagen.
-          related_entity_id: rest_command.perfect_waste_get_next_address_collection
-          entity_id: todo.todo_smart_todo
-  - if:
-    - condition: template
-      value_template: '{{ now().weekday() == 1 }}'
-    then:
-    - action: script.create_todo_task
-      data:
-        subject: Tøm affald
-        description: Tøm alle affaldsspande i huset, inklusiv toiletter, værelser
-          og bryggers
-        entity_id: todo.todo_smart_todo
+  description: Automation til at oprette todo for at tømme affald og tage affaldscontainer på til vejen
   mode: queued
   max: 10
   trace:
     stored_traces: 30
+
+  triggers:
+    - trigger: time
+      at: 09:00:00
+
+  conditions: []
+
+  actions:
+    - action: rest_command.perfect_waste_get_next_address_collection
+      metadata: {}
+      data:
+        addressID: "17545"
+        municipality: 253
+      response_variable: response
+    - variables:
+        pickup_date: "{{ as_datetime(response.content.result.date).date() }}"
+        tomorrow: "{{ now().date() + timedelta(days=1) }}"
+        today: "{{ now().date() }}"
+        status: "{{ response.status }}"
+        containers:
+          "{% set ns = namespace(fractions=[]) %}\n{% for fraction in response.content.result.fractions %}\n  {% set ns.fractions = ns.fractions + [fraction.fractionName] %}\n{% endfor %}\n{{ ns.fractions }}"
+        description_text:
+          "Følgende affaldscontainere skal køres op til vejen i dag: <ul> {% for c in containers %}\n  <li>{{ c }}</li>\n{% endfor %} </ul>"
+    - action: system_log.write
+      metadata: {}
+      data:
+        level: debug
+        message: '"Pickup date: {{ pickup_date }}"
+
+          "Tomorrow: {{ tomorrow }}"'
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ status != 200 }}"
+          sequence:
+            - action: persistent_notification.create
+              metadata: {}
+              data:
+                message: "Status: {{ status }}
+
+                  Response: {{ response }}              "
+                title: Unable to find next trash pickup
+
+        - conditions:
+            - condition: template
+              value_template: "{{ pickup_date == tomorrow }}"
+          sequence:
+            - action: input_datetime.set_datetime
+              metadata: {}
+              data:
+                date: "{{ pickup_date }}"
+              target:
+                entity_id: input_datetime.home_trash_pickup_date
+            - action: script.create_todo_task
+              data:
+                subject: Kør affaldscontainer op til vejen
+                description: "{{ description_text }}"
+                related_entity_id: rest_command.perfect_waste_get_next_address_collection
+                entity_id: todo.todo_smart_todo
+                is_active: "true"
+
+        - conditions:
+            - condition: template
+              value_template: "{{ states('input_datetime.home_trash_pickup_date') == today }}"
+          sequence:
+            - action: script.create_todo_task
+              data:
+                subject: Hent affaldscontainer ved vejen
+                description: Hent affaldscontainere ved vejen og sæt tilbage bag garagen.
+                related_entity_id: rest_command.perfect_waste_get_next_address_collection
+                entity_id: todo.todo_smart_todo
+
+    - if:
+        - condition: template
+          value_template: "{{ now().weekday() == 1 }}"
+      then:
+        - action: script.create_todo_task
+          data:
+            subject: Tøm affald
+            description: Tøm alle affaldsspande i huset, inklusiv toiletter, værelser og bryggers
+            entity_id: todo.todo_smart_todo

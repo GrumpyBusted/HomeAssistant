@@ -45,6 +45,9 @@
   conditions: []
 
   actions:
+    - variables:
+        mode: "off"
+
     - choose:
         - conditions:
             - condition: state

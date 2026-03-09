@@ -1,88 +1,100 @@
-- id: '1769208997346'
+- id: "1769208997346"
   alias: Gang fotorammer
   description: Automatik for at styre fotorammer i gangen
-  triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.someone_home
-  - trigger: state
-    entity_id: select.bedroom_state
-  - trigger: state
-    entity_id:
-    - binary_sensor.bedroom_door
-  - trigger: state
-    entity_id:
-    - media_player.hallway_photo_frame_joakim
-    - media_player.hallway_photo_frame_emil
-    - media_player.hallway_photo_frame_charlie
-    from: unavailable
-    id: Available
-  - trigger: homeassistant
-    event: start
-    id: started
-  actions:
-  - if:
-    - condition: trigger
-      id: started
-    then:
-    - action: androidtv.adb_command
-      data:
-        command: echo test
-      target:
-        entity_id:
-        - media_player.hallway_photo_frame_joakim
-        - media_player.hallway_photo_frame_emil
-        - media_player.hallway_photo_frame_charlie
-    - delay:
-        seconds: 30
-  - action: homeassistant.update_entity
-    target:
-      entity_id:
-      - media_player.hallway_photo_frame_joakim
-      - media_player.hallway_photo_frame_emil
-      - media_player.hallway_photo_frame_charlie
-  - delay:
-      seconds: 3
-  - if:
-    - condition: or
-      conditions:
-      - condition: state
-        entity_id: binary_sensor.someone_home
-        state: 'off'
-      - condition: and
-        conditions:
-        - condition: state
-          entity_id: select.bedroom_state
-          state: 
-            - sleeping
-            - quiet_time
-            - wake_up_soon
-        - condition: state
-          entity_id: binary_sensor.bedroom_door
-          state: 'on'
-    then:
-    - action: media_player.turn_off
-      target:
-        entity_id:
-        - media_player.hallway_photo_frame_charlie
-        - media_player.hallway_photo_frame_emil
-        - media_player.hallway_photo_frame_joakim
-    else:
-    - action: media_player.turn_on
-      target:
-        entity_id:
-        - media_player.hallway_photo_frame_charlie
-        - media_player.hallway_photo_frame_emil
-        - media_player.hallway_photo_frame_joakim
-  - delay:
-      seconds: 3
-  - action: homeassistant.update_entity
-    target:
-      entity_id:
-      - media_player.hallway_photo_frame_joakim
-      - media_player.hallway_photo_frame_emil
-      - media_player.hallway_photo_frame_charlie
   mode: queued
   max: 10
   trace:
     stored_traces: 20
+
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.someone_home
+
+    - trigger: state
+      entity_id: select.bedroom_state
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.bedroom_door
+
+    - trigger: state
+      entity_id:
+        - media_player.hallway_photo_frame_joakim
+        - media_player.hallway_photo_frame_emil
+        - media_player.hallway_photo_frame_charlie
+      from: unavailable
+      id: Available
+
+    - trigger: homeassistant
+      event: start
+      id: started
+
+  conditions: []
+
+  actions:
+    - if:
+        - condition: trigger
+          id: started
+      then:
+        - action: androidtv.adb_command
+          data:
+            command: echo test
+          target:
+            entity_id:
+              - media_player.hallway_photo_frame_joakim
+              - media_player.hallway_photo_frame_emil
+              - media_player.hallway_photo_frame_charlie
+        - delay:
+            seconds: 30
+
+    - action: homeassistant.update_entity
+      target:
+        entity_id:
+          - media_player.hallway_photo_frame_joakim
+          - media_player.hallway_photo_frame_emil
+          - media_player.hallway_photo_frame_charlie
+    - delay:
+        seconds: 3
+
+    - if:
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: binary_sensor.someone_home
+              state: "off"
+            - condition: and
+              conditions:
+                - condition: state
+                  entity_id: select.bedroom_state
+                  state:
+                    - sleeping
+                    - quiet_time
+                    - wake_up_soon
+                - condition: state
+                  entity_id: binary_sensor.bedroom_door
+                  state: "on"
+      then:
+        - action: media_player.turn_off
+          target:
+            entity_id:
+              - media_player.hallway_photo_frame_charlie
+              - media_player.hallway_photo_frame_emil
+              - media_player.hallway_photo_frame_joakim
+      else:
+        - action: media_player.turn_on
+          target:
+            entity_id:
+              - media_player.hallway_photo_frame_charlie
+              - media_player.hallway_photo_frame_emil
+              - media_player.hallway_photo_frame_joakim
+
+    - delay:
+        seconds: 3
+
+    - action: homeassistant.update_entity
+      target:
+        entity_id:
+          - media_player.hallway_photo_frame_joakim
+          - media_player.hallway_photo_frame_emil
+          - media_player.hallway_photo_frame_charlie

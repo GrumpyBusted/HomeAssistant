@@ -1,161 +1,170 @@
-- id: '1738962148356'
+- id: "1738962148356"
   alias: Garage 3D Printer
   description: Automatik til at slukke for 3D printer
-  triggers:
-  - trigger: state
-    entity_id:
-    - sensor.garage_3d_printer
-    from:
-    - busy
-    - printing
-    to:
-    - finished
-    - idle
-    - ready
-    id: finished
-  - trigger: state
-    entity_id:
-    - sensor.garage_3d_printer
-    to:
-    - busy
-    - printing
-    id: started
-  - trigger: state
-    entity_id:
-    - sensor.garage_3d_printer
-    to:
-    - stopped
-    - error
-    - attention
-    - pause
-    id: failed
-  - trigger: state
-    entity_id: timer.garage_3d_printer_timer
-    to: idle
-    id: timeout
-  - trigger: state
-    entity_id: light.garage_3d_printer_power
-    from: 'on'
-    to: 'off'
-    id: 'off'
-  - trigger: state
-    entity_id: light.garage_3d_printer_power
-    from: 'off'
-    to: 'on'
-    id: 'on'
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id: finished
-      sequence:
-      - action: timer.start
-        metadata: {}
-        target:
-          entity_id: timer.garage_3d_printer_timer
-        data:
-          duration: 00:10:00
-      - action: script.create_todo_task
-        data:
-          subject: Hent 3D printer
-          entity_id: todo.todo_smart_todo
-          description: 3D-printeren i garagen er færdig, hent printet og gør printeren
-            ren.
-          related_entity_id: sensor.garage_3d_printer
-      - action: script.push_notification
-        data:
-          type: info
-          recipient: emil
-          persistent: false
-          id: 3d_printer_finished
-          title: 3D-print er færdig
-          message: 3D-printeren i garagen er færdig, hent printet og gør printeren
-            ren.
-    - conditions:
-      - condition: trigger
-        id: started
-      sequence:
-      - action: timer.cancel
-        target:
-          entity_id: timer.garage_3d_printer_timer
-    - conditions:
-      - condition: trigger
-        id: failed
-      sequence:
-      - action: timer.cancel
-        target:
-          entity_id: timer.garage_3d_printer_timer
-      - action: script.create_todo_task
-        data:
-          subject: Kontroller 3D printer
-          entity_id: todo.todo_smart_todo
-          description: 3D-printeren i garagen er stoppet med status [{{ states('sensor.garage_3d_printer')
-            }}], kontroller og genstart.
-          related_entity_id: sensor.garage_3d_printer
-      - action: script.push_notification
-        data:
-          type: warning
-          recipient: emil
-          persistent: false
-          id: 3d_printer_failed
-          title: 3D-print er fejlet
-          message: 3D-printeren i garagen er stoppet med status [{{states('sensor.garage_3d_printer')
-            }}]
-    - conditions:
-      - condition: trigger
-        id: timeout
-      - condition: state
-        entity_id: sensor.garage_3d_printer
-        state:
-        - idle
-        - finished
-      sequence:
-      - action: light.turn_off
-        target:
-          entity_id: light.garage_3d_printer_power
-    - conditions:
-      - condition: trigger
-        id: 'off'
-      sequence:
-      - action: homeassistant.disable_device
-        data:
-          device_id:
-          - 5120a1d4206d34361feb88c4094a20de
-      - delay:
-          seconds: 3
-      - action: homeassistant.disable_config_entry
-        data:
-          config_entry_id: 01JGCEWM58T7N5MY3Z1HSEDK4E
-      - delay:
-          seconds: 3
-    - conditions:
-      - condition: trigger
-        id: 'on'
-      sequence:
-      - action: homeassistant.enable_config_entry
-        data:
-          config_entry_id: 01JGCEWM58T7N5MY3Z1HSEDK4E
-      - delay:
-          seconds: 3
-      - action: homeassistant.enable_device
-        data:
-          device_id:
-          - 5120a1d4206d34361feb88c4094a20de
-      - delay:
-          seconds: 3
-      - action: homeassistant.reload_config_entry
-        data:
-          entry_id: 01JGCEWM58T7N5MY3Z1HSEDK4E
-      - delay:
-          seconds: 3
-      - action: timer.start
-        metadata: {}
-        target:
-          entity_id: timer.garage_3d_printer_timer
-        data:
-          duration: 01:00:00
   mode: queued
   max: 10
   trace:
     stored_traces: 30
+
+  triggers:
+    - trigger: state
+      entity_id:
+        - sensor.garage_3d_printer
+      from:
+        - busy
+        - printing
+      to:
+        - finished
+        - idle
+        - ready
+      id: finished
+
+    - trigger: state
+      entity_id:
+        - sensor.garage_3d_printer
+      to:
+        - busy
+        - printing
+      id: started
+
+    - trigger: state
+      entity_id:
+        - sensor.garage_3d_printer
+      to:
+        - stopped
+        - error
+        - attention
+        - pause
+      id: failed
+
+    - trigger: state
+      entity_id: timer.garage_3d_printer_timer
+      to: idle
+      id: timeout
+
+    - trigger: state
+      entity_id: light.garage_3d_printer_power
+      from: "on"
+      to: "off"
+      id: "off"
+
+    - trigger: state
+      entity_id: light.garage_3d_printer_power
+      from: "off"
+      to: "on"
+      id: "on"
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: finished
+          sequence:
+            - action: timer.start
+              metadata: {}
+              target:
+                entity_id: timer.garage_3d_printer_timer
+              data:
+                duration: 00:10:00
+            - action: script.create_todo_task
+              data:
+                subject: Hent 3D printer
+                entity_id: todo.todo_smart_todo
+                description: 3D-printeren i garagen er færdig, hent printet og gør printeren ren.
+                related_entity_id: sensor.garage_3d_printer
+            - action: script.push_notification
+              data:
+                type: info
+                recipient: emil
+                persistent: false
+                id: 3d_printer_finished
+                title: 3D-print er færdig
+                message: 3D-printeren i garagen er færdig, hent printet og gør printeren ren.
+
+        - conditions:
+            - condition: trigger
+              id: started
+          sequence:
+            - action: timer.cancel
+              target:
+                entity_id: timer.garage_3d_printer_timer
+
+        - conditions:
+            - condition: trigger
+              id: failed
+          sequence:
+            - action: timer.cancel
+              target:
+                entity_id: timer.garage_3d_printer_timer
+            - action: script.create_todo_task
+              data:
+                subject: Kontroller 3D printer
+                entity_id: todo.todo_smart_todo
+                description: 3D-printeren i garagen er stoppet med status [{{ states('sensor.garage_3d_printer') }}], kontroller og genstart.
+                related_entity_id: sensor.garage_3d_printer
+            - action: script.push_notification
+              data:
+                type: warning
+                recipient: emil
+                persistent: false
+                id: 3d_printer_failed
+                title: 3D-print er fejlet
+                message: 3D-printeren i garagen er stoppet med status [{{states('sensor.garage_3d_printer') }}]
+
+        - conditions:
+            - condition: trigger
+              id: timeout
+            - condition: state
+              entity_id: sensor.garage_3d_printer
+              state:
+                - idle
+                - finished
+          sequence:
+            - action: light.turn_off
+              target:
+                entity_id: light.garage_3d_printer_power
+
+        - conditions:
+            - condition: trigger
+              id: "off"
+          sequence:
+            - action: homeassistant.disable_device
+              data:
+                device_id:
+                  - 5120a1d4206d34361feb88c4094a20de
+            - delay:
+                seconds: 3
+            - action: homeassistant.disable_config_entry
+              data:
+                config_entry_id: 01JGCEWM58T7N5MY3Z1HSEDK4E
+            - delay:
+                seconds: 3
+
+        - conditions:
+            - condition: trigger
+              id: "on"
+          sequence:
+            - action: homeassistant.enable_config_entry
+              data:
+                config_entry_id: 01JGCEWM58T7N5MY3Z1HSEDK4E
+            - delay:
+                seconds: 3
+            - action: homeassistant.enable_device
+              data:
+                device_id:
+                  - 5120a1d4206d34361feb88c4094a20de
+            - delay:
+                seconds: 3
+            - action: homeassistant.reload_config_entry
+              data:
+                entry_id: 01JGCEWM58T7N5MY3Z1HSEDK4E
+            - delay:
+                seconds: 3
+            - action: timer.start
+              metadata: {}
+              target:
+                entity_id: timer.garage_3d_printer_timer
+              data:
+                duration: 01:00:00

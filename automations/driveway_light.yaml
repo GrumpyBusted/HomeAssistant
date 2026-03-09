@@ -1,260 +1,272 @@
-- id: '1737916297775'
+- id: "1737916297775"
   alias: Indkørsel lys
   description: Automatik til at styre lys i indkørsel
-  triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_street_presence
-    from: 'off'
-    to: 'on'
-    id: detected_street
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_street_presence
-    from: 'on'
-    to: 'off'
-    id: cleared_street
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_house_south_presence
-    from: 'off'
-    to: 'on'
-    id: detected_south
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_house_south_presence
-    from: 'on'
-    to: 'off'
-    id: cleared_south
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_entrance_presence
-    from: 'off'
-    to: 'on'
-    id: detected_entrance
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_entrance_presence
-    from: 'on'
-    to: 'off'
-    id: cleared_entrance
-  - trigger: state
-    entity_id:
-    - binary_sensor.garden_house_east_presence
-    from: 'off'
-    to: 'on'
-    id: detected_east
-  - trigger: state
-    entity_id:
-    - binary_sensor.garden_house_east_presence
-    from: 'on'
-    to: 'off'
-    id: cleared_east
-  - trigger: state
-    entity_id:
-    - binary_sensor.home_outside_light
-    from: 'on'
-    to: 'off'
-    id: twilight
-  - trigger: time
-    at: '22:00:00'
-    id: night
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id:
-        - detected_south
-      - condition: state
-        entity_id: binary_sensor.home_outside_light
-        state: 'off'
-      sequence:
-      - action: light.turn_on
-        continue_on_error: true
-        target:
-          entity_id:
-          - light.driveway_lights_group
-          - light.driveway_light_left_1
-          - light.driveway_light_right_1
-        data:
-          brightness_pct: 100
-          color_temp_kelvin: 3000
-          transition: 1
-    - conditions:
-      - condition: trigger
-        id:
-        - detected_street
-      - condition: state
-        entity_id: binary_sensor.home_outside_light
-        state: 'off'
-      sequence:
-      - action: light.turn_on
-        continue_on_error: true
-        target:
-          entity_id:
-          - light.driveway_lights_group
-          - light.driveway_light_left_1
-          - light.driveway_light_right_1
-        data:
-          brightness_pct: 100
-          color_temp_kelvin: 3000
-          transition: 1
-    - conditions:
-      - condition: trigger
-        id:
-        - detected_entrance
-      - condition: state
-        entity_id: binary_sensor.home_outside_light
-        state: 'off'
-      sequence:
-      - action: light.turn_on
-        continue_on_error: true
-        target:
-          entity_id:
-          - light.driveway_lights_group
-        data:
-          brightness_pct: 100
-          color_temp_kelvin: 3000
-          transition: 1
-    - conditions:
-      - condition: trigger
-        id:
-        - detected_east
-      - condition: state
-        entity_id: binary_sensor.home_outside_light
-        state: 'off'
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          brightness_pct: 100
-          transition: 1
-          color_temp_kelvin: 3000
-        target:
-          entity_id:
-          - light.driveway_light_left_1
-    - conditions:
-      - condition: trigger
-        id:
-        - cleared_street
-        - cleared_south
-        - cleared_entrance
-        - cleared_east
-        - twilight
-      - condition: state
-        entity_id: binary_sensor.driveway_street_presence
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.driveway_house_south_presence
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.driveway_entrance_presence
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.garden_house_east_presence
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.home_outside_light
-        state: 'off'
-      - condition: template
-        value_template: '{% set wd = now().weekday() %} {% set h = now().hour %} {%
-          set d = now().day %} {% set m = now().month %} {{ (wd in [4,5] and h < 23)
-          or (m == 12 and d == 31 and h < 24) or (h < 22) }}'
-      - condition: time
-        after: '12:00:00'
-      sequence:
-      - choose:
-        - conditions:
-          - condition: template
-            value_template: '{{ now().month == 12 and now().day >= 1 and now().day
-              <= 26 }}'
-          sequence:
-          - action: scene.turn_on
-            target:
-              entity_id: scene.driveway_light_christmas
-            data:
-              transition: 1
-        - conditions:
-          - condition: template
-            value_template: '{{ (now().month == 12 and now().day >= 30) or (now().month
-              == 1 and now().day == 1) }}'
-          sequence:
-          - action: scene.turn_on
-            target:
-              entity_id: scene.driveway_light_new_years
-            data:
-              transition: 1
-        - conditions:
-          - condition: template
-            value_template: '{{ now().month == 10 and now().day >= 15 and now().day
-              <= 31 }}'
-          sequence:
-          - action: scene.turn_on
-            target:
-              entity_id: scene.driveway_light_halloween
-            data:
-              transition: 1
-        - conditions:
-          - condition: template
-            value_template: '{{ now().month == 3 and now().day == 17 }}'
-          sequence:
-          - action: scene.turn_on
-            target:
-              entity_id: scene.driveway_light_sankt_patrick
-            data:
-              transition: 1
-        - conditions:
-          - condition: template
-            value_template: '{{ now().month == 2 and now().day == 14 }}'
-          sequence:
-          - action: scene.turn_on
-            target:
-              entity_id: scene.driveway_light_valentines
-            data:
-              transition: 1
-        default:
-        - action: scene.turn_on
-          target:
-            entity_id: scene.driveway_light_twlight
-          data:
-            transition: 1
-    - conditions:
-      - condition: trigger
-        id:
-        - cleared_street
-        - cleared_south
-        - cleared_entrance
-        - cleared_east
-        - night
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: binary_sensor.home_outside_light
-          state: 'on'
-        - condition: and
-          conditions:
-          - condition: state
-            entity_id: binary_sensor.driveway_street_presence
-            state: 'off'
-          - condition: state
-            entity_id: binary_sensor.driveway_house_south_presence
-            state: 'off'
-          - condition: state
-            entity_id: binary_sensor.driveway_entrance_presence
-            state: 'off'
-          - condition: state
-            entity_id: binary_sensor.garden_house_east_presence
-            state: 'off'
-      sequence:
-      - action: light.turn_off
-        continue_on_error: true
-        target:
-          entity_id:
-          - light.driveway_lights_group
-          - light.driveway_light_left_1
-          - light.driveway_light_right_1
   mode: queued
   max: 10
   trace:
     stored_traces: 100
+
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.driveway_street_presence
+      from: "off"
+      to: "on"
+      id: detected_street
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.driveway_street_presence
+      from: "on"
+      to: "off"
+      id: cleared_street
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.driveway_house_south_presence
+      from: "off"
+      to: "on"
+      id: detected_south
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.driveway_house_south_presence
+      from: "on"
+      to: "off"
+      id: cleared_south
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.driveway_entrance_presence
+      from: "off"
+      to: "on"
+      id: detected_entrance
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.driveway_entrance_presence
+      from: "on"
+      to: "off"
+      id: cleared_entrance
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.garden_house_east_presence
+      from: "off"
+      to: "on"
+      id: detected_east
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.garden_house_east_presence
+      from: "on"
+      to: "off"
+      id: cleared_east
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.home_outside_light
+      from: "on"
+      to: "off"
+      id: twilight
+
+    - trigger: time
+      at: "22:00:00"
+      id: night
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id:
+                - detected_south
+            - condition: state
+              entity_id: binary_sensor.home_outside_light
+              state: "off"
+          sequence:
+            - action: light.turn_on
+              continue_on_error: true
+              target:
+                entity_id:
+                  - light.driveway_lights_group
+                  - light.driveway_light_left_1
+                  - light.driveway_light_right_1
+              data:
+                brightness_pct: 100
+                color_temp_kelvin: 3000
+                transition: 1
+
+        - conditions:
+            - condition: trigger
+              id:
+                - detected_street
+            - condition: state
+              entity_id: binary_sensor.home_outside_light
+              state: "off"
+          sequence:
+            - action: light.turn_on
+              continue_on_error: true
+              target:
+                entity_id:
+                  - light.driveway_lights_group
+                  - light.driveway_light_left_1
+                  - light.driveway_light_right_1
+              data:
+                brightness_pct: 100
+                color_temp_kelvin: 3000
+                transition: 1
+
+        - conditions:
+            - condition: trigger
+              id:
+                - detected_entrance
+            - condition: state
+              entity_id: binary_sensor.home_outside_light
+              state: "off"
+          sequence:
+            - action: light.turn_on
+              continue_on_error: true
+              target:
+                entity_id:
+                  - light.driveway_lights_group
+              data:
+                brightness_pct: 100
+                color_temp_kelvin: 3000
+                transition: 1
+
+        - conditions:
+            - condition: trigger
+              id:
+                - detected_east
+            - condition: state
+              entity_id: binary_sensor.home_outside_light
+              state: "off"
+          sequence:
+            - action: light.turn_on
+              metadata: {}
+              data:
+                brightness_pct: 100
+                transition: 1
+                color_temp_kelvin: 3000
+              target:
+                entity_id:
+                  - light.driveway_light_left_1
+
+        - conditions:
+            - condition: trigger
+              id:
+                - cleared_street
+                - cleared_south
+                - cleared_entrance
+                - cleared_east
+                - twilight
+            - condition: state
+              entity_id: binary_sensor.driveway_street_presence
+              state: "off"
+            - condition: state
+              entity_id: binary_sensor.driveway_house_south_presence
+              state: "off"
+            - condition: state
+              entity_id: binary_sensor.driveway_entrance_presence
+              state: "off"
+            - condition: state
+              entity_id: binary_sensor.garden_house_east_presence
+              state: "off"
+            - condition: state
+              entity_id: binary_sensor.home_outside_light
+              state: "off"
+            - condition: template
+              value_template: "{% set wd = now().weekday() %} {% set h = now().hour %} {% set d = now().day %} {% set m = now().month %} {{ (wd in [4,5] and h < 23) or (m == 12 and d == 31 and h < 24) or (h < 22) }}"
+            - condition: time
+              after: "12:00:00"
+          sequence:
+            - choose:
+                - conditions:
+                    - condition: template
+                      value_template: "{{ now().month == 12 and now().day >= 1 and now().day <= 26 }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_christmas
+                      data:
+                        transition: 1
+                - conditions:
+                    - condition: template
+                      value_template: "{{ (now().month == 12 and now().day >= 30) or (now().month == 1 and now().day == 1) }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_new_years
+                      data:
+                        transition: 1
+                - conditions:
+                    - condition: template
+                      value_template: "{{ now().month == 10 and now().day >= 15 and now().day <= 31 }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_halloween
+                      data:
+                        transition: 1
+                - conditions:
+                    - condition: template
+                      value_template: "{{ now().month == 3 and now().day == 17 }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_sankt_patrick
+                      data:
+                        transition: 1
+                - conditions:
+                    - condition: template
+                      value_template: "{{ now().month == 2 and now().day == 14 }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_valentines
+                      data:
+                        transition: 1
+              default:
+                - action: scene.turn_on
+                  target:
+                    entity_id: scene.driveway_light_twlight
+                  data:
+                    transition: 1
+
+        - conditions:
+            - condition: trigger
+              id:
+                - cleared_street
+                - cleared_south
+                - cleared_entrance
+                - cleared_east
+                - night
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: binary_sensor.home_outside_light
+                  state: "on"
+                - condition: and
+                  conditions:
+                    - condition: state
+                      entity_id: binary_sensor.driveway_street_presence
+                      state: "off"
+                    - condition: state
+                      entity_id: binary_sensor.driveway_house_south_presence
+                      state: "off"
+                    - condition: state
+                      entity_id: binary_sensor.driveway_entrance_presence
+                      state: "off"
+                    - condition: state
+                      entity_id: binary_sensor.garden_house_east_presence
+                      state: "off"
+          sequence:
+            - action: light.turn_off
+              continue_on_error: true
+              target:
+                entity_id:
+                  - light.driveway_lights_group
+                  - light.driveway_light_left_1
+                  - light.driveway_light_right_1

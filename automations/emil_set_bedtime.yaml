@@ -1,20 +1,23 @@
-- id: '1740423743719'
+- id: "1740423743719"
   alias: Emil sæt sengetid
   description: Sæt sengetid input hjælper for Emil, når webhook er kaldt
-  triggers:
-  - trigger: webhook
-    allowed_methods:
-    - POST
-    local_only: false
-    webhook_id: emil-set-bedtime-06NToCv45RaHexKeI8Smp4d-
-  conditions: []
-  actions:
-  - action: input_datetime.set_datetime
-    metadata: {}
-    data:
-      datetime: '{{ now() + timedelta(seconds=10) }}'
-    target:
-      entity_id: input_datetime.emil_bedtime_alarm
   mode: restart
   trace:
     stored_traces: 10
+
+  triggers:
+    - trigger: webhook
+      allowed_methods:
+        - POST
+      local_only: false
+      webhook_id: emil-set-bedtime-06NToCv45RaHexKeI8Smp4d-
+
+  conditions: []
+
+  actions:
+    - action: input_datetime.set_datetime
+      metadata: {}
+      data:
+        datetime: "{{ now() + timedelta(seconds=10) }}"
+      target:
+        entity_id: input_datetime.emil_bedtime_alarm

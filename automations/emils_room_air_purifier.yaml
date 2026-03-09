@@ -1,297 +1,318 @@
-- id: '1739016002574'
+- id: "1739016002574"
   alias: Emils værelse blæser
-  description: Tænder for Dyson Hot+Cool i Emils værelse, for at varme hurtigere op
-    hvis den ønskede temperatur er væsentligt koldere end den aktuelle.
-  triggers:
-  - trigger: state
-    entity_id: sensor.emils_room_air_purifier_mode
-  - trigger: state
-    entity_id: binary_sensor.emil_home
-  - trigger: numeric_state
-    entity_id: sensor.emils_room_air_quality_score
-    above: 50
-  - trigger: numeric_state
-    entity_id: sensor.emils_room_air_quality_score
-    below: 50
-  - trigger: state
-    entity_id: binary_sensor.emils_room_light
-  - trigger: state
-    entity_id: binary_sensor.emils_room_window
-    to: 'on'
-    id: window_opened
-  - trigger: state
-    entity_id: binary_sensor.emils_room_window
-    to: 'off'
-    id: window_closed
-  - trigger: state
-    entity_id: timer.emils_room_air_purifier_timer
-    to: idle
-    id: timeout
-  conditions: []
-  actions:
-  - variables:
-      mode: 'off'
-  - choose:
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.emil_home
-        state: 'off'
-      sequence: []
-    - conditions:
-      - condition: trigger
-        id: timeout
-      sequence: []
-    - conditions:
-      - condition: trigger
-        id: window_opened
-      sequence:
-      - variables:
-          mode: fan
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:10:00
-        target:
-          entity_id: timer.emils_room_air_purifier_timer
-    - conditions:
-      - condition: trigger
-        id: window_closed
-      - condition: state
-        entity_id: timer.emils_room_air_purifier_timer
-        state: active
-      sequence:
-      - variables:
-          mode: 'off'
-      - action: timer.cancel
-        metadata: {}
-        data: {}
-        target:
-          entity_id: timer.emils_room_air_purifier_timer
-    - conditions:
-      - condition: state
-        entity_id: sensor.emils_room_air_purifier_mode
-        state: heat
-      - condition: state
-        entity_id: binary_sensor.emils_room_window
-        state: 'off'
-      sequence:
-      - variables:
-          mode: heat
-    - conditions:
-      - condition: state
-        entity_id: sensor.emils_room_air_purifier_mode
-        state: cool
-      sequence:
-      - variables:
-          mode: cool
-    - conditions:
-      - condition: numeric_state
-        entity_id: sensor.emils_room_air_quality_score
-        below: 50
-      - condition: state
-        entity_id: binary_sensor.emils_room_window
-        state: 'off'
-      sequence:
-      - variables:
-          mode: filter
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ mode == ''off'' }}'
-      sequence: []
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.emils_room_light
-        state: 'on'
-      sequence:
-      - action: switch.turn_off
-        target:
-          entity_id: switch.emils_room_air_purifier_night_mode
-    default:
-    - action: switch.turn_on
-      target:
-        entity_id: switch.emils_room_air_purifier_night_mode
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ mode == ''off'' }}'
-      - condition: not
-        conditions:
-        - condition: state
-          entity_id: climate.emils_room_air_purifier
-          state: 'off'
-      sequence:
-      - action: climate.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id: climate.emils_room_air_purifier
-      - action: fan.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id: fan.emils_room_air_purifier_fan
-    - conditions:
-      - condition: template
-        value_template: '{{ mode == ''heat'' }}'
-      sequence:
-      - action: climate.turn_on
-        metadata: {}
-        data: {}
-        target:
-          entity_id: climate.emils_room_air_purifier
-      - action: climate.set_temperature
-        metadata: {}
-        data:
-          temperature: '{{ min(states(''sensor.emils_room_target_temperature'') |
-            float(0.0) + 3, 37) }}'
-          hvac_mode: heat
-        target:
-          entity_id: climate.emils_room_air_purifier
-      - action: fan.turn_on
-        metadata: {}
-        data: {}
-        target:
-          entity_id: fan.emils_room_air_purifier_fan
-      - action: fan.set_preset_mode
-        metadata: {}
-        data:
-          preset_mode: Auto
-        target:
-          entity_id: fan.emils_room_air_purifier_fan
-      - action: fan.oscillate
-        metadata: {}
-        data:
-          oscillating: 'true'
-        target:
-          entity_id: fan.emils_room_air_purifier_fan
-      - action: switch.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id: switch.emils_room_air_purifier_focus_mode
-    - conditions:
-      - condition: template
-        value_template: '{{ mode == ''cool'' }}'
-      sequence:
-      - action: climate.turn_on
-        metadata: {}
-        data: {}
-        target:
-          entity_id: climate.emils_room_air_purifier
-      - action: climate.set_temperature
-        metadata: {}
-        data:
-          temperature: '{{ max(1, states(''sensor.emils_room_target_temperature'')
-            | float(0.0) - 3) }}'
-          hvac_mode: cool
-        target:
-          entity_id: climate.emils_room_air_purifier
-      - action: fan.turn_on
-        metadata: {}
-        data: {}
-        target:
-          entity_id: fan.emils_room_air_purifier_fan
-      - action: fan.set_preset_mode
-        metadata: {}
-        data:
-          preset_mode: Auto
-        target:
-          entity_id: fan.emils_room_air_purifier_fan
-      - action: fan.oscillate
-        metadata: {}
-        data:
-          oscillating: 'true'
-        target:
-          entity_id: fan.emils_room_air_purifier_fan
-      - action: switch.turn_on
-        metadata: {}
-        data: {}
-        target:
-          entity_id: switch.emils_room_air_purifier_focus_mode
-    - conditions:
-      - condition: template
-        value_template: '{{ mode == ''fan'' }}'
-      sequence:
-      - action: climate.turn_on
-        metadata: {}
-        data: {}
-        target:
-          entity_id: climate.emils_room_air_purifier
-      - action: climate.set_temperature
-        metadata: {}
-        data:
-          temperature: '{{ states(''sensor.emils_room_current_temperature'')|float(21)
-            }}'
-          hvac_mode: cool
-        target:
-          entity_id: climate.emils_room_air_purifier
-      - action: fan.turn_on
-        metadata: {}
-        data: {}
-        target:
-          entity_id: fan.emils_room_air_purifier_fan
-      - action: fan.set_percentage
-        metadata: {}
-        data:
-          percentage: 100
-        target:
-          entity_id: fan.emils_room_air_purifier_fan
-      - action: fan.set_preset_mode
-        metadata: {}
-        data:
-          preset_mode: Normal
-        target:
-          entity_id: fan.emils_room_air_purifier_fan
-      - action: fan.oscillate
-        metadata: {}
-        data:
-          oscillating: 'true'
-        target:
-          entity_id: fan.emils_room_air_purifier_fan
-      - action: switch.turn_on
-        metadata: {}
-        data: {}
-        target:
-          entity_id: switch.emils_room_air_purifier_focus_mode
-    - conditions:
-      - condition: template
-        value_template: '{{ mode == ''filter'' }}'
-      sequence:
-      - action: climate.turn_on
-        metadata: {}
-        data: {}
-        target:
-          entity_id: climate.emils_room_air_purifier
-      - action: climate.set_hvac_mode
-        metadata: {}
-        data:
-          hvac_mode: cool
-        target:
-          entity_id: climate.emils_room_air_purifier
-      - action: fan.turn_on
-        metadata: {}
-        data: {}
-        target:
-          entity_id: fan.emils_room_air_purifier_fan
-      - action: fan.set_preset_mode
-        metadata: {}
-        data:
-          preset_mode: Auto
-        target:
-          entity_id: fan.emils_room_air_purifier_fan
-      - action: fan.oscillate
-        metadata: {}
-        data:
-          oscillating: 'true'
-        target:
-          entity_id: fan.emils_room_air_purifier_fan
-      - action: switch.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id: switch.emils_room_air_purifier_focus_mode
+  description: Tænder for Dyson Hot+Cool i Emils værelse, for at varme hurtigere op hvis den ønskede temperatur er væsentligt koldere end den aktuelle.
   mode: queued
   max: 10
   trace:
     stored_traces: 50
+
+  triggers:
+    - trigger: state
+      entity_id: sensor.emils_room_air_purifier_mode
+
+    - trigger: state
+      entity_id: binary_sensor.emil_home
+
+    - trigger: numeric_state
+      entity_id: sensor.emils_room_air_quality_score
+      above: 50
+
+    - trigger: numeric_state
+      entity_id: sensor.emils_room_air_quality_score
+      below: 50
+
+    - trigger: state
+      entity_id: binary_sensor.emils_room_light
+
+    - trigger: state
+      entity_id: binary_sensor.emils_room_window
+      to: "on"
+      id: window_opened
+
+    - trigger: state
+      entity_id: binary_sensor.emils_room_window
+      to: "off"
+      id: window_closed
+
+    - trigger: state
+      entity_id: timer.emils_room_air_purifier_timer
+      to: idle
+      id: timeout
+
+  conditions: []
+
+  actions:
+    - variables:
+        mode: "off"
+
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.emil_home
+              state: "off"
+          sequence: []
+
+        - conditions:
+            - condition: trigger
+              id: timeout
+          sequence: []
+
+        - conditions:
+            - condition: trigger
+              id: window_opened
+          sequence:
+            - variables:
+                mode: fan
+            - action: timer.start
+              metadata: {}
+              data:
+                duration: 00:10:00
+              target:
+                entity_id: timer.emils_room_air_purifier_timer
+
+        - conditions:
+            - condition: trigger
+              id: window_closed
+            - condition: state
+              entity_id: timer.emils_room_air_purifier_timer
+              state: active
+          sequence:
+            - variables:
+                mode: "off"
+            - action: timer.cancel
+              metadata: {}
+              data: {}
+              target:
+                entity_id: timer.emils_room_air_purifier_timer
+
+        - conditions:
+            - condition: state
+              entity_id: sensor.emils_room_air_purifier_mode
+              state: heat
+            - condition: state
+              entity_id: binary_sensor.emils_room_window
+              state: "off"
+          sequence:
+            - variables:
+                mode: heat
+
+        - conditions:
+            - condition: state
+              entity_id: sensor.emils_room_air_purifier_mode
+              state: cool
+          sequence:
+            - variables:
+                mode: cool
+
+        - conditions:
+            - condition: numeric_state
+              entity_id: sensor.emils_room_air_quality_score
+              below: 50
+            - condition: state
+              entity_id: binary_sensor.emils_room_window
+              state: "off"
+          sequence:
+            - variables:
+                mode: filter
+
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ mode == 'off' }}"
+          sequence: []
+
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.emils_room_light
+              state: "on"
+          sequence:
+            - action: switch.turn_off
+              target:
+                entity_id: switch.emils_room_air_purifier_night_mode
+
+      default:
+        - action: switch.turn_on
+          target:
+            entity_id: switch.emils_room_air_purifier_night_mode
+
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ mode == 'off' }}"
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: climate.emils_room_air_purifier
+                  state: "off"
+          sequence:
+            - action: climate.turn_off
+              metadata: {}
+              data: {}
+              target:
+                entity_id: climate.emils_room_air_purifier
+            - action: fan.turn_off
+              metadata: {}
+              data: {}
+              target:
+                entity_id: fan.emils_room_air_purifier_fan
+
+        - conditions:
+            - condition: template
+              value_template: "{{ mode == 'heat' }}"
+          sequence:
+            - action: climate.turn_on
+              metadata: {}
+              data: {}
+              target:
+                entity_id: climate.emils_room_air_purifier
+            - action: climate.set_temperature
+              metadata: {}
+              data:
+                temperature: "{{ min(states('sensor.emils_room_target_temperature') | float(0.0) + 3, 37) }}"
+                hvac_mode: heat
+              target:
+                entity_id: climate.emils_room_air_purifier
+            - action: fan.turn_on
+              metadata: {}
+              data: {}
+              target:
+                entity_id: fan.emils_room_air_purifier_fan
+            - action: fan.set_preset_mode
+              metadata: {}
+              data:
+                preset_mode: Auto
+              target:
+                entity_id: fan.emils_room_air_purifier_fan
+            - action: fan.oscillate
+              metadata: {}
+              data:
+                oscillating: "true"
+              target:
+                entity_id: fan.emils_room_air_purifier_fan
+            - action: switch.turn_off
+              metadata: {}
+              data: {}
+              target:
+                entity_id: switch.emils_room_air_purifier_focus_mode
+
+        - conditions:
+            - condition: template
+              value_template: "{{ mode == 'cool' }}"
+          sequence:
+            - action: climate.turn_on
+              metadata: {}
+              data: {}
+              target:
+                entity_id: climate.emils_room_air_purifier
+            - action: climate.set_temperature
+              metadata: {}
+              data:
+                temperature: "{{ max(1, states('sensor.emils_room_target_temperature') | float(0.0) - 3) }}"
+                hvac_mode: cool
+              target:
+                entity_id: climate.emils_room_air_purifier
+            - action: fan.turn_on
+              metadata: {}
+              data: {}
+              target:
+                entity_id: fan.emils_room_air_purifier_fan
+            - action: fan.set_preset_mode
+              metadata: {}
+              data:
+                preset_mode: Auto
+              target:
+                entity_id: fan.emils_room_air_purifier_fan
+            - action: fan.oscillate
+              metadata: {}
+              data:
+                oscillating: "true"
+              target:
+                entity_id: fan.emils_room_air_purifier_fan
+            - action: switch.turn_on
+              metadata: {}
+              data: {}
+              target:
+                entity_id: switch.emils_room_air_purifier_focus_mode
+
+        - conditions:
+            - condition: template
+              value_template: "{{ mode == 'fan' }}"
+          sequence:
+            - action: climate.turn_on
+              metadata: {}
+              data: {}
+              target:
+                entity_id: climate.emils_room_air_purifier
+            - action: climate.set_temperature
+              metadata: {}
+              data:
+                temperature: "{{ states('sensor.emils_room_current_temperature')|float(21) }}"
+                hvac_mode: cool
+              target:
+                entity_id: climate.emils_room_air_purifier
+            - action: fan.turn_on
+              metadata: {}
+              data: {}
+              target:
+                entity_id: fan.emils_room_air_purifier_fan
+            - action: fan.set_percentage
+              metadata: {}
+              data:
+                percentage: 100
+              target:
+                entity_id: fan.emils_room_air_purifier_fan
+            - action: fan.set_preset_mode
+              metadata: {}
+              data:
+                preset_mode: Normal
+              target:
+                entity_id: fan.emils_room_air_purifier_fan
+            - action: fan.oscillate
+              metadata: {}
+              data:
+                oscillating: "true"
+              target:
+                entity_id: fan.emils_room_air_purifier_fan
+            - action: switch.turn_on
+              metadata: {}
+              data: {}
+              target:
+                entity_id: switch.emils_room_air_purifier_focus_mode
+
+        - conditions:
+            - condition: template
+              value_template: "{{ mode == 'filter' }}"
+          sequence:
+            - action: climate.turn_on
+              metadata: {}
+              data: {}
+              target:
+                entity_id: climate.emils_room_air_purifier
+            - action: climate.set_hvac_mode
+              metadata: {}
+              data:
+                hvac_mode: cool
+              target:
+                entity_id: climate.emils_room_air_purifier
+            - action: fan.turn_on
+              metadata: {}
+              data: {}
+              target:
+                entity_id: fan.emils_room_air_purifier_fan
+            - action: fan.set_preset_mode
+              metadata: {}
+              data:
+                preset_mode: Auto
+              target:
+                entity_id: fan.emils_room_air_purifier_fan
+            - action: fan.oscillate
+              metadata: {}
+              data:
+                oscillating: "true"
+              target:
+                entity_id: fan.emils_room_air_purifier_fan
+            - action: switch.turn_off
+              metadata: {}
+              data: {}
+              target:
+                entity_id: switch.emils_room_air_purifier_focus_mode

@@ -1,55 +1,57 @@
-- id: '1769871939427'
+- id: "1769871939427"
   alias: Køkken tilstedeværelsessensor
   description: Automatik til at styre køkken tilstedeværelsessensor
-  triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.kitchen_presence_sensor_occupancy
-    from: 'off'
-    to: 'on'
-    id: detected
-  - trigger: state
-    entity_id:
-    - binary_sensor.kitchen_presence_sensor_occupancy
-    from: 'on'
-    to: 'off'
-    id: cleared
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id:
-        - detected
-      sequence:
-      - target:
-          entity_id: input_datetime.kitchen_presence_sensor_start
-        data:
-          datetime: '{{ now() }}'
-        action: input_datetime.set_datetime
-      - action: timer.cancel
-        target:
-          entity_id: timer.kitchen_presence_sensor_timer
-    - conditions:
-      - condition: trigger
-        id:
-        - cleared
-      sequence:
-      - target:
-          entity_id: input_number.kitchen_presence_sensor_seconds
-        data:
-          value: '{% set start = states(''input_datetime.kitchen_presence_sensor_start'')
-            | as_datetime | as_local %} {% set seconds = states(''input_number.kitchen_presence_sensor_seconds'')
-            | float(0.0) %} {% set duration = (as_timestamp(now()) - as_timestamp(start))
-            | round(1) %} {{ seconds + duration }}'
-        action: input_number.set_value
-      - action: timer.start
-        metadata: {}
-        data:
-          duration: 00:03:00
-        target:
-          entity_id: timer.kitchen_presence_sensor_timer
   mode: queued
   max: 10
   trace:
     stored_traces: 20
+
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.kitchen_presence_sensor_occupancy
+      from: "off"
+      to: "on"
+      id: detected
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.kitchen_presence_sensor_occupancy
+      from: "on"
+      to: "off"
+      id: cleared
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id:
+                - detected
+          sequence:
+            - target:
+                entity_id: input_datetime.kitchen_presence_sensor_start
+              data:
+                datetime: "{{ now() }}"
+              action: input_datetime.set_datetime
+            - action: timer.cancel
+              target:
+                entity_id: timer.kitchen_presence_sensor_timer
+
+        - conditions:
+            - condition: trigger
+              id:
+                - cleared
+          sequence:
+            - target:
+                entity_id: input_number.kitchen_presence_sensor_seconds
+              data:
+                value: "{% set start = states('input_datetime.kitchen_presence_sensor_start') | as_datetime | as_local %} {% set seconds = states('input_number.kitchen_presence_sensor_seconds') | float(0.0) %} {% set duration = (as_timestamp(now()) - as_timestamp(start)) | round(1) %} {{ seconds + duration }}"
+              action: input_number.set_value
+            - action: timer.start
+              metadata: {}
+              data:
+                duration: 00:03:00
+              target:
+                entity_id: timer.kitchen_presence_sensor_timer

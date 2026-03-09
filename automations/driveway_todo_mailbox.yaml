@@ -1,43 +1,47 @@
-- id: '1739712804347'
+- id: "1739712804347"
   alias: Indkørsel todo postkasse
   description: Opret todo opgaver vedrørende postkasse
-  triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_mailbox_vibration_sensor
-    to: 'on'
-    id: new_post
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_mailbox_vibration_sensor
-    to: unavailable
-    for:
-      seconds: 180
-    id: sensor_unavailable
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-        condition: trigger
-        id: new_post
-      sequence:
-      - action: script.create_todo_task
-        data:
-          subject: Tøm postkasse
-          description: Der er nye breve i postkassen ved vejen
-          related_entity_id: binary_sensor.driveway_mailbox_vibration_sensor
-          entity_id: todo.todo_smart_todo
-    - conditions:
-        condition: trigger
-        id: sensor_unavailable
-      sequence:
-      - action: script.create_todo_task
-        data:
-          subject: Der kan være noget i postkassen
-          description: Sensoren på postkasssen har været utilgængelig i længere tid
-            og der kan derfor være post i postkassen ved vejen
-          related_entity_id: binary_sensor.driveway_mailbox_vibration_sensor
-          entity_id: todo.todo_smart_todo
   mode: restart
   trace:
     stored_traces: 30
+
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.driveway_mailbox_vibration_sensor
+      to: "on"
+      id: new_post
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.driveway_mailbox_vibration_sensor
+      to: unavailable
+      for:
+        seconds: 180
+      id: sensor_unavailable
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            condition: trigger
+            id: new_post
+          sequence:
+            - action: script.create_todo_task
+              data:
+                subject: Tøm postkasse
+                description: Der er nye breve i postkassen ved vejen
+                related_entity_id: binary_sensor.driveway_mailbox_vibration_sensor
+                entity_id: todo.todo_smart_todo
+
+        - conditions:
+            condition: trigger
+            id: sensor_unavailable
+          sequence:
+            - action: script.create_todo_task
+              data:
+                subject: Der kan være noget i postkassen
+                description: Sensoren på postkasssen har været utilgængelig i længere tid og der kan derfor være post i postkassen ved vejen
+                related_entity_id: binary_sensor.driveway_mailbox_vibration_sensor
+                entity_id: todo.todo_smart_todo

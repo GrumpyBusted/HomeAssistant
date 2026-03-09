@@ -1,28 +1,31 @@
-- id: '1770917834825'
+- id: "1770917834825"
   alias: Drivhus todo temperatur
   description: Overvåg temperaturen i drivhuset
-  triggers:
-  - trigger: numeric_state
-    entity_id: sensor.greenhouse_current_temperature
-    below: -1
-  - trigger: numeric_state
-    entity_id: sensor.greenhouse_heating_smart_plug_power
-    below: 5
-  - trigger: time
-    at: 03:00:00
-  conditions: []
-  actions:
-  - action: script.create_todo_task
-    data:
-      subject: Tænd varmen i drivhuset
-      description: '"Temperaturen i drivhuset er {{ states(''sensor.greenhouse_current_temperature'')
-        }}, tænd for varme blæseren."'
-      entity_id: todo.todo_smart_todo
-      related_entity_id: sensor.greenhouse_current_temperature
-      is_active: "{{ states('sensor.greenhouse_current_temperature') | float(10.0)
-        < -1.0 and\n   states('sensor.greenhouse_heating_smart_plug_power') | float(0.0)
-        < 5.0 }}"
   mode: queued
   max: 10
   trace:
     stored_traces: 30
+
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.greenhouse_current_temperature
+      below: -1
+
+    - trigger: numeric_state
+      entity_id: sensor.greenhouse_heating_smart_plug_power
+      below: 5
+
+    - trigger: time
+      at: 03:00:00
+
+  conditions: []
+
+  actions:
+    - action: script.create_todo_task
+      data:
+        subject: Tænd varmen i drivhuset
+        description: '"Temperaturen i drivhuset er {{ states(''sensor.greenhouse_current_temperature'') }}, tænd for varme blæseren."'
+        entity_id: todo.todo_smart_todo
+        related_entity_id: sensor.greenhouse_current_temperature
+        is_active:
+          "{{ states('sensor.greenhouse_current_temperature') | float(10.0) < -1.0 and\n   states('sensor.greenhouse_heating_smart_plug_power') | float(0.0) < 5.0 }}"

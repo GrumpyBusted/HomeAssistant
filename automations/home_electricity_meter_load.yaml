@@ -1,40 +1,45 @@
-- id: '1764365776080'
+- id: "1764365776080"
   alias: Hjem elektricitet måler indlæs
   description: Indlæs elektricitet måler aflæsninger og opdater sensor
-  triggers:
-  - trigger: homeassistant
-    event: start
-  - trigger: event
-    event_type: folder_data_csv
-    event_data:
-      status: meter_reading_electricity
-  - trigger: state
-    entity_id: sensor.home_meter_readings_electricity
-    to: '0'
-  conditions: []
-  actions:
-  - action: shell_command.csv_to_json
-    metadata: {}
-    data:
-      csvfile: /config/data/meter_reading_electricity.csv
-      jsonfile: /config/data/meter_reading_electricity.json
-  - action: file.read_file
-    metadata: {}
-    data:
-      file_name: /config/data/meter_reading_electricity.json
-      file_encoding: JSON
-    response_variable: readings
-  - action: python_script.hass_entities
-    data:
-      action: set_state_attributes
-      entity_id: sensor.home_meter_readings_electricity
-      state: '{{ readings.data[-1].reading }}'
-      attributes:
-      - raw: '{{ readings.data }}'
-  - action: python_script.meter_interpolate
-    data:
-      entity_id: sensor.home_meter_readings_electricity
   mode: queued
   max: 10
   trace:
     stored_traces: 20
+
+  triggers:
+    - trigger: homeassistant
+      event: start
+
+    - trigger: event
+      event_type: folder_data_csv
+      event_data:
+        status: meter_reading_electricity
+
+    - trigger: state
+      entity_id: sensor.home_meter_readings_electricity
+      to: "0"
+
+  conditions: []
+
+  actions:
+    - action: shell_command.csv_to_json
+      metadata: {}
+      data:
+        csvfile: /config/data/meter_reading_electricity.csv
+        jsonfile: /config/data/meter_reading_electricity.json
+    - action: file.read_file
+      metadata: {}
+      data:
+        file_name: /config/data/meter_reading_electricity.json
+        file_encoding: JSON
+      response_variable: readings
+    - action: python_script.hass_entities
+      data:
+        action: set_state_attributes
+        entity_id: sensor.home_meter_readings_electricity
+        state: "{{ readings.data[-1].reading }}"
+        attributes:
+          - raw: "{{ readings.data }}"
+    - action: python_script.meter_interpolate
+      data:
+        entity_id: sensor.home_meter_readings_electricity

@@ -1,43 +1,42 @@
-- id: '1770991959858'
+- id: "1770991959858"
   alias: Hjem todo vanding indendørs
-  description: Opret todo opgaver vedrørende jordfugtighed måler og vanding af blomster
-    indendørs
-  triggers:
-  - trigger: numeric_state
-    entity_id:
-    - sensor.bedroom_soil_moisture_sensor_moisture
-    - sensor.charlies_room_soil_moisture_sensor_moisture
-    - sensor.living_room_soil_moisture_sensor_moisture
-    below: 40
-    for:
-      seconds: 180
-  - trigger: numeric_state
-    entity_id:
-    - sensor.living_room_soil_moisture_sensor_moisture
-    - sensor.bedroom_soil_moisture_sensor_moisture
-    - sensor.charlies_room_soil_moisture_sensor_moisture
-    above: 60
-  - trigger: time
-    at: 03:16:00
-  conditions: []
-  actions:
-  - action: script.create_todo_task
-    data:
-      subject: Vand blomster indendørs
-      description: 'Jordfugtigheden på potteplanter er ved at være lav. I stuen er
-        målt {{ states(''sensor.living_room_soil_moisture_sensor_moisture'') | float(0)
-        | round(0) }}%, I soveværelset er målt {{ states(''sensor.bedroom_soil_moisture_sensor_moisture'')
-        | float(0) | round(0) }}%, og på Charlies værelse er målt {{ states(''sensor.charlies_room_soil_moisture_sensor_moisture'')
-        | float(0) | round(0) }}%
-
-        '
-      related_entity_id: sensor.living_room_soil_moisture_sensor_moisture
-      entity_id: todo.todo_smart_todo
-      is_active: "{{ states('sensor.living_room_soil_moisture_sensor_moisture') |
-        float(50.0) < 40.0 or\n   states('sensor.bedroom_soil_moisture_sensor_moisture')
-        | float(50.0) < 40.0 or\n   states('sensor.charlies_room_soil_moisture_sensor_moisture')
-        | float(50.0) < 40.0 }}"
+  description: Opret todo opgaver vedrørende jordfugtighed måler og vanding af blomster indendørs
   mode: queued
   max: 10
   trace:
     stored_traces: 30
+
+  triggers:
+    - trigger: numeric_state
+      entity_id:
+        - sensor.bedroom_soil_moisture_sensor_moisture
+        - sensor.charlies_room_soil_moisture_sensor_moisture
+        - sensor.living_room_soil_moisture_sensor_moisture
+      below: 40
+      for:
+        seconds: 180
+
+    - trigger: numeric_state
+      entity_id:
+        - sensor.living_room_soil_moisture_sensor_moisture
+        - sensor.bedroom_soil_moisture_sensor_moisture
+        - sensor.charlies_room_soil_moisture_sensor_moisture
+      above: 60
+
+    - trigger: time
+      at: 03:16:00
+
+  conditions: []
+
+  actions:
+    - action: script.create_todo_task
+      data:
+        subject: Vand blomster indendørs
+        description:
+          "Jordfugtigheden på potteplanter er ved at være lav. I stuen er målt {{ states('sensor.living_room_soil_moisture_sensor_moisture') | float(0) | round(0) }}%, I soveværelset er målt {{ states('sensor.bedroom_soil_moisture_sensor_moisture') | float(0) | round(0) }}%, og på Charlies værelse er målt {{ states('sensor.charlies_room_soil_moisture_sensor_moisture') | float(0) | round(0) }}%
+
+          "
+        related_entity_id: sensor.living_room_soil_moisture_sensor_moisture
+        entity_id: todo.todo_smart_todo
+        is_active:
+          "{{ states('sensor.living_room_soil_moisture_sensor_moisture') | float(50.0) < 40.0 or\n   states('sensor.bedroom_soil_moisture_sensor_moisture') | float(50.0) < 40.0 or\n   states('sensor.charlies_room_soil_moisture_sensor_moisture') | float(50.0) < 40.0 }}"

@@ -1,37 +1,39 @@
-- id: '1770311389520'
+- id: "1770311389520"
   alias: Todo strømpriser
   description: Overvåg om strømpriser er tilgængelige og valide
-  triggers:
-  - trigger: time_pattern
-    hours: /1
-    minutes: 1
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ states(''sensor.energy_data_service'') in [''unknown'',
-          ''unavailable'', ''none'', ''''] }}'
-      sequence:
-      - action: script.push_notification
-        data:
-          type: info
-          recipient: anders
-          persistent: true
-          title: Strømpriser er ikke tilgængelig
-          message: Priser fra sensor.energy_data_service er ikke valide
-    - conditions:
-      - condition: template
-        value_template: '{{ state_attr(''sensor.energy_data_service'', ''raw_today'')
-          is none }}'
-      sequence:
-      - action: script.push_notification
-        data:
-          type: info
-          recipient: anders
-          persistent: true
-          title: Detaljeret strøm pris mangler
-          message: Attributen raw_today fra sensor.energy_data_service mangler
   mode: restart
   trace:
     stored_traces: 50
+
+  triggers:
+    - trigger: time_pattern
+      hours: /1
+      minutes: 1
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ states('sensor.energy_data_service') in ['unknown', 'unavailable', 'none', ''] }}"
+          sequence:
+            - action: script.push_notification
+              data:
+                type: info
+                recipient: anders
+                persistent: true
+                title: Strømpriser er ikke tilgængelig
+                message: Priser fra sensor.energy_data_service er ikke valide
+
+        - conditions:
+            - condition: template
+              value_template: "{{ state_attr('sensor.energy_data_service', 'raw_today') is none }}"
+          sequence:
+            - action: script.push_notification
+              data:
+                type: info
+                recipient: anders
+                persistent: true
+                title: Detaljeret strøm pris mangler
+                message: Attributen raw_today fra sensor.energy_data_service mangler

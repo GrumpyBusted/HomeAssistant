@@ -1,108 +1,119 @@
-- id: '1760882975403'
+- id: "1760882975403"
   alias: Indkørsel lys hus syd
   description: Automatik til at styre lys i indkørslen på syd siden af huset
-  triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_house_south_presence
-    from: 'off'
-    to: 'on'
-    id: detected_south
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_house_south_presence
-    from: 'on'
-    to: 'off'
-    id: cleared_south
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_entrance_presence
-    from: 'off'
-    to: 'on'
-    id: detected_entrance
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_entrance_presence
-    from: 'on'
-    to: 'off'
-    id: cleared_entrance
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_street_presence
-    from: 'off'
-    to: 'on'
-    id: detected_street
-  - trigger: state
-    entity_id:
-    - binary_sensor.driveway_street_presence
-    from: 'on'
-    to: 'off'
-    id: cleared_street
-  - trigger: state
-    entity_id:
-    - binary_sensor.garden_house_west_presence
-    from: 'off'
-    to: 'on'
-    id: detected_west
-  - trigger: state
-    entity_id:
-    - binary_sensor.garden_house_west_presence
-    from: 'on'
-    to: 'off'
-    id: cleared_west
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id:
-        - detected_south
-        - detected_entrance
-        - detected_street
-        - detected_west
-      - condition: state
-        entity_id: binary_sensor.home_outside_light
-        state: 'off'
-      sequence:
-      - action: light.turn_on
-        metadata: {}
-        data:
-          brightness_pct: 100
-          color_temp_kelvin: 2700
-          transition: 1
-        target:
-          entity_id:
-          - light.driveway_light_house_south
-    - conditions:
-      - condition: and
-        conditions:
-        - condition: trigger
-          id:
-          - cleared_south
-          - cleared_entrance
-          - cleared_street
-          - cleared_west
-        - condition: state
-          entity_id: binary_sensor.driveway_house_south_presence
-          state: 'off'
-        - condition: state
-          entity_id: binary_sensor.driveway_entrance_presence
-          state: 'off'
-        - condition: state
-          entity_id: binary_sensor.driveway_street_presence
-          state: 'off'
-        - condition: state
-          entity_id: binary_sensor.garden_house_west_presence
-          state: 'off'
-      sequence:
-      - action: light.turn_off
-        metadata: {}
-        data:
-          transition: 1
-        target:
-          entity_id:
-          - light.driveway_light_house_south
   mode: queued
   max: 10
   trace:
     stored_traces: 20
+
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.driveway_house_south_presence
+      from: "off"
+      to: "on"
+      id: detected_south
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.driveway_house_south_presence
+      from: "on"
+      to: "off"
+      id: cleared_south
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.driveway_entrance_presence
+      from: "off"
+      to: "on"
+      id: detected_entrance
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.driveway_entrance_presence
+      from: "on"
+      to: "off"
+      id: cleared_entrance
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.driveway_street_presence
+      from: "off"
+      to: "on"
+      id: detected_street
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.driveway_street_presence
+      from: "on"
+      to: "off"
+      id: cleared_street
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.garden_house_west_presence
+      from: "off"
+      to: "on"
+      id: detected_west
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.garden_house_west_presence
+      from: "on"
+      to: "off"
+      id: cleared_west
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id:
+                - detected_south
+                - detected_entrance
+                - detected_street
+                - detected_west
+            - condition: state
+              entity_id: binary_sensor.home_outside_light
+              state: "off"
+          sequence:
+            - action: light.turn_on
+              metadata: {}
+              data:
+                brightness_pct: 100
+                color_temp_kelvin: 2700
+                transition: 1
+              target:
+                entity_id:
+                  - light.driveway_light_house_south
+
+        - conditions:
+            - condition: and
+              conditions:
+                - condition: trigger
+                  id:
+                    - cleared_south
+                    - cleared_entrance
+                    - cleared_street
+                    - cleared_west
+                - condition: state
+                  entity_id: binary_sensor.driveway_house_south_presence
+                  state: "off"
+                - condition: state
+                  entity_id: binary_sensor.driveway_entrance_presence
+                  state: "off"
+                - condition: state
+                  entity_id: binary_sensor.driveway_street_presence
+                  state: "off"
+                - condition: state
+                  entity_id: binary_sensor.garden_house_west_presence
+                  state: "off"
+          sequence:
+            - action: light.turn_off
+              metadata: {}
+              data:
+                transition: 1
+              target:
+                entity_id:
+                  - light.driveway_light_house_south

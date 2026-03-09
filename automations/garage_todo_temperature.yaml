@@ -1,25 +1,26 @@
-- id: '1770918254782'
+- id: "1770918254782"
   alias: Garage todo temperatur
   description: Overvåg temperaturen i garagen
-  triggers:
-  - trigger: numeric_state
-    entity_id: sensor.garage_avarage_temperature_24h
-    below: 2
-  - trigger: time
-    at: 03:02:00
-  conditions: []
-  actions:
-  - action: script.create_todo_task
-    data:
-      subject: Der er frost i garagen
-      description: Temperaturen i garagen er {{ states('sensor.garage_current_temperature')
-        }}°C. Gennemsnittet over de sidste 24 timer er {{ states('sensor.garage_avarage_temperature_24h')
-        }}°C. Overvej om sodavand eller andet skal ind.
-      entity_id: todo.todo_smart_todo
-      related_entity_id: sensor.garage_avarage_temperature_24h
-      is_active: '{{ states(''sensor.garage_avarage_temperature_24h'') | float(10.0)
-        < 2.0 }}'
   mode: queued
   max: 10
   trace:
     stored_traces: 30
+
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.garage_avarage_temperature_24h
+      below: 2
+
+    - trigger: time
+      at: 03:02:00
+
+  conditions: []
+
+  actions:
+    - action: script.create_todo_task
+      data:
+        subject: Der er frost i garagen
+        description: Temperaturen i garagen er {{ states('sensor.garage_current_temperature') }}°C. Gennemsnittet over de sidste 24 timer er {{ states('sensor.garage_avarage_temperature_24h') }}°C. Overvej om sodavand eller andet skal ind.
+        entity_id: todo.todo_smart_todo
+        related_entity_id: sensor.garage_avarage_temperature_24h
+        is_active: "{{ states('sensor.garage_avarage_temperature_24h') | float(10.0) < 2.0 }}"

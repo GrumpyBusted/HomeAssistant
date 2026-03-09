@@ -1,40 +1,44 @@
-- id: '1736103151599'
+- id: "1736103151599"
   alias: Emils værelse rullegardin stop
   description: Automatik for at stoppe rullegardin på Emils værelse
-  triggers:
-  - trigger: device
-    device_id: 1dd2442d9e607d9f290aebbb666cef43
-    domain: zha
-    type: remote_button_long_release
-    subtype: open
-    id: open_long_pressed
-  - trigger: device
-    device_id: 1dd2442d9e607d9f290aebbb666cef43
-    domain: zha
-    type: remote_button_long_release
-    subtype: close
-    id: close_long_pressed
-  conditions: []
-  actions:
-  - target:
-      entity_id: automation.emils_room_blind
-    action: automation.turn_off
-  - action: cover.stop_cover
-    metadata: {}
-    data: {}
-    target:
-      entity_id: cover.emils_room_blind
-  - delay:
-      seconds: 1
-  - action: input_number.set_value
-    target:
-      entity_id: input_number.emils_room_blind_position
-    data:
-      value: '{{ state_attr(''cover.emils_room_blind'', ''current_position'') }}'
-  - target:
-      entity_id: automation.emils_room_blind
-    action: automation.turn_on
   mode: queued
   max: 10
   trace:
     stored_traces: 20
+
+  triggers:
+    - trigger: device
+      device_id: 1dd2442d9e607d9f290aebbb666cef43
+      domain: zha
+      type: remote_button_long_release
+      subtype: open
+      id: open_long_pressed
+
+    - trigger: device
+      device_id: 1dd2442d9e607d9f290aebbb666cef43
+      domain: zha
+      type: remote_button_long_release
+      subtype: close
+      id: close_long_pressed
+
+  conditions: []
+
+  actions:
+    - target:
+        entity_id: automation.emils_room_blind
+      action: automation.turn_off
+    - action: cover.stop_cover
+      metadata: {}
+      data: {}
+      target:
+        entity_id: cover.emils_room_blind
+    - delay:
+        seconds: 1
+    - action: input_number.set_value
+      target:
+        entity_id: input_number.emils_room_blind_position
+      data:
+        value: "{{ state_attr('cover.emils_room_blind', 'current_position') }}"
+    - target:
+        entity_id: automation.emils_room_blind
+      action: automation.turn_on

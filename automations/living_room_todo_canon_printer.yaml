@@ -2,6 +2,8 @@
   alias: Stue todo Canon printer
   description: Kontroller blæk status på Canon printer
   mode: restart
+  trace:
+    stored_traces: 20
 
   triggers:
     - trigger: numeric_state
@@ -70,9 +72,8 @@
                 data:
                   subject: "Skift {{ repeat.item.name }} blæk på printer"
                   description: >
-                    Blæk niveau for {{ states(repeat.item.entity) }}%
-                    på Canon TS8300 printer.<br>
-                    Blæk type: {{ repeat.item.ink }}
+                    Blæk niveau for {{ states(repeat.item.entity) }}% på Canon TS8300 printer.<br> Blæk type: {{ repeat.item.ink }}
+
                   related_entity_id: "{{ repeat.item.entity }}"
                   entity_id: todo.todo_smart_todo
                   is_active: "{{ states(repeat.item.entity)|int(100) < state_attr(repeat.item.entity,'marker_low_level')|int(15) }}"
@@ -81,9 +82,8 @@
       data:
         subject: Løs problem med printer
         description: >
-          Der er registreret et problem med Canon TS8300 printer.<br>
-          Message: {{ state_attr('sensor.living_room_printer','state_message') }}<br>
-          Reason: {{ state_attr('sensor.living_room_printer','state_reason') }}
+          Der er registreret et problem med Canon TS8300 printer.<br> Message: {{ state_attr('sensor.living_room_printer','state_message') }}<br> Reason: {{ state_attr('sensor.living_room_printer','state_reason') }}
+
         related_entity_id: sensor.living_room_printer
         entity_id: todo.todo_smart_todo
         is_active: "{{ states('sensor.living_room_printer') not in ['printing','idle'] }}"

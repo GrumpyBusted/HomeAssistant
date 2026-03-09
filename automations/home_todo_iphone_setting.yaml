@@ -1,104 +1,107 @@
-- id: '1740941401019'
+- id: "1740941401019"
   alias: Hjem todo iPhone indstillinger
   description: Automatik til at kontrollere iPhone-status
-  triggers:
-  - entity_id:
-    - sensor.anders_iphone_location_permission
-    - sensor.monique_iphone_location_permission
-    - sensor.emil_iphone_location_permission
-    - sensor.charlie_iphone_location_permission
-    id: permission_changed
-    trigger: state
-  - entity_id:
-    - sensor.anders_iphone_connection_type
-    - sensor.monique_iphone_connection_type
-    - sensor.emil_iphone_connection_type
-    - sensor.charlie_iphone_connection_type
-    to: Wi-Fi
-    id: wifi_connected
-    trigger: state
-  - at: 03:22:00
-    id: periodic
-    trigger: time
-  conditions: []
-  actions:
-  - variables:
-      iphones:
-      - name: Anders
-        location_permission: sensor.anders_iphone_location_permission
-        connection_type: sensor.anders_iphone_connection_type
-        device_tracker: device_tracker.anders_iphone
-        notify: notify.mobile_app_anders_iphone
-      - name: Monique
-        location_permission: sensor.monique_iphone_location_permission
-        connection_type: sensor.monique_iphone_connection_type
-        device_tracker: device_tracker.monique_iphone
-        notify: notify.mobile_app_monique_iphone
-      - name: Emil
-        location_permission: sensor.emil_iphone_location_permission
-        connection_type: sensor.emil_iphone_connection_type
-        device_tracker: device_tracker.emil_iphone
-        notify: notify.mobile_app_emil_iphone
-      - name: Charlie
-        location_permission: sensor.charlie_iphone_location_permission
-        connection_type: sensor.charlie_iphone_connection_type
-        device_tracker: device_tracker.charlie_iphone
-        notify: notify.mobile_app_charlie_iphone
-  - if:
-    - condition: trigger
-      id:
-      - permission_changed
-      - periodic
-    then:
-    - repeat:
-        for_each: '{{ iphones }}'
-        sequence:
-        - action: script.create_todo_task
-          data:
-            subject: 'Lokation: Tillad altid ({{ repeat.item.name }} iPhone)'
-            description: Gå til Indstillinger → Anonymitet & sikkerhed → Lokalitetstjenester,
-              og sæt Home Assistant til "Altid". Slå også "Præcis lokalitet" til.
-            related_entity_id: '{{ repeat.item.location_permission }}'
-            entity_id: todo.todo_smart_todo
-            is_active: '{{ states(repeat.item.location_permission) != ''Authorized
-              Always'' }}'
-  - if:
-    - condition: trigger
-      id:
-      - wifi_connected
-      - periodic
-    then:
-    - repeat:
-        for_each: '{{ iphones }}'
-        sequence:
-        - if:
-          - condition: template
-            value_template: '{{ states(repeat.item.connection_type) == ''Wi-Fi'' }}'
-          then:
-          - action: homeassistant.update_entity
-            data:
-              entity_id: '{{ repeat.item.device_tracker }}'
-          - action: '{{ repeat.item.notify }}'
-            data:
-              message: request_location_update
-    - delay: 00:00:10
-    - repeat:
-        for_each: '{{ iphones }}'
-        sequence:
-        - if:
-          - condition: template
-            value_template: '{{ states(repeat.item.connection_type) == ''Wi-Fi'' }}'
-          then:
-          - action: script.create_todo_task
-            data:
-              subject: Lokation opdateres ikke ({{ repeat.item.name }} iPhone)
-              description: Lokationen fra {{ repeat.item.name }} iPhone er ikke blevet
-                opdateret som forventet. Kontroller Home Assistant appens lokationsindstillinger
-                og baggrundsopdatering.
-              related_entity_id: '{{ repeat.item.device_tracker }}'
-              entity_id: todo.todo_smart_todo
-              is_active: "{{ (as_timestamp(now()) -\n    as_timestamp(states[repeat.item.device_tracker].last_updated))
-                > 60 }}"
   mode: single
   trace:
     stored_traces: 20
+
+  triggers:
+    - entity_id:
+        - sensor.anders_iphone_location_permission
+        - sensor.monique_iphone_location_permission
+        - sensor.emil_iphone_location_permission
+        - sensor.charlie_iphone_location_permission
+      id: permission_changed
+      trigger: state
+
+    - entity_id:
+        - sensor.anders_iphone_connection_type
+        - sensor.monique_iphone_connection_type
+        - sensor.emil_iphone_connection_type
+        - sensor.charlie_iphone_connection_type
+      to: Wi-Fi
+      id: wifi_connected
+      trigger: state
+
+    - at: 03:22:00
+      id: periodic
+      trigger: time
+
+  conditions: []
+
+  actions:
+    - variables:
+        iphones:
+          - name: Anders
+            location_permission: sensor.anders_iphone_location_permission
+            connection_type: sensor.anders_iphone_connection_type
+            device_tracker: device_tracker.anders_iphone
+            notify: notify.mobile_app_anders_iphone
+          - name: Monique
+            location_permission: sensor.monique_iphone_location_permission
+            connection_type: sensor.monique_iphone_connection_type
+            device_tracker: device_tracker.monique_iphone
+            notify: notify.mobile_app_monique_iphone
+          - name: Emil
+            location_permission: sensor.emil_iphone_location_permission
+            connection_type: sensor.emil_iphone_connection_type
+            device_tracker: device_tracker.emil_iphone
+            notify: notify.mobile_app_emil_iphone
+          - name: Charlie
+            location_permission: sensor.charlie_iphone_location_permission
+            connection_type: sensor.charlie_iphone_connection_type
+            device_tracker: device_tracker.charlie_iphone
+            notify: notify.mobile_app_charlie_iphone
+
+    - if:
+        - condition: trigger
+          id:
+            - permission_changed
+            - periodic
+      then:
+        - repeat:
+            for_each: "{{ iphones }}"
+            sequence:
+              - action: script.create_todo_task
+                data:
+                  subject: "Lokation: Tillad altid ({{ repeat.item.name }} iPhone)"
+                  description: Gå til Indstillinger → Anonymitet & sikkerhed → Lokalitetstjenester, og sæt Home Assistant til "Altid". Slå også "Præcis lokalitet" til.
+                  related_entity_id: "{{ repeat.item.location_permission }}"
+                  entity_id: todo.todo_smart_todo
+                  is_active: "{{ states(repeat.item.location_permission) != 'Authorized Always' }}"
+
+    - if:
+        - condition: trigger
+          id:
+            - wifi_connected
+            - periodic
+      then:
+        - repeat:
+            for_each: "{{ iphones }}"
+            sequence:
+              - if:
+                  - condition: template
+                    value_template: "{{ states(repeat.item.connection_type) == 'Wi-Fi' }}"
+                then:
+                  - action: homeassistant.update_entity
+                    data:
+                      entity_id: "{{ repeat.item.device_tracker }}"
+                  - action: "{{ repeat.item.notify }}"
+                    data:
+                      message: request_location_update
+        - delay: 00:00:10
+        - repeat:
+            for_each: "{{ iphones }}"
+            sequence:
+              - if:
+                  - condition: template
+                    value_template: "{{ states(repeat.item.connection_type) == 'Wi-Fi' }}"
+                then:
+                  - action: script.create_todo_task
+                    data:
+                      subject: Lokation opdateres ikke ({{ repeat.item.name }} iPhone)
+                      description: Lokationen fra {{ repeat.item.name }} iPhone er ikke blevet opdateret som forventet. Kontroller Home Assistant appens lokationsindstillinger og baggrundsopdatering.
+                      related_entity_id: "{{ repeat.item.device_tracker }}"
+                      entity_id: todo.todo_smart_todo
+                      is_active:
+                        "{{ (as_timestamp(now()) -\n    as_timestamp(states[repeat.item.device_tracker].last_updated)) > 60 }}"

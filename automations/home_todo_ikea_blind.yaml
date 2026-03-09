@@ -1,52 +1,57 @@
-- id: '1739744093398'
+- id: "1739744093398"
   alias: Hjem todo IKEA rullegardiner
   description: Kontroller batteri status på IKEA rullegardiner
-  triggers:
-  - trigger: numeric_state
-    entity_id:
-    - sensor.bedroom_blind_battery
-    - sensor.emils_room_blind_battery
-    - sensor.charlies_room_blind_battery
-    - sensor.bedroom_blind_open_close_remote_battery
-    - sensor.emils_room_blind_open_close_remote_battery
-    - sensor.charlies_room_blind_open_close_remote_battery
-    below: 5
-    for:
-      minutes: 3
-  - trigger: numeric_state
-    entity_id:
-    - sensor.bedroom_blind_battery
-    - sensor.emils_room_blind_battery
-    - sensor.charlies_room_blind_battery
-    - sensor.bedroom_blind_open_close_remote_battery
-    - sensor.emils_room_blind_open_close_remote_battery
-    - sensor.charlies_room_blind_open_close_remote_battery
-    above: 70
-    for:
-      minutes: 3
-  - trigger: time
-    at: 03:09:00
-  conditions: []
-  actions:
-  - variables:
-      sensors:
-      - entity_id: sensor.bedroom_blind_battery
-        battery_type: Genopladelig batteripakke
-      - entity_id: sensor.emils_room_blind_battery
-        battery_type: Genopladelig batteripakke
-      - entity_id: sensor.charlies_room_blind_battery
-        battery_type: Genopladelig batteripakke
-      - entity_id: sensor.bedroom_blind_open_close_remote_battery
-      - entity_id: sensor.emils_room_blind_open_close_remote_battery
-      - entity_id: sensor.charlies_room_blind_open_close_remote_battery
-  - repeat:
-      for_each: '{{ sensors }}'
-      sequence:
-      - action: script.create_todo_battery_task
-        data:
-          entity_id: '{{ repeat.item.entity_id }}'
-          type: '{{ repeat.item.battery_type | default('''') }}'
-          threshold: 5
   mode: restart
   trace:
     stored_traces: 30
+
+  triggers:
+    - trigger: numeric_state
+      entity_id:
+        - sensor.bedroom_blind_battery
+        - sensor.emils_room_blind_battery
+        - sensor.charlies_room_blind_battery
+        - sensor.bedroom_blind_open_close_remote_battery
+        - sensor.emils_room_blind_open_close_remote_battery
+        - sensor.charlies_room_blind_open_close_remote_battery
+      below: 5
+      for:
+        minutes: 3
+
+    - trigger: numeric_state
+      entity_id:
+        - sensor.bedroom_blind_battery
+        - sensor.emils_room_blind_battery
+        - sensor.charlies_room_blind_battery
+        - sensor.bedroom_blind_open_close_remote_battery
+        - sensor.emils_room_blind_open_close_remote_battery
+        - sensor.charlies_room_blind_open_close_remote_battery
+      above: 70
+      for:
+        minutes: 3
+
+    - trigger: time
+      at: 03:09:00
+
+  conditions: []
+
+  actions:
+    - variables:
+        sensors:
+          - entity_id: sensor.bedroom_blind_battery
+            battery_type: Genopladelig batteripakke
+          - entity_id: sensor.emils_room_blind_battery
+            battery_type: Genopladelig batteripakke
+          - entity_id: sensor.charlies_room_blind_battery
+            battery_type: Genopladelig batteripakke
+          - entity_id: sensor.bedroom_blind_open_close_remote_battery
+          - entity_id: sensor.emils_room_blind_open_close_remote_battery
+          - entity_id: sensor.charlies_room_blind_open_close_remote_battery
+    - repeat:
+        for_each: "{{ sensors }}"
+        sequence:
+          - action: script.create_todo_battery_task
+            data:
+              entity_id: "{{ repeat.item.entity_id }}"
+              type: "{{ repeat.item.battery_type | default('') }}"
+              threshold: 5

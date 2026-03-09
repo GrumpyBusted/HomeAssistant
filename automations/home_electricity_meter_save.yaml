@@ -1,18 +1,21 @@
-- id: '1764364029434'
+- id: "1764364029434"
   alias: Hjem elektricitet måler aflæs
   description: Aflæs elektricitets forbrug og gem i CSV fil
-  triggers:
-  - at: 01:00:00
-    trigger: time
-  conditions:
-  - condition: template
-    value_template: '{{ now().day == 1 }}'
-  actions:
-  - action: shell_command.append_to_file
-    metadata: {}
-    data:
-      line: '{{ (state_attr(''sensor.home_electricity_meter'', ''ValueDate'') | as_datetime
-        | as_local).strftime(''%Y-%m-%dT%H:%M:%S'') }},{{ state_attr(''sensor.home_electricity_meter'',
-        ''CounterReadingImport'') }}'
-      file: /config/data/meter_reading_electricity.csv
   mode: single
+  trace:
+    stored_traces: 20
+
+  triggers:
+    - at: 01:00:00
+      trigger: time
+
+  conditions:
+    - condition: template
+      value_template: "{{ now().day == 1 }}"
+
+  actions:
+    - action: shell_command.append_to_file
+      metadata: {}
+      data:
+        line: "{{ (state_attr('sensor.home_electricity_meter', 'ValueDate') | as_datetime | as_local).strftime('%Y-%m-%dT%H:%M:%S') }},{{ state_attr('sensor.home_electricity_meter', 'CounterReadingImport') }}"
+        file: /config/data/meter_reading_electricity.csv

@@ -1,60 +1,63 @@
-- id: '1770548858082'
+- id: "1770548858082"
   alias: Køkken køleskab
   description: Styring af power booster på køleskab i køkkenet
-  triggers:
-  - trigger: template
-    value_template: '{{ states(''sensor.kitchen_fridge_fridge_temperature'') | round(0)
-      >= states(''number.kitchen_fridge_fridge_temperature'') | float(3) | round(0)
-      + 2 }}'
-    id: fridge_start_boost
-  - trigger: template
-    value_template: '{{ states(''sensor.kitchen_fridge_fridge_temperature'') | round(0)
-      < states(''number.kitchen_fridge_fridge_temperature'') | float(3) | round(0)
-      + 2 }}'
-    id: fridge_end_boost
-  - trigger: template
-    value_template: '{{ states(''sensor.kitchen_fridge_freezer_temperature'') | round(0)
-      >= states(''number.kitchen_fridge_freezer_temperature'') | float(18) | round(0)
-      + 2 }}'
-    id: freezer_start_boost
-  - trigger: template
-    value_template: '{{ states(''sensor.kitchen_fridge_freezer_temperature'') | round(0)
-      < states(''number.kitchen_fridge_freezer_temperature'') | float(18) | round(0)
-      + 2 }}'
-    id: freezer_end_boost
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id: fridge_start_boost
-      sequence:
-      - action: switch.turn_on
-        target:
-          entity_id:
-          - switch.kitchen_fridge_power_cool
-    - conditions:
-      - condition: trigger
-        id: fridge_end_boost
-      sequence:
-      - action: switch.turn_off
-        target:
-          entity_id:
-          - switch.kitchen_fridge_power_cool
-    - conditions:
-      - condition: trigger
-        id: freezer_start_boost
-      sequence:
-      - action: switch.turn_on
-        target:
-          entity_id:
-          - switch.kitchen_fridge_power_freeze
-    - conditions:
-      - condition: trigger
-        id: freezer_end_boost
-      sequence:
-      - action: switch.turn_off
-        target:
-          entity_id:
-          - switch.kitchen_fridge_power_freeze
   mode: single
+  trace:
+    stored_traces: 30
+
+  triggers:
+    - trigger: template
+      value_template: "{{ states('sensor.kitchen_fridge_fridge_temperature') | round(0) >= states('number.kitchen_fridge_fridge_temperature') | float(3) | round(0) + 2 }}"
+      id: fridge_start_boost
+
+    - trigger: template
+      value_template: "{{ states('sensor.kitchen_fridge_fridge_temperature') | round(0) < states('number.kitchen_fridge_fridge_temperature') | float(3) | round(0) + 2 }}"
+      id: fridge_end_boost
+
+    - trigger: template
+      value_template: "{{ states('sensor.kitchen_fridge_freezer_temperature') | round(0) >= states('number.kitchen_fridge_freezer_temperature') | float(18) | round(0) + 2 }}"
+      id: freezer_start_boost
+
+    - trigger: template
+      value_template: "{{ states('sensor.kitchen_fridge_freezer_temperature') | round(0) < states('number.kitchen_fridge_freezer_temperature') | float(18) | round(0) + 2 }}"
+      id: freezer_end_boost
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: fridge_start_boost
+          sequence:
+            - action: switch.turn_on
+              target:
+                entity_id:
+                  - switch.kitchen_fridge_power_cool
+
+        - conditions:
+            - condition: trigger
+              id: fridge_end_boost
+          sequence:
+            - action: switch.turn_off
+              target:
+                entity_id:
+                  - switch.kitchen_fridge_power_cool
+
+        - conditions:
+            - condition: trigger
+              id: freezer_start_boost
+          sequence:
+            - action: switch.turn_on
+              target:
+                entity_id:
+                  - switch.kitchen_fridge_power_freeze
+
+        - conditions:
+            - condition: trigger
+              id: freezer_end_boost
+          sequence:
+            - action: switch.turn_off
+              target:
+                entity_id:
+                  - switch.kitchen_fridge_power_freeze

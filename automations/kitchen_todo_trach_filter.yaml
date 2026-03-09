@@ -1,47 +1,50 @@
-- id: '1770459627394'
+- id: "1770459627394"
   alias: Todo køkken affald filter
   description: Opret todo opgaver vedrørende skift af biofilter på affald
-  triggers:
-  - trigger: time
-    at: input_datetime.kitchen_trash_biofilter_next_change
-    id: deadline
-  - at: 03:18:00
-    id: periodic
-    trigger: time
-  - trigger: event
-    event_type: todo_item_completed
-    event_data:
-      related: input_datetime.kitchen_trash_biofilter_next_change
-    id: todo_completed
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id:
-        - deadline
-        - periodic
-      sequence:
-      - action: script.create_todo_task
-        data:
-          subject: Skift biofilter på affald i køkken
-          description: Skift biofilter på rest og mad affaldsspande i køkkenet, i
-            skabet ved siden af vasken.
-          related_entity_id: input_datetime.kitchen_trash_biofilter_next_change
-          entity_id: todo.todo_smart_todo
-          is_active: '{{ states(''input_datetime.kitchen_trash_biofilter_next_change'')
-            | as_datetime | as_local < now() }}'
-    - conditions:
-      - condition: trigger
-        id: todo_completed
-      sequence:
-      - action: input_datetime.set_datetime
-        target:
-          entity_id: input_datetime.kitchen_trash_biofilter_next_change
-        data:
-          datetime: '{{ (now() + timedelta(days=120)).strftime(''%Y-%m-%d %H:%M:%S'')
-            }}'
   mode: queued
   max: 10
   trace:
     stored_traces: 30
+
+  triggers:
+    - trigger: time
+      at: input_datetime.kitchen_trash_biofilter_next_change
+      id: deadline
+
+    - at: 03:18:00
+      id: periodic
+      trigger: time
+
+    - trigger: event
+      event_type: todo_item_completed
+      event_data:
+        related: input_datetime.kitchen_trash_biofilter_next_change
+      id: todo_completed
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id:
+                - deadline
+                - periodic
+          sequence:
+            - action: script.create_todo_task
+              data:
+                subject: Skift biofilter på affald i køkken
+                description: Skift biofilter på rest og mad affaldsspande i køkkenet, i skabet ved siden af vasken.
+                related_entity_id: input_datetime.kitchen_trash_biofilter_next_change
+                entity_id: todo.todo_smart_todo
+                is_active: "{{ states('input_datetime.kitchen_trash_biofilter_next_change') | as_datetime | as_local < now() }}"
+
+        - conditions:
+            - condition: trigger
+              id: todo_completed
+          sequence:
+            - action: input_datetime.set_datetime
+              target:
+                entity_id: input_datetime.kitchen_trash_biofilter_next_change
+              data:
+                datetime: "{{ (now() + timedelta(days=120)).strftime('%Y-%m-%d %H:%M:%S') }}"

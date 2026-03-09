@@ -1,47 +1,50 @@
-- id: '1737835831554'
+- id: "1737835831554"
   alias: Hjem sæt huspasser
-  description: Slår huspasser fra når familien kommer hjem, og til hvis andre låser
-    op med keypad
-  triggers:
-  - entity_id: binary_sensor.family_home
-    from: 'off'
-    to: 'on'
-    id: family_home
-    trigger: state
-  - entity_id:
-    - sensor.entrance_lock_operator
-    - sensor.utility_room_lock_operator
-    id: unlock
-    trigger: state
-  actions:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id: family_home
-      - condition: template
-        value_template: |-
-          {{ now() > (states.input_boolean.house_sitter.last_updated + timedelta(minutes=15)) }}
-      sequence:
-      - target:
-          entity_id: input_boolean.house_sitter
-        action: input_boolean.turn_off
-    - conditions:
-      - condition: trigger
-        id: unlock
-      - condition: state
-        entity_id: binary_sensor.family_home
-        state: 'off'
-      - condition: template
-        value_template: |-
-          {{ state_attr(trigger.entity_id, 'method') == 'keypad' }}
-      - condition: template
-        value_template: |-
-          {{ 'Busted-Janum' not in states(trigger.entity_id) }}
-      sequence:
-      - target:
-          entity_id: input_boolean.house_sitter
-        action: input_boolean.turn_on
+  description: Slår huspasser fra når familien kommer hjem, og til hvis andre låser op med keypad
   mode: queued
   max: 10
   trace:
     stored_traces: 20
+
+  triggers:
+    - entity_id: binary_sensor.family_home
+      from: "off"
+      to: "on"
+      id: family_home
+      trigger: state
+
+    - entity_id:
+        - sensor.entrance_lock_operator
+        - sensor.utility_room_lock_operator
+      id: unlock
+      trigger: state
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: family_home
+            - condition: template
+              value_template: |-
+                {{ now() > (states.input_boolean.house_sitter.last_updated + timedelta(minutes=15)) }}
+          sequence:
+            - target:
+                entity_id: input_boolean.house_sitter
+              action: input_boolean.turn_off
+
+        - conditions:
+            - condition: trigger
+              id: unlock
+            - condition: state
+              entity_id: binary_sensor.family_home
+              state: "off"
+            - condition: template
+              value_template: |-
+                {{ state_attr(trigger.entity_id, 'method') == 'keypad' }}
+            - condition: template
+              value_template: |-
+                {{ 'Busted-Janum' not in states(trigger.entity_id) }}
+          sequence:
+            - target:
+                entity_id: input_boolean.house_sitter
+              action: input_boolean.turn_on
