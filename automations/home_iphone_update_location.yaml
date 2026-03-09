@@ -62,5 +62,14 @@
       - sensor.monique_iphone_location_last_updated
       - sensor.emil_iphone_location_last_updated
       - sensor.charlie_iphone_location_last_updated
-    stale_locations:
-      "{% set ns = namespace(stale=[]) %} {% for e in iphone_sensors %}\n  {% set s = states(e) %}\n  {% if s not in ['unknown', 'unavailable', ''] %}\n    {% set age = (now() - (s | as_datetime)).total_seconds() %}\n    {% if age > 3600 and age < 4200 %} \n      {% set ns.stale = ns.stale + [e] %}\n \   {% endif %}\n  {% endif %}\n{% endfor %} {{ ns.stale }}"
+    stale_locations: |-
+      {% set ns = namespace(stale=[]) %} {% for e in iphone_sensors %}
+        {% set s = states(e) %}
+        {% if s not in ['unknown', 'unavailable', ''] %}
+          {% set age = (now() - (s | as_datetime)).total_seconds() %}
+          {% if age > 3600 and age < 4200 %}
+            {% set ns.stale = ns.stale + [e] %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+      {{ ns.stale }}

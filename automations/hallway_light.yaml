@@ -405,7 +405,6 @@
           data:
             transition: "{{ transition }}"
             color_temp_kelvin: "{{ kelvin }}"
-            brightness_pct:
-              "{% set bedroom = (state_attr('light.bedroom_lights', 'brightness') | int(0) / 255 * 100) | int %} {{ min(bedroom, brightness) if 0 < bedroom < 75 else brightness }}
-
-              "
+            brightness_pct: |-
+              {% set bedroom = (state_attr('light.bedroom_lights', 'brightness') | int(0) / 255 * 100) | int %}
+              {{ min(bedroom, brightness) if 0 < bedroom < 75 else brightness }}

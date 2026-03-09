@@ -24,10 +24,19 @@
         tomorrow: "{{ now().date() + timedelta(days=1) }}"
         today: "{{ now().date() }}"
         status: "{{ response.status }}"
-        containers:
-          "{% set ns = namespace(fractions=[]) %}\n{% for fraction in response.content.result.fractions %}\n  {% set ns.fractions = ns.fractions + [fraction.fractionName] %}\n{% endfor %}\n{{ ns.fractions }}"
-        description_text:
-          "Følgende affaldscontainere skal køres op til vejen i dag: <ul> {% for c in containers %}\n  <li>{{ c }}</li>\n{% endfor %} </ul>"
+
+        containers: |-
+          {% set ns = namespace(fractions=[]) %}
+          {% for fraction in response.content.result.fractions %}
+            {% set ns.fractions = ns.fractions + [fraction.fractionName] %}
+          {% endfor %}
+          {{ ns.fractions }}
+        description_text: |-
+          Følgende affaldscontainere skal køres op til vejen i dag: <ul> 
+          {% for c in containers %}
+            <li>{{ c }}</li>
+          {% endfor %}
+          </ul>
     - action: system_log.write
       data:
         level: debug

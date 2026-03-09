@@ -53,14 +53,13 @@
         - action: script.create_todo_task
           data:
             subject: Udskift filter på ventilationsanlægget
-            description: >
-              Udskift {% if is_state('input_boolean.storage_ventilation_system_replace_pollen_filter_next','on') %}
+            description: |-
+              Udskift 
+              {% if is_state('input_boolean.storage_ventilation_system_replace_pollen_filter_next','on') %}
                 både Standardfilter (tynde blå) og Pollenfilter (tykke hvide)
               {% else %}
                 Standardfilter (tynde blå)
               {% endif %} på ventilationsanlægget på loftet. Husk at nulstille filter alarm til 90 dage.
-
-
             related_entity_id: sensor.storage_ventilation_system_days_left_until_filter_change
             entity_id: todo.todo_smart_todo
             is_active: "{{ states('sensor.storage_ventilation_system_days_left_until_filter_change') | int(99) < 1 }}"

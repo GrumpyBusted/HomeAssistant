@@ -49,8 +49,16 @@
           automation.living_room_media_player_set_status: 150
           automation.utility_room_washer: 150
           automation.storage_light: 32
-        offenders:
-          "{% set res = sql_result.result if sql_result is defined else [] %}  {% set ns = namespace(offenders=[]) %} {% for row in res %}\n  {% set automation_id = row.automation_id %}\n  {% set count = row.trigger_count | int %}\n  {% set limit = custom_limits.get(automation_id, default_limit) | int %}\n  {% if count > limit %}\n    {% set ns.offenders = ns.offenders + [dict(row, limit=limit)] %}\n  {% endif %}\n{% endfor %} {{ ns.offenders }}\n"
+        offenders: >
+          {% set res = sql_result.result if sql_result is defined else [] %} {% set ns = namespace(offenders=[]) %} {% for row in res %}
+            {% set automation_id = row.automation_id %}
+            {% set count = row.trigger_count | int %}
+            {% set limit = custom_limits.get(automation_id, default_limit) | int %}
+            {% if count > limit %}
+              {% set ns.offenders = ns.offenders + [dict(row, limit=limit)] %}
+            {% endif %}
+          {% endfor %} {{ ns.offenders }}
+
         message: |-
           count: {{ offenders | count }}
           automations:

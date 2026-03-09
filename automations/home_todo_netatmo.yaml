@@ -76,11 +76,10 @@
         for_each: "{{ entities }}"
         sequence:
           - variables:
-              device_name: "{% set i = device_id(repeat.item) %}
-
+              device_name: |-
+                {% set i = device_id(repeat.item) %}
                 {% set n = device_attr(i, 'name_by_user') %}
-
-                {{ n }}"
+                {{ n }}
           - action: script.create_todo_task
             data:
               subject: Genetabler forbindelse til {{ device_name }}

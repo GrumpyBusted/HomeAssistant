@@ -221,7 +221,7 @@
 
     - wait_template: |-
         {{ states('cover.bedroom_blind') not in ['opening', 'closing'] }}
-      timeout: "00:00:30"
+      timeout: 00:00:30
       continue_on_timeout: true
 
     - variables:
@@ -309,5 +309,5 @@
 
     - wait_template: |-
         {{ states('cover.bedroom_blind') not in ['opening', 'closing'] }}
-      timeout: "00:00:30"
+      timeout: 00:00:30
       continue_on_timeout: true

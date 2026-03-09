@@ -15,8 +15,24 @@ charlies_room_light_desk_adjust:
           - light.charlies_room_light_desk_right
       data:
         transition: 0.5
-        brightness:
-          "{% set current_brightness = state_attr(light_entity, 'brightness') | int(0) %} {% if is_state('input_boolean.charlies_room_light_desk_brightness_up', 'on') %}\n  {% set new_brightness = current_brightness + step %}\n  {% if new_brightness > 255 %}\n    {{ 255 }}\n  {% else %}\n    {{ new_brightness }}\n  {% endif %}\n{% else %}\n  {% set new_brightness = current_brightness - step %}\n  {% if new_brightness < 0 %}\n    {{ 0 }}\n  {% else %}\n    {{ new_brightness }}\n  {% endif %}\n{% endif %}\n"
+        brightness: |-
+          {% set current_brightness = state_attr(light_entity, 'brightness') | int(0) %}
+
+          {% if is_state('input_boolean.charlies_room_light_desk_brightness_up', 'on') %}
+            {% set new_brightness = current_brightness + step %}
+            {% if new_brightness > 255 %}
+              {{ 255 }}
+            {% else %}
+              {{ new_brightness }}
+            {% endif %}
+          {% else %}
+            {% set new_brightness = current_brightness - step %}
+            {% if new_brightness < 0 %}
+              {{ 0 }}
+            {% else %}
+              {{ new_brightness }}
+            {% endif %}
+          {% endif %}
 
     - choose:
         - conditions:
@@ -387,9 +403,7 @@ living_room_robot_vacuum_start_cleaning:
       then:
         - action: timer.start
           data:
-            duration: "{{ (timeout | int * 60) | timestamp_custom('%H:%M:%S', false) }}
-
-              "
+            duration: "{{ (timeout | int * 60) | timestamp_custom('%H:%M:%S', false) }}"
           target:
             entity_id: timer.living_room_robot_vacuum_timer
         - choose:
@@ -1204,9 +1218,7 @@ cleanup_todo_tasks:
           domain: todo
     date:
       name: Afsluttet dato
-      description: "Slet kun opgaver færdiggjort før eller på denne dag, udelad for at slette alle færdiggjorte.
-
-        "
+      description: Slet kun opgaver færdiggjort før eller på denne dag, udelad for at slette alle færdiggjorte.
       example: "2025-01-20"
       required: false
       selector:

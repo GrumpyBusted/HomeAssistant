@@ -1,7 +1,8 @@
 - id: "1739016002574"
   alias: Emils værelse blæser
   description: |
-    Tænder for Dyson Hot+Cool i Emils værelse, for at varme hurtigere op hvis den ønskede temperatur er væsentligt koldere end den aktuelle.
+    Tænder for Dyson Hot+Cool i Emils værelse, for at varme hurtigere op hvis den ønskede temperatur 
+    er væsentligt koldere end den aktuelle.
   mode: queued
   max: 10
   trace:

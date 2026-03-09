@@ -27,8 +27,35 @@
           automation.living_room_tv: 9999
           automation.home_monitor_system: 9999
           automation.storage_light: 999
-        offenders:
-          "{% set ns = namespace(offenders=[]) %}\n{% for a in states.automation | list %}\n  {% set days = custom_days.get(a.entity_id, default_days) | int %}\n  {% set cutoff = now() - timedelta(days=days) %}\n  {% set last = state_attr(a.entity_id, 'last_triggered') %}\n\n  {% if last is none %}\n    {% set ns.offenders = ns.offenders + [dict(\n      automation_id=a.entity_id,\n      friendly_name=a.name,\n \     last_triggered='never',\n      days_since=999999,\n      cutoff_days=days\n \   )] %}\n  {% else %}\n    {% set last_dt = as_datetime(last) %}\n    {% set age_days = ((now() - last_dt).total_seconds() / 86400) %}\n\n    {% if last_dt < cutoff %}\n      {% set ns.offenders = ns.offenders + [dict(\n        automation_id=a.entity_id,\n \       friendly_name=a.name,\n        last_triggered=(last_dt | as_local).isoformat(),\n \       days_since=age_days | round(1),\n        cutoff_days=days\n      )] %}\n    {% endif %}\n  {% endif %}\n{% endfor %}\n{{ (ns.offenders | sort(attribute='days_since', reverse=true) | list) | to_json }}\n"
+        offenders: |-
+          {% set ns = namespace(offenders=[]) %}
+          {% for a in states.automation | list %}
+            {% set days = custom_days.get(a.entity_id, default_days) | int %}
+            {% set cutoff = now() - timedelta(days=days) %}
+            {% set last = state_attr(a.entity_id, 'last_triggered') %}
+            {% if last is none %}
+              {% set ns.offenders = ns.offenders + [dict(
+                automation_id=a.entity_id,
+                friendly_name=a.name,
+                last_triggered='never',
+                days_since=999999,
+                cutoff_days=days
+              )] %}
+            {% else %}
+              {% set last_dt = as_datetime(last) %}
+              {% set age_days = ((now() - last_dt).total_seconds() / 86400) %}
+              {% if last_dt < cutoff %}
+                {% set ns.offenders = ns.offenders + [dict(
+                  automation_id=a.entity_id,
+                  friendly_name=a.name,
+                  last_triggered=(last_dt | as_local).isoformat(),
+                  days_since=age_days | round(1),
+                  cutoff_days=days
+                )] %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+          {{ (ns.offenders | sort(attribute='days_since', reverse=true) | list) | to_json }}
         offenders_obj: "{{ offenders | trim | from_json }}"
         message: |-
           count: {{ offenders_obj | count }}

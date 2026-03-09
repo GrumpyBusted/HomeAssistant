@@ -84,8 +84,14 @@
           - subject: Afspændingsmiddel
             entity_id: sensor.kitchen_dishwasher_rinse_aid_level_safe
             threshold: 33
-        supply_todos:
-          "{% set ns = namespace(count=0) %} {% for item in supply_tasks %}\n  {% if states(item.entity_id) | float(100) < item.threshold | float(10) %}\n    {% set ns.count = ns.count + 1 %}\n  {% endif %}\n{% endfor %} {{ ns.count }}"
+        supply_todos: |-
+          {% set ns = namespace(count=0) %}
+          {% for item in supply_tasks %}
+            {% if states(item.entity_id) | float(100) < item.threshold | float(10) %}
+              {% set ns.count = ns.count + 1 %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.count }}
     - repeat:
         for_each: "{{ supply_tasks }}"
         sequence:

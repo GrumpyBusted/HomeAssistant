@@ -69,8 +69,22 @@
         level: debug
         message: "Response: {{ response }}"
     - variables:
-        devices:
-          "[\n  {% for room in response.content.rooms %}\n    {% for device in room.devices %}\n      {\n        \"roomName\": \"{{ room.roomName }}\",\n \       \"deviceSerialNo\": \"{{ device.serialNumber }}\",\n        \"batteryState\": \"{{ device.batteryState }}\",\n        \"mountingState\": \"{{ device.mountingState | default('') }}\",\n        \"type\": \"{{ state_attr('sensor.tado_device_types', 'types').get(device.type, device.type) }}\",\n        \"location\": \"{{ state_attr('sensor.tado_device_locations', 'locations').get(device.serialNumber, device.serialNumber) }}\",\n        \"entity_id\": \"{{ state_attr('sensor.tado_device_ids', 'ids').get(device.serialNumber, device.serialNumber) }}\",\n        \"battery\": \"{{ state_attr('sensor.tado_device_batterys', 'batterys').get(device.type, device.type) }}\",\n      }{% if not loop.last %}, {% endif %}\n    {% endfor %}\n  {% if not loop.last %}, {% endif %}\n \ {% endfor %}\n]"
+        devices: |-
+          [ {% for room in response.content.rooms %}
+            {% for device in room.devices %}
+              {
+                "roomName": "{{ room.roomName }}",
+                "deviceSerialNo": "{{ device.serialNumber }}",
+                "batteryState": "{{ device.batteryState }}",
+                "mountingState": "{{ device.mountingState | default('') }}",
+                "type": "{{ state_attr('sensor.tado_device_types', 'types').get(device.type, device.type) }}",
+                "location": "{{ state_attr('sensor.tado_device_locations', 'locations').get(device.serialNumber, device.serialNumber) }}",
+                "entity_id": "{{ state_attr('sensor.tado_device_ids', 'ids').get(device.serialNumber, device.serialNumber) }}",
+                "battery": "{{ state_attr('sensor.tado_device_batterys', 'batterys').get(device.type, device.type) }}"
+              }{% if not loop.last %},{% endif %}
+            {% endfor %}
+            {% if not loop.last %},{% endif %}
+          {% endfor %} ]
     - repeat:
         count: "{{ devices | length }}"
         sequence:

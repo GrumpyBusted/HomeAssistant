@@ -1,7 +1,8 @@
 - id: "1739647490572"
   alias: Soveværelse blæser
   description: |
-    Tænder for Dyson Hot+Cool i soveværelset, for at varme hurtigere op hvis den ønskede temperatur er væsentligt koldere end den aktuelle.
+    Tænder for Dyson Hot+Cool i soveværelset, for at varme hurtigere op hvis den ønskede temperatur 
+    er væsentligt koldere end den aktuelle.
   mode: queued
   max: 10
   trace:

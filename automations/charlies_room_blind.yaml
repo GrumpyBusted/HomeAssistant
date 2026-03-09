@@ -169,7 +169,7 @@
 
     - wait_template: |-
         {{ states('cover.charlies_room_blind') not in ['opening', 'closing'] }}
-      timeout: "00:00:30"
+      timeout: 00:00:30
       continue_on_timeout: true
 
     - action: system_log.write
@@ -227,5 +227,5 @@
 
     - wait_template: |-
         {{ states('cover.charlies_room_blind') not in ['opening', 'closing'] }}
-      timeout: "00:00:30"
+      timeout: 00:00:30
       continue_on_timeout: true

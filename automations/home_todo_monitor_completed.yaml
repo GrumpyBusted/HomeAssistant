@@ -15,8 +15,36 @@
 
   actions:
     - variables:
-        completed:
-          "{% set new = trigger.to_state.attributes.all_todos | default([]) | selectattr('status', 'eq', 'completed') | list %}\n{% set old = trigger.from_state.attributes.all_todos | default([]) | selectattr('status', 'eq', 'completed') | map(attribute='todo_id') | list %}\n{% set completed = new | rejectattr('todo_id', 'in', old) | list %} \n{% set ns = namespace(result=[]) %} \n{% for item in completed %}\n  {% set related = none %}\n  {% if 'Relateret:' in item.description %}\n    {% set related = item.description.split('Relateret:')[1].strip() %}\n  {% endif %}\n\n  {% set ns.result = ns.result + [{\n    \"subject\": item.subject,\n \   \"todo_id\": item.todo_id,\n    \"related\": related\n   }] %}\n{% endfor %} {{ ns.result | to_json }}"
+        completed: >
+          {% set new = trigger.to_state.attributes.all_todos
+            | default([])
+            | selectattr('status', 'eq', 'completed')
+            | list %}
+          
+          {% set old = trigger.from_state.attributes.all_todos
+            | default([])
+            | selectattr('status', 'eq', 'completed')
+            | map(attribute='todo_id')
+            | list %}
+          
+          {% set completed = new | rejectattr('todo_id', 'in', old) | list %} {% set ns = namespace(result=[]) %}
+          
+          {% for item in completed %}
+            {% set related = none %}
+          
+            {% if 'Relateret:' in item.description %}
+              {% set related = item.description.split('Relateret:')[1].strip() %}
+            {% endif %}
+          
+            {% set ns.result = ns.result + [{
+              "subject": item.subject,
+              "todo_id": item.todo_id,
+              "related": related
+            }] %}
+          {% endfor %}
+          
+          {{ ns.result | to_json }}
+
     - repeat:
         count: "{{ completed | trim | from_json | length }}"
         sequence:
