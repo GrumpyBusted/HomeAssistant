@@ -17,6 +17,7 @@
         default_days: 7
         custom_days:
           automation.home_electricity_meter_save: 32
+          automation.home_watch_data_folder: 32
           automation.home_water_meter_save: 32
           automation.emils_room_blind_stop: 999
           automation.charlies_room_blind_stop: 999

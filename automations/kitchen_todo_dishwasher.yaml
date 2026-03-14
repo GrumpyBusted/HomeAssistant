@@ -9,12 +9,12 @@
 
   triggers:
     - trigger: state
-      entity_id: sensor.kitchen_dishwasher_safe
+      entity_id: sensor.kitchen_dishwasher
       to: program_ended
       id: done
 
     - trigger: state
-      entity_id: sensor.kitchen_dishwasher_safe
+      entity_id: sensor.kitchen_dishwasher
       to:
         - waiting_to_start
         - in_use
@@ -22,35 +22,35 @@
       id: started
 
     - trigger: state
-      entity_id: binary_sensor.kitchen_dishwasher_notification_active_safe
+      entity_id: binary_sensor.kitchen_dishwasher_notification_active
       id: notification
 
     - trigger: state
-      entity_id: binary_sensor.kitchen_dishwasher_problem_safe
+      entity_id: binary_sensor.kitchen_dishwasher_problem
       id: problem
 
     - trigger: numeric_state
-      entity_id: sensor.kitchen_dishwasher_powerdisk_level_safe
+      entity_id: sensor.kitchen_dishwasher_powerdisk_level
       below: 3
 
     - trigger: numeric_state
-      entity_id: sensor.kitchen_dishwasher_powerdisk_level_safe
+      entity_id: sensor.kitchen_dishwasher_powerdisk_level
       above: 80
 
     - trigger: numeric_state
-      entity_id: sensor.kitchen_dishwasher_salt_level_safe
+      entity_id: sensor.kitchen_dishwasher_salt_level
       below: 15
 
     - trigger: numeric_state
-      entity_id: sensor.kitchen_dishwasher_salt_level_safe
+      entity_id: sensor.kitchen_dishwasher_salt_level
       above: 80
 
     - trigger: numeric_state
-      entity_id: sensor.kitchen_dishwasher_rinse_aid_level_safe
+      entity_id: sensor.kitchen_dishwasher_rinse_aid_level
       below: 33
 
     - trigger: numeric_state
-      entity_id: sensor.kitchen_dishwasher_rinse_aid_level_safe
+      entity_id: sensor.kitchen_dishwasher_rinse_aid_level
       above: 80
 
   conditions: []
@@ -58,7 +58,7 @@
   actions:
     - if:
         - condition: state
-          entity_id: sensor.kitchen_dishwasher_safe
+          entity_id: sensor.kitchen_dishwasher
           state:
             - program_ended
             - waiting_to_start
@@ -69,20 +69,20 @@
           data:
             subject: Tøm opvaskemaskinen
             description: Opvaskemaskine er færdig, tøm og sæt service væk
-            related_entity_id: sensor.kitchen_dishwasher_safe
+            related_entity_id: sensor.kitchen_dishwasher
             entity_id: todo.todo_smart_todo
-            is_active: "{{ states('sensor.kitchen_dishwasher_safe') == 'program_ended' }}"
+            is_active: "{{ states('sensor.kitchen_dishwasher') == 'program_ended' }}"
 
     - variables:
         supply_tasks:
           - subject: PowerDisk
-            entity_id: sensor.kitchen_dishwasher_powerdisk_level_safe
+            entity_id: sensor.kitchen_dishwasher_powerdisk_level
             threshold: 3
           - subject: Salt
-            entity_id: sensor.kitchen_dishwasher_salt_level_safe
+            entity_id: sensor.kitchen_dishwasher_salt_level
             threshold: 15
           - subject: Afspændingsmiddel
-            entity_id: sensor.kitchen_dishwasher_rinse_aid_level_safe
+            entity_id: sensor.kitchen_dishwasher_rinse_aid_level
             threshold: 33
         supply_todos: |-
           {% set ns = namespace(count=0) %}
@@ -107,22 +107,22 @@
       data:
         subject: Besked fra opvaskemaskinen
         description: Kontroller opvaskemaskinen der er en aktiv notifikation
-        related_entity_id: binary_sensor.kitchen_dishwasher_notification_active_safe
+        related_entity_id: binary_sensor.kitchen_dishwasher_notification_active
         entity_id: todo.todo_smart_todo
-        is_active: "{{ is_state('binary_sensor.kitchen_dishwasher_notification_active_safe', 'on') and supply_todos | int(0) == 0 }}"
+        is_active: "{{ is_state('binary_sensor.kitchen_dishwasher_notification_active', 'on') and supply_todos | int(0) == 0 }}"
 
     - action: script.create_todo_task
       data:
         subject: Problem med opvaskemaskinen
         description: Kontroller opvaskemaskinen der er registreret et problem
-        related_entity_id: binary_sensor.kitchen_dishwasher_problem_safe
+        related_entity_id: binary_sensor.kitchen_dishwasher_problem
         entity_id: todo.todo_smart_todo
-        is_active: "{{ is_state('binary_sensor.kitchen_dishwasher_problem_safe', 'on') }}"
+        is_active: "{{ is_state('binary_sensor.kitchen_dishwasher_problem', 'on') }}"
 
     - action: script.create_todo_task
       data:
         subject: Opvaskermaskinens program er fejlet
         description: Opvaskemaskinens program er i fejl status, kontroller opvaske maskinen
-        related_entity_id: sensor.kitchen_dishwasher_safe_problem
+        related_entity_id: sensor.kitchen_dishwasher
         entity_id: todo.todo_smart_todo
-        is_active: "{{ is_state('sensor.kitchen_dishwasher_safe', 'failure') }}"
+        is_active: "{{ is_state('sensor.kitchen_dishwasher', 'failure') }}"
