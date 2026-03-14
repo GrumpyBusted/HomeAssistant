@@ -38,18 +38,19 @@
   conditions: []
 
   actions:
-    - if:
-        - condition: trigger
-          id: todo_completed
-      then:
-        - action: button.press
-          target:
-            entity_id: button.storage_ventilation_system_reset_filter
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: todo_completed
+          sequence:
+            - action: button.press
+              target:
+                entity_id: button.storage_ventilation_system_reset_filter
 
-        - action: input_boolean.toggle
-          target:
-            entity_id: input_boolean.storage_ventilation_system_replace_pollen_filter_next
-      else:
+            - action: input_boolean.toggle
+              target:
+                entity_id: input_boolean.storage_ventilation_system_replace_pollen_filter_next
+      default:
         - action: script.create_todo_task
           data:
             subject: Udskift filter på ventilationsanlægget
@@ -81,10 +82,8 @@
     - action: script.create_todo_task
       data:
         subject: Alarm på ventilationsanlægget
-        description: >
+        description: |-
           Der er en eller flere alarmer på ventilationsanlægget. {{ message }}
-
-
         related_entity_id: sensor.storage_ventilation_system_days_left_until_filter_change
         entity_id: todo.todo_smart_todo
         is_active: "{{ message | trim | length > 0 }}"

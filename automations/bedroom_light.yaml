@@ -72,9 +72,6 @@
       id: sunrise_script
 
     - trigger: state
-      entity_id: select.bedroom_state
-
-    - trigger: state
       entity_id: binary_sensor.bedroom_light
       from: "off"
       to: "on"
@@ -137,7 +134,9 @@
               id: detected
             - condition: state
               entity_id: select.bedroom_state
-              state: occupied
+              state:
+                - occupied
+                - empty
             - condition: numeric_state
               entity_id: sensor.home_outside_avarage_illuminance_15m
               below: 5000

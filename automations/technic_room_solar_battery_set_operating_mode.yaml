@@ -16,38 +16,30 @@
     - variables:
         charge_start: "{{ now().replace(hour=0, minute=0, second=0) }}"
         charge_end: "{{ now().replace(hour=6, minute=0, second=0) }}"
-
-        charge_periods: >
+        charge_periods: |-
           {% set g = namespace(count = 0) %} {% set start = as_timestamp(charge_start) %} {% set end = as_timestamp(charge_end) %} {% set prices = state_attr('sensor.energy_data_service','raw_today') %} {% for entry in prices %}
             {% set ts = as_timestamp(entry.hour) %}
             {% if ts >= start and ts <= end %}
               {% set g.count = g.count + 1 %}
             {% endif %}
           {% endfor %} {{ g.count }}
-
-
         use_start: "{{ now().replace(hour=17, minute=0, second=0) }}"
         use_end: "{{ now().replace(hour=21, minute=0, second=0) }}"
-
-        use_periods: >
+        use_periods: |-
           {% set g = namespace(count = 0) %} {% set start = as_timestamp(use_start) %} {% set end = as_timestamp(use_end) %} {% set prices = state_attr('sensor.energy_data_service','raw_today') %} {% for entry in prices %}
             {% set ts = as_timestamp(entry.hour) %}
             {% if ts >= start and ts <= end %}
               {% set g.count = g.count + 1 %}
             {% endif %}
           {% endfor %} {{ g.count }}
-
-
-        capacity: >
+        capacity: |-
           {% set fixed_use = 700 %} {% set g = namespace(capacity = 0) %} {% set start = as_timestamp(charge_end) %} {% set end = as_timestamp(use_start) %} {% set forecast = state_attr('sensor.solar_forecast_energy_today','detailedHourly') %} {% set g.capacity = states('sensor.technic_room_solar_battery_installed_capacity_total') | float(0) %} {% set g.capacity = g.capacity * (1 - states('sensor.technic_room_solar_battery_battery_percentage_user') | float(0) / 100) %} {% for p in forecast %}
             {% set ts = as_timestamp(p.period_start) %}
             {% if ts >= start and ts <= end %}
               {% set g.capacity = max(0, g.capacity - max(0, p.pv_estimate * 1000 - fixed_use)) %}
             {% endif %}
           {% endfor %} {{ g.capacity | round(0) }}
-
-
-        schedule: >
+        schedule: |-
           {{
             "[{\"start\": \"" ~ (as_datetime(charge_start) + timedelta(minutes=1)).strftime('%H:%M') ~
             "\", \"stop\": \"" ~ as_datetime(charge_end).strftime('%H:%M') ~
@@ -56,26 +48,20 @@
             "\", \"stop\": \"" ~ as_datetime(use_start).strftime('%H:%M') ~
             "\", \"threshold_p_max\": 0}]"
           }}
-
-
-        charge_cost: >
+        charge_cost: |-
           {% set g = namespace(charge_cost=0) %} {% set start = as_timestamp(charge_start) %} {% set end = as_timestamp(charge_end) %} {% set prices = state_attr('sensor.energy_data_service','raw_today') %} {% for p in prices %}
             {% set ts = as_timestamp(p.hour) %}
             {% if ts >= start and ts <= end %}
               {% set g.charge_cost = g.charge_cost + p.price * (capacity / 1000 / charge_periods) %}
             {% endif %}
           {% endfor %} {{ g.charge_cost | round(2) }}
-
-
-        use_cost: >
+        use_cost: |-
           {% set g = namespace(use_cost=0) %} {% set start = as_timestamp(use_start) %} {% set end = as_timestamp(use_end) %} {% set prices = state_attr('sensor.energy_data_service','raw_today') %} {% for p in prices %}
             {% set ts = as_timestamp(p.hour) %}
             {% if ts >= start and ts <= end %}
               {% set g.use_cost = g.use_cost + p.price * (capacity / 1000 / use_periods) %}
             {% endif %}
           {% endfor %} {{ g.use_cost | round(2) }}
-
-
     - action: system_log.write
       data:
         level: info

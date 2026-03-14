@@ -42,9 +42,7 @@
               data:
                 subject: Indstil temperatur på fryseren i bryggerset
                 entity_id: todo.todo_smart_todo
-                description: >
+                description: |-
                   Fryseren i bryggersets temperaturen er {{ states('sensor.utility_room_freezer_temperature_sensor_temperature') | round(1) }} °C, bør være -18 °C
-
-
                 related_entity_id: sensor.utility_room_freezer_temperature_sensor_temperature
                 is_active: "{{ not (-22 <= (states('sensor.utility_room_freezer_temperature_sensor_temperature') | float(0)) <= -17) }}"

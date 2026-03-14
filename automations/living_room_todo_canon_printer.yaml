@@ -73,10 +73,8 @@
               - action: script.create_todo_task
                 data:
                   subject: "Skift {{ repeat.item.name }} blæk på printer"
-                  description: >
+                  description: |-
                     Blæk niveau for {{ states(repeat.item.entity) }}% på Canon TS8300 printer.<br> Blæk type: {{ repeat.item.ink }}
-
-
                   related_entity_id: "{{ repeat.item.entity }}"
                   entity_id: todo.todo_smart_todo
                   is_active: "{{ states(repeat.item.entity)|int(100) < state_attr(repeat.item.entity,'marker_low_level')|int(15) }}"

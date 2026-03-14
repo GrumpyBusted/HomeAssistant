@@ -106,5 +106,4 @@
                       description: Lokationen fra {{ repeat.item.name }} iPhone er ikke blevet opdateret som forventet. Kontroller Home Assistant appens lokationsindstillinger og baggrundsopdatering.
                       related_entity_id: "{{ repeat.item.device_tracker }}"
                       entity_id: todo.todo_smart_todo
-                      is_active:
-                        "{{ (as_timestamp(now()) -\n    as_timestamp(states[repeat.item.device_tracker].last_updated)) > 60 }}"
+                      is_active: "{{ (as_timestamp(now()) - as_timestamp(states[repeat.item.device_tracker].last_updated)) > 60 }}"

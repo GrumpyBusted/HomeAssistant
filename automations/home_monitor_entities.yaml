@@ -22,17 +22,18 @@
   conditions: []
 
   actions:
-    - if:
-        - condition: trigger
-          id: started
-      then:
-        - action: timer.start
-          target:
-            entity_id: timer.home_monitor_entities_timer
-          data:
-            duration:
-              minutes: 5
-      else:
+    - choose:
+        - conditions: 
+            - condition: trigger
+              id: started
+          sequence:
+            - action: timer.start
+              target:
+                entity_id: timer.home_monitor_entities_timer
+              data:
+                duration:
+                  minutes: 5
+      default:
         - action: timer.cancel
           target:
             entity_id: timer.home_monitor_entities_timer
@@ -47,14 +48,13 @@
               - sensor.living_room_printer_magenta
               - sensor.living_room_printer_photo_blue
               - sensor.living_room_printer_yellow
-            entities: >-
+            entities: |-
               {% set unavailable = states
                 | rejectattr('domain', 'in', ['button', 'event', 'update'])
                 | selectattr('state', 'eq', 'unavailable')
                 | map(attribute='entity_id')
                 | list
               %}
-              
               {% set unknown = states
                 | selectattr('domain', 'in', [
                     'media_player',
@@ -68,21 +68,16 @@
                 | map(attribute='entity_id')
                 | list
               %}
-              
               {% set entities = (unavailable + unknown)
                 | reject('in', exclude_entities)
                 | unique
                 | list
               %}
-              
               {{ entities | to_json }}
-
             message: |-
               {% set ns = namespace(result={}) %}
-
               {% for e in entities | trim | from_json %}
                 {% set dev_id = device_id(e) if device_id(e) else '[NO_DEVICE]' %}
-
                 {% if dev_id not in ns.result %}
                   {% if dev_id == '[NO_DEVICE]' %}
                     {% set dev_name = '[NO_DEVICE]' %}
@@ -95,7 +90,6 @@
                     %}
                     {% set dev_area_name = area_name(device_attr(dev_id, 'area_id')) %}
                   {% endif %}
-
                   {% set ns.result = dict(
                     ns.result,
                     **{
@@ -108,14 +102,12 @@
                     }
                   ) %}
                 {% endif %}
-
                 {% set ent_obj = {
                   "entity_id": e,
                   "friendly_name": state_attr(e, 'friendly_name'),
                   "state": states(e),
                   "last_changed": states[e].last_changed.isoformat()
                 } %}
-
                 {% set ns.result = dict(
                   ns.result,
                   **{
@@ -128,9 +120,7 @@
                   }
                 ) %}
               {% endfor %}
-
               {% set devices = ns.result.values() | list %}
-
               count_devices: {{ devices | count }}
               count_entities: {{ entities | count }}
               devices:

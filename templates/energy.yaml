@@ -54,7 +54,9 @@
           {# 
             Friendly time difference rounded to nearest 15 minutes.
             Format H:MM (no leading zero)
-          #} {% set ts = states('sensor.energy_price_optimal_window_start') %} {% if ts in ['unknown', 'unavailable', none] %}
+          #} 
+          {% set ts = states('sensor.energy_price_optimal_window_start') %} 
+          {% if ts in ['unknown', 'unavailable', none] %}
             {{ none }}
           {% else %}
             {% set start = ts | as_datetime %}
@@ -75,8 +77,8 @@
           
               {{ "%d:%02d" | format(hours, minutes) }}
             {% endif %}
-          {% endif %}
-
+          {% endif %} 
+          
         local_time: >-
           {% set ts = best.start if best is defined else states('sensor.energy_price_optimal_window_start') %} {% if ts in ['unknown', 'unavailable', none] %}
             {{ none }}

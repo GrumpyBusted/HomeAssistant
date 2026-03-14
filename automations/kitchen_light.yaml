@@ -93,113 +93,57 @@
       to: "on"
       id: living_room_light_on
 
+    - trigger: state
+      entity_id: input_select.living_room_robot_vacuum_current_cleaning
+      to: kitchen_cleaning
+      id: cleaning_start
+
+    - trigger: state
+      entity_id: input_select.living_room_robot_vacuum_current_cleaning
+      from: kitchen_cleaning
+      id: cleaning_end
+
+    - trigger: state
+      entity_id: binary_sensor.kitchen_light
+      from: "off"
+      to: "on"
+      for: 00:15:00
+      id: lights_on
+
   conditions: []
 
   actions:
+    - variables:
+        mode: ""
+
     - choose:
         - conditions:
             - condition: trigger
               id: button_1_short
           sequence:
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 2700
-                brightness_pct: 80
-              target:
-                entity_id:
-                  - light.kitchen_light_strip_countertop
-                  - light.kitchen_light_pendant_island_left
-                  - light.kitchen_light_pendant_island_right
-                  - light.kitchen_light_pendant_sink_left
-                  - light.kitchen_light_pendant_sink_right
-            - action: light.turn_off
-              data:
-                transition: 1
-              target:
-                entity_id:
-                  - light.kitchen_light_spot_island
-                  - light.kicthen_light_spot_cooktop
-                  - light.kitchen_light_spot_oven
-                  - light.kitchen_light_spot_sink
-                  - light.kitchen_light_spot_fridge
-                  - light.kitchen_light_spot_hallway
+            - variables:
+                mode: "normal"
 
         - conditions:
             - condition: trigger
               id: button_2_short
           sequence:
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 2300
-                brightness_pct: 50
-              target:
-                entity_id: light.kitchen_light_strip_countertop
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 2300
-                brightness_pct: 15
-              target:
-                entity_id:
-                  - light.kitchen_light_pendant_island_left
-                  - light.kitchen_light_pendant_island_right
-                  - light.kitchen_light_pendant_sink_left
-                  - light.kitchen_light_pendant_sink_right
-            - action: light.turn_off
-              data:
-                transition: 1
-              target:
-                entity_id:
-                  - light.kitchen_light_spot_island
-                  - light.kicthen_light_spot_cooktop
-                  - light.kitchen_light_spot_oven
-                  - light.kitchen_light_spot_sink
-                  - light.kitchen_light_spot_fridge
-                  - light.kitchen_light_spot_hallway
+            - variables:
+                mode: "low"
 
         - conditions:
             - condition: trigger
               id: button_3_short
           sequence:
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 2700
-                brightness_pct: 80
-              target:
-                entity_id:
-                  - light.kitchen_light_pendant_island_left
-                  - light.kitchen_light_pendant_island_right
-                  - light.kitchen_light_pendant_sink_left
-                  - light.kitchen_light_pendant_sink_right
-                  - light.kitchen_light_strip_countertop
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 2700
-                brightness_pct: 50
-              target:
-                entity_id:
-                  - light.kitchen_light_spot_island
-                  - light.kicthen_light_spot_cooktop
-                  - light.kitchen_light_spot_oven
-                  - light.kitchen_light_spot_sink
-                  - light.kitchen_light_spot_fridge
-                  - light.kitchen_light_spot_hallway
+            - variables:
+                mode: "high"
 
         - conditions:
             - condition: trigger
               id: button_4_short
           sequence:
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 3000
-                brightness_pct: 100
-              target:
-                entity_id: light.kitchen_lights
+            - variables:
+                mode: "full"
 
         - conditions:
             - condition: trigger
@@ -211,11 +155,8 @@
                 - no_one_home
                 - living_room_light_off
           sequence:
-            - action: light.turn_off
-              data:
-                transition: 1
-              target:
-                entity_id: light.kitchen_lights
+            - variables:
+                mode: "off"
 
         - conditions:
             - condition: trigger
@@ -233,13 +174,8 @@
               entity_id: binary_sensor.living_room_light
               state: "off"
           sequence:
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 2300
-                brightness_pct: 10
-              target:
-                entity_id: light.kitchen_light_strip_countertop
+            - variables:
+                mode: "night"
 
         - conditions:
             - condition: trigger
@@ -254,39 +190,15 @@
               entity_id: binary_sensor.living_room_light
               state: "off"
           sequence:
-            - action: light.turn_off
-              data:
-                transition: 1
-              target:
-                entity_id: light.kitchen_lights
+            - variables:
+                mode: "off"
 
         - conditions:
             - condition: trigger
               id: person_detected
           sequence:
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 2700
-                brightness_pct: 80
-              target:
-                entity_id:
-                  - light.kitchen_light_strip_countertop
-                  - light.kitchen_light_pendant_island_left
-                  - light.kitchen_light_pendant_island_right
-                  - light.kitchen_light_pendant_sink_left
-                  - light.kitchen_light_pendant_sink_right
-            - action: light.turn_off
-              data:
-                transition: 1
-              target:
-                entity_id:
-                  - light.kitchen_light_spot_island
-                  - light.kicthen_light_spot_cooktop
-                  - light.kitchen_light_spot_oven
-                  - light.kitchen_light_spot_sink
-                  - light.kitchen_light_spot_fridge
-                  - light.kitchen_light_spot_hallway
+            - variables:
+                mode: "normal"
 
         - conditions:
             - condition: trigger
@@ -295,35 +207,8 @@
               entity_id: binary_sensor.kitchen_light
               state: "on"
           sequence:
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 2300
-                brightness_pct: 50
-              target:
-                entity_id: light.kitchen_light_strip_countertop
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 2300
-                brightness_pct: 15
-              target:
-                entity_id:
-                  - light.kitchen_light_pendant_island_left
-                  - light.kitchen_light_pendant_island_right
-                  - light.kitchen_light_pendant_sink_left
-                  - light.kitchen_light_pendant_sink_right
-            - action: light.turn_off
-              data:
-                transition: 1
-              target:
-                entity_id:
-                  - light.kitchen_light_spot_island
-                  - light.kicthen_light_spot_cooktop
-                  - light.kitchen_light_spot_oven
-                  - light.kitchen_light_spot_sink
-                  - light.kitchen_light_spot_fridge
-                  - light.kitchen_light_spot_hallway
+            - variables:
+                mode: "low"
 
         - conditions:
             - condition: trigger
@@ -332,77 +217,20 @@
               entity_id: binary_sensor.kitchen_presence
               state: "on"
           sequence:
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 2700
-                brightness_pct: 80
-              target:
-                entity_id:
-                  - light.kitchen_light_strip_countertop
-                  - light.kitchen_light_pendant_island_left
-                  - light.kitchen_light_pendant_island_right
-                  - light.kitchen_light_pendant_sink_left
-                  - light.kitchen_light_pendant_sink_right
-            - action: light.turn_off
-              data:
-                transition: 1
-              target:
-                entity_id:
-                  - light.kitchen_light_spot_island
-                  - light.kicthen_light_spot_cooktop
-                  - light.kitchen_light_spot_oven
-                  - light.kitchen_light_spot_sink
-                  - light.kitchen_light_spot_fridge
-                  - light.kitchen_light_spot_hallway
+            - variables:
+                mode: "normal"
 
         - conditions:
             - condition: trigger
-              id: living_room_light_on
-          sequence:
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 2300
-                brightness_pct: 50
-              target:
-                entity_id: light.kitchen_light_strip_countertop
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 2300
-                brightness_pct: 15
-              target:
-                entity_id:
-                  - light.kitchen_light_pendant_island_left
-                  - light.kitchen_light_pendant_island_right
-                  - light.kitchen_light_pendant_sink_left
-                  - light.kitchen_light_pendant_sink_right
-            - action: light.turn_off
-              data:
-                transition: 1
-              target:
-                entity_id:
-                  - light.kitchen_light_spot_island
-                  - light.kicthen_light_spot_cooktop
-                  - light.kitchen_light_spot_oven
-                  - light.kitchen_light_spot_sink
-                  - light.kitchen_light_spot_fridge
-                  - light.kitchen_light_spot_hallway
-
-        - conditions:
-            - condition: trigger
-              id: light_on
+              id: lights_on
             - condition: state
               entity_id: binary_sensor.someone_home
               state: "off"
           sequence:
-            - action: light.turn_off
-              data:
-                transition: 1
-              target:
-                entity_id: light.kitchen_lights
+            - variables:
+                mode: "off"
 
+    - choose:
         - conditions:
             - condition: trigger
               id: rotary
@@ -438,4 +266,180 @@
                   data:
                     brightness_step_pct: "{{ (state_attr('event.kitchen_switch_rotary', 'steps')|float / -3.60)|round(0) }}"
                   target:
-                    entity_id: "{{ state_attr('light.kitchen_lights', 'entity_id') | expand() | selectattr('state', 'eq', 'on') | map(attribute='entity_id') | list }}      "
+                    entity_id: "{{ state_attr('light.kitchen_lights', 'entity_id') | expand() | selectattr('state', 'eq', 'on') | map(attribute='entity_id') | list }}"
+
+        - conditions:
+            - condition: trigger
+              id: cleaning_start
+            - condition: state
+              entity_id: light.kitchen_light_strip_countertop
+              state: "on"
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                xy_color: [0.17, 0.70]
+                brightness_pct: 100
+              target:
+                entity_id: light.kitchen_light_strip_countertop
+
+        - conditions:
+            - condition: trigger
+              id: cleaning_end
+            - condition: template
+              value_template: |-
+                {% set xy = state_attr('light.kitchen_light_strip_countertop', 'xy_color') %}
+                {{ xy is not none and xy[0] | round(2) == 0.17 and xy[1] | round(2) == 0.70 }}     
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: 2700
+                brightness: "{{ state_attr('light.kitchen_light_pendant_island_left', 'brightness') }}"
+              target:
+                entity_id: light.kitchen_light_strip_countertop
+
+        - conditions:
+            - condition: template
+              value_template: "{{ mode == 'normal' }}"
+          sequence:
+            - parallel:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 2700
+                    brightness_pct: 80
+                  target:
+                    entity_id:
+                      - light.kitchen_light_strip_countertop
+                      - light.kitchen_light_pendant_island_left
+                      - light.kitchen_light_pendant_island_right
+                      - light.kitchen_light_pendant_sink_left
+                      - light.kitchen_light_pendant_sink_right
+                - action: light.turn_off
+                  data:
+                    transition: 1
+                  target:
+                    entity_id:
+                      - light.kitchen_light_spot_island
+                      - light.kitchen_light_spot_cooktop
+                      - light.kitchen_light_spot_oven
+                      - light.kitchen_light_spot_sink
+                      - light.kitchen_light_spot_fridge
+                      - light.kitchen_light_spot_hallway
+
+        - conditions:
+            - condition: template
+              value_template: "{{ mode == 'night' }}"
+          sequence:
+            - parallel:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 2300
+                    brightness_pct: 10
+                  target:
+                    entity_id: light.kitchen_light_strip_countertop
+                - action: light.turn_off
+                  data:
+                    transition: 1
+                  target:
+                    entity_id:
+                      - light.kitchen_light_pendant_island_left
+                      - light.kitchen_light_pendant_island_right
+                      - light.kitchen_light_pendant_sink_left
+                      - light.kitchen_light_pendant_sink_right
+                      - light.kitchen_light_spot_island
+                      - light.kitchen_light_spot_cooktop
+                      - light.kitchen_light_spot_oven
+                      - light.kitchen_light_spot_sink
+                      - light.kitchen_light_spot_fridge
+                      - light.kitchen_light_spot_hallway
+
+        - conditions:
+            - condition: template
+              value_template: "{{ mode == 'low' }}"
+          sequence:
+            - parallel:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 2300
+                    brightness_pct: 50
+                  target:
+                    entity_id: light.kitchen_light_strip_countertop
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 2300
+                    brightness_pct: 15
+                  target:
+                    entity_id:
+                      - light.kitchen_light_pendant_island_left
+                      - light.kitchen_light_pendant_island_right
+                      - light.kitchen_light_pendant_sink_left
+                      - light.kitchen_light_pendant_sink_right
+                - action: light.turn_off
+                  data:
+                    transition: 1
+                  target:
+                    entity_id:
+                      - light.kitchen_light_spot_island
+                      - light.kitchen_light_spot_cooktop
+                      - light.kitchen_light_spot_oven
+                      - light.kitchen_light_spot_sink
+                      - light.kitchen_light_spot_fridge
+                      - light.kitchen_light_spot_hallway
+
+        - conditions:
+            - condition: template
+              value_template: "{{ mode == 'high' }}"
+          sequence:
+            - parallel:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 2700
+                    brightness_pct: 80
+                  target:
+                    entity_id:
+                      - light.kitchen_light_pendant_island_left
+                      - light.kitchen_light_pendant_island_right
+                      - light.kitchen_light_pendant_sink_left
+                      - light.kitchen_light_pendant_sink_right
+                      - light.kitchen_light_strip_countertop
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 2700
+                    brightness_pct: 50
+                  target:
+                    entity_id:
+                      - light.kitchen_light_spot_island
+                      - light.kitchen_light_spot_cooktop
+                      - light.kitchen_light_spot_oven
+                      - light.kitchen_light_spot_sink
+                      - light.kitchen_light_spot_fridge
+                      - light.kitchen_light_spot_hallway
+
+        - conditions:
+            - condition: template
+              value_template: "{{ mode == 'full' }}"
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: 3000
+                brightness_pct: 100
+              target:
+                entity_id: light.kitchen_lights
+
+        - conditions:
+            - condition: template
+              value_template: "{{ mode == 'off' }}"
+          sequence:
+            - action: light.turn_off
+              data:
+                transition: 1
+              target:
+                entity_id: light.kitchen_lights

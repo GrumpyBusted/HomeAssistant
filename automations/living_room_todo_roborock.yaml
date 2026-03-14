@@ -21,10 +21,8 @@
     - action: script.create_todo_task
       data:
         subject: "Løs problem med Dobbys hus ({{ states('sensor.living_room_robot_vacuum_dock_error') }})"
-        description: >
+        description: |-
           Advarsel på Roborock docking station. Kode {{ states('sensor.living_room_robot_vacuum_dock_error') }}
-
-
         related_entity_id: sensor.living_room_robot_vacuum_dock_error
         entity_id: todo.todo_smart_todo
         is_active: "{{ states('sensor.living_room_robot_vacuum_dock_error') != 'ok' }}"
@@ -32,10 +30,8 @@
     - action: script.create_todo_task
       data:
         subject: "Løs problem med Dobby ({{ states('sensor.living_room_robot_vacuum_error') }})"
-        description: >
+        description: |-
           Advarsel på Roborock robot støvsuger. Kode {{ states('sensor.living_room_robot_vacuum_error') }}
-
-
         related_entity_id: sensor.living_room_robot_vacuum_error
         entity_id: todo.todo_smart_todo
         is_active: "{{ states('sensor.living_room_robot_vacuum_error') != 'none' }}"
