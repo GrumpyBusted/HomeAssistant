@@ -3,7 +3,7 @@
   description: |
     Automatik til at styre lys i stuen
   mode: queued
-  max: 10
+  max: 10 
   trace:
     stored_traces: 20
 
@@ -71,6 +71,16 @@
       from: "off"
       to: "on"
       id: sleeping
+
+    - trigger: state
+      entity_id: input_select.living_room_robot_vacuum_current_cleaning
+      to: living_room_cleaning
+      id: cleaning_start
+
+    - trigger: state
+      entity_id: input_select.living_room_robot_vacuum_current_cleaning
+      from: living_room_cleaning
+      id: cleaning_end
 
     - trigger: state
       entity_id: binary_sensor.living_room_light
@@ -274,6 +284,37 @@
                 entity_id:
                   - light.living_room_smart_plug_lamp
                   - light.living_room_smart_plug_christmas_elf_house
+
+        - conditions:
+            - condition: trigger
+              id: cleaning_start
+            - condition: state
+              entity_id: light.living_room_lights
+              state: "on"
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                xy_color: [0.17, 0.70]
+                brightness_pct: 100
+              target:
+                entity_id: light.living_room_light_strip_skylight
+
+        - conditions:
+            - condition: trigger
+              id: cleaning_end
+            - condition: template
+              value_template: |-
+                {% set xy = state_attr('light.living_room_light_strip_skylight', 'xy_color') %}
+                {{ xy is not none and xy[0] | round(2) == 0.17 and xy[1] | round(2) == 0.70 }}     
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: "{{ state_attr('light.hallway_lights', 'color_temp_kelvin') }}"
+                brightness: "{{ state_attr('light.hallway_lights', 'brightness') }}"
+              target:
+                entity_id: light.living_room_light_strip_skylight
 
         - conditions:
             - condition: or
