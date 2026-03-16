@@ -271,9 +271,6 @@
         - conditions:
             - condition: trigger
               id: cleaning_start
-            - condition: state
-              entity_id: light.kitchen_light_strip_countertop
-              state: "on"
           sequence:
             - action: light.turn_on
               data:

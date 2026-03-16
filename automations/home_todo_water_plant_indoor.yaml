@@ -36,4 +36,5 @@
           Jordfugtigheden på potteplanter er ved at være lav. I stuen er målt {{ states('sensor.living_room_soil_moisture_sensor_moisture') | float(0) | round(0) }}%, I soveværelset er målt {{ states('sensor.bedroom_soil_moisture_sensor_moisture') | float(0) | round(0) }}%, og på Charlies værelse er målt {{ states('sensor.charlies_room_soil_moisture_sensor_moisture') | float(0) | round(0) }}%
         related_entity_id: sensor.living_room_soil_moisture_sensor_moisture
         entity_id: todo.todo_smart_todo
+        must_replace: true
         is_active: "{{ states('sensor.living_room_soil_moisture_sensor_moisture') | float(50.0) < 40.0 or states('sensor.bedroom_soil_moisture_sensor_moisture') | float(50.0) < 40.0 or states('sensor.charlies_room_soil_moisture_sensor_moisture') | float(50.0) < 40.0 }}"
