@@ -9,7 +9,7 @@
 
   triggers:
     - trigger: state
-      entity_id: sensor.driveway_ev_charger_status_description_safe
+      entity_id: sensor.driveway_ev_charger_state_description_safe
       to: Locked, car connected
 
     - trigger: state
@@ -21,16 +21,16 @@
       to: home
 
     - trigger: state
-      entity_id: sensor.volvo_ex30_charging_connection_status
+      entity_id: sensor.volvo_ex30_charging_connection_state
       to: connected
 
     - trigger: state
-      entity_id: sensor.volvo_xc40_charging_connection_status
+      entity_id: sensor.volvo_xc40_charging_connection_state
       to: connected
 
   conditions:
     - condition: state
-      entity_id: sensor.driveway_ev_charger_status_description_safe
+      entity_id: sensor.driveway_ev_charger_state_description_safe
       state: Locked, car connected
 
   actions:
@@ -43,7 +43,7 @@
                   entity_id: device_tracker.volvo_ex30_location
                   state: home
                 - condition: state
-                  entity_id: sensor.volvo_ex30_charging_connection_status
+                  entity_id: sensor.volvo_ex30_charging_connection_state
                   state: connected
             - condition: and
               conditions:
@@ -51,7 +51,7 @@
                   entity_id: device_tracker.volvo_xc40_location
                   state: home
                 - condition: state
-                  entity_id: sensor.volvo_xc40_charging_connection_status
+                  entity_id: sensor.volvo_xc40_charging_connection_state
                   state: connected
       then:
         - action: lock.unlock

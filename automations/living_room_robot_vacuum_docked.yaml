@@ -18,7 +18,7 @@
       for: 00:03:00
 
     - trigger: state
-      entity_id: sensor.living_room_robot_vacuum_status
+      entity_id: sensor.living_room_robot_vacuum_state
       to:
         - idle
         - charging
@@ -38,7 +38,7 @@
               entity_id: vacuum.living_room_robot_vacuum
               state: docked
             - condition: state
-              entity_id: sensor.living_room_robot_vacuum_status
+              entity_id: sensor.living_room_robot_vacuum_state
               state:
                 - idle
                 - charging
@@ -73,7 +73,7 @@
                       state: docked
 
                     - condition: state
-                      entity_id: sensor.living_room_robot_vacuum_status
+                      entity_id: sensor.living_room_robot_vacuum_state
                       state:
                         - idle
                         - charging

@@ -1,0 +1,65 @@
+- id: 83A417D9-4EAC-45B4-A0C0-385382FF9FC0
+  alias: Hjem todo kæledyr
+  description: |
+    Opret todo opgaver vedrørende hunde
+  mode: queued
+  max: 10
+
+  triggers:
+    - trigger: time
+      at: "07:00:00"
+      id: breakfast
+
+    - trigger: time
+      at: "18:00:00"
+      id: dinner
+
+    - trigger: event
+      event_type: todo_item_completed
+      event_data:
+        related: input_datetime.home_pet_flea_treatment_last_given
+      id: todo_completed
+
+    - trigger: time
+      at: "01:00:00"
+      id: check_flea_treatment
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: check_flea_treatment
+          sequence:
+            - action: script.create_todo_task
+              data:
+                subject: Giv hundene loppemiddel
+                description: |-
+                  Sidste gang hundene fik loppemiddel var {{ strptime(states('input_datetime.home_pet_flea_treatment_last_given'), '%Y-%m-%d').strftime('%-d/%-m-%Y') }}.
+                related_entity_id: input_datetime.home_pet_flea_treatment_last_given
+                entity_id: todo.todo_smart_todo
+                is_active: "{{ now().date() >= (strptime(states('input_datetime.home_pet_flea_treatment_last_given'), '%Y-%m-%d').date() + timedelta(days=90)) }}"
+
+        - conditions:
+            - condition: trigger
+              id:
+                - breakfast
+                - dinner
+          sequence:
+            - action: script.create_todo_task
+              data:
+                subject: Giv hundene mad
+                description: |-
+                  Hundene har ikke fået mad endnu til {{ 'morgen' if trigger.id == 'breakfast' else 'aften' }}.
+                entity_id: todo.todo_smart_todo
+
+        - conditions:
+            - condition: trigger
+              id: todo_completed
+          sequence:
+            - action: input_datetime.set_datetime
+              target:
+                entity_id: input_datetime.home_pet_flea_treatment_last_given
+              data:
+                datetime: "{{ now().strftime('%Y-%m-%d') }}"

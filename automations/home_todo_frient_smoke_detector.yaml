@@ -9,23 +9,23 @@
   triggers:
     - trigger: numeric_state
       entity_id:
-        - sensor.charlies_room_smoke_alarm_battery
-        - sensor.emils_room_smoke_alarm_battery
-        - sensor.bedroom_smoke_alarm_battery
-        - sensor.garage_smoke_alarm_battery
-        - sensor.storage_smoke_alarm_battery
-        - sensor.technic_room_smoke_alarm_battery
+        - sensor.charlies_room_smoke_detector_battery
+        - sensor.emils_room_smoke_detector_battery
+        - sensor.bedroom_smoke_detector_battery
+        - sensor.garage_smoke_detector_battery
+        - sensor.storage_smoke_detector_battery
+        - sensor.technic_room_smoke_detector_battery
       below: 10
       for: 00:03:00
 
     - trigger: numeric_state
       entity_id:
-        - sensor.charlies_room_smoke_alarm_battery
-        - sensor.emils_room_smoke_alarm_battery
-        - sensor.bedroom_smoke_alarm_battery
-        - sensor.garage_smoke_alarm_battery
-        - sensor.storage_smoke_alarm_battery
-        - sensor.technic_room_smoke_alarm_battery
+        - sensor.charlies_room_smoke_detector_battery
+        - sensor.emils_room_smoke_detector_battery
+        - sensor.bedroom_smoke_detector_battery
+        - sensor.garage_smoke_detector_battery
+        - sensor.storage_smoke_detector_battery
+        - sensor.technic_room_smoke_detector_battery
       above: 70
       for: 00:03:00
 
@@ -37,12 +37,12 @@
   actions:
     - variables:
         sensors:
-          - entity_id: sensor.charlies_room_smoke_alarm_battery
-          - entity_id: sensor.emils_room_smoke_alarm_battery
-          - entity_id: sensor.bedroom_smoke_alarm_battery
-          - entity_id: sensor.garage_smoke_alarm_battery
-          - entity_id: sensor.storage_smoke_alarm_battery
-          - entity_id: sensor.technic_room_smoke_alarm_battery
+          - entity_id: sensor.charlies_room_smoke_detector_battery
+          - entity_id: sensor.emils_room_smoke_detector_battery
+          - entity_id: sensor.bedroom_smoke_detector_battery
+          - entity_id: sensor.garage_smoke_detector_battery
+          - entity_id: sensor.storage_smoke_detector_battery
+          - entity_id: sensor.technic_room_smoke_detector_battery
     - repeat:
         for_each: "{{ sensors }}"
         sequence:

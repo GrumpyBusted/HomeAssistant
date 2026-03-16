@@ -9,13 +9,13 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.kitchen_fridge_filter_status
+      entity_id: binary_sensor.kitchen_fridge_filter_state
       id: status_changed
 
     - trigger: event
       event_type: todo_item_completed
       event_data:
-        related: binary_sensor.kitchen_fridge_filter_status
+        related: binary_sensor.kitchen_fridge_filter_state
       id: todo_completed
 
     - trigger: state
@@ -56,9 +56,9 @@
               data:
                 subject: Skift køleskabsfilter
                 description: Skift vandfilteret til køleskabet, det er pladseret under bryggersvasken.
-                related_entity_id: binary_sensor.kitchen_fridge_filter_status
+                related_entity_id: binary_sensor.kitchen_fridge_filter_state
                 entity_id: todo.todo_smart_todo
-                is_active: "{{ is_state('binary_sensor.kitchen_fridge_filter_status', 'on') }}"
+                is_active: "{{ is_state('binary_sensor.kitchen_fridge_filter_state', 'on') }}"
 
         - conditions:
             - condition: trigger

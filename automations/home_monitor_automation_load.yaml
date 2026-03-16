@@ -46,7 +46,7 @@
           automation.driveway_motion_sensor_house_south: 200
           automation.garden_motion_sensor_house_east: 200
           automation.entrance_light: 150
-          automation.living_room_media_player_set_status: 150
+          automation.living_room_media_player_set_state: 150
           automation.utility_room_washer: 150
           automation.storage_light: 32
         offenders: >

@@ -8,7 +8,7 @@
 
   triggers:
     - trigger: state
-      entity_id: sensor.driveway_ev_charger_status_description_safe
+      entity_id: sensor.driveway_ev_charger_state_description_safe
 
   conditions: []
 
@@ -16,7 +16,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: sensor.driveway_ev_charger_status_description_safe
+              entity_id: sensor.driveway_ev_charger_state_description_safe
               state:
                 - Locked
                 - Locked, car connected
