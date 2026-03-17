@@ -589,7 +589,7 @@ living_room_robot_vacuum_start_cleaning:
                   target:
                     entity_id: select.living_room_robot_vacuum_mop_intensity
                   data:
-                    option: moderate
+                    option: standard
                 - action: select.select_option
                   target:
                     entity_id: select.living_room_robot_vacuum_mop_mode
