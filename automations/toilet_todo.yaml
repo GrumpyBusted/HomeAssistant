@@ -38,7 +38,7 @@
                 description: Indsæt en ny WC-duftpind i gæste-toilettet.
                 related_entity_id: input_number.toilet_freshener_last_count
                 entity_id: todo.todo_smart_todo
-                is_active: "{{ states('counter.toilet_motion_sensor_count') | int(0) > states('input_number.toilet_freshener_last_count') | int(0) + 200 }}"
+                is_active: "{{ states('counter.toilet_motion_sensor_count') | int(0) > states('input_number.toilet_freshener_last_count') | int(0) + 250 }}"
 
             - action: script.create_todo_task
               data:
