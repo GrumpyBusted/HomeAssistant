@@ -1,0 +1,351 @@
+- id: home_monitor_system
+  alias: Hjem overvåg system
+  description: Overvåg Home Assistant systemet
+  mode: single
+  trace:
+    stored_traces: 50
+
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_system_monitor_swap_usage
+      above: 10
+      for:
+        minutes: 2
+      id: high_swap_usage
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_system_monitor_swap_usage
+      above: 30
+      id: critical_swap_usage
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_system_monitor_processor_temperature
+      above: 65
+      for:
+        minutes: 2
+      id: high_cpu_temperature
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_system_monitor_processor_temperature
+      above: 75
+      id: critical_cpu_temperature
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_system_monitor_processor_use
+      above: 70
+      for:
+        seconds: 60
+      id: high_cpu_usage
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_system_monitor_processor_use
+      above: 90
+      id: critical_cpu_usage
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_system_monitor_memory_usage
+      above: 85
+      for:
+        minutes: 2
+      id: high_ram_usage
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_system_monitor_memory_usage
+      above: 92
+      id: critical_ram_usage
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_system_monitor_disk_usage
+      above: 80
+      for:
+        minutes: 5
+      id: high_disk_usage
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_system_monitor_disk_usage
+      above: 90
+      id: critical_disk_usage
+
+    - trigger: time
+      at:
+        entity_id: sensor.technic_room_system_monitor_last_boot
+        offset: 04:02:00
+      id: system_booted
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_system_monitor_load_1_min
+      above: 4
+      for:
+        minutes: 2
+      id: high_load_1
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_system_monitor_load_1_min
+      above: 6
+      id: critical_load_1
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_system_monitor_load_5_min
+      above: 4
+      for:
+        minutes: 5
+      id: high_load_5
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_system_monitor_load_5_min
+      above: 6
+      id: critical_load_5
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_system_monitor_load_15_min
+      above: 4
+      for:
+        minutes: 10
+      id: high_load_15
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_system_monitor_load_15_min
+      above: 6
+      id: critical_load_15
+
+  conditions: []
+
+  actions:
+    - variables:
+        title: ""
+        message: ""
+        entity_id: "{{ trigger.entity_id | default('') }}"
+        trigger_id: "{{ trigger.id | default('') }}"
+        entity_state: "{{ states(entity_id) if entity_id else 'N/A' }}"
+        notification_type: warning
+
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: high_swap_usage
+          sequence:
+            - variables:
+                title: "Home Assistant: Højt swap-forbrug"
+                message: |-
+                  Swap-forbrug er for højt (over 10% i mindst 2 minutter). 
+                  Aktuel værdi: {{ entity_state }}% 
+                  Grænse: 10%
+                notification_type: warning
+
+        - conditions:
+            - condition: trigger
+              id: critical_swap_usage
+          sequence:
+            - variables:
+                title: "Home Assistant: Kritisk swap-forbrug"
+                message: |-
+                  Swap-forbrug er kritisk højt. 
+                  Aktuel værdi: {{ entity_state }}% 
+                  Grænse: 30%
+                notification_type: critical
+
+        - conditions:
+            - condition: trigger
+              id: high_cpu_temperature
+          sequence:
+            - variables:
+                title: "Home Assistant: Høj CPU temperatur"
+                message: |-
+                  CPU temperaturen er for høj (over 65°C i mindst 2 minutter). 
+                  Aktuel værdi: {{ entity_state }}°C 
+                  Grænse: 65°C
+                notification_type: warning
+
+        - conditions:
+            - condition: trigger
+              id: critical_cpu_temperature
+          sequence:
+            - variables:
+                title: "Home Assistant: Kritisk CPU temperatur"
+                message: |-
+                  CPU temperaturen er kritisk høj. 
+                  Aktuel værdi: {{ entity_state }}°C 
+                  Grænse: 75°C
+                notification_type: critical
+
+        - conditions:
+            - condition: trigger
+              id: high_cpu_usage
+          sequence:
+            - variables:
+                title: "Home Assistant: Højt CPU forbrug"
+                message: |-
+                  CPU forbrug har været højt i mindst 60 sekunder. 
+                  Aktuel værdi: {{ entity_state }}% 
+                  Grænse: 70%
+                notification_type: warning
+
+        - conditions:
+            - condition: trigger
+              id: critical_cpu_usage
+          sequence:
+            - variables:
+                title: "Home Assistant: Kritisk CPU forbrug"
+                message: |-
+                  CPU forbrug er kritisk højt. 
+                  Aktuel værdi: {{ entity_state }}% 
+                  Grænse: 90%
+                notification_type: critical
+
+        - conditions:
+            - condition: trigger
+              id: high_ram_usage
+          sequence:
+            - variables:
+                title: "Home Assistant: Højt RAM forbrug"
+                message: |-
+                  RAM forbrug er for højt (over 85% i mindst 2 minutter). 
+                  Aktuel værdi: {{ entity_state }}% 
+                  Grænse: 85%
+                notification_type: warning
+
+        - conditions:
+            - condition: trigger
+              id: critical_ram_usage
+          sequence:
+            - variables:
+                title: "Home Assistant: Kritisk RAM forbrug"
+                message: |-
+                  RAM forbrug er kritisk højt. 
+                  Aktuel værdi: {{ entity_state }}% 
+                  Grænse: 92%
+                notification_type: critical
+
+        - conditions:
+            - condition: trigger
+              id: high_disk_usage
+          sequence:
+            - variables:
+                title: "Home Assistant: Højt diskforbrug"
+                message: |-
+                  Diskforbrug er for højt (over 80% i mindst 5 minutter). 
+                  Aktuel værdi: {{ entity_state }}% 
+                  Grænse: 80%
+                notification_type: warning
+
+        - conditions:
+            - condition: trigger
+              id: critical_disk_usage
+          sequence:
+            - variables:
+                title: "Home Assistant: Kritisk diskforbrug"
+                message: |-
+                  Diskforbrug er kritisk højt. 
+                  Aktuel værdi: {{ entity_state }}% 
+                  Grænse: 90%
+                notification_type: critical
+
+        - conditions:
+            - condition: trigger
+              id: system_booted
+          sequence:
+            - variables:
+                title: "Home Assistant: System genstartet"
+                message: |-
+                  Home Assistant er blevet genstartet for et øjeblik siden. 
+                  Sidste genstart: {{ states('sensor.technic_room_system_monitor_last_boot') | as_datetime | as_local }}
+                notification_type: warning
+
+        - conditions:
+            - condition: trigger
+              id: high_load_1
+          sequence:
+            - variables:
+                title: "Home Assistant: Høj load (1 min)"
+                message: |-
+                  System belastning (1 minut) er for høj (over 4.0 i mindst 2 minutter). 
+                  Aktuel værdi: {{ entity_state }} 
+                  Grænse: 4.0
+                notification_type: warning
+
+        - conditions:
+            - condition: trigger
+              id: critical_load_1
+          sequence:
+            - variables:
+                title: "Home Assistant: Kritisk load (1 min)"
+                message: |-
+                  System belastning (1 minut) er kritisk høj. 
+                  Aktuel værdi: {{ entity_state }} 
+                  Grænse: 6.0
+                notification_type: critical
+
+        - conditions:
+            - condition: trigger
+              id: high_load_5
+          sequence:
+            - variables:
+                title: "Home Assistant: Høj load (5 min)"
+                message: |-
+                  System belastning (5 minutter) er for høj (over 4.0 i mindst 5 minutter). 
+                  Aktuel værdi: {{ entity_state }} 
+                  Grænse: 4.0
+                notification_type: warning
+
+        - conditions:
+            - condition: trigger
+              id: critical_load_5
+          sequence:
+            - variables:
+                title: "Home Assistant: Kritisk load (5 min)"
+                message: |-
+                  System belastning (5 minutter) er kritisk høj. 
+                  Aktuel værdi: {{ entity_state }} 
+                  Grænse: 6.0
+                notification_type: critical
+
+        - conditions:
+            - condition: trigger
+              id: high_load_15
+          sequence:
+            - variables:
+                title: "Home Assistant: Høj load (15 min)"
+                message: |-
+                  System belastning (15 minutter) er for høj (over 4.0 i mindst 10 minutter). 
+                  Aktuel værdi: {{ entity_state }} 
+                  Grænse: 4.0
+                notification_type: warning
+
+        - conditions:
+            - condition: trigger
+              id: critical_load_15
+          sequence:
+            - variables:
+                title: "Home Assistant: Kritisk load (15 min)"
+                message: |-
+                  System belastning (15 minutter) er kritisk høj. 
+                  Aktuel værdi: {{ entity_state }} 
+                  Grænse: 6.0
+                notification_type: critical
+
+      default:
+        - variables:
+            title: "Home Assistant: System alarm"
+            message: |-
+              En ukendt trigger blev aktiveret. Trigger ID: {{ trigger_id }} Entity: {{ entity_id }} Aktuel værdi: {{ entity_state }}
+            notification_type: critical
+
+    - if:
+        - condition: template
+          value_template: "{{ title != '' }}"
+      then:
+        - action: system_log.write
+          data:
+            level: warning
+            message: |-
+              {{ title }} - {{ message }} 
+              Entity: {{ entity_id }}
+              Trigger: {{ trigger_id | default('') }}
+        - action: script.push_notification
+          data:
+            type: "{{ notification_type }}"
+            recipient: none
+            persistent: true
+            id: "{{ entity_id }}"
+            title: "{{ title }}"
+            message: "{{ message }}"

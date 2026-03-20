@@ -1,0 +1,154 @@
+- id: "1771745687585"
+  alias: Hjem overvåg netværk
+  description: |
+    Overvåg internet og netværks enheder
+  mode: single
+  trace:
+    stored_traces: 20
+
+  triggers:
+    - trigger: time_pattern
+      hours: /1
+      id: hourly
+
+    - trigger: time_pattern
+      hours: /12
+
+  conditions: []
+
+  actions:
+    - if:
+        - condition: not
+          conditions:
+            - condition: trigger
+              id: hourly
+      then:
+        - action: shell_command.unifi_speedtest
+          data:
+            user: "{{ states('sensor.unifi_admin_username') }}"
+            password: "{{ states('sensor.unifi_admin_password') }}"
+          response_variable: response
+        - action: system_log.write
+          data:
+            level: debug
+            message: |-
+              Response: {{ response }}
+        - variables:
+            speedtest: |-
+              {% if response.stdout is defined %}
+                {{ response.stdout | from_json }}
+              {% else %}
+                {}
+              {% endif %}
+            wan_upload: "{{ speedtest.xput_upload | float(0.0) }}"
+            wan_download: "{{ speedtest.xput_download | float(0.0) }}"
+        - action: input_number.set_value
+          target:
+            entity_id: input_number.technic_room_last_wan_download
+          data:
+            value: "{{ wan_download }}"
+        - action: input_number.set_value
+          target:
+            entity_id: input_number.technic_room_last_wan_upload
+          data:
+            value: "{{ wan_upload }}"
+
+    - variables:
+        wan_min_speed: 800
+        min_speed: 300
+        max_ping: 20
+        max_latency: 25
+        max_cpu: 80
+        max_memory: 90
+        download: "{{ states('sensor.internet_speed_download') | float(0) }}"
+        upload: "{{ states('sensor.internet_speed_upload') | float(0) }}"
+        ping: "{{ states('sensor.internet_speed_ping') | float(0) }}"
+        wan_google: "{{ states('sensor.technic_room_cloud_gateway_google_wan_latency') | float(0) }}"
+        wan_cloudflare: "{{ states('sensor.technic_room_cloud_gateway_cloudflare_wan_latency') | float(0) }}"
+        unifi_devices:
+          - sensor.technic_room_cloud_gateway
+          - sensor.emils_room_network_switch
+          - sensor.garage_network_switch
+          - sensor.living_room_network_switch
+          - sensor.hallway_accesspoint
+          - sensor.living_room_accesspoint
+          - sensor.garage_accesspoint
+          - sensor.patio_accesspoint
+        unifi_problems: |-
+          {% set ns = namespace(list=[]) %}
+          {% for base in unifi_devices %}
+            {% set state_sensor = base ~ '_state' %}
+            {% set cpu_sensor = base ~ '_cpu_utilization' %}
+            {% set memory_sensor = base ~ '_memory_utilization' %}
+            {% set state = states(state_sensor) | lower %}
+            {% set cpu = states(cpu_sensor) | float(0) %}
+            {% set memory = states(memory_sensor) | float(0) %}
+            {% set dev_id = device_id(state_sensor) %}
+            {% if dev_id %}
+              {% set dev_name = device_attr(dev_id,'name_by_user') if device_attr(dev_id,'name_by_user') else device_attr(dev_id,'name') %}
+            {% else %}
+              {% set dev_name = base %}
+            {% endif %}
+            {% set issues = [] %}
+            {% if state in ['disconnected', 'offline'] %}
+              {% set issues = issues + ['ikke forbundet (' ~ state ~ ')'] %}
+            {% endif %}
+            {% if cpu > max_cpu %}
+              {% set issues = issues + ['CPU ' ~ cpu ~ '%'] %}
+            {% endif %}
+            {% if memory > max_memory %}
+              {% set issues = issues + ['Hukommelse ' ~ memory ~ '%'] %}
+            {% endif %}
+            {% if issues | length > 0 %}
+              {% set ns.list = ns.list + [dev_name ~ ': ' ~ issues | join(', ')] %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.list }}
+        problems: |-
+          {% set wan_download_val = states('input_number.technic_room_last_wan_download') | float(0) %}
+          {% set wan_upload_val = states('input_number.technic_room_last_wan_upload') | float(0) %}
+          {% set issues = [] %}
+          {% if wan_download_val > 0 and wan_download_val < wan_min_speed %}
+            {% set issues = issues + ['WAN Download under ' ~ wan_min_speed ~ ' Mbps (' ~ wan_download_val ~ ')'] %}
+          {% endif %}
+          {% if wan_upload_val > 0 and wan_upload_val < wan_min_speed %}
+            {% set issues = issues + ['WAN Upload under ' ~ wan_min_speed ~ ' Mbps (' ~ wan_upload_val ~ ')'] %}
+          {% endif %}
+          {% if download < min_speed %}
+            {% set issues = issues + ['LAN Download under ' ~ min_speed ~ ' Mbps (' ~ download ~ ')'] %}
+          {% endif %}
+          {% if upload < min_speed %}
+            {% set issues = issues + ['LAN Upload under ' ~ min_speed ~ ' Mbps (' ~ upload ~ ')'] %}
+          {% endif %}
+          {% if ping > max_ping %}
+            {% set issues = issues + ['Ping for høj (' ~ ping ~ ' ms)'] %}
+          {% endif %}
+          {% if wan_google > max_latency %}
+            {% set issues = issues + ['Google WAN latency høj (' ~ wan_google ~ ' ms)'] %}
+          {% endif %}
+          {% if wan_cloudflare > max_latency %}
+            {% set issues = issues + ['Cloudflare WAN latency høj (' ~ wan_cloudflare ~ ' ms)'] %}
+          {% endif %}
+          {% if unifi_problems | count > 0 %}
+            {% set issues = issues + unifi_problems %}
+          {% endif %}
+          {{ issues }}
+
+    - if:
+        - condition: template
+          value_template: "{{ problems | length > 0 }}"
+      then:
+        - action: system_log.write
+          data:
+            level: warning
+            message: |-
+              Netværksproblem: {{ problems }}
+        - action: script.push_notification
+          data:
+            type: info
+            recipient: none
+            persistent: true
+            id: home_monitor_network
+            title: Netværksproblem opdaget
+            message: |-
+              {{ problems | join('\n') }}
