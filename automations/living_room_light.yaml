@@ -304,6 +304,9 @@
               value_template: |-
                 {% set xy = state_attr('light.living_room_light_strip_skylight', 'xy_color') %}
                 {{ xy is not none and xy[0] | round(2) == 0.17 and xy[1] | round(2) == 0.70 }}     
+            - condition: state
+              entity_id: light.living_room_lights
+              state: "on"
           sequence:
             - action: light.turn_on
               data:
