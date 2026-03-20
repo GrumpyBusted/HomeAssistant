@@ -58,3 +58,17 @@ rest_command:
     headers:
       Content-Type: "application/json"
     payload: '{ "data": { "addressID": "{{ addressID }}", "municipality": {{ municipality }} } }'
+
+notify:
+  - name: mail
+    platform: smtp
+    server: send.one.com
+    port: 587
+    timeout: 15
+    sender: homeassistant@busted-janum.dk
+    encryption: starttls
+    username: homeassistant@busted-janum.dk
+    password: !secret email_password
+    recipient:
+      - homeassistant@busted-janum.dk
+    sender_name: Home Assistant

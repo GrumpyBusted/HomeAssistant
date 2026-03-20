@@ -1,0 +1,13 @@
+- id: '1773992047364'
+  alias: test
+  description: ''
+  triggers: []
+  conditions: []
+  actions:
+  - data:
+      title: Test
+      message: Hej!
+      data:
+        to: anders@busted-janum.com
+    action: notify.mail
+  mode: single
