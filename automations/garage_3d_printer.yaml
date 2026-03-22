@@ -67,7 +67,7 @@
                 duration: 00:10:00
             - action: script.create_todo_task
               data:
-                subject: Hent 3D printer
+                subject: Hent 3D print
                 entity_id: todo.todo_smart_todo
                 description: 3D-printeren i garagen er færdig, hent printet og gør printeren ren.
                 related_entity_id: sensor.garage_3d_printer
@@ -119,9 +119,12 @@
                 - idle
                 - finished
           sequence:
-            - action: light.turn_off
-              target:
-                entity_id: light.garage_3d_printer_power
+            - action: script.create_todo_task
+              data:
+                subject: Sluk 3D printer
+                entity_id: todo.todo_smart_todo
+                description: 3D-printeren i garagen er ikke igang med er stadig tændt.
+                related_entity_id: sensor.garage_3d_printer
 
         - conditions:
             - condition: trigger
