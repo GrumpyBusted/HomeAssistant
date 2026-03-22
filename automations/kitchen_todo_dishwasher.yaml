@@ -123,6 +123,6 @@
       data:
         subject: Opvaskermaskinens program er fejlet
         description: Opvaskemaskinens program er i fejl status, kontroller opvaske maskinen
-        related_entity_id: sensor.kitchen_dishwasher
+        related_entity_id: sensor.kitchen_dishwasher_failure
         entity_id: todo.todo_smart_todo
         is_active: "{{ is_state('sensor.kitchen_dishwasher', 'failure') }}"

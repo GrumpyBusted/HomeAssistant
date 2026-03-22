@@ -13,6 +13,28 @@
   conditions: []
 
   actions:
+    - variables:
+        default_limit: 100
+        custom_limits:
+          automation.driveway_light: 200
+          automation.driveway_light_house_south: 200
+          automation.driveway_motion_sensor_entrance: 200
+          automation.driveway_motion_sensor_house_south: 300
+          automation.entrance_light: 150
+          automation.garden_motion_sensor_house_east: 300
+          automation.garden_motion_sensor_house_west: 300
+          automation.hallway_light: 200
+          automation.hallway_presence_sensor: 200
+          automation.home_monitor_log: 2000
+          automation.kitchen_presence_sensor: 200
+          automation.living_room_heat_pump: 200
+          automation.living_room_media_player_set_state: 150
+          automation.storage_light: 32
+          automation.toilet_motion_sensor: 200
+          automation.utility_room_motion_sensor: 1000
+          automation.utility_room_light: 200
+          automation.utility_room_washer: 150
+
     - action: sql.query
       data:
         query: |-
@@ -30,25 +52,6 @@
       response_variable: sql_result
 
     - variables:
-        default_limit: 100
-        custom_limits:
-          automation.home_monitor_log: 2000
-          automation.utility_room_motion_sensor: 1000
-          automation.utility_room_light: 200
-          automation.hallway_light: 200
-          automation.hallway_presence_sensor: 200
-          automation.living_room_heat_pump: 200
-          automation.driveway_light_house_south: 200
-          automation.driveway_light: 200
-          automation.kitchen_presence_sensor: 200
-          automation.driveway_motion_sensor_entrance: 200
-          automation.toilet_motion_sensor: 200
-          automation.driveway_motion_sensor_house_south: 200
-          automation.garden_motion_sensor_house_east: 200
-          automation.entrance_light: 150
-          automation.living_room_media_player_set_state: 150
-          automation.utility_room_washer: 150
-          automation.storage_light: 32
         offenders: >
           {% set res = sql_result.result if sql_result is defined else [] %} {% set ns = namespace(offenders=[]) %} {% for row in res %}
             {% set automation_id = row.automation_id %}
@@ -58,6 +61,7 @@
               {% set ns.offenders = ns.offenders + [dict(row, limit=limit)] %}
             {% endif %}
           {% endfor %} {{ ns.offenders }}
+
 
         message: |-
           count: {{ offenders | count }}
