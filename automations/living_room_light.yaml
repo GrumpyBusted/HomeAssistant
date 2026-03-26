@@ -3,7 +3,7 @@
   description: |
     Automatik til at styre lys i stuen
   mode: queued
-  max: 10 
+  max: 10
   trace:
     stored_traces: 20
 
@@ -303,7 +303,7 @@
             - condition: template
               value_template: |-
                 {% set xy = state_attr('light.living_room_light_strip_skylight', 'xy_color') %}
-                {{ xy is not none and xy[0] | round(2) == 0.17 and xy[1] | round(2) == 0.70 }}     
+                {{ xy is not none and xy[0] | round(2) == 0.17 and xy[1] | round(2) == 0.70 }}
             - condition: state
               entity_id: light.living_room_lights
               state: "on"
@@ -313,6 +313,14 @@
                 transition: 1
                 color_temp_kelvin: "{{ state_attr('light.hallway_lights', 'color_temp_kelvin') }}"
                 brightness: "{{ state_attr('light.hallway_lights', 'brightness') }}"
+              target:
+                entity_id: light.living_room_light_strip_skylight
+
+        - conditions:
+            - condition: trigger
+              id: cleaning_end
+          sequence:
+            - action: light.turn_off
               target:
                 entity_id: light.living_room_light_strip_skylight
 

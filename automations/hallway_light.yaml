@@ -335,8 +335,8 @@
             - action: light.turn_on
               data:
                 transition: 1
-                xy_color: [0.17, 0.70]
                 brightness_pct: 100
+                color_temp_kelvin: 6500
               target:
                 entity_id: light.hallway_light_living_room
 
@@ -345,8 +345,8 @@
               id: cleaning_end
             - condition: template
               value_template: |-
-                {% set xy = state_attr('light.hallway_light_living_room', 'xy_color') %}
-                {{ xy is not none and xy[0] | round(2) == 0.17 and xy[1] | round(2) == 0.70 }}     
+                {% set kelvin = state_attr('light.hallway_light_living_room', 'color_temp_kelvin') %}
+                {{ kelvin is not none and kelvin | round(0) > 6000 }}
             - condition: state
               entity_id: light.hallway_lights
               state: "on"
@@ -356,6 +356,14 @@
                 transition: 1
                 color_temp_kelvin: "{{ state_attr('light.hallway_light_mirror', 'color_temp_kelvin') }}"
                 brightness: "{{ state_attr('light.hallway_light_mirror', 'brightness') }}"
+              target:
+                entity_id: light.hallway_light_living_room
+
+        - conditions:
+            - condition: trigger
+              id: cleaning_end
+          sequence:
+            - action: light.turn_off
               target:
                 entity_id: light.hallway_light_living_room
 
