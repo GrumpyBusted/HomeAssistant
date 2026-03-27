@@ -1,0 +1,48 @@
+- id: driveway_light_mailbox
+  alias: Indkørsel lys postkasse
+  description: |
+    Automatik til at styre lys ved postkasseni indkørsel
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.home_outside_light
+      to: "on"
+      id: light
+
+    - trigger: state
+      entity_id: binary_sensor.home_outside_light
+      to: "off"
+      id: dark
+
+    - trigger: time
+      at: "00:00:00"
+      id: midnight
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: dark
+          sequence:
+            - action: light.turn_on
+              target:
+                entity_id: light.driveway_light_mailbox
+              data:
+                brightness_pct: 100
+                transition: 1
+
+        - conditions:
+            - condition: trigger
+              id:
+                - light
+                - midnight
+          sequence:
+            - action: light.turn_off
+              target:
+                entity_id: light.driveway_light_mailbox
