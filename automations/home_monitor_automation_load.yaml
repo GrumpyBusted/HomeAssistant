@@ -21,6 +21,7 @@
           automation.driveway_motion_sensor_entrance: 200
           automation.driveway_motion_sensor_house_south: 300
           automation.entrance_light: 150
+          automation.garden_motion_sensor_garage_north: 300
           automation.garden_motion_sensor_house_east: 300
           automation.garden_motion_sensor_house_west: 300
           automation.hallway_light: 200
@@ -30,6 +31,7 @@
           automation.living_room_heat_pump: 200
           automation.living_room_media_player_set_state: 150
           automation.storage_light: 32
+          automation.technic_room_light: 32
           automation.toilet_motion_sensor: 200
           automation.utility_room_motion_sensor: 1000
           automation.utility_room_light: 200

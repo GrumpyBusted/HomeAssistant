@@ -1,0 +1,55 @@
+- id: garden_light_patio
+  alias: Have lys terrasse
+  description: |
+    Automatik til at styre lys i haven på vest siden af terrassen
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.garden_garage_north_presence
+      from: "off"
+      to: "on"
+      id: detected
+
+    - trigger: state
+      entity_id: binary_sensor.garden_garage_north_presence
+      from: "on"
+      to: "off"
+      id: cleared
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: detected
+            - condition: state
+              entity_id: binary_sensor.home_outside_light
+              state: "off"
+          sequence:
+            - action: light.turn_on
+              data:
+                brightness_pct: 100
+                color_temp_kelvin: 2700
+                transition: 1
+              target:
+                entity_id: light.garden_light_patio
+
+        - conditions:
+            - condition: and
+              conditions:
+                - condition: trigger
+                  id: cleared
+                - condition: state
+                  entity_id: binary_sensor.garden_garage_north_presence
+                  state: "off"
+          sequence:
+            - action: light.turn_off
+              data:
+                transition: 1
+              target:
+                entity_id: light.garden_light_patio

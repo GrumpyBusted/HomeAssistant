@@ -12,6 +12,7 @@
         - sensor.driveway_motion_sensor_entrance_battery
         - sensor.driveway_motion_sensor_house_south_battery
         - sensor.driveway_motion_sensor_street_battery
+        - sensor.garden_motion_sensor_garage_north_battery
         - sensor.garden_motion_sensor_house_east_battery
         - sensor.garden_motion_sensor_house_west_battery
         - sensor.garden_motion_sensor_house_north_battery
@@ -26,6 +27,7 @@
         - sensor.driveway_motion_sensor_entrance_battery
         - sensor.driveway_motion_sensor_house_south_battery
         - sensor.driveway_motion_sensor_street_battery
+        - sensor.garden_motion_sensor_garage_north_battery
         - sensor.garden_motion_sensor_house_east_battery
         - sensor.garden_motion_sensor_house_west_battery
         - sensor.garden_motion_sensor_house_north_battery
@@ -52,6 +54,9 @@
           - entity_id: sensor.driveway_motion_sensor_street_battery
             battery_type: 2 * AA
             location: ved vejen
+          - entity_id: sensor.garden_motion_sensor_garage_north_battery
+            battery_type: 2 * AA
+            location: på nord siden
           - entity_id: sensor.garden_motion_sensor_house_north_battery
             battery_type: 2 * AA
             location: på nord gavlen

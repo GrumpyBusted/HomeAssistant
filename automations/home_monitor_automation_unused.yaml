@@ -28,6 +28,7 @@
           automation.living_room_tv: 9999
           automation.home_monitor_system: 9999
           automation.storage_light: 999
+          automation.technic_room_light: 999
         offenders: |-
           {% set ns = namespace(offenders=[]) %}
           {% for a in states.automation | list %}

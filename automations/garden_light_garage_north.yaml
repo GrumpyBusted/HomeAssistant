@@ -1,0 +1,74 @@
+- id: garden_light_garage_north
+  alias: Have lys garage nord
+  description: |
+    Automatik til at styre lys i haven på nord siden af garagen
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.garden_house_west_presence
+      from: "off"
+      to: "on"
+      id: detected_west
+
+    - trigger: state
+      entity_id: binary_sensor.garden_house_west_presence
+      from: "on"
+      to: "off"
+      id: cleared_west
+
+    - trigger: state
+      entity_id: binary_sensor.garden_garage_north_presence
+      from: "off"
+      to: "on"
+      id: detected_north
+
+    - trigger: state
+      entity_id: binary_sensor.garden_garage_north_presence
+      from: "on"
+      to: "off"
+      id: cleared_north
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id:
+                - detected_west
+                - detected_north
+            - condition: state
+              entity_id: binary_sensor.home_outside_light
+              state: "off"
+          sequence:
+            - action: light.turn_on
+              data:
+                brightness_pct: 100
+                color_temp_kelvin: 2700
+                transition: 1
+              target:
+                entity_id: light.garden_light_garage_north
+
+        - conditions:
+            - condition: and
+              conditions:
+                - condition: trigger
+                  id:
+                    - cleared_west
+                    - cleared_north
+                - condition: state
+                  entity_id: binary_sensor.garden_house_west_presence
+                  state: "off"
+                - condition: state
+                  entity_id: binary_sensor.driveway_house_south_presence
+                  state: "off"
+          sequence:
+            - action: light.turn_off
+              data:
+                transition: 1
+              target:
+                entity_id: light.garden_light_garage_north

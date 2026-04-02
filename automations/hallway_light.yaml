@@ -307,7 +307,7 @@
             - condition: trigger
               id: person_detected
             - condition: state
-              entity_id: binary_sensor.hallway_light
+              entity_id: light.hallway_light_mirror
               state: "off"
             - condition: state
               entity_id: binary_sensor.someone_home
@@ -348,7 +348,7 @@
                 {% set kelvin = state_attr('light.hallway_light_living_room', 'color_temp_kelvin') %}
                 {{ kelvin is not none and kelvin | round(0) > 6000 }}
             - condition: state
-              entity_id: light.hallway_lights
+              entity_id: light.hallway_light_mirror
               state: "on"
           sequence:
             - action: light.turn_on
