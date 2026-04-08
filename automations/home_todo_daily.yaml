@@ -1,0 +1,26 @@
+- id: home_todo_daily
+  alias: Hjem todo daglige
+  description: |
+    Opret daglige todo opgaver
+  mode: queued
+  max: 10
+
+  triggers:
+    - trigger: time
+      at: "16:00:00"
+      id: greenhouse
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: greenhouse
+          sequence:
+            - action: script.create_todo_task
+              data:
+                subject: Vand planterne i drivhuset
+                description: |-
+                  Vand planterne i drivhuset, og evt dem uden for drivhuset.
+                entity_id: todo.todo_smart_todo
