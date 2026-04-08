@@ -73,7 +73,7 @@
           sequence:
             - action: script.push_notification
               data:
-                type: critical
+                type: warning
                 title: Advarsel
                 message: Bryggers døren kunne ikke låses automatisk!
                 id: utility_room_lock_auto_warning

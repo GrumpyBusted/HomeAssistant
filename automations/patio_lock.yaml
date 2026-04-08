@@ -88,7 +88,7 @@
               then:
                 - action: script.push_notification
                   data:
-                    type: critical
+                    type: warning
                     title: Advarsel
                     message: Terrassedøren kunne ikke låses automatisk!
                     id: patio_lock_auto_warning

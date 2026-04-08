@@ -45,7 +45,7 @@
               target:
                 entity_id: timer.toilet_motion_sensor_timer
               data:
-                duration: "00:02:00"
+                duration: "00:03:00"
 
         - conditions:
             - condition: trigger

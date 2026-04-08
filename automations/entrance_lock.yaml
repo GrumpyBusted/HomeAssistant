@@ -149,7 +149,7 @@
           sequence:
             - action: script.push_notification
               data:
-                type: critical
+                type: warning
                 title: Advarsel
                 message: Hoveddøren kunne ikke låses automatisk!
                 id: entrance_lock_auto_warning

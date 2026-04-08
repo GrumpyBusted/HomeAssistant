@@ -73,7 +73,7 @@
           sequence:
             - action: script.push_notification
               data:
-                type: critical
+                type: warning
                 title: Advarsel
                 message: Garage døren kunne ikke låses automatisk!
                 id: garage_lock_auto_warning
