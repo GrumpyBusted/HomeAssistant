@@ -2,7 +2,8 @@
   alias: Stue varmepumpe
   description: |
     Styring af varmepumpe i stuen, for at varme hurtigere op hvis den ønskede temperatur er væsentligt koldere end den aktuelle.
-  mode: restart
+  mode: queued
+  max: 10
   trace:
     stored_traces: 100
 

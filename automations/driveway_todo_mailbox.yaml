@@ -2,7 +2,8 @@
   alias: Indkørsel todo postkasse
   description: |
     Opret todo opgaver vedrørende postkasse
-  mode: restart
+  mode: queued
+  max: 10
   trace:
     stored_traces: 30
 
