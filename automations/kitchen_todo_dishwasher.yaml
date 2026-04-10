@@ -31,7 +31,7 @@
 
     - trigger: numeric_state
       entity_id: sensor.kitchen_dishwasher_powerdisk_level
-      below: 3
+      below: 4
 
     - trigger: numeric_state
       entity_id: sensor.kitchen_dishwasher_powerdisk_level
@@ -87,7 +87,7 @@
         supply_todos: |-
           {% set ns = namespace(count=0) %}
           {% for item in supply_tasks %}
-            {% if states(item.entity_id) | float(100) < item.threshold | float(10) %}
+            {% if states(item.entity_id) | float(100) <= item.threshold | float(10) %}
               {% set ns.count = ns.count + 1 %}
             {% endif %}
           {% endfor %}

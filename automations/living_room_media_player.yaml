@@ -32,6 +32,16 @@
       id: paused
 
     - trigger: state
+      entity_id: media_player.living_room_receiver
+      to: "off"
+      id: receiver_off
+
+    - trigger: state
+      entity_id: media_player.living_room_receiver
+      to: "on"
+      id: receiver_on
+
+    - trigger: state
       entity_id: binary_sensor.someone_home
       from: "on"
       to: "off"
@@ -103,6 +113,20 @@
           sequence:
             - variables:
                 command: playing
+
+        - conditions:
+            - condition: trigger
+              id: receiver_off
+          sequence:
+            - variables:
+                command: "off"
+
+        - conditions:
+            - condition: trigger
+              id: receiver_on
+          sequence:
+            - variables:
+                command: pause
 
     - choose:
         - conditions:
