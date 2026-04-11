@@ -41,7 +41,7 @@
             location: over køleskabet
             battery_type: 4 * AAA
           - entity_id: sensor.garden_anemometer_battery
-            location: teknik rummet
+            location: teknikrummet
             battery_type: strøm tilslutning
           - entity_id: sensor.garden_rain_gauge_battery
             location: på terrassen

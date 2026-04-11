@@ -12,6 +12,7 @@
         - sensor.living_room_soil_moisture_sensor_battery
         - sensor.bedroom_soil_moisture_sensor_battery
         - sensor.charlies_room_soil_moisture_sensor_battery
+        - sensor.patio_soil_moisture_sensor_battery
       below: 10
       for: 00:03:00
 
@@ -20,6 +21,7 @@
         - sensor.living_room_soil_moisture_sensor_battery
         - sensor.bedroom_soil_moisture_sensor_battery
         - sensor.charlies_room_soil_moisture_sensor_battery
+        - sensor.patio_soil_moisture_sensor_battery
       above: 70
       for: 00:03:00
 
@@ -34,6 +36,7 @@
           - entity_id: sensor.living_room_soil_moisture_sensor_battery
           - entity_id: sensor.bedroom_soil_moisture_sensor_battery
           - entity_id: sensor.charlies_room_soil_moisture_sensor_battery
+          - entity_id: sensor.patio_soil_moisture_sensor_battery
     - repeat:
         for_each: "{{ sensors }}"
         sequence:

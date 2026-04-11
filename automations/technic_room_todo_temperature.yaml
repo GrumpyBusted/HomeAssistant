@@ -1,7 +1,7 @@
 - id: "1770918500447"
-  alias: Teknik todo temperatur
+  alias: Teknikrum todo temperatur
   description: |
-    Overvåg temperaturen i teknik rummet
+    Overvåg temperaturen i teknikrummet
   mode: queued
   max: 10
   trace:
@@ -36,7 +36,7 @@
           {% endif %}
           i teknikrummet
         description: |-
-          Temperaturen i teknik rummet er {{ states('sensor.technic_room_current_temperature') }} °C, kontroller om døren er lukket eller der er et andet problem.
+          Temperaturen i teknikrummet er {{ states('sensor.technic_room_current_temperature') }} °C, kontroller om døren er lukket eller der er et andet problem.
         entity_id: todo.todo_smart_todo
         related_entity_id: sensor.technic_room_current_temperature
         is_active: "{{ not (10.0 <= states('sensor.technic_room_current_temperature') | float(20.0) <= 30.0) }}"
