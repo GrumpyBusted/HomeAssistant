@@ -55,7 +55,7 @@
 
     - variables:
         wan_min_speed: 800
-        min_speed: 300
+        min_speed: 100
         max_ping: 20
         max_latency: 25
         max_cpu: 80

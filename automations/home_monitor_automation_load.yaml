@@ -16,14 +16,15 @@
     - variables:
         default_limit: 100
         custom_limits:
-          automation.driveway_light: 200
-          automation.driveway_light_house_south: 200
+          automation.driveway_light: 300
+          automation.driveway_light_house_south: 300
           automation.driveway_motion_sensor_entrance: 200
-          automation.driveway_motion_sensor_house_south: 300
+          automation.driveway_motion_sensor_house_south: 400
           automation.entrance_light: 150
-          automation.garden_motion_sensor_garage_north: 300
-          automation.garden_motion_sensor_house_east: 300
+          automation.garden_motion_sensor_garage_north: 400
+          automation.garden_motion_sensor_house_east: 400
           automation.garden_motion_sensor_house_west: 300
+          automation.garden_motion_sensor_house_north: 400
           automation.hallway_light: 200
           automation.hallway_presence_sensor: 200
           automation.home_monitor_log: 2000
@@ -35,7 +36,7 @@
           automation.toilet_motion_sensor: 200
           automation.utility_room_motion_sensor: 1000
           automation.utility_room_light: 200
-          automation.utility_room_washer: 150
+          automation.utility_room_washer: 300
 
     - action: sql.query
       data:
