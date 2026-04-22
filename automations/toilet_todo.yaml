@@ -9,6 +9,12 @@
 
   triggers:
     - trigger: state
+      entity_id: binary_sensor.toilet_presence
+      to: "off"
+      for: "00:00:05"
+      id: person_left
+
+    - trigger: state
       entity_id: counter.toilet_motion_sensor_count
       id: counter_changed
 
@@ -28,6 +34,14 @@
 
   actions:
     - choose:
+        - conditions:
+            - condition: trigger
+              id: person_left
+          sequence:
+            - action: counter.increment
+              target:
+                entity_id: counter.toilet_motion_sensor_count
+
         - conditions:
             - condition: trigger
               id: counter_changed

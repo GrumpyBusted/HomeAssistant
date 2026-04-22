@@ -20,11 +20,6 @@
       to: "off"
       id: cleared
 
-    - trigger: state
-      entity_id: timer.toilet_motion_sensor_timer
-      to: idle
-      id: timeout
-
   conditions: []
 
   actions:
@@ -46,11 +41,3 @@
                 entity_id: timer.toilet_motion_sensor_timer
               data:
                 duration: "00:03:00"
-
-        - conditions:
-            - condition: trigger
-              id: timeout
-          sequence:
-            - action: counter.increment
-              target:
-                entity_id: counter.toilet_motion_sensor_count
