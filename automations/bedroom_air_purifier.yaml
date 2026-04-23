@@ -279,17 +279,6 @@
               value_template: |-
                 {{ mode == 'fan' }}
           sequence:
-            - action: climate.turn_on
-              target:
-                entity_id: climate.bedroom_air_purifier
-
-            - action: climate.set_temperature
-              target:
-                entity_id: climate.bedroom_air_purifier
-              data:
-                temperature: "{{ states('sensor.bedroom_current_temperature') | float(21) }}"
-                hvac_mode: cool
-
             - action: fan.turn_on
               target:
                 entity_id: fan.bedroom_air_purifier_fan
