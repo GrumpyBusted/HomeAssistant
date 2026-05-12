@@ -32,7 +32,7 @@
           automation.home_monitor_log: 2000
           automation.kitchen_presence_sensor: 200
           automation.kitchen_robot_vacuum_cleaning: 200
-          automation.kitchen_todo_dishwasher: 200
+          automation.kitchen_todo_dishwasher: 250
           automation.living_room_heat_pump: 200
           automation.living_room_media_player_set_state: 150
           automation.storage_light: 32
