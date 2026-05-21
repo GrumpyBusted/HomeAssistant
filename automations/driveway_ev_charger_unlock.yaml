@@ -13,16 +13,8 @@
       to: Locked, car connected
 
     - trigger: state
-      entity_id: device_tracker.volvo_ex30_location
-      to: home
-
-    - trigger: state
       entity_id: device_tracker.volvo_xc40_location
       to: home
-
-    - trigger: state
-      entity_id: sensor.volvo_ex30_charging_connection_state
-      to: connected
 
     - trigger: state
       entity_id: sensor.volvo_xc40_charging_connection_state
@@ -35,24 +27,14 @@
 
   actions:
     - if:
-        - condition: or
+        - condition: and
           conditions:
-            - condition: and
-              conditions:
-                - condition: state
-                  entity_id: device_tracker.volvo_ex30_location
-                  state: home
-                - condition: state
-                  entity_id: sensor.volvo_ex30_charging_connection_state
-                  state: connected
-            - condition: and
-              conditions:
-                - condition: state
-                  entity_id: device_tracker.volvo_xc40_location
-                  state: home
-                - condition: state
-                  entity_id: sensor.volvo_xc40_charging_connection_state
-                  state: connected
+            - condition: state
+              entity_id: device_tracker.volvo_xc40_location
+              state: home
+            - condition: state
+              entity_id: sensor.volvo_xc40_charging_connection_state
+              state: connected
       then:
         - action: lock.unlock
           target:
