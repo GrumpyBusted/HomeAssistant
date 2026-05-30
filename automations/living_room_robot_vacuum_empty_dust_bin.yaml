@@ -111,3 +111,18 @@
               state: none
           sequence:
             - action: script.living_room_robot_vacuum_empty_dust_bin
+
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: sensor.living_room_robot_vacuum_dock_error
+                  state: ok
+            - condition: state
+              entity_id: timer.living_room_robot_vacuum_timer
+              state: idle
+            - condition: state
+              entity_id: input_select.living_room_robot_vacuum_current_cleaning
+              state: none
+          sequence:
+            - action: script.living_room_robot_vacuum_empty_dust_bin

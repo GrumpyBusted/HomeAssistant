@@ -22,14 +22,17 @@
           automation.driveway_motion_sensor_entrance: 200
           automation.driveway_motion_sensor_house_south: 400
           automation.entrance_light: 200
-          automation.garden_motion_sensor_garage_north: 400
+          automation.garden_motion_sensor_garage_north: 800
           automation.garden_motion_sensor_house_east: 400
           automation.garden_motion_sensor_house_west: 300
           automation.garden_motion_sensor_house_north: 400
           automation.garden_light_garage_north: 200
+          automation.garden_light_house_west: 200
+          automation.garden_light_patio: 200
           automation.hallway_light: 200
           automation.hallway_presence_sensor: 200
           automation.home_monitor_log: 2000
+          automation.kitchen_light: 200
           automation.kitchen_presence_sensor: 200
           automation.kitchen_robot_vacuum_cleaning: 200
           automation.kitchen_todo_dishwasher: 250
@@ -40,7 +43,7 @@
           automation.toilet_motion_sensor: 200
           automation.utility_room_motion_sensor: 1000
           automation.utility_room_light: 200
-          automation.utility_room_washer: 300
+          automation.utility_room_washer: 400
 
     - action: sql.query
       data:
