@@ -60,7 +60,7 @@
                 description: Hæld mere sæbe på sæbedispenser på gæste-toilettet.
                 related_entity_id: input_number.toilet_soap_last_count
                 entity_id: todo.todo_smart_todo
-                is_active: "{{ states('counter.toilet_motion_sensor_count') | int(0) > states('input_number.toilet_soap_last_count') | int(0) + 500 }}"
+                is_active: "{{ states('counter.toilet_motion_sensor_count') | int(0) > states('input_number.toilet_soap_last_count') | int(0) + 300 }}"
 
         - conditions:
             - condition: trigger
