@@ -113,6 +113,9 @@
             - action: script.living_room_robot_vacuum_empty_dust_bin
 
         - conditions:
+            - condition: template
+              value_template: |-
+                {{ states('sensor.living_room_robot_vacuum_time_since_empty_dust_bin') | int > 1 }}
             - condition: not
               conditions:
                 - condition: state
