@@ -15,7 +15,7 @@
         - sensor.garden_weather_station_battery
         - sensor.greenhouse_weather_station_battery
         - sensor.technic_room_weather_station_battery
-      below: 5
+      below: 20
       for: 00:03:00
 
     - trigger: numeric_state
@@ -62,7 +62,7 @@
               entity_id: "{{ repeat.item.entity_id }}"
               type: "{{ repeat.item.battery_type | default('') }}"
               location: "{{ repeat.item.location | default('') }}"
-              threshold: 5
+              threshold: 20
     - variables:
         entities:
           - binary_sensor.greenhouse_weather_station_connectivity
