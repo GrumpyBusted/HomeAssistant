@@ -244,7 +244,12 @@
                 entity_id: climate.bedroom_air_purifier
               data:
                 temperature: "{{ max(1, states('sensor.bedroom_target_temperature') | float(0.0) - 3) }}"
+
+            - action: climate.set_hvac_mode
+              data:
                 hvac_mode: cool
+              target:
+                entity_id: climate.bedroom_air_purifier
 
             - action: fan.turn_on
               target:

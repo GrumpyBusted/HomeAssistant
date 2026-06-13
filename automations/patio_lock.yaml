@@ -74,7 +74,7 @@
               target:
                 entity_id: lock.patio_lock
 
-            - delay: "00:00:01"
+            - delay: "00:00:05"
 
             - if:
                 - condition: not
@@ -82,9 +82,14 @@
                     - condition: state
                       entity_id: lock.patio_lock
                       state: locked
-                - condition: state
-                  entity_id: binary_sensor.house_sitter_home
-                  state: "off"
+                - condition: or
+                  conditions:
+                    - condition: state
+                      entity_id: binary_sensor.someone_home
+                      state: "off"
+                    - condition: state
+                      entity_id: binary_sensor.everyone_sleeping
+                      state: "on"
               then:
                 - action: script.push_notification
                   data:

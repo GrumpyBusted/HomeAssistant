@@ -67,9 +67,14 @@
             - condition: state
               entity_id: lock.utility_room_lock
               state: unlocked
-            - condition: state
-              entity_id: binary_sensor.house_sitter_home
-              state: "off"
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: binary_sensor.someone_home
+                  state: "off"
+                - condition: state
+                  entity_id: binary_sensor.everyone_sleeping
+                  state: "on"
           sequence:
             - action: script.push_notification
               data:
