@@ -8,20 +8,6 @@
     stored_traces: 20
 
   triggers:
-    - trigger: device
-      device_id: 1dd2442d9e607d9f290aebbb666cef43
-      domain: zha
-      type: remote_button_short_press
-      subtype: open
-      id: open_short_pressed
-
-    - trigger: device
-      device_id: 1dd2442d9e607d9f290aebbb666cef43
-      domain: zha
-      type: remote_button_short_press
-      subtype: close
-      id: close_short_pressed
-
     - trigger: state
       entity_id: binary_sensor.emil_home
       from: "on"
@@ -77,26 +63,6 @@
 
   actions:
     - choose:
-        - conditions:
-            - condition: trigger
-              id: open_short_pressed
-          sequence:
-            - action: input_number.set_value
-              target:
-                entity_id: input_number.emils_room_blind_position
-              data:
-                value: 100
-
-        - conditions:
-            - condition: trigger
-              id: close_short_pressed
-          sequence:
-            - action: input_number.set_value
-              target:
-                entity_id: input_number.emils_room_blind_position
-              data:
-                value: 0
-
         - conditions:
             - condition: trigger
               id:

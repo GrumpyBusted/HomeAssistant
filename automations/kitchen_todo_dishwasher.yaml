@@ -118,11 +118,3 @@
         related_entity_id: binary_sensor.kitchen_dishwasher_problem
         entity_id: todo.todo_smart_todo
         is_active: "{{ is_state('binary_sensor.kitchen_dishwasher_problem', 'on') }}"
-
-    - action: script.create_todo_task
-      data:
-        subject: Opvaskermaskinens program er fejlet
-        description: Opvaskemaskinens program er i fejl status, kontroller opvaske maskinen
-        related_entity_id: sensor.kitchen_dishwasher_failure
-        entity_id: todo.todo_smart_todo
-        is_active: "{{ is_state('sensor.kitchen_dishwasher', 'failure') }}"

@@ -13,7 +13,6 @@
         - sensor.emils_room_blind_battery
         - sensor.charlies_room_blind_battery
         - sensor.bedroom_blind_open_close_remote_battery
-        - sensor.emils_room_blind_open_close_remote_battery
         - sensor.charlies_room_blind_open_close_remote_battery
       below: 5
       for: 00:03:00
@@ -24,7 +23,6 @@
         - sensor.emils_room_blind_battery
         - sensor.charlies_room_blind_battery
         - sensor.bedroom_blind_open_close_remote_battery
-        - sensor.emils_room_blind_open_close_remote_battery
         - sensor.charlies_room_blind_open_close_remote_battery
       above: 70
       for: 00:03:00
@@ -44,7 +42,6 @@
           - entity_id: sensor.charlies_room_blind_battery
             battery_type: Genopladelig batteripakke
           - entity_id: sensor.bedroom_blind_open_close_remote_battery
-          - entity_id: sensor.emils_room_blind_open_close_remote_battery
           - entity_id: sensor.charlies_room_blind_open_close_remote_battery
     - repeat:
         for_each: "{{ sensors }}"
