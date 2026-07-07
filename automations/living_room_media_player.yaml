@@ -37,11 +37,6 @@
       id: receiver_off
 
     - trigger: state
-      entity_id: media_player.living_room_receiver
-      to: "on"
-      id: receiver_on
-
-    - trigger: state
       entity_id: binary_sensor.someone_home
       from: "on"
       to: "off"
@@ -56,11 +51,6 @@
       attribute: event_type
       to: long_release
       id: living_room_button_long_press
-
-    - trigger: state
-      entity_id: binary_sensor.living_room_media_player
-      to: "off"
-      id: media_off
 
   conditions: []
 
@@ -80,20 +70,7 @@
 
         - conditions:
             - condition: trigger
-              id: media_off
-            - condition: state
-              entity_id: binary_sensor.living_room_light
-              state: "off"
-          sequence:
-            - variables:
-                command: "off"
-
-        - conditions:
-            - condition: trigger
               id: "off"
-            - condition: template
-              value_template: |-
-                {{ state_attr('media_player.living_room_apple_tv_media_player','source_list') != none }}
           sequence:
             - variables:
                 command: "off"
@@ -120,13 +97,6 @@
           sequence:
             - variables:
                 command: "off"
-
-        - conditions:
-            - condition: trigger
-              id: receiver_on
-          sequence:
-            - variables:
-                command: pause
 
     - choose:
         - conditions:

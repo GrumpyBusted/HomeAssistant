@@ -14,7 +14,15 @@
 
     - trigger: numeric_state
       entity_id: sensor.technic_room_current_temperature
-      above: 30
+      above: 12
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_current_temperature
+      above: 40
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_current_temperature
+      below: 38
 
     - trigger: time
       at: "01:00:00"
@@ -29,7 +37,7 @@
       data:
         subject: |-
           Der er
-          {% if states('sensor.technic_room_current_temperature') | float <= 20 %}
+          {% if states('sensor.technic_room_current_temperature') | float <= 10 %}
             koldt
           {% else %}
             varmt
@@ -39,4 +47,4 @@
           Temperaturen i teknikrummet er {{ states('sensor.technic_room_current_temperature') }} °C, kontroller om døren er lukket eller der er et andet problem.
         entity_id: todo.todo_smart_todo
         related_entity_id: sensor.technic_room_current_temperature
-        is_active: "{{ not (10.0 <= states('sensor.technic_room_current_temperature') | float(20.0) <= 30.0) }}"
+        is_active: "{{ not (10.0 <= states('sensor.technic_room_current_temperature') | float(20.0) <= 40.0) }}"
