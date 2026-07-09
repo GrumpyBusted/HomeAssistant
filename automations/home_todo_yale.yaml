@@ -13,8 +13,13 @@
         - sensor.utility_room_lock_battery
         - sensor.garage_lock_battery
         - sensor.patio_lock_battery
-        - sensor.patio_keypad_battery
       below: 15
+      for: 00:03:00
+
+    - trigger: numeric_state
+      entity_id:
+        - sensor.patio_keypad_battery
+      below: 35
       for: 00:03:00
 
     - trigger: numeric_state
@@ -45,6 +50,7 @@
             battery_type: 2 × AAA
           - entity_id: sensor.patio_keypad_battery
             battery_type: 4 × AAA
+            threshold: 35
     - repeat:
         for_each: "{{ sensors }}"
         sequence:
@@ -52,4 +58,4 @@
             data:
               entity_id: "{{ repeat.item.entity_id }}"
               type: "{{ repeat.item.battery_type | default('') }}"
-              threshold: 15
+              threshold: "{{ repeat.item.threshold | default(15) }}"
