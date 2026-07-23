@@ -10,16 +10,11 @@
   triggers:
     - trigger: state
       entity_id: sensor.kitchen_dishwasher
-      to: program_ended
-      id: done
-
-    - trigger: state
-      entity_id: sensor.kitchen_dishwasher
       to:
+        - program_ended
         - waiting_to_start
         - in_use
         - programmed
-      id: started
 
     - trigger: state
       entity_id: binary_sensor.kitchen_dishwasher_notification_active
