@@ -13,7 +13,7 @@
         - sensor.charlies_room_blind_battery
         - sensor.bedroom_blind_open_close_remote_battery
         - sensor.charlies_room_blind_open_close_remote_battery
-      below: 5
+      below: 20
       for: 00:03:00
 
     - trigger: numeric_state
@@ -46,4 +46,4 @@
             data:
               entity_id: "{{ repeat.item.entity_id }}"
               type: "{{ repeat.item.battery_type | default('') }}"
-              threshold: 5
+              threshold: 20
