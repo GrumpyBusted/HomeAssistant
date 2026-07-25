@@ -84,7 +84,7 @@
         subject: Alarm på ventilationsanlægget
         description: |-
           Der er en eller flere alarmer på ventilationsanlægget. {{ message }}
-        related_entity_id: sensor.storage_ventilation_system_days_left_until_filter_change
+        related_entity_id: sensor.storage_ventilation_system_active_alarm_count
         entity_id: todo.todo_smart_todo
         is_active: "{{ message | trim | length > 0 }}"
 
