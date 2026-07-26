@@ -17,8 +17,16 @@
       to: home
 
     - trigger: state
+      entity_id: device_tracker.ford_explorer_ev_tracker
+      to: home
+
+    - trigger: state
       entity_id: sensor.volvo_xc40_charging_connection_state
       to: connected
+
+    - trigger: state
+      entity_id: sensor.ford_explorer_ev_el_plug
+      to: CONNECTED
 
   conditions:
     - condition: state
@@ -27,14 +35,24 @@
 
   actions:
     - if:
-        - condition: and
+        - condition: or
           conditions:
-            - condition: state
-              entity_id: device_tracker.volvo_xc40_location
-              state: home
-            - condition: state
-              entity_id: sensor.volvo_xc40_charging_connection_state
-              state: connected
+            - condition: and
+              conditions:
+                - condition: state
+                  entity_id: device_tracker.volvo_xc40_location
+                  state: home
+                - condition: state
+                  entity_id: sensor.volvo_xc40_charging_connection_state
+                  state: connected
+            - condition: and
+              conditions:
+                - condition: state
+                  entity_id: device_tracker.ford_explorer_ev_tracker
+                  state: home
+                - condition: state
+                  entity_id: sensor.ford_explorer_ev_el_plug
+                  state: CONNECTED
       then:
         - action: lock.unlock
           target:

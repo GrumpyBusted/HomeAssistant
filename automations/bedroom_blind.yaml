@@ -231,6 +231,9 @@
         - condition: state
           entity_id: binary_sensor.bedroom_window
           state: "on"
+        - condition: state
+          entity_id: binary_sensor.home_night
+          state: "on"
         - condition: template
           value_template: |-
             {{ not(trigger.id in ['close_short_pressed', 'button_3'] and (state_attr('cover.bedroom_blind', 'current_position') | float(999)) <= 20) }}
