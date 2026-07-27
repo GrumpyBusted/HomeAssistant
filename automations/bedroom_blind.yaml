@@ -239,10 +239,10 @@
           state: "on"
         - condition: template
           value_template: |-
-            {{ not(trigger.id in ['close_short_pressed', 'button_3'] and (state_attr('cover.bedroom_blind', 'current_position') | float(999)) <= 20) }}
+            {{ not(trigger.id in ['close_short_pressed', 'button_3'] and (state_attr('cover.bedroom_blind', 'current_position') | float(999)) <= 10) }}
       then:
         - variables:
-            position: "{{ [position | int, 20] | max }}"
+            position: "{{ [position | int, 10] | max }}"
 
     - if:
         - condition: state
