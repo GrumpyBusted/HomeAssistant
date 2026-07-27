@@ -65,6 +65,9 @@
       id: light_outside
 
     - trigger: state
+      entity_id: binary_sensor.home_night
+
+    - trigger: state
       entity_id: binary_sensor.bedroom_sun_overheat
       to: "on"
 
