@@ -1,0 +1,29 @@
+- id: "B0E5CA34-D5CC-4672-A2BB-80BF38A9C91F"
+  alias: Ford Explorer EV
+  description: |
+    Disable entities på Ford Explorer EV
+  mode: single
+  trace:
+    stored_traces: 100
+
+  triggers:
+    - trigger: state
+      entity_id: sensor.ford_explorer_ev_el_plug
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: sensor.ford_explorer_ev_el_plug
+              state: CONNECTED
+          sequence:
+            - action: homeassistant.enable_entity
+              data:
+                entity_id: switch.ford_explorer_ev_charging_pause
+
+      default:
+        - action: homeassistant.disable_entity
+          data:
+            entity_id: switch.ford_explorer_ev_charging_pause
