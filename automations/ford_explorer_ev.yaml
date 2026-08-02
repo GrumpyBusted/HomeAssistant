@@ -8,7 +8,7 @@
 
   triggers:
     - trigger: state
-      entity_id: sensor.ford_explorer_ev_el_plug
+      entity_id: sensor.ford_explorer_ev_el_plug_safe
 
   conditions: []
 
@@ -16,7 +16,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: sensor.ford_explorer_ev_el_plug
+              entity_id: sensor.ford_explorer_ev_el_plug_safe
               state: CONNECTED
           sequence:
             - action: homeassistant.enable_entity
