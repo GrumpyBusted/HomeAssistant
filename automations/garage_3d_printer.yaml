@@ -71,14 +71,6 @@
                 entity_id: todo.todo_smart_todo
                 description: 3D-printeren i garagen er færdig, hent printet og gør printeren ren.
                 related_entity_id: sensor.garage_3d_printer
-            - action: script.push_notification
-              data:
-                type: info
-                recipient: emil
-                persistent: false
-                id: 3d_printer_finished
-                title: 3D-print er færdig
-                message: 3D-printeren i garagen er færdig, hent printet og gør printeren ren.
 
         - conditions:
             - condition: trigger
@@ -87,6 +79,12 @@
             - action: timer.cancel
               target:
                 entity_id: timer.garage_3d_printer_timer
+            - action: script.create_todo_task
+              data:
+                subject: 3D print started
+                entity_id: todo.todo_smart_todo
+                related_entity_id: sensor.garage_3d_printer
+                is_active: false
 
         - conditions:
             - condition: trigger
@@ -101,14 +99,6 @@
                 entity_id: todo.todo_smart_todo
                 description: 3D-printeren i garagen er stoppet med status [{{ states('sensor.garage_3d_printer') }}], kontroller og genstart.
                 related_entity_id: sensor.garage_3d_printer
-            - action: script.push_notification
-              data:
-                type: warning
-                recipient: emil
-                persistent: false
-                id: 3d_printer_failed
-                title: 3D-print er fejlet
-                message: 3D-printeren i garagen er stoppet med status [{{ states('sensor.garage_3d_printer') }}]
 
         - conditions:
             - condition: trigger
@@ -140,6 +130,12 @@
                 config_entry_id: 01JGCEWM58T7N5MY3Z1HSEDK4E
             - delay:
                 seconds: 3
+            - action: script.create_todo_task
+              data:
+                subject: 3D printer slukket
+                entity_id: todo.todo_smart_todo
+                related_entity_id: sensor.garage_3d_printer
+                is_active: false
 
         - conditions:
             - condition: trigger
