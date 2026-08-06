@@ -25,7 +25,7 @@
       to: connected
 
     - trigger: state
-      entity_id: sensor.ford_explorer_ev_el_plug
+      entity_id: sensor.ford_explorer_ev_el_plug_safe
       to: CONNECTED
 
   conditions:

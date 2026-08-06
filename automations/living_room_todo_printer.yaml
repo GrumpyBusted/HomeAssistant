@@ -85,7 +85,8 @@
         description: |-
           Der er registreret et problem med Canon TS8300 printer.<br> 
           Message: {{ state_attr('sensor.living_room_printer','state_message') }}<br> 
-          Reason: {{ state_attr('sensor.living_room_printer','state_reason') }}
+          Reason: {{ state_attr('sensor.living_room_printer','state_reason') }}<br>
+          Status: {{ states('sensor.living_room_printer') }}
         related_entity_id: sensor.living_room_printer
         entity_id: todo.todo_smart_todo
         is_active: "{{ states('sensor.living_room_printer') not in ['printing','idle'] }}"
