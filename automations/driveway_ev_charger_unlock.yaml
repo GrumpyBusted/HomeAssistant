@@ -17,7 +17,7 @@
       to: home
 
     - trigger: state
-      entity_id: device_tracker.ford_explorer_ev_tracker
+      entity_id: sensor.ford_explorer_ev_tracker_safe
       to: home
 
     - trigger: state
@@ -48,10 +48,10 @@
             - condition: and
               conditions:
                 - condition: state
-                  entity_id: device_tracker.ford_explorer_ev_tracker
+                  entity_id: sensor.ford_explorer_ev_tracker_safe
                   state: home
                 - condition: state
-                  entity_id: sensor.ford_explorer_ev_el_plug
+                  entity_id: sensor.ford_explorer_ev_el_plug_safe
                   state: CONNECTED
       then:
         - action: lock.unlock
