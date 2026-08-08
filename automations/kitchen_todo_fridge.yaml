@@ -8,14 +8,15 @@
     stored_traces: 30
 
   triggers:
-    - trigger: state
-      entity_id: binary_sensor.kitchen_fridge_filter_state
-      id: status_changed
+    - trigger: numeric_state
+      entity_id: sensor.kitchen_fridge_water_filter_usage
+      above: 95
+      id: change_filter
 
     - trigger: event
       event_type: todo_item_completed
       event_data:
-        related: binary_sensor.kitchen_fridge_filter_state
+        related: sensor.kitchen_fridge_water_filter_usage
       id: todo_completed
 
     - trigger: state
@@ -50,15 +51,15 @@
     - choose:
         - conditions:
             - condition: trigger
-              id: status_changed
+              id: change_filter
           sequence:
             - action: script.create_todo_task
               data:
                 subject: Skift køleskabsfilter
                 description: Skift vandfilteret til køleskabet, det er pladseret under bryggersvasken.
-                related_entity_id: binary_sensor.kitchen_fridge_filter_state
+                related_entity_id: sensor.kitchen_fridge_water_filter_usage
                 entity_id: todo.todo_smart_todo
-                is_active: "{{ is_state('binary_sensor.kitchen_fridge_filter_state', 'on') }}"
+                is_active: "{{ states('sensor.kitchen_fridge_water_filter_usage')|int > 95 }}"
 
         - conditions:
             - condition: trigger
