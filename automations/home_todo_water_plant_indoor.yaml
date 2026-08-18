@@ -12,8 +12,13 @@
       entity_id:
         - sensor.bedroom_soil_moisture_sensor_moisture
         - sensor.charlies_room_soil_moisture_sensor_moisture
-        - sensor.living_room_soil_moisture_sensor_moisture
       below: 40
+      for: 00:03:00
+      
+    - trigger: numeric_state
+      entity_id:
+        - sensor.living_room_soil_moisture_sensor_moisture
+      below: 47
       for: 00:03:00
 
     - trigger: numeric_state
@@ -37,4 +42,4 @@
         related_entity_id: sensor.living_room_soil_moisture_sensor_moisture
         entity_id: todo.todo_smart_todo
         must_replace: true
-        is_active: "{{ states('sensor.living_room_soil_moisture_sensor_moisture') | float(50.0) < 40.0 or states('sensor.bedroom_soil_moisture_sensor_moisture') | float(50.0) < 40.0 or states('sensor.charlies_room_soil_moisture_sensor_moisture') | float(50.0) < 40.0 }}"
+        is_active: "{{ states('sensor.living_room_soil_moisture_sensor_moisture') | float(50.0) < 47.0 or states('sensor.bedroom_soil_moisture_sensor_moisture') | float(50.0) < 40.0 or states('sensor.charlies_room_soil_moisture_sensor_moisture') | float(50.0) < 40.0 }}"
