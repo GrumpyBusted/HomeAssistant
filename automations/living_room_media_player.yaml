@@ -277,20 +277,34 @@
                   value_template: |-
                     {{ command == 'playing' }}
               sequence:
-                - action: huesyncbox.set_sync_state
+                - action: switch.turn_on
+                  target:
+                    entity_id: switch.living_room_tv_sync_box_power
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_tv_sync_box_hdmi_input
                   data:
-                    device_id: 1cf95a14183d127c38d2f6af89ed61c5
-                    power: true
-                    sync: true
-                    brightness: 100
-                    input: input1
-                    mode: video
-                    intensity: moderate
+                    option: Receiver
                 - action: select.select_option
                   target:
                     entity_id: select.living_room_tv_sync_box_entertainment_area
                   data:
                     option: TV-område
+                - action: number.set_value
+                  target:
+                    entity_id: number.living_room_tv_sync_box_brightness
+                  data:
+                    value: "100"
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_tv_sync_box_intensity
+                  data:
+                    option: moderate
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_tv_sync_box_sync_mode
+                  data:
+                    option: video
                 - action: switch.turn_on
                   target:
                     entity_id: switch.living_room_tv_sync_box_light_sync
@@ -299,7 +313,6 @@
                   value_template: |-
                     {{ command == 'pause' }}
               sequence:
-                - action: huesyncbox.set_sync_state
-                  data:
-                    device_id: 1cf95a14183d127c38d2f6af89ed61c5
-                    sync: false
+                - action: switch.turn_off
+                  target:
+                    entity_id: switch.living_room_tv_sync_box_light_sync
