@@ -36,4 +36,4 @@
             data:
               entity_id: "{{ repeat.item.entity_id }}"
               type: "{{ repeat.item.battery_type | default('') }}"
-              threshold: 5
+              threshold: 50

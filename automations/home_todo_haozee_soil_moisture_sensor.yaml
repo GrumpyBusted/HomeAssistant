@@ -43,3 +43,4 @@
           - action: script.create_todo_battery_task
             data:
               entity_id: "{{ repeat.item.entity_id }}"
+              type: "2 x AAA"
