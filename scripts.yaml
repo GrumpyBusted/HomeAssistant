@@ -1405,6 +1405,19 @@ create_todo_battery_task:
         related_entity_id: '{{ entity_id }}'
         entity_id: todo.todo_smart_todo
         is_active: '{{ _level <= _threshold }}'
+  - if:
+    - condition: template
+      value_template: '{{ _level | int(100) == -1 and _temperature | float > 2.0 }}'
+    then:
+    - action: script.create_todo_task
+      data:
+        subject: Kontroller batteri på {{ _device_name }}
+        description: '{% set clean_name = (_device_name | replace(_area, '''')).strip()
+          %} Batteri sensor på {{ clean_name }} i {{ _area }}{% if _location %}, placeret
+          {{ _location }}{% endif %}, er ikke tilgængelig {{ _level }}%. Den bruger
+          {{ _type }}.'
+        related_entity_id: '{{ entity_id }}'
+        entity_id: todo.todo_smart_todo
   trace:
     stored_traces: 100
 living_room_light_sofa_toggle:
