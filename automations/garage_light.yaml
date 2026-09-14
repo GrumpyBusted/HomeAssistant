@@ -74,7 +74,10 @@
           sequence:
             - action: light.turn_off
               target:
-                entity_id: light.garage_lights
+                entity_id:
+                  - light.garage_light_mail
+                  - light.garage_light_spots
+                  - light.garage_light_projector
 
         - conditions:
             - condition: trigger
@@ -121,7 +124,10 @@
           sequence:
             - action: light.turn_off
               target:
-                entity_id: light.garage_lights
+                entity_id:
+                  - light.garage_light_mail
+                  - light.garage_light_spots
+                  - light.garage_light_projector
 
         - conditions:
             - condition: trigger
@@ -132,4 +138,7 @@
           sequence:
             - action: light.turn_off
               target:
-                entity_id: light.garage_lights
+                entity_id:
+                  - light.garage_light_mail
+                  - light.garage_light_spots
+                  - light.garage_light_projector
