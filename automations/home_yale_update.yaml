@@ -1,0 +1,92 @@
+- id: BBC7811A-5951-47FC-B04B-2689E05C349B
+  alias: Hjem Yale Opdater
+  description: |
+    Opdater sensorer på Yale låse
+  mode: restart
+  trace:
+    stored_traces: 30
+
+  triggers:
+    - trigger: state
+      id: entrance_lock
+      entity_id: lock.entrance_lock
+      to: unknown
+      for: "00:01:00"
+
+    - trigger: state
+      id: utility_room_lock
+      entity_id: lock.utility_room_lock
+      to: unknown
+      for: "00:01:00"
+
+    - trigger: state
+      id: garage_lock
+      entity_id: lock.garage_lock
+      to: unknown
+      for: "00:01:00"
+
+    - trigger: state
+      id: patio_lock
+      entity_id: lock.patio_lock
+      to: unknown
+      for: "00:01:00"
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: entrance_lock
+          sequence:
+            - action: button.press
+              target:
+                entity_id: button.entrance_lock_wake
+
+            - delay: "00:00:05"
+
+            - action: homeassistant.update_entity
+              target:
+                entity_id: lock.entrance_lock
+
+        - conditions:
+            - condition: trigger
+              id: utility_room_lock
+          sequence:
+            - action: button.press
+              target:
+                entity_id: button.utility_room_lock_wake
+
+            - delay: "00:00:05"
+
+            - action: homeassistant.update_entity
+              target:
+                entity_id: lock.utility_room_lock
+
+        - conditions:
+            - condition: trigger
+              id: garage_lock
+          sequence:
+            - action: button.press
+              target:
+                entity_id: button.garage_lock_wake
+
+            - delay: "00:00:05"
+
+            - action: homeassistant.update_entity
+              target:
+                entity_id: lock.garage_lock
+
+        - conditions:
+            - condition: trigger
+              id: patio_lock
+          sequence:
+            - action: button.press
+              target:
+                entity_id: button.patio_lock_wake
+
+            - delay: "00:00:05"
+
+            - action: homeassistant.update_entity
+              target:
+                entity_id: lock.patio_lock
