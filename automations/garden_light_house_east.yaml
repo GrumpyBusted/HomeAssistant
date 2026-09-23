@@ -54,18 +54,16 @@
                 entity_id: light.garden_light_house_east
 
         - conditions:
-            - condition: and
-              conditions:
-                - condition: trigger
-                  id:
-                    - cleared_east
-                    - cleared_entrance
-                - condition: state
-                  entity_id: binary_sensor.garden_house_east_presence
-                  state: "off"
-                - condition: state
-                  entity_id: binary_sensor.driveway_entrance_presence
-                  state: "off"
+            - condition: trigger
+              id:
+                - cleared_east
+                - cleared_entrance
+            - condition: state
+              entity_id: binary_sensor.garden_house_east_presence
+              state: "off"
+            - condition: state
+              entity_id: binary_sensor.driveway_entrance_presence
+              state: "off"
           sequence:
             - action: light.turn_off
               data:

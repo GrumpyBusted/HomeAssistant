@@ -54,18 +54,16 @@
                 entity_id: light.garden_light_garage_north
 
         - conditions:
-            - condition: and
-              conditions:
-                - condition: trigger
-                  id:
-                    - cleared_west
-                    - cleared_north
-                - condition: state
-                  entity_id: binary_sensor.garden_house_west_presence
-                  state: "off"
-                - condition: state
-                  entity_id: binary_sensor.driveway_house_south_presence
-                  state: "off"
+            - condition: trigger
+              id:
+                - cleared_west
+                - cleared_north
+            - condition: state
+              entity_id: binary_sensor.garden_house_west_presence
+              state: "off"
+            - condition: state
+              entity_id: binary_sensor.garden_garage_north_presence
+              state: "off"
           sequence:
             - action: light.turn_off
               data:

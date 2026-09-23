@@ -80,26 +80,24 @@
                 entity_id: light.driveway_light_house_south
 
         - conditions:
-            - condition: and
-              conditions:
-                - condition: trigger
-                  id:
-                    - cleared_south
-                    - cleared_entrance
-                    - cleared_street
-                    - cleared_west
-                - condition: state
-                  entity_id: binary_sensor.driveway_house_south_presence
-                  state: "off"
-                - condition: state
-                  entity_id: binary_sensor.driveway_entrance_presence
-                  state: "off"
-                - condition: state
-                  entity_id: binary_sensor.driveway_street_presence
-                  state: "off"
-                - condition: state
-                  entity_id: binary_sensor.garden_house_west_presence
-                  state: "off"
+            - condition: trigger
+              id:
+                - cleared_south
+                - cleared_entrance
+                - cleared_street
+                - cleared_west
+            - condition: state
+              entity_id: binary_sensor.driveway_house_south_presence
+              state: "off"
+            - condition: state
+              entity_id: binary_sensor.driveway_entrance_presence
+              state: "off"
+            - condition: state
+              entity_id: binary_sensor.driveway_street_presence
+              state: "off"
+            - condition: state
+              entity_id: binary_sensor.garden_house_west_presence
+              state: "off"
           sequence:
             - action: light.turn_off
               data:
