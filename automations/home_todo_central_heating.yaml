@@ -1,0 +1,52 @@
+- id: E7821BBF-FBCA-4E52-9092-5EBCE04D4476
+  alias: Hjem todo centralvarme
+  description: |
+    Opret todo opgaver vedrørende centralvarme
+  mode: queued
+  max: 10
+
+  triggers:
+    - trigger: event
+      event_type: todo_item_completed
+      event_data:
+        related: input_datetime.home_central_heating_last_bleeding_time
+      id: todo_bleeding_completed
+
+    - trigger: state
+      entity_id: climate.home_heat_pump
+      to: "heat"
+      id: heat_pump_on
+
+    - trigger: time
+      at: "03:19:00"
+      id: check_bleeding
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id:
+                - check_bleeding
+                - heat_pump_on
+          sequence:
+            - action: script.create_todo_task
+              data:
+                subject: Udluft radiatorer
+                description: |-
+                  Sidste gang centralvarmerør og radiatorer blev udluftet var 
+                  {{ as_datetime(states('input_datetime.home_central_heating_last_bleeding_time')).strftime('%-d/%-m-%Y kl. %H:%M') }}
+                related_entity_id: input_datetime.home_central_heating_last_bleeding_time
+                entity_id: todo.todo_smart_todo
+                is_active: "{{ now() >= as_local(as_datetime(states('input_datetime.home_central_heating_last_bleeding_time'))) + timedelta(days=180) }}"
+
+        - conditions:
+            - condition: trigger
+              id: todo_bleeding_completed
+          sequence:
+            - action: input_datetime.set_datetime
+              target:
+                entity_id: input_datetime.home_central_heating_last_bleeding_time
+              data:
+                datetime: "{{ (now() | as_local).strftime('%Y-%m-%d %H:%M:%S') }}"
