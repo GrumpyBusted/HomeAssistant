@@ -1,0 +1,68 @@
+- id: 7CD2799A-4E37-411D-9C28-B1A9558418EF
+  alias: Hjem todo Emil
+  description: |
+    Opret todo opgaver til Emil
+  mode: queued
+  max: 10
+
+  triggers:
+    - trigger: time
+      at: "20:55:00"
+      id: daily
+
+    - trigger: state
+      entity_id: binary_sensor.emil_home
+      to: "on"
+      id: home
+
+    - trigger: state
+      entity_id: binary_sensor.emil_sleeping
+      to: "off"
+      id: wake
+
+    - trigger: event
+      event_type: todo_item_completed
+      event_data:
+        related: input_datetime.home_emil_wash_clothes_last_done
+      id: todo_wash_close_completed
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id:
+                - home
+                - daily
+                - wake
+            - condition: state
+              entity_id: binary_sensor.emil_home
+              state: "on"
+            - condition: state
+              entity_id: binary_sensor.emil_sleeping
+              state: "off"
+          sequence:
+            - action: script.create_todo_task
+              data:
+                subject: Emil skal vaske tøj
+                description: |-
+                  Sidste gang Emil vaskede tøj var 
+                  {% set weekdays = ['mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag', 'søndag'] %}
+                  {% set dt = as_datetime(states('input_datetime.home_emil_wash_clothes_last_done')) %}
+                  {{ weekdays[dt.weekday()] }} {{ dt.strftime('%-d/%-m-%Y kl. %H:%M') }}
+                related_entity_id: input_datetime.home_emil_wash_clothes_last_done
+                entity_id: todo.todo_smart_todo
+                is_active: >-
+                  {% set dt = as_local(as_datetime(states('input_datetime.home_emil_wash_clothes_last_done'))) %} {{ now() >= dt + timedelta(days=7) or (dt.weekday() == 4 and now() >= dt + timedelta(days=3)) }}
+
+
+        - conditions:
+            - condition: trigger
+              id: todo_wash_close_completed
+          sequence:
+            - action: input_datetime.set_datetime
+              target:
+                entity_id: input_datetime.home_emil_wash_clothes_last_done
+              data:
+                datetime: "{{ (now() | as_local).strftime('%Y-%m-%d %H:%M:%S') }}"

@@ -40,12 +40,12 @@
           automation.living_room_heat_pump: 200
           automation.living_room_media_player_set_state: 150
           automation.storage_light: 32
+          automation.storage_ventilation_system: 150
           automation.technic_room_light: 32
           automation.toilet_motion_sensor: 200
           automation.utility_room_motion_sensor: 1000
           automation.utility_room_light: 200
           automation.utility_room_washer: 400
-
     - action: sql.query
       data:
         query: |-
