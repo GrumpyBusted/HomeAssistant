@@ -7,7 +7,7 @@
 
   triggers:
     - trigger: time
-      at: "20:55:00"
+      at: "14:00:00"
       id: daily
 
     - trigger: state

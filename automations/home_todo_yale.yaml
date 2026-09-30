@@ -12,8 +12,13 @@
         - sensor.entrance_lock_battery
         - sensor.utility_room_lock_battery
         - sensor.garage_lock_battery
-        - sensor.patio_lock_battery
       below: 15
+      for: 00:03:00
+
+    - trigger: numeric_state
+      entity_id:
+        - sensor.patio_lock_battery
+      below: 47
       for: 00:03:00
 
     - trigger: numeric_state
@@ -48,6 +53,7 @@
             battery_type: 4 × AA
           - entity_id: sensor.patio_lock_battery
             battery_type: 2 × AAA
+            threshold: 47
           - entity_id: sensor.patio_keypad_battery
             battery_type: 4 × AAA
             threshold: 35
