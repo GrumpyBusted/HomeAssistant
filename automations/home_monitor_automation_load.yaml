@@ -27,6 +27,7 @@
           automation.garden_motion_sensor_house_east: 1000
           automation.garden_motion_sensor_house_west: 1000
           automation.garden_motion_sensor_house_north: 1000
+          automation.garden_light_house_east: 150
           automation.garden_light_garage_north: 200
           automation.garden_light_house_west: 200
           automation.garden_light_patio: 200

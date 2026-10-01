@@ -7,7 +7,7 @@
 
   triggers:
     - trigger: time
-      at: "14:00:00"
+      at: "17:16:00"
       id: daily
 
     - trigger: state
@@ -53,10 +53,8 @@
                   {{ weekdays[dt.weekday()] }} {{ dt.strftime('%-d/%-m-%Y kl. %H:%M') }}
                 related_entity_id: input_datetime.home_emil_wash_clothes_last_done
                 entity_id: todo.todo_smart_todo
-                is_active: >-
-                  {% set dt = as_local(as_datetime(states('input_datetime.home_emil_wash_clothes_last_done'))) %} {{ now() >= dt + timedelta(days=7) or (dt.weekday() == 4 and now() >= dt + timedelta(days=3)) }}
-
-
+                is_active: |-
+                  {% set dt = as_local(as_datetime(states('input_datetime.home_emil_wash_clothes_last_done'))) %} {{ now() >= dt + timedelta(days=7) or (now().weekday() == 3 and now() >= dt + timedelta(days=3)) }}
         - conditions:
             - condition: trigger
               id: todo_wash_close_completed
