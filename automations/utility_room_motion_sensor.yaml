@@ -28,6 +28,11 @@
             - condition: trigger
               id: detected
           sequence:
+            - action: input_datetime.set_datetime
+              target:
+                entity_id: input_datetime.utility_room_motion_sensor_start
+              data:
+                datetime: "{{ now() }}"
             - action: timer.cancel
               target:
                 entity_id: timer.utility_room_motion_sensor_timer
@@ -36,6 +41,15 @@
             - condition: trigger
               id: cleared
           sequence:
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.utility_room_motion_sensor_seconds
+              data:
+                value: |-
+                  {% set start = states('input_datetime.utility_room_motion_sensor_start') | as_datetime | as_local %}
+                  {% set seconds = states('input_number.utility_room_motion_sensor_seconds') | float(0.0) %}
+                  {% set duration = (as_timestamp(now()) - as_timestamp(start)) | round(1) %}
+                  {{ seconds + duration }}
             - action: timer.start
               target:
                 entity_id: timer.utility_room_motion_sensor_timer

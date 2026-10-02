@@ -9,12 +9,11 @@
 
   triggers:
     - trigger: state
-      entity_id: sensor.kitchen_dishwasher
+      entity_id: input_select.kitchen_dishwasher_state
       to:
-        - program_ended
-        - waiting_to_start
-        - in_use
-        - programmed
+        - dirty
+        - clean
+      id: state_changed
 
     - trigger: state
       entity_id: binary_sensor.kitchen_dishwasher_notification_active
@@ -52,21 +51,16 @@
 
   actions:
     - if:
-        - condition: state
-          entity_id: sensor.kitchen_dishwasher
-          state:
-            - program_ended
-            - waiting_to_start
-            - in_use
-            - programmed
+        - condition: trigger
+          id: state_changed
       then:
         - action: script.create_todo_task
           data:
             subject: Tøm opvaskemaskinen
             description: Opvaskemaskine er færdig, tøm og sæt service væk
-            related_entity_id: sensor.kitchen_dishwasher
+            related_entity_id: input_select.kitchen_dishwasher_state
             entity_id: todo.todo_smart_todo
-            is_active: "{{ states('sensor.kitchen_dishwasher') == 'program_ended' }}"
+            is_active: "{{ states('input_select.kitchen_dishwasher_state') != 'dirty' }}"
 
     - variables:
         supply_tasks:

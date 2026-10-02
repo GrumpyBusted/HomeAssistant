@@ -18,9 +18,90 @@
   conditions: []
 
   actions:
+    - variables:
+        dock_error_code: "{{ states('sensor.living_room_robot_vacuum_dock_error') }}"
+        robot_error_code: "{{ states('sensor.living_room_robot_vacuum_error') }}"
+
+        dock_error_text: >-
+          {% set translations = {
+            'duct_blockage': 'Luftkanal blokeret',
+            'water_empty': 'Rentvandstank tom',
+            'waste_water_tank_full': 'Spildevandstank fuld',
+            'no_dustbin_or_filter': 'Støvbeholder eller filter mangler',
+            'auto_empty_dock_fan_error': 'Fejl på dockens tømningsventilator',
+            'auto_empty_dock_voltage_error': 'Fejl på dockens strømforsyning',
+            'maintenance_brush_jammed': 'Dockens vedligeholdelsesbørste sidder fast',
+            'dirty_tank_latch_open': 'Låget til vandtanken er åbent',
+            'no_dustbin': 'Støvbeholder mangler',
+            'cleaning_tank_full_or_blocked': 'Rengøringstank fuld eller blokeret',
+            'clear_water_box_hoare': 'Kontroller rentvandstanken',
+            'clear_water_box_exception': 'Problem med rentvandstanken',
+            'dirty_water_box_hoare': 'Kontroller spildevandstanken',
+            'up_water_exception': 'Problem med vandpåfyldning',
+            'drain_water_exception': 'Problem med vandafløb',
+            'sink_strainer_hoare': 'Kontroller afløbsfilteret'
+          } %} {{ translations.get(dock_error_code, dock_error_code) }}
+
+
+        robot_error_text: >-
+          {% set translations = {
+            'lidar_blocked': 'Lidar-sensor blokeret',
+            'bumper_stuck': 'Stødfanger sidder fast',
+            'wheels_suspended': 'Hjulene har ikke kontakt med gulvet',
+            'cliff_sensor_error': 'Fejl på fallsensor',
+            'main_brush_jammed': 'Hovedbørste sidder fast',
+            'side_brush_jammed': 'Sidebørste sidder fast',
+            'wheels_jammed': 'Hjul sidder fast',
+            'robot_trapped': 'Robotten sidder fast',
+            'no_dustbin': 'Støvbeholder mangler',
+            'strainer_error': 'Fejl på filter',
+            'compass_error': 'Fejl på kompas',
+            'low_battery': 'Lavt batteri',
+            'charging_error': 'Fejl ved opladning',
+            'battery_error': 'Batterifejl',
+            'wall_sensor_dirty': 'Vægsensor skal rengøres',
+            'robot_tilted': 'Robotten står skævt',
+            'side_brush_error': 'Fejl på sidebørste',
+            'fan_error': 'Fejl på ventilator',
+            'dock': 'Problem med dock',
+            'optical_flow_sensor_dirt': 'Bevægelsessensor skal rengøres',
+            'vertical_bumper_pressed': 'Lodret stødfanger aktiveret',
+            'dock_locator_error': 'Fejl ved lokalisering af dock',
+            'return_to_dock_fail': 'Kunne ikke finde tilbage til dock',
+            'nogo_zone_detected': 'Robotten er i et område, der ikke må rengøres',
+            'visual_sensor': 'Fejl på visuelt sensorsystem',
+            'light_touch': 'Fejl på berøringssensor',
+            'vibrarise_jammed': 'Moppefunktion sidder fast',
+            'robot_on_carpet': 'Robotten står på et tæppe',
+            'filter_blocked': 'Filter er tilstoppet',
+            'invisible_wall_detected': 'Virtuel væg registreret',
+            'cannot_cross_carpet': 'Kan ikke køre over tæppe',
+            'internal_error': 'Intern fejl',
+            'collect_dust_error_3': 'Fejl ved tømning af støvbeholder',
+            'collect_dust_error_4': 'Fejl ved tømning af støvbeholder',
+            'mopping_roller_1': 'Problem med moppefunktion',
+            'mopping_roller_error_2': 'Problem med moppefunktion',
+            'clear_water_box_hoare': 'Kontroller rentvandstanken',
+            'dirty_water_box_hoare': 'Kontroller spildevandstanken',
+            'sink_strainer_hoare': 'Kontroller afløbsfilteret',
+            'clear_water_box_exception': 'Problem med rentvandstanken',
+            'clear_brush_exception': 'Problem med børsten',
+            'clear_brush_exception_2': 'Problem med børsten',
+            'filter_screen_exception': 'Problem med filteret',
+            'up_water_exception': 'Problem med vandpåfyldning',
+            'drain_water_exception': 'Problem med vandafløb',
+            'temperature_protection': 'Temperaturbeskyttelse aktiveret',
+            'clean_carousel_exception': 'Problem med rengøringsfunktion',
+            'clean_carousel_water_full': 'Vandbeholder fuld',
+            'water_carriage_drop': 'Problem med vandtilførsel',
+            'check_clean_carouse': 'Kontroller rengøringsfunktion',
+            'audio_error': 'Lydfejl'
+          } %} {{ translations.get(robot_error_code, robot_error_code) }}
+
+
     - action: script.create_todo_task
       data:
-        subject: "Løs problem med Dobbys hus ({{ states('sensor.living_room_robot_vacuum_dock_error') }})"
+        subject: "Løs problem med Dobbys hus ({{ dock_error_text }})"
         description: |-
           Advarsel på Roborock docking station. Kode {{ states('sensor.living_room_robot_vacuum_dock_error') }}
         related_entity_id: sensor.living_room_robot_vacuum_dock_error
@@ -29,7 +110,7 @@
 
     - action: script.create_todo_task
       data:
-        subject: "Løs problem med Dobby ({{ states('sensor.living_room_robot_vacuum_error') }})"
+        subject: "Løs problem med Dobby ({{ robot_error_text }})"
         description: |-
           Advarsel på Roborock robot støvsuger. Kode {{ states('sensor.living_room_robot_vacuum_error') }}
         related_entity_id: sensor.living_room_robot_vacuum_error
@@ -50,5 +131,5 @@
             id: living_room_robot_vacuum_error
             title: Løs problem med Dobby
             message: |-
-              Advarsel på Roborock robot støvsuger.
+              Advarsel på Roborock robot støvsuger ({{ robot_error_text }}).
               Kode {{ states('sensor.living_room_robot_vacuum_error') }}

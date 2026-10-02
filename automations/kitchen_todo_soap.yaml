@@ -1,0 +1,45 @@
+- id: 8EE6B489-E179-40F3-ACAC-B331F8DBC153
+  alias: Køkken todo sæbe
+  description: |
+    Opret todo opgaver vedrørende sæbe i køkkenet
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
+
+  triggers:
+    - trigger: state
+      entity_id: input_number.kitchen_presence_sensor_seconds
+      id: changed
+
+    - trigger: event
+      event_type: todo_item_completed
+      event_data:
+        related: input_number.kitchen_soap_seconds_last_change
+      id: completed
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: changed
+          sequence:
+            - action: script.create_todo_task
+              data:
+                subject: Fyld sæbe på dispenser i køkkenet
+                description: Hæld mere sæbe på sæbedispenser i køkkenet.
+                related_entity_id: input_number.kitchen_soap_seconds_last_change
+                entity_id: todo.todo_smart_todo
+                is_active: "{{ states('input_number.kitchen_presence_sensor_seconds') | int(0) > states('input_number.kitchen_soap_seconds_last_change') | int(0) + 200000 }}"
+
+        - conditions:
+            - condition: trigger
+              id: completed
+          sequence:
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.kitchen_soap_seconds_last_change
+              data:
+                value: "{{ states('input_number.kitchen_presence_sensor_seconds') | int(0) }}"

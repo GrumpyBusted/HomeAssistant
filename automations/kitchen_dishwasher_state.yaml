@@ -1,0 +1,115 @@
+- id: 86B91ADE-884A-4655-975E-0028F103AE6C"1769369132822
+  alias: Køkken opvaskemaskine status
+  description: |
+    Styring af status på opvaskemaskine
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 300
+
+  triggers:
+    - trigger: state
+      entity_id: sensor.kitchen_dishwasher
+      id: dishwasher
+
+    - trigger: state
+      entity_id: sensor.kitchen_dishwasher_program_phase
+      id: program_phase
+
+    - trigger: state
+      entity_id: binary_sensor.kitchen_dishwasher_door
+      id: door
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: dishwasher
+            - condition: state
+              entity_id: sensor.kitchen_dishwasher
+              state: waiting_to_start
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.kitchen_dishwasher_state
+              data:
+                option: planned
+
+        - conditions:
+            - condition: trigger
+              id: dishwasher
+            - condition: state
+              entity_id: sensor.kitchen_dishwasher
+              state: in_use
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.kitchen_dishwasher_state
+              data:
+                option: running
+
+        - conditions:
+            - condition: trigger
+              id: dishwasher
+            - condition: state
+              entity_id: sensor.kitchen_dishwasher
+              state: program_ended
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.kitchen_dishwasher_state
+              data:
+                option: finishing
+
+        - conditions:
+            - condition: trigger
+              id: door
+            - condition: state
+              entity_id: input_select.kitchen_dishwasher_state
+              state: finishing
+            - condition: state
+              entity_id: binary_sensor.kitchen_dishwasher_door
+              state: "on"
+            - condition: state
+              entity_id: sensor.kitchen_dishwasher_program_phase
+              state: finished
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.kitchen_dishwasher_state
+              data:
+                option: clean
+
+        - conditions:
+            - condition: trigger
+              id: door
+            - condition: state
+              entity_id: input_select.kitchen_dishwasher_state
+              state: clean
+            - condition: state
+              entity_id: binary_sensor.kitchen_dishwasher_door
+              state: "on"
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.kitchen_dishwasher_state
+              data:
+                option: emptying
+
+        - conditions:
+            - condition: trigger
+              id: door
+            - condition: state
+              entity_id: input_select.kitchen_dishwasher_state
+              state: emptying
+            - condition: state
+              entity_id: binary_sensor.kitchen_dishwasher_door
+              state: "off"
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.kitchen_dishwasher_state
+              data:
+                option: dirty
