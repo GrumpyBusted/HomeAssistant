@@ -1,0 +1,26 @@
+- id: A8D18BF0-FD91-4293-8076-90E10604DE1E
+  alias: Køkken opvaskemaskine dørsensor polling
+  description: |
+    Polling af dørsensor på opvaskemaskine
+  mode: restart
+  trace:
+    stored_traces: 10
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.kitchen_presence_sensor_occupancy
+      to: "on"
+
+  conditions: []
+
+  actions:
+    - repeat:
+        while:
+          - condition: state
+            entity_id: binary_sensor.kitchen_presence_sensor_occupancy
+            state: "on"
+        sequence:
+          - action: homeassistant.update_entity
+            target:
+              entity_id: binary_sensor.kitchen_dishwasher_door
+          - delay: "00:00:05"

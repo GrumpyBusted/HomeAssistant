@@ -17,7 +17,7 @@
       id: program_phase
 
     - trigger: state
-      entity_id: binary_sensor.kitchen_dishwasher_door
+      entity_id: binary_sensor.kitchen_dishwasher_door_safe
       id: door
 
   conditions: []
@@ -70,7 +70,7 @@
               entity_id: input_select.kitchen_dishwasher_state
               state: finishing
             - condition: state
-              entity_id: binary_sensor.kitchen_dishwasher_door
+              entity_id: binary_sensor.kitchen_dishwasher_door_safe
               state: "on"
             - condition: state
               entity_id: sensor.kitchen_dishwasher_program_phase
@@ -89,7 +89,7 @@
               entity_id: input_select.kitchen_dishwasher_state
               state: clean
             - condition: state
-              entity_id: binary_sensor.kitchen_dishwasher_door
+              entity_id: binary_sensor.kitchen_dishwasher_door_safe
               state: "on"
           sequence:
             - action: input_select.select_option
@@ -105,7 +105,7 @@
               entity_id: input_select.kitchen_dishwasher_state
               state: emptying
             - condition: state
-              entity_id: binary_sensor.kitchen_dishwasher_door
+              entity_id: binary_sensor.kitchen_dishwasher_door_safe
               state: "off"
           sequence:
             - action: input_select.select_option

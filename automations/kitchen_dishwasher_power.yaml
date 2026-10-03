@@ -1,0 +1,61 @@
+- id: D4C18065-836D-4EF1-A508-F806355A7027
+  alias: Køkken opvaskemaskine tænd
+  description: |
+    Styring af opvaskemaskine tænder når nogen er i køkkenet
+  mode: restart
+  trace:
+    stored_traces: 100
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.kitchen_presence
+      to: "on"
+      id: detected
+
+    - trigger: state
+      entity_id: binary_sensor.kitchen_presence
+      to: "off"
+      id: cleared
+
+    - trigger: state
+      entity_id: binary_sensor.someone_home
+      to: "off"
+      id: away
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: detected
+            - condition: state
+              entity_id: switch.kitchen_dishwasher_power
+              state: "off"
+            - condition: state
+              entity_id: binary_sensor.someone_home
+              state: "on"
+          sequence:
+            - action: switch.turn_on
+              target:
+                entity_id: switch.kitchen_dishwasher_power
+            - wait_template: |-
+                {{ is_state('switch.kitchen_dishwasher_power', 'on') }}
+              timeout: "00:00:15"
+              continue_on_timeout: true
+
+        - conditions:
+            - condition: trigger
+              id:
+                - cleared
+                - away
+            - condition: state
+              entity_id: switch.kitchen_dishwasher_power
+              state: "on"
+            - condition: state
+              entity_id: input_select.kitchen_dishwasher_state
+              state: "dirty"
+          sequence:
+            - action: switch.turn_off
+              target:
+                entity_id: switch.kitchen_dishwasher_power
