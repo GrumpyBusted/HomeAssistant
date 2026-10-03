@@ -65,12 +65,6 @@
                 entity_id: timer.garage_3d_printer_timer
               data:
                 duration: 00:10:00
-            - action: script.create_todo_task
-              data:
-                subject: Hent 3D print
-                entity_id: todo.todo_smart_todo
-                description: 3D-printeren i garagen er færdig, hent printet og gør printeren ren.
-                related_entity_id: sensor.garage_3d_printer
 
         - conditions:
             - condition: trigger
@@ -79,12 +73,6 @@
             - action: timer.cancel
               target:
                 entity_id: timer.garage_3d_printer_timer
-            - action: script.create_todo_task
-              data:
-                subject: 3D print started
-                entity_id: todo.todo_smart_todo
-                related_entity_id: sensor.garage_3d_printer
-                is_active: false
 
         - conditions:
             - condition: trigger
@@ -93,12 +81,6 @@
             - action: timer.cancel
               target:
                 entity_id: timer.garage_3d_printer_timer
-            - action: script.create_todo_task
-              data:
-                subject: Kontroller 3D printer
-                entity_id: todo.todo_smart_todo
-                description: 3D-printeren i garagen er stoppet med status [{{ states('sensor.garage_3d_printer') }}], kontroller og genstart.
-                related_entity_id: sensor.garage_3d_printer
 
         - conditions:
             - condition: trigger
@@ -109,12 +91,9 @@
                 - idle
                 - finished
           sequence:
-            - action: script.create_todo_task
-              data:
-                subject: Sluk 3D printer
-                entity_id: todo.todo_smart_todo
-                description: 3D-printeren i garagen er ikke igang med er stadig tændt.
-                related_entity_id: sensor.garage_3d_printer
+            - action: light.turn_off
+              target:
+                entity_id: light.garage_smart_plug_3d_printer
 
         - conditions:
             - condition: trigger
@@ -130,12 +109,6 @@
                 config_entry_id: 01JGCEWM58T7N5MY3Z1HSEDK4E
             - delay:
                 seconds: 3
-            - action: script.create_todo_task
-              data:
-                subject: 3D printer slukket
-                entity_id: todo.todo_smart_todo
-                related_entity_id: sensor.garage_3d_printer
-                is_active: false
 
         - conditions:
             - condition: trigger

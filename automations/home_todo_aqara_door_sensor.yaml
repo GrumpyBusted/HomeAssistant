@@ -11,6 +11,7 @@
       entity_id:
         - sensor.technic_room_door_sensor_battery
         - sensor.storage_door_sensor_battery
+        - sensor.utility_room_door_sensor_battery
         - sensor.living_room_door_sensor_battery
         - sensor.patio_door_sensor_battery
         - sensor.emils_room_window_sensor_battery
@@ -25,6 +26,7 @@
       entity_id:
         - sensor.technic_room_door_sensor_battery
         - sensor.storage_door_sensor_battery
+        - sensor.utility_room_door_sensor_battery
         - sensor.living_room_door_sensor_battery
         - sensor.patio_door_sensor_battery
         - sensor.emils_room_window_sensor_battery
@@ -45,6 +47,7 @@
         sensors:
           - entity_id: sensor.technic_room_door_sensor_battery
           - entity_id: sensor.storage_door_sensor_battery
+          - entity_id: sensor.utility_room_door_sensor_battery
           - entity_id: sensor.living_room_door_sensor_battery
           - entity_id: sensor.patio_door_sensor_battery
           - entity_id: sensor.emils_room_window_sensor_battery

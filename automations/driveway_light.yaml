@@ -224,6 +224,107 @@
                         entity_id: scene.driveway_light_valentines
                       data:
                         transition: 1
+                - conditions:
+                    - condition: template
+                      value_template: |-
+                        {{ now().isocalendar().week == 40 and now().isoweekday() == 6 }}
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_breast_cancer_awareness
+                      data:
+                        transition: 1
+                - conditions:
+                    - condition: template
+                      value_template: |-
+                        {{ now().month == 4 and now().day == 2 }}
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_autism_awareness_day
+                      data:
+                        transition: 1
+
+                - conditions:
+                    - condition: template
+                      value_template: "{{ now().month == 2 and now().day == 4 }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_world_cancer_day
+                      data:
+                        transition: 1
+
+                - conditions:
+                    - condition: template
+                      value_template: "{{ now().month == 12 and now().day == 1 }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_world_aids_day
+                      data:
+                        transition: 1
+
+                - conditions:
+                    - condition: template
+                      value_template: "{{ now().month == 5 and now().day == 17 }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_idahobit
+                      data:
+                        transition: 1
+
+                - conditions:
+                    - condition: template
+                      value_template: "{{ now().month == 11 and now().day == 14 }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_diabetes_awareness
+                      data:
+                        transition: 1
+
+                - conditions:
+                    - condition: template
+                      value_template: "{{ now().month == 10 and now().day == 10 }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_mental_health_awareness
+                      data:
+                        transition: 1
+
+                - conditions:
+                    - condition: template
+                      value_template: "{{ now().month == 3 and now().day == 8 }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_international_womens_day
+                      data:
+                        transition: 1
+
+                - conditions:
+                    - condition: template
+                      value_template: "{{ now().month == 4 and now().day == 22 }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_earth_day
+                      data:
+                        transition: 1
+
+                - conditions:
+                    - condition: template
+                      value_template: "{{ now().isocalendar().week == 40 and now().isoweekday() == 6 }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_breast_cancer_awareness
+                      data:
+                        transition: 1
+
               default:
                 - action: scene.turn_on
                   target:

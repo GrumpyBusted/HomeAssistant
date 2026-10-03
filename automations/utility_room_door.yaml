@@ -39,3 +39,6 @@
                 entity_id: timer.utility_room_door_timer
               data:
                 duration: "00:00:15"
+            - action: counter.increment
+              target:
+                entity_id: counter.utility_room_door_open

@@ -1,0 +1,59 @@
+- id: 5F83CBEE-2210-443F-AE7A-F6A4369ED341
+  alias: Have todo kæledyr afføring
+  description: |
+    Opret todo opgaver vedrørende opsamling af hunde afføring i haven
+  mode: queued
+  max: 10
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.utility_room_door
+      to: "on"
+      id: door_opened
+
+    - trigger: time_pattern
+      hours: "/1"
+      id: check_pet_waste
+
+    - trigger: event
+      event_type: todo_item_completed
+      event_data:
+        related: input_datetime.garden_pet_waste_last_removed
+      id: todo_waste_completed
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id:
+                - door_opened
+                - check_pet_waste
+          sequence:
+            - action: script.create_todo_task
+              data:
+                subject: Ryd gården efter hundene
+                description: |-
+                  Sidste gang der er samlet hundeefterladenskaber i gården var {{ as_datetime(states('input_datetime.garden_pet_waste_last_removed')).strftime('%-d/%-m-%Y kl. %H:%M') }}.
+                related_entity_id: input_datetime.garden_pet_waste_last_removed
+                entity_id: todo.todo_smart_todo
+                is_active: |-
+                  {% set m = (now().timestamp() - as_timestamp(states('input_datetime.garden_pet_waste_last_removed'))) / 60 %}
+                  {% set c = states('counter.utility_room_door_open') | int(0) - states('input_number.garden_pet_waste_door_count_last_removed') | int(0) %}
+                  {{ (c >= 2 and m >= 48 * 60) or (c >= 10 and m >= 12 * 60) }}
+
+        - conditions:
+            - condition: trigger
+              id: todo_waste_completed
+          sequence:
+            - action: input_datetime.set_datetime
+              target:
+                entity_id: input_datetime.garden_pet_waste_last_removed
+              data:
+                datetime: "{{ now().isoformat() }}"
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.garden_pet_waste_door_count_last_removed
+              data:
+                value: "{{ states('counter.utility_room_door_open') | int(0) }}"

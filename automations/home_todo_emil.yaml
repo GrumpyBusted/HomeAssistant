@@ -20,6 +20,13 @@
       to: "off"
       id: wake
 
+    - trigger: state
+      entity_id: input_select.utility_room_washer_state
+      to:
+        - finished
+        - emptied
+      id: wash_finished
+
     - trigger: event
       event_type: todo_item_completed
       event_data:
@@ -36,12 +43,18 @@
                 - home
                 - daily
                 - wake
+                - wash_finished
             - condition: state
               entity_id: binary_sensor.emil_home
               state: "on"
             - condition: state
               entity_id: binary_sensor.emil_sleeping
               state: "off"
+            - condition: state
+              entity_id: input_select.utility_room_washer_state
+              state:
+                - finished
+                - emptied
           sequence:
             - action: script.create_todo_task
               data:

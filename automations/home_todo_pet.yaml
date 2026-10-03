@@ -20,19 +20,9 @@
         related: input_datetime.home_pet_flea_treatment_last_given
       id: todo_flea_completed
 
-    - trigger: event
-      event_type: todo_item_completed
-      event_data:
-        related: input_datetime.home_pet_waste_last_removed
-      id: todo_waste_completed
-
     - trigger: time
       at: "01:00:00"
       id: check_flea_treatment
-
-    - trigger: time_pattern
-      hours: "/1"
-      id: check_pet_waste
 
   conditions: []
 
@@ -50,19 +40,6 @@
                 related_entity_id: input_datetime.home_pet_flea_treatment_last_given
                 entity_id: todo.todo_smart_todo
                 is_active: "{{ now().date() >= (strptime(states('input_datetime.home_pet_flea_treatment_last_given'), '%Y-%m-%d').date() + timedelta(days=90)) }}"
-
-        - conditions:
-            - condition: trigger
-              id: check_pet_waste
-          sequence:
-            - action: script.create_todo_task
-              data:
-                subject: Ryd gården efter hundene
-                description: |-
-                  Sidste gang der er samlet hundeefterladenskaber i gården var {{ as_datetime(states('input_datetime.home_pet_waste_last_removed')).strftime('%-d/%-m-%Y kl. %H:%M') }}.
-                related_entity_id: input_datetime.home_pet_waste_last_removed
-                entity_id: todo.todo_smart_todo
-                is_active: "{{ now().timestamp() >= (as_timestamp(states('input_datetime.home_pet_waste_last_removed')) + 18 * 3600) }}"
 
         - conditions:
             - condition: trigger
@@ -86,13 +63,3 @@
                 entity_id: input_datetime.home_pet_flea_treatment_last_given
               data:
                 datetime: "{{ now().strftime('%Y-%m-%d') }}"
-
-        - conditions:
-            - condition: trigger
-              id: todo_waste_completed
-          sequence:
-            - action: input_datetime.set_datetime
-              target:
-                entity_id: input_datetime.home_pet_waste_last_removed
-              data:
-                datetime: "{{ now().isoformat() }}"
