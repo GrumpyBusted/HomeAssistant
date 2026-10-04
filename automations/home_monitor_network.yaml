@@ -21,6 +21,18 @@
       for: "00:03:00"
       id: ping_high
 
+    - trigger: numeric_state
+      entity_id: sensor.internet_speed_upload
+      below: 100
+      for: "00:03:00"
+      id: upload_low
+
+    - trigger: numeric_state
+      entity_id: sensor.internet_speed_download
+      below: 100
+      for: "00:03:00"
+      id: download_low
+
   conditions: []
 
   actions:
@@ -43,6 +55,44 @@
                 title: Høj ping opdaget
                 message: |-
                   Høj ping opdaget på {{ states('sensor.internet_speed_ping') }} ms
+
+        - conditions:
+            - condition: trigger
+              id: upload_low
+          sequence:
+            - action: system_log.write
+              data:
+                level: warning
+                message: |-
+                  Lav LAN upload opdaget: {{ states('sensor.internet_speed_upload') }} Mbps
+            - action: script.push_notification
+              data:
+                type: info
+                recipient: none
+                persistent: true
+                id: home_monitor_network_upload_low
+                title: Lav LAN upload opdaget
+                message: |-
+                  Lav LAN upload opdaget på {{ states('sensor.internet_speed_upload') }} Mbps
+
+        - conditions:
+            - condition: trigger
+              id: download_low
+          sequence:
+            - action: system_log.write
+              data:
+                level: warning
+                message: |-
+                  Lav LAN download opdaget: {{ states('sensor.internet_speed_download') }} Mbps
+            - action: script.push_notification
+              data:
+                type: info
+                recipient: none
+                persistent: true
+                id: home_monitor_network_udownload_low
+                title: Lav LAN download opdaget
+                message: |-
+                  Lav LAN download opdaget på {{ states('sensor.internet_speed_download') }} Mbps
 
         - conditions:
             - condition: trigger
@@ -84,7 +134,7 @@
           sequence:
             - variables:
                 wan_min_speed: 800
-                min_speed: 100
+                min_speed: 30
                 max_ping: 50
                 max_latency: 25
                 max_cpu: 80

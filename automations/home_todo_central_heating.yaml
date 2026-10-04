@@ -30,6 +30,9 @@
               id:
                 - check_bleeding
                 - heat_pump_on
+            - condition: state
+              entity_id: climate.home_heat_pump
+              state: "heat"
           sequence:
             - action: script.create_todo_task
               data:
@@ -39,7 +42,7 @@
                   {{ as_datetime(states('input_datetime.home_central_heating_last_bleeding_time')).strftime('%-d/%-m-%Y kl. %H:%M') }}
                 related_entity_id: input_datetime.home_central_heating_last_bleeding_time
                 entity_id: todo.todo_smart_todo
-                is_active: "{{ now() >= as_local(as_datetime(states('input_datetime.home_central_heating_last_bleeding_time'))) + timedelta(days=180) }}"
+                is_active: "{{ now() >= as_local(as_datetime(states('input_datetime.home_central_heating_last_bleeding_time'))) + timedelta(days=270) }}"
 
         - conditions:
             - condition: trigger

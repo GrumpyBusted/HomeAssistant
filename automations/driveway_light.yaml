@@ -63,7 +63,11 @@
       id: twilight
 
     - trigger: time
-      at: "22:00:00"
+      at:
+        - "22:00:00"
+        - "23:00:00"
+        - "00:00:00"
+        - "01:00:00"
       id: night
 
   conditions: []
@@ -169,7 +173,11 @@
                 {% set h = now().hour %}
                 {% set d = now().day %}
                 {% set m = now().month %}
-                {{ (wd in [4,5] and h < 23) or (m == 12 and d == 31 and h < 24) or (h < 22) }}
+                {{ (m == 12 and d == 24) or
+                   (m == 12 and d == 31) or
+                   (m == 1 and d == 1 and h < 1) or
+                   (wd in [4,5] and h < 23) or
+                   (wd in [0,1,2,3,6] and h < 22) }}
             - condition: time
               after: "12:00:00"
           sequence:

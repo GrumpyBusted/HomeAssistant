@@ -20,6 +20,12 @@
       entity_id: binary_sensor.kitchen_dishwasher_door_safe
       id: door
 
+    - trigger: state
+      entity_id: binary_sensor.kitchen_dishwasher_door_safe
+      to: "off"
+      for: "00:00:30"
+      id: door_closed
+
   conditions: []
 
   actions:
@@ -100,7 +106,7 @@
 
         - conditions:
             - condition: trigger
-              id: door
+              id: door_closed
             - condition: state
               entity_id: input_select.kitchen_dishwasher_state
               state: emptying

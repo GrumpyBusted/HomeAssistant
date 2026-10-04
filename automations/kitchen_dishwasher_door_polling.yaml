@@ -23,4 +23,4 @@
           - action: homeassistant.update_entity
             target:
               entity_id: binary_sensor.kitchen_dishwasher_door
-          - delay: "00:00:05"
+          - delay: "00:00:02"

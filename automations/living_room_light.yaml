@@ -15,22 +15,10 @@
       id: button_1_short
 
     - trigger: state
-      entity_id: event.living_room_switch_button_1
-      attribute: event_type
-      to: long_release
-      id: button_1_long
-
-    - trigger: state
       entity_id: event.living_room_switch_button_2
       attribute: event_type
       to: short_release
       id: button_2_short
-
-    - trigger: state
-      entity_id: event.living_room_switch_button_2
-      attribute: event_type
-      to: long_release
-      id: button_2_long
 
     - trigger: state
       entity_id: event.living_room_switch_button_3
@@ -39,32 +27,24 @@
       id: button_3_short
 
     - trigger: state
-      entity_id: event.living_room_switch_button_3
-      attribute: event_type
-      to: long_release
-      id: button_3_long
-
-    - trigger: state
       entity_id: event.living_room_switch_button_4
       attribute: event_type
       to: short_release
       id: button_4_short
 
     - trigger: state
-      entity_id: event.living_room_switch_button_4
+      entity_id:
+        - event.living_room_switch_button_1
+        - event.living_room_switch_button_2
+        - event.living_room_switch_button_3
+        - event.living_room_switch_button_4
       attribute: event_type
       to: long_release
-      id: button_4_long
+      id: button_long
 
     - trigger: state
       entity_id: event.living_room_switch_rotary
       id: rotary
-
-    - trigger: state
-      entity_id: binary_sensor.someone_home
-      from: "on"
-      to: "off"
-      id: no_one_home
 
     - trigger: state
       entity_id: binary_sensor.everyone_sleeping
@@ -73,14 +53,86 @@
       id: sleeping
 
     - trigger: state
+      entity_id: binary_sensor.everyone_sleeping
+      to: "off"
+
+    - trigger: state
+      entity_id: binary_sensor.someone_home
+      from: "on"
+      to: "off"
+      id: no_one_home
+
+    - trigger: state
+      entity_id: binary_sensor.someone_home
+      to: "on"
+
+    - trigger: state
+      entity_id: binary_sensor.patio_door_long_open
+
+    - trigger: state
+      entity_id: binary_sensor.living_room_window
+
+    - trigger: state
       entity_id: input_select.living_room_robot_vacuum_current_cleaning
       to: living_room_cleaning
-      id: cleaning_start
 
     - trigger: state
       entity_id: input_select.living_room_robot_vacuum_current_cleaning
       from: living_room_cleaning
-      id: cleaning_end
+
+    - trigger: numeric_state
+      entity_id:
+        - cover.living_room_skylight_cover_north
+        - cover.living_room_skylight_cover_south
+      attribute: current_position
+      above: 50
+
+    - trigger: numeric_state
+      entity_id:
+        - cover.living_room_skylight_cover_north
+        - cover.living_room_skylight_cover_south
+      attribute: current_position
+      below: 50
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      above: 10000
+      for: "00:03:00"
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      below: 10000
+      for: "00:03:00"
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      above: 1000
+      for: "00:03:00"
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      below: 1000
+      for: "00:03:00"
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      above: 100
+      for: "00:03:00"
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      below: 100
+      for: "00:03:00"
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      above: 1
+      for: "00:03:00"
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      below: 1
+      for: "00:03:00"
 
     - trigger: state
       entity_id: binary_sensor.living_room_light
@@ -92,10 +144,569 @@
   conditions: []
 
   actions:
+    - variables:
+        current_mode: "{{ states('input_select.living_room_light_mode') }}"
+        force: false
+
     - choose:
         - conditions:
             - condition: trigger
+              id: rotary
+            - condition: state
+              entity_id: event.living_room_switch_rotary
+              attribute: event_type
+              state: clock_wise
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: custom
+            - action: script.living_room_light_rotary
+              data:
+                step: "{{ (state_attr('event.living_room_switch_rotary', 'steps')|float / 3.60)|round(0) }}"
+
+        - conditions:
+            - condition: trigger
+              id: rotary
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: custom
+            - action: script.living_room_light_rotary
+              data:
+                step: "{{ (state_attr('event.living_room_switch_rotary', 'steps')|float / -3.60)|round(0) }}"
+
+        - conditions:
+            - condition: trigger
+              id: lights_on
+            - condition: state
+              entity_id: binary_sensor.someone_home
+              state: "off"
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: "off"
+
+        - conditions:
+            - condition: trigger
+              id:
+                - button_long
+                - no_one_home
+                - sleeping
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: "off"
+
+        - conditions:
+            - condition: trigger
               id: button_1_short
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: standard
+
+        - conditions:
+            - condition: trigger
+              id: button_2_short
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: dining
+
+        - conditions:
+            - condition: trigger
+              id: button_3_short
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: lounging
+
+        - conditions:
+            - condition: trigger
+              id: button_4_short
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: all
+
+    - if:
+        - condition: trigger
+          id:
+            - button_1_short
+            - button_2_short
+            - button_3_short
+            - button_4_short
+        - condition: template
+          value_template: |-
+            {{ current_mode == states('input_select.living_room_light_mode') }}
+      then:
+        - variables:
+            force: true
+
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_robot_vacuum_current_cleaning
+              state: living_room_cleaning
+            - condition: state
+              entity_id: binary_sensor.someone_home
+              state: "on"
+            - condition: state
+              entity_id: binary_sensor.everyone_sleeping
+              state: "off"
+            - condition: template
+              value_template: "{{ force == false }}"
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                xy_color: [0.17, 0.70]
+                brightness_pct: 100
+              target:
+                entity_id:
+                  - light.living_room_light_strip_skylight
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: custom
+          sequence: []
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: "off"
+          sequence:
+            - action: light.turn_off
+              data:
+                transition: 1
+              target:
+                entity_id:
+                  - light.living_room_light_strip_skylight
+
+        - conditions:
+            - condition: numeric_state
+              entity_id: sensor.home_outside_illuminance
+              above: 1000
+            - condition: numeric_state
+              entity_id: cover.living_room_skylight_cover_north
+              attribute: current_position
+              above: 50
+            - condition: numeric_state
+              entity_id: cover.living_room_skylight_cover_south
+              attribute: current_position
+              above: 50
+            - condition: template
+              value_template: "{{ force == false }}"
+          sequence:
+            - action: light.turn_off
+              data:
+                transition: 1
+              target:
+                entity_id:
+                  - light.living_room_light_strip_skylight
+
+        - conditions:
+            - condition: numeric_state
+              entity_id: sensor.home_outside_illuminance
+              above: 1
+              below: 100
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: binary_sensor.patio_door_long_open
+                  state: "on"
+                - condition: state
+                  entity_id: binary_sensor.living_room_window
+                  state: "on"
+            - condition: template
+              value_template: "{{ force == false }}"
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: 1800
+                brightness_pct: 15
+              target:
+                entity_id:
+                  - light.living_room_light_strip_skylight
+
+        - conditions:
+            - condition: numeric_state
+              entity_id: sensor.home_outside_illuminance
+              below: 1
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: binary_sensor.patio_door_long_open
+                  state: "on"
+                - condition: state
+                  entity_id: binary_sensor.living_room_window
+                  state: "on"
+            - condition: template
+              value_template: "{{ force == false }}"
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: 2500
+                brightness_pct: 30
+              target:
+                entity_id:
+                  - light.living_room_light_strip_skylight
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: standard
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: 2700
+                brightness_pct: 80
+              target:
+                entity_id:
+                  - light.living_room_light_strip_skylight
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: dining
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: 2700
+                brightness_pct: 75
+              target:
+                entity_id:
+                  - light.living_room_light_strip_skylight
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: lounging
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: 2300
+                brightness_pct: 50
+              target:
+                entity_id:
+                  - light.living_room_light_strip_skylight
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: all
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: 3000
+                brightness_pct: 100
+              target:
+                entity_id:
+                  - light.living_room_light_strip_skylight
+
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: custom
+          sequence: []
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: "off"
+          sequence:
+            - action: light.turn_off
+              data:
+                transition: 1
+              target:
+                entity_id:
+                  - light.living_room_light_strip_tv
+                  - light.living_room_light_gradient_tube_tv
+
+        - conditions:
+            - condition: numeric_state
+              entity_id: sensor.home_outside_illuminance
+              above: 1
+              below: 100
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: binary_sensor.patio_door_long_open
+                  state: "on"
+                - condition: state
+                  entity_id: binary_sensor.living_room_window
+                  state: "on"
+            - condition: template
+              value_template: "{{ force == false }}"
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: 1800
+                brightness_pct: 15
+              target:
+                entity_id:
+                  - light.living_room_light_strip_tv
+                  - light.living_room_light_gradient_tube_tv
+
+        - conditions:
+            - condition: numeric_state
+              entity_id: sensor.home_outside_illuminance
+              below: 1
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: binary_sensor.patio_door_long_open
+                  state: "on"
+                - condition: state
+                  entity_id: binary_sensor.living_room_window
+                  state: "on"
+            - condition: template
+              value_template: "{{ force == false }}"
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: 2500
+                brightness_pct: 30
+              target:
+                entity_id:
+                  - light.living_room_light_strip_tv
+                  - light.living_room_light_gradient_tube_tv
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: lounging
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: 2700
+                brightness_pct: 75
+              target:
+                entity_id:
+                  - light.living_room_light_strip_tv
+                  - light.living_room_light_gradient_tube_tv
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: all
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: 3000
+                brightness_pct: 100
+              target:
+                entity_id:
+                  - light.living_room_light_strip_tv
+                  - light.living_room_light_gradient_tube_tv
+      default:
+        - action: light.turn_off
+          data:
+            transition: 1
+          target:
+            entity_id:
+              - light.living_room_light_strip_tv
+              - light.living_room_light_gradient_tube_tv
+
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: custom
+          sequence: []
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: "off"
+          sequence:
+            - action: light.turn_off
+              data:
+                transition: 1
+              target:
+                entity_id:
+                  - light.living_room_light_dining_table_spot_cabinet
+                  - light.living_room_light_dining_table_spot_sofa
+
+        - conditions:
+            - condition: numeric_state
+              entity_id: sensor.home_outside_illuminance
+              above: 10000
+            - condition: template
+              value_template: "{{ force == false }}"
+          sequence:
+            - action: light.turn_off
+              data:
+                transition: 1
+              target:
+                entity_id:
+                  - light.living_room_light_dining_table_spot_cabinet
+                  - light.living_room_light_dining_table_spot_sofa
+
+        - conditions:
+            - condition: numeric_state
+              entity_id: sensor.home_outside_illuminance
+              below: 100
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: binary_sensor.patio_door_long_open
+                  state: "on"
+                - condition: state
+                  entity_id: binary_sensor.living_room_window
+                  state: "on"
+            - condition: template
+              value_template: "{{ force == false }}"
+          sequence:
+            - action: light.turn_off
+              data:
+                transition: 1
+              target:
+                entity_id:
+                  - light.living_room_light_dining_table_spot_cabinet
+                  - light.living_room_light_dining_table_spot_sofa
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: dining
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: 2700
+                brightness_pct: 100
+              target:
+                entity_id:
+                  - light.living_room_light_dining_table_spot_cabinet
+                  - light.living_room_light_dining_table_spot_sofa
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: all
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: 3000
+                brightness_pct: 100
+              target:
+                entity_id:
+                  - light.living_room_light_dining_table_spot_cabinet
+                  - light.living_room_light_dining_table_spot_sofa
+      default:
+        - action: light.turn_off
+          data:
+            transition: 1
+          target:
+            entity_id:
+              - light.living_room_light_dining_table_spot_cabinet
+              - light.living_room_light_dining_table_spot_sofa
+
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: custom
+          sequence: []
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: "off"
+          sequence:
+            - action: light.turn_off
+              data:
+                transition: 1
+              target:
+                entity_id:
+                  - light.living_room_light_bookcase_left
+                  - light.living_room_light_bookcase_right
+                  - light.living_room_light_cabinet_left
+                  - light.living_room_light_cabinet_right
+                  - light.living_room_light_tv_left
+                  - light.living_room_light_tv_right
+                  - light.living_room_light_escher
+                  - light.living_room_light_window_left
+                  - light.living_room_light_window_right
+                  - light.living_room_light_strip_glass_cabinet
+                  - light.living_room_smart_plug_lamp
+                  - light.living_room_smart_plug_christmas_elf_house
+                  - light.living_room_light_coffee_table_1
+                  - light.living_room_light_coffee_table_2
+                  - light.living_room_light_table_lamp_cabinet
+                  - light.living_room_light_table_lamp_sofa
+
+        - conditions:
+            - condition: numeric_state
+              entity_id: sensor.home_outside_illuminance
+              below: 100
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: binary_sensor.patio_door_long_open
+                  state: "on"
+                - condition: state
+                  entity_id: binary_sensor.living_room_window
+                  state: "on"
+            - condition: template
+              value_template: "{{ force == false }}"
+          sequence:
+            - action: light.turn_off
+              data:
+                transition: 1
+              target:
+                entity_id:
+                  - light.living_room_light_bookcase_left
+                  - light.living_room_light_bookcase_right
+                  - light.living_room_light_cabinet_left
+                  - light.living_room_light_cabinet_right
+                  - light.living_room_light_tv_left
+                  - light.living_room_light_tv_right
+                  - light.living_room_light_escher
+                  - light.living_room_light_window_left
+                  - light.living_room_light_window_right
+                  - light.living_room_light_strip_glass_cabinet
+                  - light.living_room_smart_plug_lamp
+                  - light.living_room_smart_plug_christmas_elf_house
+                  - light.living_room_light_coffee_table_1
+                  - light.living_room_light_coffee_table_2
+                  - light.living_room_light_table_lamp_cabinet
+                  - light.living_room_light_table_lamp_sofa
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: standard
           sequence:
             - action: light.turn_on
               data:
@@ -113,7 +724,6 @@
                   - light.living_room_light_escher
                   - light.living_room_light_window_left
                   - light.living_room_light_window_right
-                  - light.living_room_light_strip_skylight
             - action: light.turn_on
               target:
                 entity_id:
@@ -124,36 +734,17 @@
                 transition: 1
               target:
                 entity_id:
-                  - light.living_room_light_dining_table_spot_cabinet
-                  - light.living_room_light_dining_table_spot_sofa
                   - light.living_room_light_strip_glass_cabinet
-                  - light.living_room_light_strip_tv
-                  - light.living_room_light_gradient_tube_tv
                   - light.living_room_light_coffee_table_1
                   - light.living_room_light_coffee_table_2
                   - light.living_room_light_table_lamp_cabinet
                   - light.living_room_light_table_lamp_sofa
 
         - conditions:
-            - condition: trigger
-              id: button_2_short
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: dining
           sequence:
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 2700
-                brightness_pct: 100
-              target:
-                entity_id:
-                  - light.living_room_light_dining_table_spot_cabinet
-                  - light.living_room_light_dining_table_spot_sofa
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 2700
-                brightness_pct: 75
-              target:
-                entity_id: light.living_room_light_strip_skylight
             - action: light.turn_on
               data:
                 transition: 1
@@ -174,7 +765,8 @@
                 color_temp_kelvin: 2300
                 brightness_pct: 50
               target:
-                entity_id: light.living_room_light_tv_left
+                entity_id:
+                  - light.living_room_light_tv_left
             - action: light.turn_on
               target:
                 entity_id:
@@ -191,12 +783,11 @@
                   - light.living_room_light_window_right
                   - light.living_room_light_coffee_table_1
                   - light.living_room_light_coffee_table_2
-                  - light.living_room_light_strip_tv
-                  - light.living_room_light_gradient_tube_tv
 
         - conditions:
-            - condition: trigger
-              id: button_3_short
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: lounging
           sequence:
             - action: light.turn_on
               data:
@@ -210,8 +801,6 @@
                   - light.living_room_light_escher
                   - light.living_room_light_window_left
                   - light.living_room_light_window_right
-                  - light.living_room_light_strip_tv
-                  - light.living_room_light_gradient_tube_tv
             - action: light.turn_on
               data:
                 transition: 1
@@ -229,7 +818,6 @@
               target:
                 entity_id:
                   - light.living_room_light_strip_glass_cabinet
-                  - light.living_room_light_strip_skylight
                   - light.living_room_light_table_lamp_cabinet
                   - light.living_room_light_table_lamp_sofa
             - action: light.turn_on
@@ -246,12 +834,11 @@
                   - light.living_room_light_bookcase_right
                   - light.living_room_light_cabinet_left
                   - light.living_room_light_cabinet_right
-                  - light.living_room_light_dining_table_spot_cabinet
-                  - light.living_room_light_dining_table_spot_sofa
 
         - conditions:
-            - condition: trigger
-              id: button_4_short
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: all
           sequence:
             - action: light.turn_on
               data:
@@ -269,12 +856,7 @@
                   - light.living_room_light_escher
                   - light.living_room_light_window_left
                   - light.living_room_light_window_right
-                  - light.living_room_light_dining_table_spot_cabinet
-                  - light.living_room_light_dining_table_spot_sofa
                   - light.living_room_light_strip_glass_cabinet
-                  - light.living_room_light_strip_skylight
-                  - light.living_room_light_strip_tv
-                  - light.living_room_light_gradient_tube_tv
                   - light.living_room_light_coffee_table_1
                   - light.living_room_light_coffee_table_2
                   - light.living_room_light_table_lamp_cabinet
@@ -284,110 +866,3 @@
                 entity_id:
                   - light.living_room_smart_plug_lamp
                   - light.living_room_smart_plug_christmas_elf_house
-
-        - conditions:
-            - condition: trigger
-              id: cleaning_start
-          sequence:
-            - action: light.turn_on
-              data:
-                transition: 1
-                xy_color: [0.17, 0.70]
-                brightness_pct: 100
-              target:
-                entity_id: light.living_room_light_strip_skylight
-
-        - conditions:
-            - condition: trigger
-              id: cleaning_end
-            - condition: template
-              value_template: |-
-                {% set xy = state_attr('light.living_room_light_strip_skylight', 'xy_color') %}
-                {{ xy is not none and xy[0] | round(2) == 0.17 and xy[1] | round(2) == 0.70 }}
-            - condition: state
-              entity_id: light.living_room_lights
-              state: "on"
-          sequence:
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: "{{ state_attr('light.hallway_lights', 'color_temp_kelvin') }}"
-                brightness: "{{ state_attr('light.hallway_lights', 'brightness') }}"
-              target:
-                entity_id: light.living_room_light_strip_skylight
-
-        - conditions:
-            - condition: trigger
-              id: cleaning_end
-          sequence:
-            - action: light.turn_off
-              target:
-                entity_id: light.living_room_light_strip_skylight
-
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: trigger
-                  id:
-                    - button_1_long
-                    - button_2_long
-                    - button_3_long
-                    - button_4_long
-                    - no_one_home
-                - condition: and
-                  conditions:
-                    - condition: trigger
-                      id: lights_on
-                    - condition: state
-                      entity_id: binary_sensor.someone_home
-                      state: "off"
-                - condition: and
-                  conditions:
-                    - condition: trigger
-                      id: sleeping
-          sequence:
-            - action: light.turn_off
-              data:
-                transition: 1
-              target:
-                entity_id:
-                  - light.living_room_light_bookcase_left
-                  - light.living_room_light_bookcase_right
-                  - light.living_room_light_cabinet_left
-                  - light.living_room_light_cabinet_right
-                  - light.living_room_light_tv_left
-                  - light.living_room_light_tv_right
-                  - light.living_room_light_escher
-                  - light.living_room_light_window_left
-                  - light.living_room_light_window_right
-                  - light.living_room_light_dining_table_spot_cabinet
-                  - light.living_room_light_dining_table_spot_sofa
-                  - light.living_room_light_strip_glass_cabinet
-                  - light.living_room_light_strip_skylight
-                  - light.living_room_light_strip_tv
-                  - light.living_room_light_gradient_tube_tv
-                  - light.living_room_smart_plug_lamp
-                  - light.living_room_smart_plug_christmas_elf_house
-                  - light.living_room_light_coffee_table_1
-                  - light.living_room_light_coffee_table_2
-                  - light.living_room_light_table_lamp_cabinet
-                  - light.living_room_light_table_lamp_sofa
-
-        - conditions:
-            - condition: trigger
-              id: rotary
-          sequence:
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: event.living_room_switch_rotary
-                      attribute: event_type
-                      state: clock_wise
-                  sequence:
-                    - action: script.living_room_light_rotary
-                      data:
-                        step: "{{ (state_attr('event.living_room_switch_rotary', 'steps')|float / 3.60)|round(0) }}"
-              default:
-                - action: script.living_room_light_rotary
-                  data:
-                    step: "{{ (state_attr('event.living_room_switch_rotary', 'steps')|float / -3.60)|round(0) }}"
