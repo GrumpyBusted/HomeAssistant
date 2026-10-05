@@ -649,6 +649,80 @@
                 transition: 1
               target:
                 entity_id:
+                  - light.living_room_light_coffee_table_1
+                  - light.living_room_light_coffee_table_2
+
+        - conditions:
+            - condition: numeric_state
+              entity_id: sensor.home_outside_illuminance
+              above: 1000
+            - condition: template
+              value_template: "{{ force == false }}"
+          sequence:
+            - action: light.turn_off
+              data:
+                transition: 1
+              target:
+                entity_id:
+                  - light.living_room_light_coffee_table_1
+                  - light.living_room_light_coffee_table_2
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: lounging
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: 2100
+                brightness_pct: 80
+              target:
+                entity_id:
+                  - light.living_room_light_coffee_table_1
+                  - light.living_room_light_coffee_table_2
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: all
+          sequence:
+            - action: light.turn_on
+              data:
+                transition: 1
+                color_temp_kelvin: 3000
+                brightness_pct: 100
+              target:
+                entity_id:
+                  - light.living_room_light_coffee_table_1
+                  - light.living_room_light_coffee_table_2
+
+      default:
+        - action: light.turn_off
+          data:
+            transition: 1
+          target:
+            entity_id:
+              - light.living_room_light_coffee_table_1
+              - light.living_room_light_coffee_table_2
+
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: custom
+          sequence: []
+
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: "off"
+          sequence:
+            - action: light.turn_off
+              data:
+                transition: 1
+              target:
+                entity_id:
                   - light.living_room_light_bookcase_left
                   - light.living_room_light_bookcase_right
                   - light.living_room_light_cabinet_left
@@ -661,8 +735,6 @@
                   - light.living_room_light_strip_glass_cabinet
                   - light.living_room_smart_plug_lamp
                   - light.living_room_smart_plug_christmas_elf_house
-                  - light.living_room_light_coffee_table_1
-                  - light.living_room_light_coffee_table_2
                   - light.living_room_light_table_lamp_cabinet
                   - light.living_room_light_table_lamp_sofa
 
@@ -698,8 +770,6 @@
                   - light.living_room_light_strip_glass_cabinet
                   - light.living_room_smart_plug_lamp
                   - light.living_room_smart_plug_christmas_elf_house
-                  - light.living_room_light_coffee_table_1
-                  - light.living_room_light_coffee_table_2
                   - light.living_room_light_table_lamp_cabinet
                   - light.living_room_light_table_lamp_sofa
 
@@ -735,8 +805,6 @@
               target:
                 entity_id:
                   - light.living_room_light_strip_glass_cabinet
-                  - light.living_room_light_coffee_table_1
-                  - light.living_room_light_coffee_table_2
                   - light.living_room_light_table_lamp_cabinet
                   - light.living_room_light_table_lamp_sofa
 
@@ -781,8 +849,6 @@
                   - light.living_room_light_escher
                   - light.living_room_light_window_left
                   - light.living_room_light_window_right
-                  - light.living_room_light_coffee_table_1
-                  - light.living_room_light_coffee_table_2
 
         - conditions:
             - condition: state
@@ -801,15 +867,6 @@
                   - light.living_room_light_escher
                   - light.living_room_light_window_left
                   - light.living_room_light_window_right
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 2100
-                brightness_pct: 80
-              target:
-                entity_id:
-                  - light.living_room_light_coffee_table_1
-                  - light.living_room_light_coffee_table_2
             - action: light.turn_on
               data:
                 transition: 1
@@ -857,8 +914,6 @@
                   - light.living_room_light_window_left
                   - light.living_room_light_window_right
                   - light.living_room_light_strip_glass_cabinet
-                  - light.living_room_light_coffee_table_1
-                  - light.living_room_light_coffee_table_2
                   - light.living_room_light_table_lamp_cabinet
                   - light.living_room_light_table_lamp_sofa
             - action: light.turn_on
