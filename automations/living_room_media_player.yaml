@@ -55,15 +55,15 @@
   conditions: []
 
   actions:
-    - action: logbook.log
+    - action: system_log.write
       data:
-        name: Stue medieafspiller
+        level: warning
         message: |-
-          Trigger={{ trigger.id }}, 
-          Apple TV={{ states('sensor.living_room_apple_tv_media_player_safe') }}, 
-          Receiver={{ states('media_player.living_room_receiver') }}, 
-          TV={{ states('media_player.living_room_tv') }}
-        entity_id: automation.living_room_media_player
+          Trigger: {{ trigger.id }}
+          Current position: {{ state_attr('cover.emils_room_blind', 'current_position') }}
+          Desired position: {{ states('input_number.emils_room_blind_position') }}
+          New position: {{ position }}
+          entity_id: automation.living_room_media_player
 
     - variables:
         command: pause
