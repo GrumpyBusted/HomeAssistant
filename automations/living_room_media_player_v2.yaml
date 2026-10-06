@@ -1,0 +1,327 @@
+- id: "17692576821231"
+  alias: Stue medieafspiller v2
+  description: |
+    Styring af tilbehør til medie afspilning i Stuen
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 50
+
+  triggers:
+    - trigger: state
+      entity_id: sensor.living_room_apple_tv_media_player_safe
+      to: "off"
+      id: "off"
+      for: 00:00:03
+
+    - trigger: state
+      entity_id: sensor.living_room_apple_tv_media_player_safe
+      to: idle
+      id: waiting
+
+    - trigger: state
+      entity_id: sensor.living_room_apple_tv_media_player_safe
+      to:
+        - playing
+        - buffering
+      id: playing
+
+    - trigger: state
+      entity_id: sensor.living_room_apple_tv_media_player_safe
+      to: paused
+      id: paused
+
+    - trigger: state
+      entity_id: media_player.living_room_receiver
+      to: "off"
+      id: receiver_off
+
+    - trigger: state
+      entity_id: binary_sensor.someone_home
+      from: "on"
+      to: "off"
+      id: no_one_home
+
+    - trigger: state
+      entity_id:
+        - event.living_room_switch_button_1
+        - event.living_room_switch_button_2
+        - event.living_room_switch_button_3
+        - event.living_room_switch_button_4
+      attribute: event_type
+      to: long_release
+      id: living_room_button_long_press
+
+  conditions: []
+
+  actions:
+    - action: logbook.log
+      data:
+        name: Stue medieafspiller
+        message: |-
+          Trigger={{ trigger.id }}, 
+          Apple TV={{ states('sensor.living_room_apple_tv_media_player_safe') }}, 
+          Receiver={{ states('media_player.living_room_receiver') }}, 
+          TV={{ states('media_player.living_room_tv') }}
+        entity_id: automation.living_room_media_player
+
+    - variables:
+        command: pause
+
+    - choose:
+        - conditions:
+            - condition: trigger
+              id:
+                - living_room_button_long_press
+                - no_one_home
+          sequence:
+            - variables:
+                command: "off"
+
+        - conditions:
+            - condition: trigger
+              id: "off"
+          sequence:
+            - variables:
+                command: "off"
+
+        - conditions:
+            - condition: trigger
+              id:
+                - waiting
+                - paused
+          sequence:
+            - variables:
+                command: pause
+
+        - conditions:
+            - condition: trigger
+              id: playing
+          sequence:
+            - variables:
+                command: playing
+
+        - conditions:
+            - condition: trigger
+              id: receiver_off
+          sequence:
+            - variables:
+                command: "off"
+
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: |-
+                {{ command == 'off' }}
+          sequence:
+            - parallel:
+                - if:
+                    - condition: not
+                      conditions:
+                        - condition: state
+                          entity_id: sensor.living_room_apple_tv_media_player_safe
+                          state: "off"
+                  then:
+                    - action: media_player.turn_off
+                      target:
+                        entity_id: media_player.living_room_apple_tv_media_player
+                - if:
+                    - condition: state
+                      entity_id: light.living_room_light_strip_receiver
+                      state: "on"
+                  then:
+                    - action: light.turn_off
+                      data:
+                        transition: 1
+                      target:
+                        entity_id: light.living_room_light_strip_receiver
+                - if:
+                    - condition: state
+                      entity_id: light.living_room_smart_plug_receiver_accessories
+                      state: "on"
+                  then:
+                    - action: light.turn_off
+                      target:
+                        entity_id: light.living_room_smart_plug_receiver_accessories
+                - if:
+                    - condition: state
+                      entity_id: media_player.living_room_receiver
+                      state: "on"
+                  then:
+                    - action: media_player.turn_off
+                      target:
+                        entity_id: media_player.living_room_receiver
+                - if:
+                    - condition: state
+                      entity_id: switch.living_room_tv_sync_box_power
+                      state: "on"
+                  then:
+                    - action: switch.turn_off
+                      target:
+                        entity_id: switch.living_room_tv_sync_box_power
+                - if:
+                    - condition: state
+                      entity_id: media_player.living_room_tv
+                      state: "on"
+                  then:
+                    - action: media_player.turn_off
+                      target:
+                        entity_id: media_player.living_room_tv
+      default:
+        - parallel:
+            - sequence:
+                - if:
+                    - condition: state
+                      entity_id: media_player.living_room_tv
+                      state: "off"
+                  then:
+                    - action: media_player.turn_on
+                      target:
+                        entity_id: media_player.living_room_tv
+                    - wait_template: "{{ not is_state('media_player.living_room_tv', 'off') }}"
+                      timeout: "00:00:10"
+                      continue_on_timeout: true
+                - if:
+                    - condition: state
+                      entity_id: media_player.living_room_receiver
+                      state: "off"
+                  then:
+                    - action: media_player.turn_on
+                      target:
+                        entity_id: media_player.living_room_receiver
+                    - wait_template: "{{ not is_state('media_player.living_room_receiver', 'off') }}"
+                      timeout: "00:00:10"
+                      continue_on_timeout: true
+                - if:
+                    - condition: state
+                      entity_id: switch.living_room_tv_sync_box_power
+                      state: "off"
+                  then:
+                    - action: switch.turn_on
+                      target:
+                        entity_id: switch.living_room_tv_sync_box_power
+                    - wait_template: "{{ is_state('switch.living_room_tv_sync_box_power', 'on') }}"
+                      timeout: "00:00:10"
+                      continue_on_timeout: true
+                - if:
+                    - condition: state
+                      entity_id: sensor.living_room_apple_tv_media_player_safe
+                      state: "off"
+                  then:
+                    - action: media_player.turn_on
+                      target:
+                        entity_id: media_player.living_room_apple_tv_media_player
+                    - wait_template: "{{ not is_state('sensor.living_room_apple_tv_media_player_safe', 'off') }}"
+                      timeout: "00:00:10"
+                      continue_on_timeout: true
+                - if:
+                    - condition: template
+                      value_template: "{{ state_attr('media_player.living_room_receiver', 'source') != 'Apple TV' }}"
+                  then:
+                    - action: media_player.select_source
+                      target:
+                        entity_id: media_player.living_room_receiver
+                      data:
+                        source: Apple TV
+                - action: media_player.select_sound_mode
+                  target:
+                    entity_id: media_player.living_room_receiver
+                  data:
+                    sound_mode: DOLBY DIGITAL
+                - action: media_player.volume_set
+                  target:
+                    entity_id: media_player.living_room_receiver
+                  data:
+                    volume_level: 0.27
+            - if:
+                - condition: state
+                  entity_id: light.living_room_light_strip_receiver
+                  state: "off"
+              then:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 2700
+                    brightness_pct: 100
+                  target:
+                    entity_id: light.living_room_light_strip_receiver
+            - if:
+                - condition: state
+                  entity_id: light.living_room_smart_plug_receiver_accessories
+                  state: "off"
+              then:
+                - action: light.turn_on
+                  target:
+                    entity_id: light.living_room_smart_plug_receiver_accessories
+
+        - if:
+            - condition: template
+              value_template: "{{ not is_state('media_player.living_room_tv', 'off') }}"
+          then:
+            - if:
+                - condition: template
+                  value_template: "{{ state_attr('media_player.living_room_tv', 'source') != 'HDMI 3 (eARC/ARC)' }}"
+              then:
+                - action: media_player.select_source
+                  target:
+                    entity_id: media_player.living_room_tv
+                  data:
+                    source: HDMI 3 (eARC/ARC)
+        - if:
+            - condition: template
+              value_template: "{{ not is_state('media_player.living_room_receiver', 'off') }}"
+          then:
+            - if:
+                - condition: template
+                  value_template: "{{ state_attr('media_player.living_room_receiver', 'source') != 'Apple TV' }}"
+              then:
+                - action: media_player.select_source
+                  target:
+                    entity_id: media_player.living_room_receiver
+                  data:
+                    source: Apple TV
+
+        - choose:
+            - conditions:
+                - condition: template
+                  value_template: "{{ command == 'playing' }}"
+              sequence:
+                - action: switch.turn_on
+                  target:
+                    entity_id: switch.living_room_tv_sync_box_power
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_tv_sync_box_hdmi_input
+                  data:
+                    option: Receiver
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_tv_sync_box_entertainment_area
+                  data:
+                    option: TV-område
+                - action: number.set_value
+                  target:
+                    entity_id: number.living_room_tv_sync_box_brightness
+                  data:
+                    value: "100"
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_tv_sync_box_intensity
+                  data:
+                    option: moderate
+                - action: select.select_option
+                  target:
+                    entity_id: select.living_room_tv_sync_box_sync_mode
+                  data:
+                    option: video
+                - action: switch.turn_on
+                  target:
+                    entity_id: switch.living_room_tv_sync_box_light_sync
+            - conditions:
+                - condition: template
+                  value_template: |-
+                    {{ command == 'pause' }}
+              sequence:
+                - action: switch.turn_off
+                  target:
+                    entity_id: switch.living_room_tv_sync_box_light_sync

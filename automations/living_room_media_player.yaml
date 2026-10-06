@@ -55,6 +55,16 @@
   conditions: []
 
   actions:
+    - action: logbook.log
+      data:
+        name: Stue medieafspiller
+        message: |-
+          Trigger={{ trigger.id }}, 
+          Apple TV={{ states('sensor.living_room_apple_tv_media_player_safe') }}, 
+          Receiver={{ states('media_player.living_room_receiver') }}, 
+          TV={{ states('media_player.living_room_tv') }}
+        entity_id: automation.living_room_media_player
+
     - variables:
         command: pause
 
