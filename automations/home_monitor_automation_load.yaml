@@ -17,6 +17,7 @@
         default_limit: 100
         custom_limits:
           automation.bedroom_presence_sensor: 200
+          automation.bedroom_air_purifier: 150
           automation.driveway_light: 300
           automation.driveway_light_house_south: 300
           automation.driveway_motion_sensor_entrance: 1000
@@ -47,6 +48,8 @@
           automation.utility_room_motion_sensor: 1000
           automation.utility_room_light: 200
           automation.utility_room_washer: 400
+          automation.utility_room_todo_soap: 150
+          automation.utility_room_heating: 200
     - action: sql.query
       data:
         query: |-
