@@ -1,0 +1,55 @@
+- id: AED45BA1-517A-41A7-B96B-2BF273932B26
+  alias: Emils værelses todo dør
+  description: |
+    Overvåg døren til Emils værelse, send beskeder hvis døren er åben for længe og vinduet er åbent
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 50
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.emils_room_door_long_open
+      to: "on"
+
+    - trigger: state
+      entity_id: binary_sensor.emils_room_window
+      to: "on"
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.emils_room_door_long_open
+              state: "on"
+            - condition: state
+              entity_id: binary_sensor.emils_room_window
+              state: "on"
+            - condition: numeric_state
+              entity_id: sensor.home_heat_need
+              above: 0.5
+          sequence:
+            - if:
+                - condition: state
+                  entity_id: binary_sensor.emil_home
+                  state: "on"
+              then:
+                - action: script.push_notification
+                  data:
+                    type: critical
+                    title: Advarsel
+                    id: emils_room_door_open
+                    persistent: false
+                    recipient: emil
+                    message: Luk døren til dit værelse når vinduet er åbent!
+              else:
+                - action: script.push_notification
+                  data:
+                    type: critical
+                    title: Advarsel
+                    id: emils_room_door_open
+                    persistent: false
+                    recipient: home
+                    message: Luk døren til Emils værelse når vinduet er åbent!

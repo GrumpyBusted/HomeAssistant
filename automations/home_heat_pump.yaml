@@ -14,14 +14,20 @@
     - trigger: state
       entity_id: sensor.home_heat_pump_offset
 
+    - trigger: time_pattern
+      minutes: "/5"
+      id: fallback
+
   conditions: []
 
   actions:
     - choose:
         - conditions:
-            - condition: climate.is_on
-              target:
-                entity_id: climate.home_heat_pump
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: climate.home_heat_pump
+                  state: "off"
             - condition: state
               entity_id: binary_sensor.home_heat_pump_operation
               state: "off"
@@ -30,9 +36,9 @@
               target:
                 entity_id: climate.home_heat_pump
         - conditions:
-            - condition: climate.is_off
-              target:
-                entity_id: climate.home_heat_pump
+            - condition: state
+              entity_id: climate.home_heat_pump
+              state: "off"
             - condition: state
               entity_id: binary_sensor.home_heat_pump_operation
               state: "on"
@@ -45,40 +51,36 @@
                 entity_id: climate.home_heat_pump
               data:
                 hvac_mode: heat
-            - wait_template: >
-                {{ not is_state('climate.home_heat_pump', 'off') }}
-
-
+            - wait_template: "{{ not is_state('climate.home_heat_pump', 'off') }}"
               timeout: "00:00:05"
               continue_on_timeout: true
-            - wait_template: >
-                {{ state_attr('climate.home_heat_pump', 'min_temp') < 0 }}
-
-
-              timeout: "00:00:10"
+            - wait_template: "{{ state_attr('climate.home_heat_pump', 'min_temp') < 0 }}"
+              timeout: "00:00:15"
               continue_on_timeout: true
 
     - if:
         - condition: state
           entity_id: binary_sensor.home_heat_pump_operation
           state: "on"
-        - condition: climate.is_on
-          target:
-            entity_id: climate.home_heat_pump
+        - condition: not
+          conditions:
+            - condition: state
+              entity_id: climate.home_heat_pump
+              state: "off"
       then:
         - action: climate.set_temperature
           target:
             entity_id: climate.home_heat_pump
           data:
-            temperature: >
+            temperature: |-
               {{ states('sensor.home_heat_pump_offset') | float(0) }}
-
+          continue_on_error: true
 
     - choose:
         - conditions:
-            - condition: climate.is_off
-              target:
-                entity_id: climate.home_heat_pump
+            - condition: state
+              entity_id: climate.home_heat_pump
+              state: "off"
           sequence: []
         - conditions:
             - condition: numeric_state
