@@ -1,0 +1,40 @@
+- id: D49B95D1-A648-48BF-A346-BA3996F96840
+  alias: Hjem sæt opstartsbeskyttelse
+  description: |
+    Beskyt medieautomationen mod utilsigtede off-signaler ved opstart.
+  mode: restart
+  trace:
+    stored_traces: 20
+
+  triggers:
+    - trigger: homeassistant
+      event: shutdown
+      id: shutdown
+
+    - trigger: homeassistant
+      event: start
+      id: startup
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: shutdown
+          sequence:
+            - action: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.home_assistant_restart_protection
+
+        - conditions:
+            - condition: trigger
+              id: startup
+          sequence:
+            - action: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.home_assistant_restart_protection
+            - delay: "00:00:20"
+            - action: input_boolean.turn_off
+              target:
+                entity_id: input_boolean.home_assistant_restart_protection

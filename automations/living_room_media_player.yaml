@@ -14,73 +14,49 @@
       id: "off"
       for: 00:00:03
 
-    # - trigger: state
-    #   entity_id: sensor.living_room_apple_tv_media_player_safe
-    #   to: idle
-    #   id: waiting
+    - trigger: state
+      entity_id: sensor.living_room_apple_tv_media_player_safe
+      to: idle
+      id: waiting
 
-    # - trigger: state
-    #   entity_id: sensor.living_room_apple_tv_media_player_safe
-    #   to:
-    #     - playing
-    #     - buffering
-    #   id: playing
+    - trigger: state
+      entity_id: sensor.living_room_apple_tv_media_player_safe
+      to:
+        - playing
+        - buffering
+      id: playing
 
-    # - trigger: state
-    #   entity_id: sensor.living_room_apple_tv_media_player_safe
-    #   to: paused
-    #   id: paused
+    - trigger: state
+      entity_id: sensor.living_room_apple_tv_media_player_safe
+      to: paused
+      id: paused
 
-    # - trigger: state
-    #   entity_id: media_player.living_room_receiver
-    #   to: "off"
-    #   id: receiver_off
+    - trigger: state
+      entity_id: media_player.living_room_receiver
+      to: "off"
+      id: receiver_off
 
-    # - trigger: state
-    #   entity_id: binary_sensor.someone_home
-    #   from: "on"
-    #   to: "off"
-    #   id: no_one_home
+    - trigger: state
+      entity_id: binary_sensor.someone_home
+      from: "on"
+      to: "off"
+      id: no_one_home
 
-    # - trigger: state
-    #   entity_id:
-    #     - event.living_room_switch_button_1
-    #     - event.living_room_switch_button_2
-    #     - event.living_room_switch_button_3
-    #     - event.living_room_switch_button_4
-    #   attribute: event_type
-    #   to: long_release
-    #   id: living_room_button_long_press
+    - trigger: state
+      entity_id:
+        - event.living_room_switch_button_1
+        - event.living_room_switch_button_2
+        - event.living_room_switch_button_3
+        - event.living_room_switch_button_4
+      attribute: event_type
+      to: long_release
+      id: living_room_button_long_press
 
   conditions: []
 
   actions:
-    - action: script.push_notification
-      data:
-        type: info
-        recipient: none
-        persistent: true
-        id: living_room_media_player
-        title: Tracing Stue Media
-        message: |-
-          Trigger: {{ trigger.id }}
-          Trigger entity: {{ trigger.entity_id | default('ukendt') }}
-          Trigger from: {{ trigger.from_state.state if trigger.from_state is defined and trigger.from_state else 'ukendt' }}
-          Trigger to: {{ trigger.to_state.state if trigger.to_state is defined and trigger.to_state else 'ukendt' }}
-          Apple TV safe: {{ states('sensor.living_room_apple_tv_media_player_safe') }}
-          Apple TV player: {{ states('media_player.living_room_apple_tv_media_player') }}
-          Receiver: {{ states('media_player.living_room_receiver') }}
-          TV: {{ states('media_player.living_room_tv') }}
-          Sync Box power: {{ states('switch.living_room_tv_sync_box_power') }}
-          Sync Box light sync: {{ states('switch.living_room_tv_sync_box_light_sync') }}
-          Receiver source: {{ state_attr('media_player.living_room_receiver', 'source') }}
-          TV source: {{ state_attr('media_player.living_room_tv', 'source') }}
-          Someone home: {{ states('binary_sensor.someone_home') }}
-          Timestamp: {{ now().strftime('%Y-%m-%d %H:%M:%S') }}
-          Automation: automation.living_room_media_player
-
     - variables:
-        command: pause
+        command: none
 
     - choose:
         - conditions:
@@ -95,6 +71,9 @@
         - conditions:
             - condition: trigger
               id: "off"
+            - condition: state
+              entity_id: input_boolean.home_assistant_restart_protection
+              state: "off"
           sequence:
             - variables:
                 command: "off"
@@ -123,6 +102,12 @@
                 command: "off"
 
     - choose:
+        - conditions:
+            - condition: template
+              value_template: |-
+                {{ command == 'none' }}
+          sequence: []
+
         - conditions:
             - condition: template
               value_template: |-
