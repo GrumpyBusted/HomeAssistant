@@ -19,12 +19,12 @@
     #   to: idle
     #   id: waiting
 
-    # - trigger: state
-    #   entity_id: sensor.living_room_apple_tv_media_player_safe
-    #   to:
-    #     - playing
-    #     - buffering
-    #   id: playing
+    - trigger: state
+      entity_id: sensor.living_room_apple_tv_media_player_safe
+      to:
+        - playing
+        - buffering
+      id: playing
 
     - trigger: state
       entity_id: sensor.living_room_apple_tv_media_player_safe
