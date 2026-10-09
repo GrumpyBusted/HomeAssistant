@@ -55,15 +55,29 @@
   conditions: []
 
   actions:
-    - action: system_log.write
+    - action: script.push_notification
       data:
-        level: warning
+        type: info
+        recipient: none
+        persistent: true
+        id: living_room_media_player
+        title: Tracing Stue Media
         message: |-
           Trigger: {{ trigger.id }}
-          Current position: {{ state_attr('cover.emils_room_blind', 'current_position') }}
-          Desired position: {{ states('input_number.emils_room_blind_position') }}
-          New position: {{ position }}
-          entity_id: automation.living_room_media_player
+          Trigger entity: {{ trigger.entity_id | default('ukendt') }}
+          Trigger from: {{ trigger.from_state.state if trigger.from_state is defined and trigger.from_state else 'ukendt' }}
+          Trigger to: {{ trigger.to_state.state if trigger.to_state is defined and trigger.to_state else 'ukendt' }}
+          Apple TV safe: {{ states('sensor.living_room_apple_tv_media_player_safe') }}
+          Apple TV player: {{ states('media_player.living_room_apple_tv_media_player') }}
+          Receiver: {{ states('media_player.living_room_receiver') }}
+          TV: {{ states('media_player.living_room_tv') }}
+          Sync Box power: {{ states('switch.living_room_tv_sync_box_power') }}
+          Sync Box light sync: {{ states('switch.living_room_tv_sync_box_light_sync') }}
+          Receiver source: {{ state_attr('media_player.living_room_receiver', 'source') }}
+          TV source: {{ state_attr('media_player.living_room_tv', 'source') }}
+          Someone home: {{ states('binary_sensor.someone_home') }}
+          Timestamp: {{ now().strftime('%Y-%m-%d %H:%M:%S') }}
+          Automation: automation.living_room_media_player
 
     - variables:
         command: pause

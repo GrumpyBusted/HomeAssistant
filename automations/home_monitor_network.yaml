@@ -145,18 +145,18 @@
                 wan_google: "{{ states('sensor.technic_room_cloud_gateway_google_wan_latency') | float(0) }}"
                 wan_cloudflare: "{{ states('sensor.technic_room_cloud_gateway_cloudflare_wan_latency') | float(0) }}"
                 unifi_devices:
-                  - sensor.technic_room_cloud_gateway
-                  - sensor.emils_room_network_switch
-                  - sensor.garage_network_switch
-                  - sensor.living_room_network_switch
-                  - sensor.hallway_accesspoint
-                  - sensor.living_room_accesspoint
-                  - sensor.garage_accesspoint
-                  - sensor.patio_accesspoint
+                  - sensor.technic_room_cloud_gateway_state
+                  - sensor.emils_room_network_switch_state
+                  - sensor.garage_network_switch_state
+                  - sensor.living_room_network_switch_state
+                  - sensor.hallway_accesspoint_state
+                  - sensor.living_room_accesspoint_state
+                  - sensor.garage_accesspoint_state
+                  - sensor.patio_accesspoint_state
                 unifi_problems: |-
                   {% set ns = namespace(list=[]) %}
-                  {% for base in unifi_devices %}
-                    {% set state_sensor = base ~ '_state' %}
+                  {% for state_sensor  in unifi_devices %}
+                    {% set base = state_sensor | regex_replace('_state$', '') %}
                     {% set cpu_sensor = base ~ '_cpu_utilization' %}
                     {% set memory_sensor = base ~ '_memory_utilization' %}
                     {% set state = states(state_sensor) | lower %}
