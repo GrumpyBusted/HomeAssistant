@@ -26,10 +26,10 @@
     #     - buffering
     #   id: playing
 
-    # - trigger: state
-    #   entity_id: sensor.living_room_apple_tv_media_player_safe
-    #   to: paused
-    #   id: paused
+    - trigger: state
+      entity_id: sensor.living_room_apple_tv_media_player_safe
+      to: paused
+      id: paused
 
     - trigger: state
       entity_id: media_player.living_room_receiver
