@@ -8,11 +8,11 @@
     stored_traces: 50
 
   triggers:
-    # - trigger: state
-    #   entity_id: sensor.living_room_apple_tv_media_player_safe
-    #   to: "off"
-    #   id: "off"
-    #   for: 00:00:03
+    - trigger: state
+      entity_id: sensor.living_room_apple_tv_media_player_safe
+      to: "off"
+      id: "off"
+      for: 00:00:03
 
     - trigger: state
       entity_id: sensor.living_room_apple_tv_media_player_safe
