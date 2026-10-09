@@ -8,49 +8,49 @@
     stored_traces: 50
 
   triggers:
-    - trigger: state
-      entity_id: sensor.living_room_apple_tv_media_player_safe
-      to: "off"
-      id: "off"
-      for: 00:00:03
+    # - trigger: state
+    #   entity_id: sensor.living_room_apple_tv_media_player_safe
+    #   to: "off"
+    #   id: "off"
+    #   for: 00:00:03
 
-    - trigger: state
-      entity_id: sensor.living_room_apple_tv_media_player_safe
-      to: idle
-      id: waiting
+    # - trigger: state
+    #   entity_id: sensor.living_room_apple_tv_media_player_safe
+    #   to: idle
+    #   id: waiting
 
-    - trigger: state
-      entity_id: sensor.living_room_apple_tv_media_player_safe
-      to:
-        - playing
-        - buffering
-      id: playing
+    # - trigger: state
+    #   entity_id: sensor.living_room_apple_tv_media_player_safe
+    #   to:
+    #     - playing
+    #     - buffering
+    #   id: playing
 
-    - trigger: state
-      entity_id: sensor.living_room_apple_tv_media_player_safe
-      to: paused
-      id: paused
+    # - trigger: state
+    #   entity_id: sensor.living_room_apple_tv_media_player_safe
+    #   to: paused
+    #   id: paused
 
-    - trigger: state
-      entity_id: media_player.living_room_receiver
-      to: "off"
-      id: receiver_off
+    # - trigger: state
+    #   entity_id: media_player.living_room_receiver
+    #   to: "off"
+    #   id: receiver_off
 
-    - trigger: state
-      entity_id: binary_sensor.someone_home
-      from: "on"
-      to: "off"
-      id: no_one_home
+    # - trigger: state
+    #   entity_id: binary_sensor.someone_home
+    #   from: "on"
+    #   to: "off"
+    #   id: no_one_home
 
-    - trigger: state
-      entity_id:
-        - event.living_room_switch_button_1
-        - event.living_room_switch_button_2
-        - event.living_room_switch_button_3
-        - event.living_room_switch_button_4
-      attribute: event_type
-      to: long_release
-      id: living_room_button_long_press
+    # - trigger: state
+    #   entity_id:
+    #     - event.living_room_switch_button_1
+    #     - event.living_room_switch_button_2
+    #     - event.living_room_switch_button_3
+    #     - event.living_room_switch_button_4
+    #   attribute: event_type
+    #   to: long_release
+    #   id: living_room_button_long_press
 
   conditions: []
 

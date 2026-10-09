@@ -23,7 +23,7 @@
 
   actions:
     - choose:
-        - conditions: 
+        - conditions:
             - condition: trigger
               id: started
           sequence:
@@ -32,7 +32,7 @@
                 entity_id: timer.home_monitor_entities_timer
               data:
                 duration:
-                  minutes: 5
+                  minutes: 10
       default:
         - action: timer.cancel
           target:
