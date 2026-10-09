@@ -32,7 +32,7 @@
                 description: Hæld mere sæbe på sæbedispenser i køkkenet.
                 related_entity_id: input_number.kitchen_soap_seconds_last_change
                 entity_id: todo.todo_smart_todo
-                is_active: "{{ states('input_number.kitchen_presence_sensor_seconds') | int(0) > states('input_number.kitchen_soap_seconds_last_change') | int(0) + 200000 }}"
+                is_active: "{{ states('input_number.kitchen_presence_sensor_seconds') | int(0) > states('input_number.kitchen_soap_seconds_last_change') | int(0) + 500000 }}"
 
         - conditions:
             - condition: trigger
