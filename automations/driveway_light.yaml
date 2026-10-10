@@ -58,17 +58,21 @@
 
     - trigger: state
       entity_id: binary_sensor.home_outside_light
+      from: "off"
+      to: "on"
+      id: light_outside
+
+    - trigger: state
+      entity_id: binary_sensor.home_light_decoration
+      from: "off"
+      to: "on"
+      id: decoration_on
+
+    - trigger: state
+      entity_id: binary_sensor.home_light_decoration
       from: "on"
       to: "off"
-      id: twilight
-
-    - trigger: time
-      at:
-        - "22:00:00"
-        - "23:00:00"
-        - "00:00:00"
-        - "01:00:00"
-      id: night
+      id: decoration_off
 
   conditions: []
 
@@ -151,7 +155,7 @@
                 - cleared_south
                 - cleared_entrance
                 - cleared_east
-                - twilight
+                - decoration_on
             - condition: state
               entity_id: binary_sensor.driveway_street_presence
               state: "off"
@@ -165,67 +169,27 @@
               entity_id: binary_sensor.garden_house_east_presence
               state: "off"
             - condition: state
-              entity_id: binary_sensor.home_outside_light
-              state: "off"
-            - condition: template
-              value_template: |-
-                {% set wd = now().weekday() %}
-                {% set h = now().hour %}
-                {% set d = now().day %}
-                {% set m = now().month %}
-                {{ (m == 12 and d == 24) or
-                   (m == 12 and d == 31) or
-                   (m == 1 and d == 1 and h < 1) or
-                   (wd in [4,5] and h < 23) or
-                   (wd in [0,1,2,3,6] and h < 22) }}
-            - condition: time
-              after: "12:00:00"
+              entity_id: binary_sensor.home_light_decoration
+              state: "on"
           sequence:
+            - variables:
+                date: "{{ now().strftime('%m-%d') }}"
+                day: "{{['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'][now().weekday()] }}"
+                week: "{{ now().isocalendar().week }}"
+
             - choose:
                 - conditions:
                     - condition: template
-                      value_template: |-
-                        {{ now().month == 12 and now().day >= 1 and now().day <= 26 }}
+                      value_template: "{{ date <= '02-04' }}"
                   sequence:
                     - action: scene.turn_on
                       target:
-                        entity_id: scene.driveway_light_christmas
+                        entity_id: scene.driveway_light_world_cancer_day
                       data:
                         transition: 1
                 - conditions:
                     - condition: template
-                      value_template: |-
-                        {{ (now().month == 12 and now().day >= 30) or (now().month == 1 and now().day == 1) }}
-                  sequence:
-                    - action: scene.turn_on
-                      target:
-                        entity_id: scene.driveway_light_new_years
-                      data:
-                        transition: 1
-                - conditions:
-                    - condition: template
-                      value_template: |-
-                        {{ now().month == 10 and now().day >= 15 and now().day <= 31 }}
-                  sequence:
-                    - action: scene.turn_on
-                      target:
-                        entity_id: scene.driveway_light_halloween
-                      data:
-                        transition: 1
-                - conditions:
-                    - condition: template
-                      value_template: |-
-                        {{ now().month == 3 and now().day == 17 }}
-                  sequence:
-                    - action: scene.turn_on
-                      target:
-                        entity_id: scene.driveway_light_sankt_patrick
-                      data:
-                        transition: 1
-                - conditions:
-                    - condition: template
-                      value_template: |-
-                        {{ now().month == 2 and now().day == 14 }}
+                      value_template: "{{ date <= '02-14' }}"
                   sequence:
                     - action: scene.turn_on
                       target:
@@ -234,105 +198,112 @@
                         transition: 1
                 - conditions:
                     - condition: template
-                      value_template: |-
-                        {{ now().isocalendar().week == 40 and now().isoweekday() == 6 }}
-                  sequence:
-                    - action: scene.turn_on
-                      target:
-                        entity_id: scene.driveway_light_breast_cancer_awareness
-                      data:
-                        transition: 1
-                - conditions:
-                    - condition: template
-                      value_template: |-
-                        {{ now().month == 4 and now().day == 2 }}
-                  sequence:
-                    - action: scene.turn_on
-                      target:
-                        entity_id: scene.driveway_light_autism_awareness_day
-                      data:
-                        transition: 1
-
-                - conditions:
-                    - condition: template
-                      value_template: "{{ now().month == 2 and now().day == 4 }}"
-                  sequence:
-                    - action: scene.turn_on
-                      target:
-                        entity_id: scene.driveway_light_world_cancer_day
-                      data:
-                        transition: 1
-
-                - conditions:
-                    - condition: template
-                      value_template: "{{ now().month == 12 and now().day == 1 }}"
-                  sequence:
-                    - action: scene.turn_on
-                      target:
-                        entity_id: scene.driveway_light_world_aids_day
-                      data:
-                        transition: 1
-
-                - conditions:
-                    - condition: template
-                      value_template: "{{ now().month == 5 and now().day == 17 }}"
-                  sequence:
-                    - action: scene.turn_on
-                      target:
-                        entity_id: scene.driveway_light_idahobit
-                      data:
-                        transition: 1
-
-                - conditions:
-                    - condition: template
-                      value_template: "{{ now().month == 11 and now().day == 14 }}"
-                  sequence:
-                    - action: scene.turn_on
-                      target:
-                        entity_id: scene.driveway_light_diabetes_awareness
-                      data:
-                        transition: 1
-
-                - conditions:
-                    - condition: template
-                      value_template: "{{ now().month == 10 and now().day == 10 }}"
-                  sequence:
-                    - action: scene.turn_on
-                      target:
-                        entity_id: scene.driveway_light_mental_health_awareness
-                      data:
-                        transition: 1
-
-                - conditions:
-                    - condition: template
-                      value_template: "{{ now().month == 3 and now().day == 8 }}"
+                      value_template: "{{ date <= '03-08' }}"
                   sequence:
                     - action: scene.turn_on
                       target:
                         entity_id: scene.driveway_light_international_womens_day
                       data:
                         transition: 1
-
                 - conditions:
                     - condition: template
-                      value_template: "{{ now().month == 4 and now().day == 22 }}"
+                      value_template: "{{ date <= '03-17' }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_sankt_patrick
+                      data:
+                        transition: 1
+                - conditions:
+                    - condition: template
+                      value_template: "{{ date <= '04-02' }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_autism_awareness_day
+                      data:
+                        transition: 1
+                - conditions:
+                    - condition: template
+                      value_template: "{{ date <= '04-22' }}"
                   sequence:
                     - action: scene.turn_on
                       target:
                         entity_id: scene.driveway_light_earth_day
                       data:
                         transition: 1
-
                 - conditions:
                     - condition: template
-                      value_template: "{{ now().isocalendar().week == 40 and now().isoweekday() == 6 }}"
+                      value_template: "{{ date <= '05-17' }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_idahobit
+                      data:
+                        transition: 1
+                - conditions:
+                    - condition: template
+                      value_template: "{{ week <= 40 and day == 'Sa' }}"
                   sequence:
                     - action: scene.turn_on
                       target:
                         entity_id: scene.driveway_light_breast_cancer_awareness
                       data:
                         transition: 1
-
+                - conditions:
+                    - condition: template
+                      value_template: "{{ date <= '10-10' }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_mental_health_awareness
+                      data:
+                        transition: 1
+                - conditions:
+                    - condition: template
+                      value_template: "{{ '10-15' <= date <= '10-31' }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_halloween
+                      data:
+                        transition: 1
+                - conditions:
+                    - condition: template
+                      value_template: "{{ date <= '11-14' }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_diabetes_awareness
+                      data:
+                        transition: 1
+                - conditions:
+                    - condition: template
+                      value_template: "{{ date <= '12-01' }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_world_aids_day
+                      data:
+                        transition: 1
+                - conditions:
+                    - condition: template
+                      value_template: "{{ '12-02' <= date <= '12-26' }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_christmas
+                      data:
+                        transition: 1
+                - conditions:
+                    - condition: template
+                      value_template: "{{ '12-30' <= date or date == '01-01' }}"
+                  sequence:
+                    - action: scene.turn_on
+                      target:
+                        entity_id: scene.driveway_light_new_years
+                      data:
+                        transition: 1
               default:
                 - action: scene.turn_on
                   target:
@@ -347,7 +318,8 @@
                 - cleared_south
                 - cleared_entrance
                 - cleared_east
-                - night
+                - decoration_off
+                - light_outside
             - condition: or
               conditions:
                 - condition: state
@@ -355,6 +327,9 @@
                   state: "on"
                 - condition: and
                   conditions:
+                    - condition: state
+                      entity_id: binary_sensor.home_light_decoration
+                      state: "off"
                     - condition: state
                       entity_id: binary_sensor.driveway_street_presence
                       state: "off"

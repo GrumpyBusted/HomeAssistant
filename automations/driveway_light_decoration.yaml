@@ -9,95 +9,55 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.home_outside_light
-      to: "off"
-      id: twilight
-
-    - trigger: time
-      at:
-        - "22:00:00"
-        - "23:00:00"
-        - "00:00:00"
-        - "01:00:00"
-      id: night
+      entity_id: binary_sensor.home_light_decoration
 
   conditions: []
 
   actions:
+    - variables:
+        date: "{{ now().strftime('%m-%d') }}"
+
     - choose:
         - conditions:
-            - condition: trigger
-              id: twilight
+            - condition: state
+              entity_id: binary_sensor.home_light_decoration
+              state: "off"
+          sequence:
+            - action: light.turn_off
+              data:
+                transition: 1
+              target:
+                entity_id: light.driveway_light_strip_house
+        - conditions:
             - condition: template
-              value_template: |-
-                {{ now().month == 12 and now().day >= 1 and now().day <= 26 }}
+              value_template: "{{ '10-15' <= date <= '10-31' }}"
           sequence:
             - action: light.turn_on
+              target:
+                entity_id: light.driveway_light_strip_house
+              data:
+                brightness_pct: 70
+                transition: 1
+                rgb_color: [255, 69, 0]
+        - conditions:
+            - condition: template
+              value_template: "{{ '12-01' <= date <= '12-26' }}"
+          sequence:
+            - action: light.turn_on
+              target:
+                entity_id: light.driveway_light_strip_house
               data:
                 brightness_pct: 90
                 transition: 1
-                rgb_color: [255, 20, 10]
+                rgb_color: [0, 128, 0]
+        - conditions:
+            - condition: template
+              value_template: "{{ date >= '12-30' or date == '01-01' }}"
+          sequence:
+            - action: light.turn_on
               target:
                 entity_id: light.driveway_light_strip_house
-
-        - conditions:
-            - condition: trigger
-              id: twilight
-            - condition: template
-              value_template: |-
-                {{ now().month == 10 and now().day >= 15 and now().day <= 31 }}
-          sequence:
-            action: light.turn_on
-            data:
-              brightness_pct: 70
-              transition: 1
-              rgb_color: [255, 30, 0]
-            target:
-              entity_id: light.driveway_light_strip_house
-
-        - conditions:
-            - condition: trigger
-              id: night
-            - condition: template
-              value_template: |-
-                {{ now().strftime('%d/%m') in('31/12', '24/12') }}
-          sequence: []
-
-        - conditions:
-            - condition: trigger
-              id: night
-            - condition: template
-              value_template: |-
-                {{ now().strftime('%d/%m %H') in('01/01 01', '25/12 00') }}
-          sequence:
-            - action: light.turn_off
               data:
+                brightness_pct: 90
                 transition: 1
-              target:
-                entity_id: light.driveway_light_strip_house
-
-        - conditions:
-            - condition: trigger
-              id: night
-            - condition: template
-              value_template: |-
-                {{ now().weekday() in [4,5] and now().hour >= 23 }}
-          sequence:
-            - action: light.turn_off
-              data:
-                transition: 1
-              target:
-                entity_id: light.driveway_light_strip_house
-
-        - conditions:
-            - condition: trigger
-              id: night
-            - condition: template
-              value_template: |-
-                {{ now().hour >= 22 }}
-          sequence:
-            - action: light.turn_off
-              data:
-                transition: 1
-              target:
-                entity_id: light.driveway_light_strip_house
+                rgb_color: [0, 100, 255]

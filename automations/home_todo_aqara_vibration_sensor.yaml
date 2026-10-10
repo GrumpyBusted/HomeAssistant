@@ -8,12 +8,16 @@
 
   triggers:
     - trigger: numeric_state
-      entity_id: sensor.driveway_mailbox_vibration_sensor_battery
+      entity_id:
+        - sensor.driveway_mailbox_vibration_sensor_battery
+        - sensor.kitchen_dishwasher_vibration_sensor_battery
       below: 20
       for: 00:03:00
 
     - trigger: numeric_state
-      entity_id: sensor.driveway_mailbox_vibration_sensor_battery
+      entity_id:
+        - sensor.driveway_mailbox_vibration_sensor_battery
+        - sensor.kitchen_dishwasher_vibration_sensor_battery
       above: 70
       for: 00:03:00
 
@@ -27,11 +31,16 @@
         sensors:
           - entity_id: sensor.driveway_mailbox_vibration_sensor_battery
             temperature: "{{ states('sensor.driveway_mailbox_vibration_sensor_device_temperature') }}"
+            location: på indersiden af låget
+          - entity_id: sensor.kitchen_dishwasher_vibration_sensor_battery
+            temperature: "{{ states('sensor.kitchen_dishwasher_vibration_sensor_device_temperature') }}"
+            location: midt på lågens bagside, på indersiden
     - repeat:
         for_each: "{{ sensors }}"
         sequence:
           - action: script.create_todo_battery_task
             data:
               entity_id: "{{ repeat.item.entity_id }}"
-              temperature:
+              temperature: "{{ repeat.item.temperature }}"
+              location: "{{ repeat.item.location }}"
               threshold: 20
