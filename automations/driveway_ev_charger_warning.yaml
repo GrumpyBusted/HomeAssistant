@@ -40,11 +40,23 @@
                       entity_id: sensor.ford_explorer_ev_el_plug_safe
                       state: CONNECTED
       then:
-        - action: script.push_notification
-          data:
-            type: critical
-            title: Advarsel
-            id: driveway_ev_charger_connected_unknown
-            persistent: false
-            recipient: all
-            message: Der er en ukendt bil tilsluttet til vores billader i indkørslen
+        - if:
+            - condition: state
+              entity_id: binary_sensor.someone_home
+              state: "on"
+          then:
+            - action: script.push_notification
+              data:
+                type: warning
+                title: Advarsel
+                id: driveway_ev_charger_connected_unknown
+                recipient: home
+                message: Der er en ukendt bil tilsluttet til vores billader i indkørslen
+          else:
+            - action: script.push_notification
+              data:
+                type: warning
+                title: Advarsel
+                id: driveway_ev_charger_connected_unknown
+                recipient: all
+                message: Der er en ukendt bil tilsluttet til vores billader i indkørslen

@@ -22,7 +22,7 @@
 
     - trigger: numeric_state
       entity_id: sensor.utility_room_smart_plug_washer_power
-      above: 3
+      above: 5
       for: 00:00:10
       id: planning
 

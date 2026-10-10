@@ -38,7 +38,7 @@
               then:
                 - action: script.push_notification
                   data:
-                    type: critical
+                    type: warning
                     title: Advarsel
                     id: emils_room_door_open
                     persistent: false
@@ -47,7 +47,7 @@
               else:
                 - action: script.push_notification
                   data:
-                    type: critical
+                    type: warning
                     title: Advarsel
                     id: emils_room_door_open
                     persistent: false

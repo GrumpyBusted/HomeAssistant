@@ -142,7 +142,7 @@
                   Swap-forbrug er kritisk højt. 
                   Aktuel værdi: {{ entity_state }}% 
                   Grænse: 30%
-                notification_type: critical
+                notification_type: warning
 
         - conditions:
             - condition: trigger
@@ -166,7 +166,7 @@
                   CPU temperaturen er kritisk høj. 
                   Aktuel værdi: {{ entity_state }}°C 
                   Grænse: 75°C
-                notification_type: critical
+                notification_type: warning
 
         - conditions:
             - condition: trigger
@@ -190,7 +190,7 @@
                   CPU forbrug er kritisk højt. 
                   Aktuel værdi: {{ entity_state }}% 
                   Grænse: 90%
-                notification_type: critical
+                notification_type: warning
 
         - conditions:
             - condition: trigger
@@ -214,7 +214,7 @@
                   RAM forbrug er kritisk højt. 
                   Aktuel værdi: {{ entity_state }}% 
                   Grænse: 92%
-                notification_type: critical
+                notification_type: warning
 
         - conditions:
             - condition: trigger
@@ -238,7 +238,7 @@
                   Diskforbrug er kritisk højt. 
                   Aktuel værdi: {{ entity_state }}% 
                   Grænse: 90%
-                notification_type: critical
+                notification_type: warning
 
         - conditions:
             - condition: trigger
@@ -273,7 +273,7 @@
                   System belastning (1 minut) er kritisk høj. 
                   Aktuel værdi: {{ entity_state }} 
                   Grænse: 6.0
-                notification_type: critical
+                notification_type: warning
 
         - conditions:
             - condition: trigger
@@ -297,7 +297,7 @@
                   System belastning (5 minutter) er kritisk høj. 
                   Aktuel værdi: {{ entity_state }} 
                   Grænse: 6.0
-                notification_type: critical
+                notification_type: warning
 
         - conditions:
             - condition: trigger
@@ -321,14 +321,14 @@
                   System belastning (15 minutter) er kritisk høj. 
                   Aktuel værdi: {{ entity_state }} 
                   Grænse: 6.0
-                notification_type: critical
+                notification_type: warning
 
       default:
         - variables:
             title: "Home Assistant: System alarm"
             message: |-
               En ukendt trigger blev aktiveret. Trigger ID: {{ trigger_id }} Entity: {{ entity_id }} Aktuel værdi: {{ entity_state }}
-            notification_type: critical
+            notification_type: warning
 
     - if:
         - condition: template

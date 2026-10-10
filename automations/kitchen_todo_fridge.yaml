@@ -75,7 +75,7 @@
           sequence:
             - action: script.push_notification
               data:
-                type: critical
+                type: warning
                 title: Advarsel
                 id: kitchen_fridge_door_open
                 persistent: false
@@ -88,7 +88,7 @@
           sequence:
             - action: script.push_notification
               data:
-                type: critical
+                type: warning
                 title: Advarsel
                 id: kitchen_freezer_door_open
                 persistent: false

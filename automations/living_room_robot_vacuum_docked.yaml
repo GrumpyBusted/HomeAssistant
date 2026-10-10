@@ -81,7 +81,7 @@
               then:
                 - action: script.push_notification
                   data:
-                    type: critical
+                    type: warning
                     title: Advarsel
                     id: living_room_robot_vacuum_return_to_dock
                     persistent: true
