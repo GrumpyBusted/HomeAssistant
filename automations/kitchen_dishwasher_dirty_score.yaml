@@ -9,24 +9,35 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.kitchen_dishwasher_door_safe
+      entity_id: binary_sensor.kitchen_dishwasher_vibration_sensor
       to: "on"
-      id: door_opened
+      id: detected
 
     - trigger: state
-      entity_id: binary_sensor.kitchen_dishwasher_door_safe
+      entity_id: binary_sensor.kitchen_dishwasher_vibration_sensor
       to: "off"
-      id: door_closed
+      id: cleared
 
     - trigger: state
       entity_id: input_select.kitchen_dishwasher_state
       to: "running"
       id: dishwasher_running
 
+    - trigger: time
+      at:
+        - "10:00:00"
+        - "12:00:00"
+        - "18:00:00"
+      id: meal_time
+
     - trigger: state
-      entity_id: binary_sensor.kitchen_presence
-      to: "off"
-      id: kitchen_empty
+      entity_id: timer.people_home_meal_timer
+      to: idle
+      id: meal_done
+
+    - trigger: state
+      entity_id: number.people_home
+      id: people_changed
 
   conditions: []
 
@@ -42,14 +53,11 @@
 
         - conditions:
             - condition: trigger
-              id: door_opened
+              id: detected
             - condition: state
               entity_id: input_select.kitchen_dishwasher_state
               state: dirty
           sequence:
-            - action: counter.increment
-              target:
-                entity_id: counter.kitchen_dishwasher_dirty_score
             - action: input_datetime.set_datetime
               target:
                 entity_id: input_datetime.kitchen_dishwasher_door_opened
@@ -58,49 +66,56 @@
 
         - conditions:
             - condition: trigger
-              id: kitchen_empty
-            - condition: state
-              entity_id: binary_sensor.kitchen_dishwasher_door_safe
-              state: "on"
-          sequence:
-            - action: counter.increment
-              target:
-                entity_id: counter.kitchen_dishwasher_dirty_score
-            - action: input_datetime.set_datetime
-              target:
-                entity_id: input_datetime.kitchen_dishwasher_door_opened
-              data:
-                timestamp: 0
-
-        - conditions:
-            - condition: trigger
-              id: door_closed
+              id: cleared
             - condition: state
               entity_id: input_select.kitchen_dishwasher_state
               state: dirty
-            - condition: template
-              value_template: |-
-                {{ states('input_datetime.kitchen_dishwasher_door_opened')
-                  | as_timestamp(0) > 0 }}
           sequence:
-            - variables:
-                additional_score: |-
-                  {% set seconds =
-                    now().timestamp()
-                    - states('input_datetime.kitchen_dishwasher_door_opened') | as_timestamp(0)
-                  %} {% if seconds > 60 %}
-                    5
-                  {% elif seconds >= 30 %}
-                    2
-                  {% else %}
-                    0
-                  {% endif %}
-
             - action: counter.set_value
               target:
                 entity_id: counter.kitchen_dishwasher_dirty_score
               data:
-                value: >
-                  {{ states('counter.kitchen_dishwasher_dirty_score') | int(0)
-                    + additional_score | int(0) }}
+                value: |-
+                  {% set seconds = now().timestamp() - states('input_datetime.kitchen_dishwasher_door_opened') | as_timestamp(0) %}
+                  {% set minutes = (seconds / 60) | round(0, 'ceil') | int %}
+                  {{ states('counter.kitchen_dishwasher_dirty_score') | int(0) + minutes | int(0) }}
 
+        - conditions:
+            - condition: trigger
+              id: meal_time
+            - condition: template
+              value_template: "{{ now().weekday() >= 5 and now().hour < 12 or now().hour >= 12 }}"
+          sequence:
+            - action: timer.start
+              target:
+                entity_id: timer.people_home_meal_timer
+              data:
+                duration: 02:00:00
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.people_home_meal
+              data:
+                value: |-
+                  {{ states('number.people_home') | int(0) }}
+
+        - conditions:
+            - condition: trigger
+              id: meal_done
+          sequence:
+            - action: counter.set_value
+              target:
+                entity_id: counter.kitchen_dishwasher_dirty_score
+              data:
+                value: |-
+                  {{ states('counter.kitchen_dishwasher_dirty_score') | int(0) + states('input_number.people_home_meal') | int(0) }}
+
+        - conditions:
+            - condition: trigger
+              id: people_changed
+          sequence:
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.people_home_meal
+              data:
+                value: |-
+                  {{ max(states('input_number.people_home_meal') | int(0), states('number.people_home') | int(0)) }}

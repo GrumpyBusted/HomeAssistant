@@ -74,6 +74,25 @@
                     - condition: state
                       entity_id: binary_sensor.bedroom_door
                       state: "on"
+                - condition: and
+                  conditions:
+                    - condition: state
+                      entity_id: binary_sensor.emil_sleeping
+                      state: "on"
+                    - condition: state
+                      entity_id: binary_sensor.emils_room_door
+                      state: "on"
+                - condition: and
+                  conditions:
+                    - condition: state
+                      entity_id: binary_sensor.charlie_sleeping
+                      state: "on"
+                    - condition: state
+                      entity_id: binary_sensor.emil_home
+                      state: "off"
+                    - condition: state
+                      entity_id: binary_sensor.parent_home
+                      state: "off"
           sequence:
             - action: media_player.turn_off
               target:
