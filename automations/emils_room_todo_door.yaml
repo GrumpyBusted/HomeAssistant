@@ -41,7 +41,6 @@
                     type: warning
                     title: Advarsel
                     id: emils_room_door_open
-                    persistent: false
                     recipient: emil
                     message: Luk døren til dit værelse når vinduet er åbent!
               else:
@@ -50,6 +49,5 @@
                     type: warning
                     title: Advarsel
                     id: emils_room_door_open
-                    persistent: false
                     recipient: home
                     message: Luk døren til Emils værelse når vinduet er åbent!

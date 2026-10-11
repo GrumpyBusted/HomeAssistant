@@ -9,16 +9,31 @@
 
   triggers:
     - trigger: state
-      entity_id: event.kitchen_switch_button_1
+      entity_id: event.kitchen_switch_rotary
+      id: rotary
+
+    - trigger: state
+      entity_id: binary_sensor.kitchen_light
+      from: "off"
+      to: "on"
+      for: 00:15:00
+      id: lights_on
+
+    - trigger: state
+      entity_id:
+        - event.kitchen_switch_button_1
+        - event.kitchen_switch_button_2
+        - event.kitchen_switch_button_3
+        - event.kitchen_switch_button_4
       attribute: event_type
-      to: short_release
-      id: button_1_short
+      to: long_release
+      id: button_long
 
     - trigger: state
       entity_id: event.kitchen_switch_button_1
       attribute: event_type
-      to: long_release
-      id: button_1_long
+      to: short_release
+      id: button_1_short
 
     - trigger: state
       entity_id: event.kitchen_switch_button_2
@@ -27,22 +42,10 @@
       id: button_2_short
 
     - trigger: state
-      entity_id: event.kitchen_switch_button_2
-      attribute: event_type
-      to: long_release
-      id: button_2_long
-
-    - trigger: state
       entity_id: event.kitchen_switch_button_3
       attribute: event_type
       to: short_release
       id: button_3_short
-
-    - trigger: state
-      entity_id: event.kitchen_switch_button_3
-      attribute: event_type
-      to: long_release
-      id: button_3_long
 
     - trigger: state
       entity_id: event.kitchen_switch_button_4
@@ -51,37 +54,14 @@
       id: button_4_short
 
     - trigger: state
-      entity_id: event.kitchen_switch_button_4
-      attribute: event_type
-      to: long_release
-      id: button_4_long
-
-    - trigger: state
-      entity_id: event.kitchen_switch_rotary
-      id: rotary
-
-    - trigger: state
       entity_id: binary_sensor.someone_home
-      from: "on"
       to: "off"
       id: no_one_home
 
     - trigger: state
-      entity_id: binary_sensor.kitchen_light
-      from: "off"
+      entity_id: binary_sensor.everyone_sleeping
       to: "on"
-      for: 00:15:00
-      id: lights_on
-
-    - trigger: state
-      entity_id: binary_sensor.kitchen_presence
-      to: "off"
-      id: person_cleared
-
-    - trigger: state
-      entity_id: binary_sensor.kitchen_presence
-      to: "on"
-      id: person_detected
+      id: sleeping
 
     - trigger: state
       entity_id: binary_sensor.living_room_light
@@ -89,152 +69,98 @@
       id: living_room_light_off
 
     - trigger: state
-      entity_id: binary_sensor.living_room_light
-      to: "on"
-      id: living_room_light_on
+      entity_id: binary_sensor.kitchen_presence
+
+    - trigger: state
+      entity_id: input_select.living_room_robot_vacuum_current_cleaning
+
+    - trigger: state
+      entity_id: binary_sensor.someone_home
+
+    - trigger: state
+      entity_id: binary_sensor.everyone_sleeping
+
+    - trigger: state
+      entity_id: binary_sensor.patio_door_long_open
+
+    - trigger: state
+      entity_id: binary_sensor.kitchen_window
 
     - trigger: state
       entity_id: input_select.living_room_robot_vacuum_current_cleaning
       to: kitchen_cleaning
-      id: cleaning_start
 
     - trigger: state
       entity_id: input_select.living_room_robot_vacuum_current_cleaning
       from: kitchen_cleaning
-      id: cleaning_end
 
-    - trigger: state
-      entity_id: binary_sensor.kitchen_light
-      from: "off"
-      to: "on"
-      for: 00:15:00
-      id: lights_on
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      above: 10000
+      for: "00:03:00"
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      below: 10000
+      for: "00:03:00"
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      above: 5000
+      for: "00:03:00"
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      below: 5000
+      for: "00:03:00"
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      above: 1000
+      for: "00:03:00"
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      below: 1000
+      for: "00:03:00"
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      above: 100
+      for: "00:03:00"
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      below: 100
+      for: "00:03:00"
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      above: 1
+      for: "00:03:00"
+
+    - trigger: numeric_state
+      entity_id: sensor.home_outside_illuminance
+      below: 1
+      for: "00:03:00"
 
   conditions: []
 
   actions:
     - variables:
-        mode: ""
-
-    - choose:
-        - conditions:
-            - condition: trigger
-              id: button_1_short
-          sequence:
-            - variables:
-                mode: "normal"
-
-        - conditions:
-            - condition: trigger
-              id: button_2_short
-          sequence:
-            - variables:
-                mode: "low"
-
-        - conditions:
-            - condition: trigger
-              id: button_3_short
-          sequence:
-            - variables:
-                mode: "high"
-
-        - conditions:
-            - condition: trigger
-              id: button_4_short
-          sequence:
-            - variables:
-                mode: "full"
-
-        - conditions:
-            - condition: trigger
-              id:
-                - button_1_long
-                - button_2_long
-                - button_3_long
-                - button_4_long
-                - no_one_home
-                - living_room_light_off
-          sequence:
-            - variables:
-                mode: "off"
-
-        - conditions:
-            - condition: trigger
-              id: person_detected
-            - condition: state
-              entity_id: select.bedroom_state
-              state:
-                - sleeping
-                - quiet_time
-                - wake_up_soon
-            - condition: state
-              entity_id: binary_sensor.kitchen_light
-              state: "off"
-            - condition: state
-              entity_id: binary_sensor.living_room_light
-              state: "off"
-          sequence:
-            - variables:
-                mode: "night"
-
-        - conditions:
-            - condition: trigger
-              id: person_cleared
-            - condition: state
-              entity_id: select.bedroom_state
-              state:
-                - sleeping
-                - quiet_time
-                - wake_up_soon
-            - condition: state
-              entity_id: binary_sensor.living_room_light
-              state: "off"
-          sequence:
-            - variables:
-                mode: "off"
-
-        - conditions:
-            - condition: trigger
-              id: person_detected
-          sequence:
-            - variables:
-                mode: "normal"
-
-        - conditions:
-            - condition: trigger
-              id: person_cleared
-            - condition: state
-              entity_id: binary_sensor.kitchen_light
-              state: "on"
-          sequence:
-            - variables:
-                mode: "low"
-
-        - conditions:
-            - condition: trigger
-              id: living_room_light_on
-            - condition: state
-              entity_id: binary_sensor.kitchen_presence
-              state: "on"
-          sequence:
-            - variables:
-                mode: "normal"
-
-        - conditions:
-            - condition: trigger
-              id: lights_on
-            - condition: state
-              entity_id: binary_sensor.someone_home
-              state: "off"
-          sequence:
-            - variables:
-                mode: "off"
+        current_mode: "{{ states('input_select.kitchen_light_mode') }}"
+        force: false
 
     - choose:
         - conditions:
             - condition: trigger
               id: rotary
           sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.kitchen_light_mode
+              data:
+                option: custom
             - choose:
                 - conditions:
                     - condition: state
@@ -270,77 +196,212 @@
 
         - conditions:
             - condition: trigger
-              id: cleaning_start
-          sequence:
-            - action: light.turn_on
-              data:
-                transition: 1
-                xy_color: [0.17, 0.70]
-                brightness_pct: 100
-              target:
-                entity_id: light.kitchen_light_strip_countertop
-
-        - conditions:
-            - condition: trigger
-              id: cleaning_end
-            - condition: template
-              value_template: |-
-                {% set xy = state_attr('light.kitchen_light_strip_countertop', 'xy_color') %}
-                {{ xy is not none and xy[0] | round(2) == 0.17 and xy[1] | round(2) == 0.70 }}
+              id: lights_on
             - condition: state
-              entity_id: light.kitchen_lights
-              state: "on"
+              entity_id: binary_sensor.someone_home
+              state: "off"
           sequence:
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 2700
-                brightness: "{{ state_attr('light.kitchen_light_pendant_island_left', 'brightness') | int(100) }}"
+            - action: input_select.select_option
               target:
-                entity_id: light.kitchen_light_strip_countertop
+                entity_id: input_select.kitchen_light_mode
+              data:
+                option: "off"
 
         - conditions:
             - condition: trigger
-              id: cleaning_end
+              id:
+                - button_long
+                - no_one_home
+                - living_room_light_off
+                - sleeping
           sequence:
-            - action: light.turn_off
+            - action: input_select.select_option
               target:
-                entity_id: light.kitchen_light_strip_countertop
+                entity_id: input_select.kitchen_light_mode
+              data:
+                option: "off"
 
         - conditions:
-            - condition: template
-              value_template: "{{ mode == 'normal' }}"
+            - condition: trigger
+              id: button_1_short
           sequence:
-            - parallel:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.kitchen_light_mode
+              data:
+                option: normal
+
+        - conditions:
+            - condition: trigger
+              id: button_2_short
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.kitchen_light_mode
+              data:
+                option: low
+
+        - conditions:
+            - condition: trigger
+              id: button_3_short
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.kitchen_light_mode
+              data:
+                option: high
+
+        - conditions:
+            - condition: trigger
+              id: button_4_short
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.kitchen_light_mode
+              data:
+                option: full
+
+    - if:
+        - condition: trigger
+          id:
+            - button_1_short
+            - button_2_short
+            - button_3_short
+            - button_4_short
+        - condition: template
+          value_template: |-
+            {{ current_mode == states('input_select.kitchen_light_mode') }}
+      then:
+        - variables:
+            force: true
+
+    - parallel:
+        - choose:
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state: custom
+              sequence: []
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.living_room_robot_vacuum_current_cleaning
+                  state: kitchen_cleaning
+                - condition: state
+                  entity_id: binary_sensor.someone_home
+                  state: "on"
+                - condition: state
+                  entity_id: binary_sensor.everyone_sleeping
+                  state: "off"
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
                 - action: light.turn_on
                   data:
                     transition: 1
-                    color_temp_kelvin: 2700
-                    brightness_pct: 80
+                    xy_color: [0.17, 0.70]
+                    brightness_pct: 100
                   target:
-                    entity_id:
-                      - light.kitchen_light_strip_countertop
-                      - light.kitchen_light_pendant_island_left
-                      - light.kitchen_light_pendant_island_right
-                      - light.kitchen_light_pendant_sink_left
-                      - light.kitchen_light_pendant_sink_right
+                    entity_id: light.kitchen_light_strip_countertop
+
+            - conditions:
+                - condition: state
+                  entity_id: binary_sensor.kitchen_presence
+                  state: "on"
+                - condition: numeric_state
+                  entity_id: sensor.home_outside_illuminance
+                  below: 1
+                - condition: or
+                  conditions:
+                    - condition: state
+                      entity_id: binary_sensor.patio_door_long_open
+                      state: "on"
+                    - condition: state
+                      entity_id: binary_sensor.kitchen_window
+                      state: "on"
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 2500
+                    brightness_pct: 30
+                  target:
+                    entity_id: light.kitchen_light_strip_countertop
+
+            - conditions:
+                - condition: state
+                  entity_id: binary_sensor.kitchen_presence
+                  state: "on"
+                - condition: numeric_state
+                  entity_id: sensor.home_outside_illuminance
+                  above: 1
+                  below: 100
+                - condition: or
+                  conditions:
+                    - condition: state
+                      entity_id: binary_sensor.patio_door_long_open
+                      state: "on"
+                    - condition: state
+                      entity_id: binary_sensor.kitchen_window
+                      state: "on"
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 1800
+                    brightness_pct: 15
+                  target:
+                    entity_id: light.kitchen_light_strip_countertop
+
+            - conditions:
+                - condition: state
+                  entity_id: binary_sensor.kitchen_presence
+                  state: "off"
+                - condition: numeric_state
+                  entity_id: sensor.home_outside_illuminance
+                  below: 100
+                - condition: or
+                  conditions:
+                    - condition: state
+                      entity_id: binary_sensor.patio_door_long_open
+                      state: "on"
+                    - condition: state
+                      entity_id: binary_sensor.kitchen_window
+                      state: "on"
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
                 - action: light.turn_off
                   data:
                     transition: 1
                   target:
-                    entity_id:
-                      - light.kitchen_light_spot_island
-                      - light.kitchen_light_spot_cooktop
-                      - light.kitchen_light_spot_oven
-                      - light.kitchen_light_spot_sink
-                      - light.kitchen_light_spot_fridge
-                      - light.kitchen_light_spot_hallway
+                    entity_id: light.kitchen_light_strip_countertop
 
-        - conditions:
-            - condition: template
-              value_template: "{{ mode == 'night' }}"
-          sequence:
-            - parallel:
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state:
+                    - "off"
+                    - normal
+                - condition: state
+                  entity_id: binary_sensor.kitchen_presence
+                  state: "on"
+                - condition: state
+                  entity_id: select.bedroom_state
+                  state:
+                    - sleeping
+                    - quiet_time
+                    - wake_up_soon
+                - condition: state
+                  entity_id: binary_sensor.living_room_light
+                  state: "off"
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
                 - action: light.turn_on
                   data:
                     transition: 1
@@ -348,6 +409,180 @@
                     brightness_pct: 10
                   target:
                     entity_id: light.kitchen_light_strip_countertop
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state:
+                    - "off"
+                    - normal
+                - condition: state
+                  entity_id: binary_sensor.kitchen_presence
+                  state: "on"
+                - condition: numeric_state
+                  entity_id: sensor.home_outside_illuminance
+                  below: 10000
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 2700
+                    brightness_pct: 80
+                  target:
+                    entity_id: light.kitchen_light_strip_countertop
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state:
+                    - "off"
+                    - normal
+                - condition: state
+                  entity_id: binary_sensor.kitchen_presence
+                  state: "on"
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
+                - action: light.turn_off
+                  data:
+                    transition: 1
+                  target:
+                    entity_id: light.kitchen_light_strip_countertop
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state:
+                    - "off"
+                    - normal
+                - condition: state
+                  entity_id: binary_sensor.kitchen_presence
+                  state: "off"
+                - condition: numeric_state
+                  entity_id: sensor.home_outside_illuminance
+                  below: 1000
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 2300
+                    brightness_pct: 50
+                  target:
+                    entity_id: light.kitchen_light_strip_countertop
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state:
+                    - "off"
+                    - normal
+                - condition: state
+                  entity_id: binary_sensor.kitchen_presence
+                  state: "off"
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
+                - action: light.turn_off
+                  data:
+                    transition: 1
+                  target:
+                    entity_id: light.kitchen_light_strip_countertop
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state: "off"
+              sequence:
+                - action: light.turn_off
+                  data:
+                    transition: 1
+                  target:
+                    entity_id: light.kitchen_light_strip_countertop
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state: normal
+              sequence:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 2700
+                    brightness_pct: 80
+                  target:
+                    entity_id: light.kitchen_light_strip_countertop
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state: low
+              sequence:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 2300
+                    brightness_pct: 50
+                  target:
+                    entity_id: light.kitchen_light_strip_countertop
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state: high
+              sequence:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 2700
+                    brightness_pct: 80
+                  target:
+                    entity_id: light.kitchen_light_strip_countertop
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state: full
+              sequence:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 3000
+                    brightness_pct: 100
+                  target:
+                    entity_id: light.kitchen_light_strip_countertop
+
+        - choose:
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state: custom
+              sequence: []
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state:
+                    - "off"
+                    - normal
+                - condition: state
+                  entity_id: binary_sensor.kitchen_presence
+                  state: "on"
+                - condition: state
+                  entity_id: select.bedroom_state
+                  state:
+                    - sleeping
+                    - quiet_time
+                    - wake_up_soon
+                - condition: state
+                  entity_id: binary_sensor.living_room_light
+                  state: "off"
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
                 - action: light.turn_off
                   data:
                     transition: 1
@@ -357,25 +592,94 @@
                       - light.kitchen_light_pendant_island_right
                       - light.kitchen_light_pendant_sink_left
                       - light.kitchen_light_pendant_sink_right
-                      - light.kitchen_light_spot_island
-                      - light.kitchen_light_spot_cooktop
-                      - light.kitchen_light_spot_oven
-                      - light.kitchen_light_spot_sink
-                      - light.kitchen_light_spot_fridge
-                      - light.kitchen_light_spot_hallway
 
-        - conditions:
-            - condition: template
-              value_template: "{{ mode == 'low' }}"
-          sequence:
-            - parallel:
+            - conditions:
+                - condition: numeric_state
+                  entity_id: sensor.home_outside_illuminance
+                  below: 100
+                - condition: or
+                  conditions:
+                    - condition: state
+                      entity_id: binary_sensor.patio_door_long_open
+                      state: "on"
+                    - condition: state
+                      entity_id: binary_sensor.kitchen_window
+                      state: "on"
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
+                - action: light.turn_off
+                  data:
+                    transition: 1
+                  target:
+                    entity_id:
+                      - light.kitchen_light_pendant_island_left
+                      - light.kitchen_light_pendant_island_right
+                      - light.kitchen_light_pendant_sink_left
+                      - light.kitchen_light_pendant_sink_right
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state:
+                    - "off"
+                    - normal
+                - condition: state
+                  entity_id: binary_sensor.kitchen_presence
+                  state: "on"
+                - condition: numeric_state
+                  entity_id: sensor.home_outside_illuminance
+                  below: 5000
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
                 - action: light.turn_on
                   data:
                     transition: 1
-                    color_temp_kelvin: 2300
-                    brightness_pct: 50
+                    color_temp_kelvin: 2700
+                    brightness_pct: 80
                   target:
-                    entity_id: light.kitchen_light_strip_countertop
+                    entity_id:
+                      - light.kitchen_light_pendant_island_left
+                      - light.kitchen_light_pendant_island_right
+                      - light.kitchen_light_pendant_sink_left
+                      - light.kitchen_light_pendant_sink_right
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state:
+                    - "off"
+                    - normal
+                - condition: state
+                  entity_id: binary_sensor.kitchen_presence
+                  state: "on"
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
+                - action: light.turn_off
+                  data:
+                    transition: 1
+                  target:
+                    entity_id:
+                      - light.kitchen_light_pendant_island_left
+                      - light.kitchen_light_pendant_island_right
+                      - light.kitchen_light_pendant_sink_left
+                      - light.kitchen_light_pendant_sink_right
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state:
+                    - "off"
+                    - normal
+                - condition: state
+                  entity_id: binary_sensor.kitchen_presence
+                  state: "off"
+                - condition: numeric_state
+                  entity_id: sensor.home_outside_illuminance
+                  below: 100
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
                 - action: light.turn_on
                   data:
                     transition: 1
@@ -387,23 +691,47 @@
                       - light.kitchen_light_pendant_island_right
                       - light.kitchen_light_pendant_sink_left
                       - light.kitchen_light_pendant_sink_right
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state:
+                    - "off"
+                    - normal
+                - condition: state
+                  entity_id: binary_sensor.kitchen_presence
+                  state: "off"
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
                 - action: light.turn_off
                   data:
                     transition: 1
                   target:
                     entity_id:
-                      - light.kitchen_light_spot_island
-                      - light.kitchen_light_spot_cooktop
-                      - light.kitchen_light_spot_oven
-                      - light.kitchen_light_spot_sink
-                      - light.kitchen_light_spot_fridge
-                      - light.kitchen_light_spot_hallway
-
-        - conditions:
-            - condition: template
-              value_template: "{{ mode == 'high' }}"
-          sequence:
-            - parallel:
+                      - light.kitchen_light_pendant_island_left
+                      - light.kitchen_light_pendant_island_right
+                      - light.kitchen_light_pendant_sink_left
+                      - light.kitchen_light_pendant_sink_right
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state: "off"
+              sequence:
+                - action: light.turn_off
+                  data:
+                    transition: 1
+                  target:
+                    entity_id:
+                      - light.kitchen_light_pendant_island_left
+                      - light.kitchen_light_pendant_island_right
+                      - light.kitchen_light_pendant_sink_left
+                      - light.kitchen_light_pendant_sink_right
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state: normal
+              sequence:
                 - action: light.turn_on
                   data:
                     transition: 1
@@ -415,7 +743,87 @@
                       - light.kitchen_light_pendant_island_right
                       - light.kitchen_light_pendant_sink_left
                       - light.kitchen_light_pendant_sink_right
-                      - light.kitchen_light_strip_countertop
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state: low
+              sequence:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 2300
+                    brightness_pct: 15
+                  target:
+                    entity_id:
+                      - light.kitchen_light_pendant_island_left
+                      - light.kitchen_light_pendant_island_right
+                      - light.kitchen_light_pendant_sink_left
+                      - light.kitchen_light_pendant_sink_right
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state: high
+              sequence:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 2700
+                    brightness_pct: 80
+                  target:
+                    entity_id:
+                      - light.kitchen_light_pendant_island_left
+                      - light.kitchen_light_pendant_island_right
+                      - light.kitchen_light_pendant_sink_left
+                      - light.kitchen_light_pendant_sink_right
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state: full
+              sequence:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 3000
+                    brightness_pct: 100
+                  target:
+                    entity_id:
+                      - light.kitchen_light_pendant_island_left
+                      - light.kitchen_light_pendant_island_right
+                      - light.kitchen_light_pendant_sink_left
+                      - light.kitchen_light_pendant_sink_right
+
+        - choose:
+            - conditions:
+                - condition: numeric_state
+                  entity_id: sensor.home_outside_illuminance
+                  below: 100
+                - condition: or
+                  conditions:
+                    - condition: state
+                      entity_id: binary_sensor.patio_door_long_open
+                      state: "on"
+                    - condition: state
+                      entity_id: binary_sensor.kitchen_window
+                      state: "on"
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
+                - action: light.turn_off
+                  data:
+                    transition: 1
+                  target:
+                    entity_id:
+                      - light.kitchen_light_spot_island
+                      - light.kitchen_light_spot_cooktop
+                      - light.kitchen_light_spot_oven
+                      - light.kitchen_light_spot_sink
+                      - light.kitchen_light_spot_fridge
+                      - light.kitchen_light_spot_hallway
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state: "high"
+              sequence:
                 - action: light.turn_on
                   data:
                     transition: 1
@@ -429,25 +837,33 @@
                       - light.kitchen_light_spot_sink
                       - light.kitchen_light_spot_fridge
                       - light.kitchen_light_spot_hallway
-
-        - conditions:
-            - condition: template
-              value_template: "{{ mode == 'full' }}"
-          sequence:
-            - action: light.turn_on
-              data:
-                transition: 1
-                color_temp_kelvin: 3000
-                brightness_pct: 100
-              target:
-                entity_id: light.kitchen_lights
-
-        - conditions:
-            - condition: template
-              value_template: "{{ mode == 'off' }}"
-          sequence:
+            - conditions:
+                - condition: state
+                  entity_id: input_select.kitchen_light_mode
+                  state: "full"
+              sequence:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 3000
+                    brightness_pct: 100
+                  target:
+                    entity_id:
+                      - light.kitchen_light_spot_island
+                      - light.kitchen_light_spot_cooktop
+                      - light.kitchen_light_spot_oven
+                      - light.kitchen_light_spot_sink
+                      - light.kitchen_light_spot_fridge
+                      - light.kitchen_light_spot_hallway
+          default:
             - action: light.turn_off
               data:
                 transition: 1
               target:
-                entity_id: light.kitchen_lights
+                entity_id:
+                  - light.kitchen_light_spot_island
+                  - light.kitchen_light_spot_cooktop
+                  - light.kitchen_light_spot_oven
+                  - light.kitchen_light_spot_sink
+                  - light.kitchen_light_spot_fridge
+                  - light.kitchen_light_spot_hallway

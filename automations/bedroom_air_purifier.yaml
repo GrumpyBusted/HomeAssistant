@@ -20,7 +20,7 @@
 
     - trigger: numeric_state
       entity_id: sensor.bedroom_air_quality_score
-      above: 50
+      above: 52
 
     - trigger: numeric_state
       entity_id: sensor.bedroom_air_quality_score

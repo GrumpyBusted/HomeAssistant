@@ -16,6 +16,10 @@
 
     - trigger: state
       entity_id: climate.home_heat_pump
+      to:
+        - "off"
+        - "heat"
+      for: "00:00:03"
       id: heat_pump_changed
 
     - trigger: state
