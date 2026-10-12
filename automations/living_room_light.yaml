@@ -287,7 +287,7 @@
                   data:
                     transition: 1
                     xy_color: [0.17, 0.70]
-                    brightness_pct: 100
+                    brightness_pct: 50
                   target:
                     entity_id:
                       - light.living_room_light_strip_skylight

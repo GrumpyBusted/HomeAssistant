@@ -30,9 +30,10 @@
         - "18:00:00"
       id: meal_time
 
-    - trigger: state
-      entity_id: timer.people_home_meal_timer
-      to: idle
+    - trigger: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.people_home_meal_timer
       id: meal_done
 
     - trigger: state
@@ -47,9 +48,11 @@
             - condition: trigger
               id: dishwasher_running
           sequence:
-            - action: counter.reset
+            - action: input_number.set_value
               target:
-                entity_id: counter.kitchen_dishwasher_dirty_score
+                entity_id: input_number.kitchen_dishwasher_dirty_score
+              data:
+                value: 0
 
         - conditions:
             - condition: trigger
@@ -71,15 +74,14 @@
               entity_id: input_select.kitchen_dishwasher_state
               state: dirty
           sequence:
-            - action: counter.set_value
+            - action: input_number.set_value
               target:
-                entity_id: counter.kitchen_dishwasher_dirty_score
+                entity_id: input_number.kitchen_dishwasher_dirty_score
               data:
                 value: |-
-                  {% set seconds = now().timestamp() - states('input_datetime.kitchen_dishwasher_door_opened') | as_timestamp(0) %}
-                  {% set minutes = (seconds / 60) | round(0, 'ceil') | int %}
-                  {{ states('counter.kitchen_dishwasher_dirty_score') | int(0) + minutes | int(0) }}
-
+                  {% set s = now().timestamp() - states('input_datetime.kitchen_dishwasher_door_opened') | as_timestamp(0) %}
+                  {% set v = [(s / 60) | round(0) | int, 1] | max %}
+                  {{ states('input_number.kitchen_dishwasher_dirty_score') | int(0) + v }}
         - conditions:
             - condition: trigger
               id: meal_time
@@ -102,12 +104,12 @@
             - condition: trigger
               id: meal_done
           sequence:
-            - action: counter.set_value
+            - action: input_number.set_value
               target:
-                entity_id: counter.kitchen_dishwasher_dirty_score
+                entity_id: input_number.kitchen_dishwasher_dirty_score
               data:
                 value: |-
-                  {{ states('counter.kitchen_dishwasher_dirty_score') | int(0) + states('input_number.people_home_meal') | int(0) }}
+                  {{ states('input_number.kitchen_dishwasher_dirty_score') | int(0) + states('input_number.people_home_meal') | int(0) }}
 
         - conditions:
             - condition: trigger

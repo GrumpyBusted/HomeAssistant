@@ -87,6 +87,9 @@
       entity_id: binary_sensor.kitchen_window
 
     - trigger: state
+      entity_id: binary_sensor.living_room_light
+
+    - trigger: state
       entity_id: input_select.living_room_robot_vacuum_current_cleaning
       to: kitchen_cleaning
 
@@ -364,6 +367,9 @@
                 - condition: numeric_state
                   entity_id: sensor.home_outside_illuminance
                   below: 100
+                - condition: state
+                  entity_id: binary_sensor.living_room_light
+                  state: "on"
                 - condition: or
                   conditions:
                     - condition: state
@@ -463,6 +469,9 @@
                 - condition: numeric_state
                   entity_id: sensor.home_outside_illuminance
                   below: 1000
+                - condition: state
+                  entity_id: binary_sensor.living_room_light
+                  state: "on"
                 - condition: template
                   value_template: "{{ force == false }}"
               sequence:
@@ -597,6 +606,9 @@
                 - condition: numeric_state
                   entity_id: sensor.home_outside_illuminance
                   below: 100
+                - condition: state
+                  entity_id: binary_sensor.living_room_light
+                  state: "on"
                 - condition: or
                   conditions:
                     - condition: state
@@ -677,6 +689,9 @@
                 - condition: numeric_state
                   entity_id: sensor.home_outside_illuminance
                   below: 100
+                - condition: state
+                  entity_id: binary_sensor.living_room_light
+                  state: "on"
                 - condition: template
                   value_template: "{{ force == false }}"
               sequence:

@@ -26,6 +26,11 @@
       for: "00:00:30"
       id: door_closed
 
+    - trigger: state
+      entity_id: binary_sensor.kitchen_dishwasher_vibration_sensor
+      to: "on"
+      id: door_motion
+
   conditions: []
 
   actions:
@@ -113,6 +118,21 @@
             - condition: state
               entity_id: binary_sensor.kitchen_dishwasher_door_safe
               state: "off"
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.kitchen_dishwasher_state
+              data:
+                option: dirty
+
+        - conditions:
+            - condition: trigger
+              id: door_motion
+            - condition: state
+              entity_id: input_select.kitchen_dishwasher_state
+              state:
+                - emptying
+                - clean
           sequence:
             - action: input_select.select_option
               target:

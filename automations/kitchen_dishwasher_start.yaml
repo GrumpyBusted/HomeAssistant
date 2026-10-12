@@ -1,0 +1,55 @@
+- id: kitchen_dishwasher_start
+  alias: Køkken opvaskemaskine start
+  description: |
+    Automatisk start af opvaskemaskine
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
+
+  triggers:
+    - trigger: time
+      at: sensor.energy_price_dishwasher_start
+
+  conditions:
+    - condition: state
+      entity_id: sensor.kitchen_dishwasher
+      state: "off"
+    - condition: state
+      entity_id: binary_sensor.kitchen_dishwasher_door_safe
+      state: "off"
+    - condition: numeric_state
+      entity_id: input_number.kitchen_dishwasher_dirty_score
+      above: 100
+
+  actions:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.kitchen_dishwasher_power
+
+    - wait_template: "{{ is_state('sensor.kitchen_dishwasher', 'programmed') }}"
+      timeout: "00:02:00"
+      continue_on_timeout: false
+
+    - if:
+        - condition: state
+          entity_id: binary_sensor.kitchen_dishwasher_door
+          state: "off"
+      then:
+        - action: miele.set_program
+          data:
+            device_id: ba95db4473ba78bbbf1d19ec8340480f
+            program_id: 200
+
+        - wait_template: "{{ is_state('sensor.kitchen_dishwasher_program', 'eco') }}"
+          timeout: "00:00:15"
+          continue_on_timeout: false
+
+        - if:
+            - condition: state
+              entity_id: sensor.kitchen_dishwasher
+              state: programmed
+          then:
+            - action: button.press
+              target:
+                entity_id: button.kitchen_dishwasher_start
