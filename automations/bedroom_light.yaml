@@ -72,6 +72,16 @@
       id: sunrise_script
 
     - trigger: state
+      entity_id: cover.bedroom_blind
+      to: open
+      id: blind_opened
+
+    - trigger: state
+      entity_id: cover.bedroom_blind
+      to: closed
+      id: blind_closed
+
+    - trigger: state
       entity_id: binary_sensor.bedroom_light
       from: "off"
       to: "on"

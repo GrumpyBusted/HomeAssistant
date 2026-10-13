@@ -182,13 +182,6 @@
           New position: {{ position }}
     - choose:
         - conditions:
-            - condition: trigger
-              id:
-                - open_long_pressed
-                - close_long_pressed
-          sequence: []
-
-        - conditions:
             - condition: template
               value_template: |-
                 {{ position | int(0) == 100 }}

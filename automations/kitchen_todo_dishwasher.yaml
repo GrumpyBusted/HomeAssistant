@@ -16,11 +16,11 @@
       id: state_changed
 
     - trigger: state
-      entity_id: binary_sensor.kitchen_dishwasher_notification_active
+      entity_id: binary_sensor.kitchen_dishwasher_notification_active_safe
       id: notification
 
     - trigger: state
-      entity_id: binary_sensor.kitchen_dishwasher_problem
+      entity_id: binary_sensor.kitchen_dishwasher_problem_safe
       id: problem
 
     - trigger: numeric_state
@@ -98,7 +98,7 @@
         description: Kontroller opvaskemaskinen der er en aktiv notifikation
         related_entity_id: binary_sensor.kitchen_dishwasher_notification_active
         entity_id: todo.todo_smart_todo
-        is_active: "{{ is_state('binary_sensor.kitchen_dishwasher_notification_active', 'on') and supply_todos | int(0) == 0 }}"
+        is_active: "{{ is_state('binary_sensor.kitchen_dishwasher_notification_active_safe', 'on') and supply_todos | int(0) == 0 }}"
 
     - action: script.create_todo_task
       data:
@@ -106,4 +106,4 @@
         description: Kontroller opvaskemaskinen der er registreret et problem
         related_entity_id: binary_sensor.kitchen_dishwasher_problem
         entity_id: todo.todo_smart_todo
-        is_active: "{{ is_state('binary_sensor.kitchen_dishwasher_problem', 'on') }}"
+        is_active: "{{ is_state('binary_sensor.kitchen_dishwasher_problem_safe', 'on') }}"

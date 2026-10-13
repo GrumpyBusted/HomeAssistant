@@ -1,0 +1,39 @@
+- triggers:
+    - trigger: state
+      entity_id: binary_sensor.kitchen_dishwasher_notification_active
+      to: "on"
+    - trigger: state
+      entity_id: binary_sensor.kitchen_dishwasher_notification_active
+      to: "off"
+      for: "00:00:02"
+  binary_sensor:
+    - name: "Køkken opvaskemaskine notifikation aktiv (sikker)"
+      unique_id: kitchen_dishwasher_notification_active_safe
+      device_class: problem
+      state: |-
+        {% set value = states('binary_sensor.kitchen_dishwasher_notification_active') %}
+        {% if value in ['unavailable', 'unknown'] or is_state('switch.kitchen_dishwasher_power', 'off') %}
+          {{ this.state }}
+        {% else %}
+          {{ value }}
+        {% endif %}
+
+- triggers:
+    - trigger: state
+      entity_id: binary_sensor.kitchen_dishwasher_problem
+      to: "on"
+    - trigger: state
+      entity_id: binary_sensor.kitchen_dishwasher_problem
+      to: "off"
+      for: "00:00:02"
+  binary_sensor:
+    - name: "Køkken opvaskemaskine problem (sikker)"
+      unique_id: kitchen_dishwasher_problem_safe
+      device_class: problem
+      state: |-
+        {% set value = states('binary_sensor.kitchen_dishwasher_problem') %}
+        {% if value in ['unavailable', 'unknown'] or is_state('switch.kitchen_dishwasher_power', 'off') %}
+          {{ this.state }}
+        {% else %}
+          {{ value }}
+        {% endif %}

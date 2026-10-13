@@ -244,24 +244,6 @@
 
         - conditions:
             - condition: trigger
-              id: bedroom_waking
-            - condition: state
-              entity_id: binary_sensor.hallway_presence
-              state: "on"
-            - condition: state
-              entity_id: binary_sensor.bedroom_door
-              state: "on"
-            - condition: state
-              entity_id: binary_sensor.hallway_light
-              state: "off"
-          sequence:
-            - variables:
-                transition: 60
-                brightness: 75
-                kelvin: 2700
-
-        - conditions:
-            - condition: trigger
               id: person_detected
             - condition: state
               entity_id: binary_sensor.bedroom_door

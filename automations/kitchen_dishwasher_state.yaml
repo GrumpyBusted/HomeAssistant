@@ -60,6 +60,39 @@
                 entity_id: input_select.kitchen_dishwasher_state
               data:
                 option: running
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: sensor.kitchen_dishwasher_program
+                      state: intensive
+                  sequence:
+                    - action: counter.reset
+                      target:
+                        entity_id:
+                          - counter.kitchen_dishwasher_washes_since_75
+                          - counter.kitchen_dishwasher_washes_since_65
+                    - action: input_datetime.set_datetime
+                      target:
+                        entity_id: input_datetime.kitchen_dishwasher_last_75
+                      data:
+                        datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+                - conditions:
+                    - condition: state
+                      entity_id: sensor.kitchen_dishwasher_program
+                      state: power_wash
+                  sequence:
+                    - action: counter.increment
+                      target:
+                        entity_id: counter.kitchen_dishwasher_washes_since_75
+                    - action: counter.reset
+                      target:
+                        entity_id: counter.kitchen_dishwasher_washes_since_65
+              default:
+                - action: counter.increment
+                  target:
+                    entity_id:
+                      - counter.kitchen_dishwasher_washes_since_75
+                      - counter.kitchen_dishwasher_washes_since_65
 
         - conditions:
             - condition: trigger

@@ -35,13 +35,42 @@
         - condition: state
           entity_id: binary_sensor.kitchen_dishwasher_door
           state: "off"
+        - condition: state
+          entity_id: binary_sensor.kitchen_dishwasher_mobile_start
+          state: "on"
       then:
+        - variables:
+            id: 200
+            name: eco
+
+        - choose:
+            - conditions:
+                - condition: or
+                  conditions:
+                    - condition: numeric_state
+                      entity_id: counter.kitchen_dishwasher_washes_since_75
+                      above: 50
+                    - condition: template
+                      value_template: "{{ (now() - as_local(as_datetime(states('input_datetime.kitchen_dishwasher_last_75')))).days >= 90 }}"
+              sequence:
+                - variables:
+                    id: 205
+                    name: intensive
+            - conditions:
+                - condition: numeric_state
+                  entity_id: counter.kitchen_dishwasher_washes_since_65
+                  above: 20
+              sequence:
+                - variables:
+                    id: 204
+                    name: power_wash
+
         - action: miele.set_program
           data:
             device_id: ba95db4473ba78bbbf1d19ec8340480f
-            program_id: 200
+            program_id: "{{ id }}"
 
-        - wait_template: "{{ is_state('sensor.kitchen_dishwasher_program', 'eco') }}"
+        - wait_template: "{{ is_state('sensor.kitchen_dishwasher_program', name) }}"
           timeout: "00:00:15"
           continue_on_timeout: false
 

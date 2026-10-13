@@ -151,7 +151,7 @@
           state: "on"
         - condition: template
           value_template: |-
-            {{ not(trigger.id == 'close_short_pressed' and (state_attr('cover.emils_room_blind','current_position') | float(999)) <= 20) }}
+            {{ not(state_attr('cover.emils_room_blind','current_position') | float(999) <= 20) }}
       then:
         - variables:
             position: "{{ [position | int, 20] | max }}"
@@ -170,13 +170,6 @@
           Desired position: {{ states('input_number.emils_room_blind_position') }}
           New position: {{ position }}
     - choose:
-        - conditions:
-            - condition: trigger
-              id:
-                - open_long_pressed
-                - close_long_pressed
-          sequence: []
-
         - conditions:
             - condition: template
               value_template: |-
