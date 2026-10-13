@@ -73,6 +73,8 @@
             - condition: state
               entity_id: input_select.kitchen_dishwasher_state
               state: dirty
+            - condition: template
+              value_template: "{{ as_timestamp(states('input_datetime.kitchen_dishwasher_door_opened'), 0) > 0 }}"
           sequence:
             - action: input_number.set_value
               target:
@@ -82,6 +84,12 @@
                   {% set s = now().timestamp() - states('input_datetime.kitchen_dishwasher_door_opened') | as_timestamp(0) %}
                   {% set v = [(s / 60) | round(0) | int, 1] | max %}
                   {{ states('input_number.kitchen_dishwasher_dirty_score') | int(0) + v }}
+            - action: input_datetime.set_datetime
+              target:
+                entity_id: input_datetime.kitchen_dishwasher_door_opened
+              data:
+                timestamp: 0
+
         - conditions:
             - condition: trigger
               id: meal_time
