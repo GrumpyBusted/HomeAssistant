@@ -20,7 +20,7 @@
       state: "off"
     - condition: numeric_state
       entity_id: input_number.kitchen_dishwasher_dirty_score
-      above: 100
+      above: 40
 
   actions:
     - action: switch.turn_on
