@@ -5,7 +5,7 @@
   mode: queued
   max: 10
   trace:
-    stored_traces: 50
+    stored_traces: 100
 
   triggers:
     - trigger: device

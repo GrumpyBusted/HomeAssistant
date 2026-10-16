@@ -11,6 +11,7 @@
     - trigger: state
       entity_id: sensor.driveway_ev_charger_state_description_safe
       to: Locked, car connected
+      for: "00:03:00"
 
   conditions: []
 
