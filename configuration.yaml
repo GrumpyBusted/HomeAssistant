@@ -21,6 +21,8 @@ automation ui: !include automations.yaml
 automation manual: !include_dir_merge_list automations/
 script custom: !include_dir_merge_named ./scripts
 
+harvest:
+
 logger:
   logs:
     aiohue.util: warning
