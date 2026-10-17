@@ -1,0 +1,43 @@
+- id: bathroom_motion_sensor
+  alias: Badeværelse bevægelsessensor
+  description: |
+    Håndtering af bevægelsessensoren på badeværelset
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.bathroom_motion_sensor_motion
+      from: "off"
+      to: "on"
+      id: detected
+
+    - trigger: state
+      entity_id: binary_sensor.bathroom_motion_sensor_motion
+      from: "on"
+      to: "off"
+      id: cleared
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: detected
+          sequence:
+            - action: timer.cancel
+              target:
+                entity_id: timer.bathroom_motion_sensor_timer
+
+        - conditions:
+            - condition: trigger
+              id: cleared
+          sequence:
+            - action: timer.start
+              target:
+                entity_id: timer.bathroom_motion_sensor_timer
+              data:
+                duration: "00:03:00"

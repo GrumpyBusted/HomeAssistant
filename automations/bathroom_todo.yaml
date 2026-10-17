@@ -1,0 +1,83 @@
+- id: bathroom_todo
+  alias: Badeværelse todo
+  description: |
+    Opret todo opgaver vedrørende sæbe og duft påfyldning på badeværelset
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.bathroom_presence
+      to: "off"
+      for: "00:00:05"
+      id: person_left
+
+    - trigger: state
+      entity_id: counter.bathroom_motion_sensor_count
+      id: counter_changed
+
+    - trigger: event
+      event_type: todo_item_completed
+      event_data:
+        related: input_number.bathroom_freshener_last_count
+      id: freshener_completed
+
+    - trigger: event
+      event_type: todo_item_completed
+      event_data:
+        related: input_number.bathroom_soap_last_count
+      id: soap_completed
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: person_left
+          sequence:
+            - action: counter.increment
+              target:
+                entity_id: counter.bathroom_motion_sensor_count
+
+        - conditions:
+            - condition: trigger
+              id: counter_changed
+          sequence:
+            - action: script.create_todo_task
+              data:
+                subject: Tilføj WC-duft på bathroomtet
+                description: Indsæt en ny WC-duftpind i gæste-bathroomtet.
+                related_entity_id: input_number.bathroom_freshener_last_count
+                entity_id: todo.todo_smart_todo
+                is_active: "{{ states('counter.bathroom_motion_sensor_count') | int(0) > states('input_number.bathroom_freshener_last_count') | int(0) + 100 }}"
+
+            - action: script.create_todo_task
+              data:
+                subject: Fyld sæbe på dispenser på bathroomtet
+                description: Hæld mere sæbe på sæbedispenser på gæste-bathroomtet.
+                related_entity_id: input_number.bathroom_soap_last_count
+                entity_id: todo.todo_smart_todo
+                is_active: "{{ states('counter.bathroom_motion_sensor_count') | int(0) > states('input_number.bathroom_soap_last_count') | int(0) + 150 }}"
+
+        - conditions:
+            - condition: trigger
+              id: freshener_completed
+          sequence:
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.bathroom_freshener_last_count
+              data:
+                value: "{{ states('counter.bathroom_motion_sensor_count') | int(0) }}"
+
+        - conditions:
+            - condition: trigger
+              id: soap_completed
+          sequence:
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.bathroom_soap_last_count
+              data:
+                value: "{{ states('counter.bathroom_motion_sensor_count') | int(0) }}"

@@ -19,6 +19,7 @@
         - sensor.entrance_motion_sensor_battery
         - sensor.utility_room_motion_sensor_battery
         - sensor.toilet_motion_sensor_battery
+        - sensor.bathroom_motion_sensor_battery
       below: 20
       for: 00:03:00
 
@@ -34,6 +35,7 @@
         - sensor.entrance_motion_sensor_battery
         - sensor.utility_room_motion_sensor_battery
         - sensor.toilet_motion_sensor_battery
+        - sensor.bathroom_motion_sensor_battery
       above: 70
       for: 00:03:00
 
@@ -71,6 +73,8 @@
           - entity_id: sensor.utility_room_motion_sensor_battery
             battery_type: 2 * AAA
           - entity_id: sensor.toilet_motion_sensor_battery
+            battery_type: 2 * AAA
+          - entity_id: sensor.bathroom_motion_sensor_battery
             battery_type: 2 * AAA
     - repeat:
         for_each: "{{ sensors }}"
