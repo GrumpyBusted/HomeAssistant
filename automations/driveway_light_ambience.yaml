@@ -1,0 +1,78 @@
+- id: driveway_light_ambience
+  alias: Indkørsel lys stemning
+  description: |
+    Automatik til at julelys på huset i indkørslen
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.home_light_ambience
+
+  conditions: []
+
+  actions:
+    - variables:
+        date: "12-02" #"{{ now().strftime('%m-%d') }}"
+
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.home_light_ambience_evening
+              state: "on"
+          sequence:
+            - choose:
+                - conditions:
+                    - condition: template
+                      value_template: "{{ '10-15' <= date <= '10-31' }}"
+                  sequence:
+                    - action: script.turn_on_light_effect
+                      data:
+                        entity_id: light.driveway_light_strip_house
+                        effect: Stripes
+                        brightness_pct: 70
+                        rgb_color: [255, 69, 0]
+                - conditions:
+                    - condition: template
+                      value_template: "{{ '12-01' <= date <= '12-26' }}"
+                  sequence:
+                    - action: script.turn_on_light_effect
+                      data:
+                        entity_id: light.driveway_light_strip_house
+                        effect: Sparkle
+                        brightness_pct: 70
+                        rgb_color: [0, 180, 30]
+                - conditions:
+                    - condition: template
+                      value_template: "{{ date >= '12-30' or date == '01-01' }}"
+                  sequence:
+                    - action: script.turn_on_light_effect
+                      data:
+                        entity_id: light.driveway_light_strip_house
+                        effect: Rainbow
+                        brightness_pct: 70
+                        rgb_color: [0, 100, 255]
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.home_light_ambience_morning
+              state: "on"
+          sequence:
+            - choose:
+                - conditions:
+                    - condition: template
+                      value_template: "{{ '12-01' <= date <= '12-26' }}"
+                  sequence:
+                    - action: light.turn_on
+                      target:
+                        entity_id: light.driveway_light_strip_house
+                      data:
+                        brightness_pct: 70
+                        rgb_color: [0, 180, 30]
+      default:
+        - action: light.turn_off
+          data:
+            transition: 1
+          target:
+            entity_id: light.driveway_light_strip_house

@@ -63,13 +63,13 @@
       id: light_outside
 
     - trigger: state
-      entity_id: binary_sensor.home_light_decoration
+      entity_id: binary_sensor.home_light_ambience_evening
       from: "off"
       to: "on"
       id: decoration_on
 
     - trigger: state
-      entity_id: binary_sensor.home_light_decoration
+      entity_id: binary_sensor.home_light_ambience_evening
       from: "on"
       to: "off"
       id: decoration_off
@@ -169,7 +169,7 @@
               entity_id: binary_sensor.garden_house_east_presence
               state: "off"
             - condition: state
-              entity_id: binary_sensor.home_light_decoration
+              entity_id: binary_sensor.home_light_ambience_evening
               state: "on"
           sequence:
             - variables:
@@ -328,7 +328,7 @@
                 - condition: and
                   conditions:
                     - condition: state
-                      entity_id: binary_sensor.home_light_decoration
+                      entity_id: binary_sensor.home_light_ambience_evening
                       state: "off"
                     - condition: state
                       entity_id: binary_sensor.driveway_street_presence
