@@ -40,6 +40,11 @@
       entity_id: number.people_home
       id: people_changed
 
+    - trigger: state
+      entity_id: input_number.kitchen_presence_duration
+      from: "0"
+      id: duration_changed
+
   conditions: []
 
   actions:
@@ -80,11 +85,31 @@
                 value: |-
                   {% set s = now().timestamp() - states('input_datetime.kitchen_dishwasher_door_opened') | as_timestamp(0) %}
                   {% set v = [[(s / 60) | round(0) | int, 1] | max, 10] | min %}
-                  {{ [states('input_number.kitchen_dishwasher_dirty_score') | int(0) + v, 10] | min }}            - action: input_datetime.set_datetime
+                  {{ [states('input_number.kitchen_dishwasher_dirty_score') | int(0) + v, 10] | min }}
+            - action: input_datetime.set_datetime
               target:
                 entity_id: input_datetime.kitchen_dishwasher_door_opened
               data:
                 timestamp: 0
+
+        - conditions:
+            - condition: trigger
+              id: duration_changed
+            - condition: state
+              entity_id: input_select.kitchen_dishwasher_state
+              state: dirty
+          sequence:
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.kitchen_dishwasher_dirty_score
+              data:
+                value: |-
+                  {% set d = states('input_number.kitchen_presence_duration') | int(0) %}
+                  {% if d >= 30 %}
+                    {{ [3 + ((d - 31) // 10), 10] | min }}
+                  {% else %}
+                    0
+                  {% endif %}
 
         - conditions:
             - condition: trigger

@@ -1243,32 +1243,6 @@ cleanup_todo_tasks:
           todo_id: '{{ delete[repeat.index - 1] }}'
   - stop: All Done
     response_variable: output
-emils_varelse_tand_og_sluk_lys:
-  alias: Emils værelse lys tænd og sluk
-  description: Tænd og slut lys på Emils værelse, script til at blive brugt i iPhone
-    widget
-  mode: queued
-  max: 10
-  sequence:
-  - choose:
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.emils_room_light
-        state: 'on'
-      sequence:
-      - action: light.turn_off
-        data:
-          transition: 1
-        target:
-          entity_id: light.emils_room_lights
-    default:
-    - action: light.turn_on
-      data:
-        transition: 1
-        color_temp_kelvin: 2700
-        brightness_pct: 80
-      target:
-        entity_id: light.emils_room_lights
 create_todo_battery_task:
   alias: Opret todo batteri opgave
   description: Kontroller batteri niveau og opret evt opgave
@@ -1484,3 +1458,97 @@ bedroom_blind_down:
         command: close
   mode: queued
   max: 10
+light_turn_on_effect:
+  alias: Lys tænd effekt
+  description: Tænder et lys med den første effekt, der matcher inputtet. Hvis ingen
+    effekt matcher, anvendes den angivne fallback-farve og lysstyrke.
+  mode: parallel
+  max: 10
+  fields:
+    entity_id:
+      name: Lys
+      description: Det lys, der skal tændes.
+      required: true
+      selector:
+        entity:
+          domain:
+          - light
+          multiple: false
+    effect:
+      name: Effekt
+      description: Søgetekst i effektens navn. Finder den første effekt, der indeholder
+        teksten, uanset store og små bogstaver.
+      required: true
+      selector:
+        text: {}
+    brightness_pct:
+      name: Fallback lysstyrke
+      description: Lysstyrke i procent, hvis effekten ikke findes.
+      required: false
+      default: 100
+      selector:
+        number:
+          min: 1
+          max: 100
+          step: 1
+          unit_of_measurement: '%'
+          mode: slider
+    rgb_color:
+      name: Fallback farve
+      description: RGB-farve, hvis effekten ikke findes.
+      required: false
+      default:
+      - 255
+      - 255
+      - 255
+      selector:
+        color_rgb: {}
+  sequence:
+  - variables:
+      matched_effect: "{% set effects = state_attr(entity_id, 'effect_list') or []
+        %} {% set search = effect | trim | lower %} {% set ns = namespace(match='')
+        %} {% for item in effects %}\n  {% if search in (item | lower) and ns.match
+        == '' %}\n    {% set ns.match = item %}\n  {% endif %}\n{% endfor %} {{ ns.match
+        }}"
+  - action: light.turn_on
+    data:
+      entity_id: '{{ entity_id }}'
+      brightness_pct: '{{ brightness | default(100) | int(100) }}'
+      rgb_color: '{{ rgb_color | default([255, 255, 255]) }}'
+  - delay:
+      seconds: 3
+  - if:
+    - condition: template
+      value_template: '{{ matched_effect | trim != '''' }}'
+    then:
+    - action: light.set_effect
+      target:
+        entity_id: '{{ entity_id }}'
+      data:
+        effect: '{{ matched_effect }}'
+emils_room_light_switch:
+  alias: Emils værelse lys tænd og sluk
+  description: Tænd og slut lys på Emils værelse, script til at blive brugt i iPhone
+    widget
+  mode: queued
+  max: 10
+  sequence:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.emils_room_light
+        state: 'on'
+      sequence:
+      - action: light.turn_off
+        data:
+          transition: 1
+        target:
+          entity_id: light.emils_room_lights
+    default:
+    - action: light.turn_on
+      data:
+        transition: 1
+        color_temp_kelvin: 2700
+        brightness_pct: 80
+      target:
+        entity_id: light.emils_room_lights

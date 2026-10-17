@@ -36,6 +36,11 @@
             - action: timer.cancel
               target:
                 entity_id: timer.kitchen_presence_sensor_timer
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.kitchen_presence_duration
+              data:
+                value: 0
 
         - conditions:
             - condition: trigger
@@ -50,6 +55,13 @@
                   {% set seconds = states('input_number.kitchen_presence_sensor_seconds') | float(0.0) %}
                   {% set duration = (as_timestamp(now()) - as_timestamp(start)) | round(1) %}
                   {{ seconds + duration }}
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.kitchen_presence_duration
+              data:
+                value: |-
+                  {% set start = states('input_datetime.kitchen_presence_sensor_start') | as_datetime | as_local %}
+                  {{ ((as_timestamp(now()) - as_timestamp(start)) / 60) | round(0) | int }}
             - action: timer.start
               target:
                 entity_id: timer.kitchen_presence_sensor_timer

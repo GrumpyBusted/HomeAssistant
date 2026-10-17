@@ -15,7 +15,7 @@
 
   actions:
     - variables:
-        date: "12-02" #"{{ now().strftime('%m-%d') }}"
+        date: "{{ now().strftime('%m-%d') }}"
 
     - choose:
         - conditions:
@@ -28,7 +28,7 @@
                     - condition: template
                       value_template: "{{ '10-15' <= date <= '10-31' }}"
                   sequence:
-                    - action: script.turn_on_light_effect
+                    - action: script.light_turn_on_effect
                       data:
                         entity_id: light.driveway_light_strip_house
                         effect: Stripes
@@ -38,7 +38,7 @@
                     - condition: template
                       value_template: "{{ '12-01' <= date <= '12-26' }}"
                   sequence:
-                    - action: script.turn_on_light_effect
+                    - action: script.light_turn_on_effect
                       data:
                         entity_id: light.driveway_light_strip_house
                         effect: Sparkle
@@ -48,7 +48,7 @@
                     - condition: template
                       value_template: "{{ date >= '12-30' or date == '01-01' }}"
                   sequence:
-                    - action: script.turn_on_light_effect
+                    - action: script.light_turn_on_effect
                       data:
                         entity_id: light.driveway_light_strip_house
                         effect: Rainbow
