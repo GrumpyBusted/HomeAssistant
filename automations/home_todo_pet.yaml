@@ -1,9 +1,11 @@
-- id: 83A417D9-4EAC-45B4-A0C0-385382FF9FC0
+- id: home_todo_pet
   alias: Hjem todo kæledyr
   description: |
-    Opret todo opgaver vedrørende hunde
+    Opretter todo-opgaver vedrørende hundene.
   mode: queued
   max: 10
+  trace:
+    stored_traces: 25
 
   triggers:
     - trigger: time

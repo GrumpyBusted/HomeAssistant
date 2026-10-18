@@ -1,7 +1,7 @@
-- id: "1747337340117"
+- id: entrance_light
   alias: Entre lys
   description: |
-    Automatik til at styre lys i entreen
+    Styrer belysningen i entreen.
   mode: queued
   max: 10
   trace:

@@ -1,7 +1,7 @@
-- id: "1760878828758"
+- id: driveway_motion_sensor_entrance
   alias: Indkørsel bevægelsessensor entre
   description: |
-    Håndtering af bevægelsessensoren i indkørslen ved hoveddøren
+    Håndterer bevægelsessensoren ved hoveddøren i indkørslen.
   mode: queued
   max: 10
   trace:

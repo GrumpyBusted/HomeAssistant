@@ -1,7 +1,7 @@
-- id: "1737299093662"
+- id: emils_room_heating
   alias: Emils værelse varme
   description: |
-    Automatik til at styre varmen på Emils værelse
+    Styrer varmen på Emils værelse.
   mode: queued
   max: 10
   trace:

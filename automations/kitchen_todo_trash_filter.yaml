@@ -1,7 +1,7 @@
-- id: "1770459627394"
-  alias: Todo køkken affald filter
+- id: kitchen_todo_trash_filter
+  alias: Køkken todo affaldsfilter
   description: |
-    Opret todo opgaver vedrørende skift af biofilter på affald
+    Opretter todo-opgaver om udskiftning af biofilteret i affaldsbeholderen.
   mode: queued
   max: 10
   trace:

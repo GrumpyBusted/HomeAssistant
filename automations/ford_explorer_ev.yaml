@@ -1,7 +1,7 @@
-- id: "B0E5CA34-D5CC-4672-A2BB-80BF38A9C91F"
+- id: ford_explorer_ev
   alias: Ford Explorer EV
   description: |
-    Disable entities på Ford Explorer EV
+    Deaktiverer de relevante entiteter for Ford Explorer EV.
   mode: single
   trace:
     stored_traces: 100

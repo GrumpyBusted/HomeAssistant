@@ -1,7 +1,7 @@
 - id: garden_light_patio
   alias: Have lys terrasse
   description: |
-    Automatik til at styre lys i haven på vest siden af terrassen
+    Styrer havebelysningen ved terrassen.
   mode: queued
   max: 10
   trace:

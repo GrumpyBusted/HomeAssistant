@@ -1,7 +1,7 @@
 - id: garden_light_garage_north
   alias: Have lys garage nord
   description: |
-    Automatik til at styre lys i haven på nord siden af garagen
+    Styrer havebelysningen nord for garagen.
   mode: queued
   max: 10
   trace:

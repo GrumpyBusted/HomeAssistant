@@ -1,7 +1,7 @@
-- id: "1770464713887"
+- id: toilet_todo
   alias: Toilet todo
   description: |
-    Opret todo opgaver vedrørende sæbe og duft påfyldning på toilet
+    Opretter todo-opgaver om genopfyldning af sæbe og duft på toilettet.
   mode: queued
   max: 10
   trace:

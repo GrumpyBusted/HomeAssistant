@@ -1,7 +1,7 @@
-- id: "1760275142990"
+- id: kitchen_light
   alias: Køkken lys
   description: |
-    Automatik til at styre lys i køkkenet
+    Styrer belysningen i køkkenet.
   mode: queued
   max: 10
   trace:

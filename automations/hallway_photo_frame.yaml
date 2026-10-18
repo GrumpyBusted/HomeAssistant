@@ -1,7 +1,7 @@
-- id: "1769208997346"
+- id: hallway_photo_frame
   alias: Gang fotorammer
   description: |
-    Automatik for at styre fotorammer i gangen
+    Styrer fotorammerne i gangen.
   mode: queued
   max: 10
   trace:

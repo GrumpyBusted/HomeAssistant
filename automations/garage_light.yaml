@@ -1,7 +1,7 @@
-- id: "1735725983183"
+- id: garage_light
   alias: Garage lys
   description: |
-    Automatik til at styre lys i garagen
+    Styrer belysningen i garagen.
   mode: queued
   max: 10
   trace:

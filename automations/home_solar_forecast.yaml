@@ -1,0 +1,20 @@
+- id: home_solar_forecast
+  alias: Hjem solproduktionsprognose
+  description: |
+    Opdaterer solproduktionsprognosen fra Solcast PV Forecast.
+  mode: single
+  trace:
+    stored_traces: 10
+
+  triggers:
+    - trigger: time
+      at: 00:00:00
+
+    - trigger: sun
+      event: sunrise
+      offset: 0
+
+  conditions: []
+
+  actions:
+    - action: solcast_solar.update_forecasts

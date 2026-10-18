@@ -1,7 +1,7 @@
-- id: "1770410133642"
+- id: utility_room_door
   alias: Bryggers dør
   description: |
-    Automatik til at styre timer til bryggers dør
+    Styrer timeren for døren til bryggerset.
   mode: queued
   max: 10
   trace:

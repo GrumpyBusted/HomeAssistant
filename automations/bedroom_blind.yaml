@@ -1,7 +1,7 @@
-- id: "1770235218775"
+- id: bedroom_blind
   alias: Soveværelse rullegardin
   description: |
-    Automatik for rullegardin på soveværelse
+    Styrer rullegardinet i soveværelset.
   mode: queued
   max: 10
   trace:

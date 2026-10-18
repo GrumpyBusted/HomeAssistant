@@ -1,11 +1,11 @@
-- id: "1769369132822"
+- id: kitchen_todo_dishwasher
   alias: Køkken todo opvaskemaskine
   description: |
-    Opret todo opgaver vedrørende opvaskemaskine
+    Opretter todo-opgaver vedrørende opvaskemaskinen.
   mode: queued
   max: 10
   trace:
-    stored_traces: 300
+    stored_traces: 100
 
   triggers:
     - trigger: state

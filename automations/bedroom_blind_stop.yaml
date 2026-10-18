@@ -1,7 +1,7 @@
-- id: "1736106591926"
+- id: bedroom_blind_stop
   alias: Soveværelse rullegardin stop
   description: |
-    Automatik for at stoppe rullegardin på soveværelse
+    Stopper rullegardinet i soveværelset efter automationsreglerne.
   mode: queued
   max: 10
   trace:

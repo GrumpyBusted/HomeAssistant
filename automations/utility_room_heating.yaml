@@ -1,7 +1,7 @@
-- id: "1737311656075"
+- id: utility_room_heating
   alias: Bryggers varme
   description: |
-    Automatik til at styre varmen på bryggers
+    Styrer varmen i bryggerset.
   mode: queued
   max: 10
   trace:

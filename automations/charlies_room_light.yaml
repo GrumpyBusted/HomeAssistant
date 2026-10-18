@@ -1,7 +1,7 @@
-- id: "1736082177257"
+- id: charlies_room_light
   alias: Charlies værelse lys
   description: |
-    Automatik til at styre lys på Charlies værelse
+    Styrer belysningen på Charlies værelse.
   mode: queued
   max: 10
   trace:

@@ -1,7 +1,7 @@
-- id: "1764973371100"
-  alias: Hjem overvåg data folder
+- id: home_watch_data_folder
+  alias: Hjem overvåg datamappe
   description: |
-    Overvågning af data folder
+    Reagerer på CSV-filer for el- og vandmåleren i datamappen og udsender events til videre behandling.
   mode: queued
   max: 10
   trace:

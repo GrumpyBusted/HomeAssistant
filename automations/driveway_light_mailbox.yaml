@@ -1,7 +1,7 @@
 - id: driveway_light_mailbox
   alias: Indkørsel lys postkasse
   description: |
-    Automatik til at styre lys ved postkasseni indkørsel
+    Styrer belysningen ved postkassen i indkørslen.
   mode: queued
   max: 10
   trace:

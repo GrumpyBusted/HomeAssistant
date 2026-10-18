@@ -1,7 +1,7 @@
 - id: kitchen_dishwasher_start
   alias: Køkken opvaskemaskine start
   description: |
-    Automatisk start af opvaskemaskine
+    Starter opvaskemaskinen automatisk, når betingelserne er opfyldt.
   mode: queued
   max: 10
   trace:

@@ -1,7 +1,7 @@
-- id: "1764974327446"
-  alias: Hjem vand måler indlæs
+- id: home_water_meter_load
+  alias: Hjem vandmåler indlæsning
   description: |
-    Indlæs vand måler aflæsninger og opdater sensor
+    Indlæser vandmålerens aflæsninger og opdaterer sensoren.
   mode: queued
   max: 10
   trace:

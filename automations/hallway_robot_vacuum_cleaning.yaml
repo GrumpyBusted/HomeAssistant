@@ -1,7 +1,7 @@
-- id: "1768143802884"
+- id: hallway_robot_vacuum_cleaning
   alias: Gang robotstøvsuger rengøring
   description: |
-    Styring af robotstøvsuger for at gør rent i gangen
+    Styrer robotstøvsugerens rengøring i gangen.
   mode: queued
   max: 10
   trace:

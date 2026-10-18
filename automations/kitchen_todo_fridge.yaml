@@ -1,7 +1,7 @@
-- id: "1770323072575"
+- id: kitchen_todo_fridge
   alias: Køkken todo køleskab
   description: |
-    Opret todo opgaver vedrørende køleskab
+    Opretter todo-opgaver vedrørende køleskabet.
   mode: queued
   max: 10
   trace:

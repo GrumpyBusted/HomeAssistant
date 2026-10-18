@@ -1,7 +1,7 @@
-- id: "1760878795560"
+- id: driveway_motion_sensor_house_south
   alias: Indkørsel bevægelsessensor hus syd
   description: |
-    Håndtering af bevægelsessensoren i indkørslen på syd siden af huset
+    Håndterer bevægelsessensoren på sydsiden af huset ved indkørslen.
   mode: queued
   max: 10
   trace:

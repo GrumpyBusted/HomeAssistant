@@ -1,7 +1,7 @@
-- id: "1760882975403"
+- id: driveway_light_house_south
   alias: Indkørsel lys hus syd
   description: |
-    Automatik til at styre lys i indkørslen på syd siden af huset
+    Styrer belysningen på sydsiden af huset ved indkørslen.
   mode: queued
   max: 10
   trace:

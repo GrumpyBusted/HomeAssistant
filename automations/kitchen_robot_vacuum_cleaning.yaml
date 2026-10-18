@@ -1,7 +1,7 @@
-- id: "1765134832184"
+- id: kitchen_robot_vacuum_cleaning
   alias: Køkken robotstøvsuger rengøring
   description: |
-    Styring af robotstøvsuger for at gør rent i køkkenet og bryggers
+    Styrer robotstøvsugerens rengøring i køkkenet og bryggerset.
   mode: queued
   max: 10
   trace:

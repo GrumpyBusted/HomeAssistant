@@ -1,7 +1,7 @@
-- id: "1770548858082"
+- id: kitchen_fridge
   alias: Køkken køleskab
   description: |
-    Styring af power booster på køleskab i køkkenet
+    Styrer køleskabets power-booster-funktion.
   mode: single
   trace:
     stored_traces: 30

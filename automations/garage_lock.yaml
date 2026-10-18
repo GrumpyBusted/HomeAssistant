@@ -1,7 +1,7 @@
-- id: "1763847410643"
+- id: garage_lock
   alias: Garage lås
   description: |
-    Automatik til at låse garage døren op og i baseret på hvem der er hjemme
+    Låser garagedøren op eller i afhængigt af, hvem der er hjemme.
   mode: queued
   max: 10
   trace:

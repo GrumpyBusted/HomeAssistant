@@ -1,7 +1,7 @@
 - id: technic_room_light
   alias: Teknikrum lys
   description: |
-    Automatik til at styre lys i teknikrummet
+    Styrer belysningen i teknikrummet.
   mode: queued
   max: 10
   trace:

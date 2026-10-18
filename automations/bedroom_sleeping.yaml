@@ -1,7 +1,7 @@
-- id: "1771522267634"
+- id: bedroom_sleeping
   alias: Soveværelse sover
   description: |
-    Styring af timer til soveværelse sover
+    Styrer timeren for sovestatus i soveværelset.
   mode: queued
   max: 10
   trace:

@@ -1,7 +1,7 @@
-- id: "1739714838791"
-  alias: Hjem Todo oprydning opgaver
+- id: home_todo_cleanup_task
+  alias: Hjem todo oprydning opgaver
   description: |
-    Automatik der sletter afsluttede opgaver fra smart todo listen
+    Sletter afsluttede opgaver fra den smart todo-liste.
   mode: restart
   trace:
     stored_traces: 30

@@ -1,7 +1,7 @@
 - id: home_todo_water_plant_outdoor
-  alias: Hjem todo vanding udendørs
+  alias: Hjem todo vand planter udendørs
   description: |
-    Opret todo opgaver vedrørende jordfugtighed måler og vanding af blomster udendørs
+    Opretter todo-opgaver om kontrol af jordfugtighed og vanding af udendørs planter.
   mode: queued
   max: 10
   trace:

@@ -1,7 +1,7 @@
-- id: "1737313921011"
+- id: hallway_heating
   alias: Gang varme
   description: |
-    Automatik til at styre varmen i gangen
+    Styrer varmen i gangen.
   mode: queued
   max: 10
   trace:

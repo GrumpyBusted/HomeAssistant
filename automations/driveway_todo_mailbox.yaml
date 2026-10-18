@@ -1,7 +1,7 @@
-- id: "1739712804347"
+- id: driveway_todo_mailbox
   alias: Indkørsel todo postkasse
   description: |
-    Opret todo opgaver vedrørende postkasse
+    Opretter todo-opgaver vedrørende postkassen.
   mode: queued
   max: 10
   trace:

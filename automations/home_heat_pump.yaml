@@ -1,7 +1,7 @@
-- id: BE2E2F67-1BD7-4C0B-9325-7799F95EB16C
+- id: home_heat_pump
   alias: Hjem varmepumpe
   description: |
-    Styring af central varmepumpe, tænder og slukker og juseret offset og effektivitet.
+    Styrer den centrale varmepumpe, herunder tænd/sluk, offset og effektivitet.
   mode: queued
   max: 10
   trace:

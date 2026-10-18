@@ -1,7 +1,7 @@
-- id: "1740165836750"
-  alias: Hjem Todo oprydning indkøbsseddel
+- id: home_todo_cleanup_shopping
+  alias: Hjem todo oprydning indkøbsseddel
   description: |
-    Automatik der sletter afsluttede opgaver på indkøbsseddel
+    Sletter afsluttede opgaver fra indkøbssedlen.
   mode: restart
   trace:
     stored_traces: 30

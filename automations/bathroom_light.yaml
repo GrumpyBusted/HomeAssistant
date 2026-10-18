@@ -1,7 +1,7 @@
 - id: bathroom_light
   alias: Badeværelse lys
   description: |
-    Automatik til at styre lys på badeværelset
+    Styrer belysningen på badeværelset.
   mode: queued
   max: 10
   trace:

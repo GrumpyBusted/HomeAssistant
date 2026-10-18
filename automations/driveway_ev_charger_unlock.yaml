@@ -1,7 +1,7 @@
-- id: "1735658670560"
+- id: driveway_ev_charger_unlock
   alias: Indkørsel billader lås op
   description: |
-    Hvis en af bilerne er hjemme og tilsluttet, lås billaderen op
+    Låser billaderen op, når en af bilerne er hjemme og tilsluttet.
   mode: queued
   max: 10
   trace:

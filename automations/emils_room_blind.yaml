@@ -1,7 +1,7 @@
-- id: "1770236661641"
+- id: emils_room_blind
   alias: Emils værelse rullegardin
   description: |
-    Automatik for rullegardin på Emils værelse
+    Styrer rullegardinet på Emils værelse.
   mode: queued
   max: 10
   trace:

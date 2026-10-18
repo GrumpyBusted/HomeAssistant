@@ -1,7 +1,7 @@
-- id: "1764364029434"
-  alias: Hjem elektricitet måler aflæs
+- id: home_electricity_meter_save
+  alias: Hjem elmåler lagring
   description: |
-    Aflæs elektricitets forbrug og gem i CSV fil
+    Aflæser elforbruget og gemmer data i en CSV-fil.
   mode: single
   trace:
     stored_traces: 20

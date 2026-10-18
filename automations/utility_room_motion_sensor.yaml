@@ -1,7 +1,7 @@
-- id: "1769872343999"
+- id: utility_room_motion_sensor
   alias: Bryggers bevægelsessensor
   description: |
-    Håndtering af bevægelsessensoren i bryggerset
+    Håndterer bevægelsessensoren i bryggerset.
   mode: queued
   max: 10
   trace:

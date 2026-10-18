@@ -1,7 +1,7 @@
-- id: "1737310628140"
+- id: toilet_heating
   alias: Toilet varme
   description: |
-    Automatik til at styre varmen på toilettet
+    Styrer varmen på toilettet.
   mode: queued
   max: 10
   trace:

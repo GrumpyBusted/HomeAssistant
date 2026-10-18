@@ -1,7 +1,7 @@
-- id: "1735842629315"
+- id: entrance_lock
   alias: Entre lås
   description: |
-    Automatik til at låse hoveddøren op og i baseret på hvem der er hjemme
+    Låser hoveddøren op eller i afhængigt af, hvem der er hjemme.
   mode: queued
   max: 10
   trace:

@@ -1,7 +1,7 @@
-- id: "1763801218547"
-  alias: Hjem ventilation forvarme
+- id: storage_ventilation_preheating
+  alias: Loftrum ventilation forvarme
   description: |
-    Styring af forvarme til Nilan ventilationsanlæg
+    Styrer forvarmen til Nilan-ventilationsanlægget.
   mode: queued
   max: 10
   trace:

@@ -1,7 +1,7 @@
-- id: "1760825948230"
+- id: garden_light_house_west
   alias: Have lys hus vest
   description: |
-    Automatik til at styre lys i haven på vest siden af huset
+    Styrer havebelysningen på vestsiden af huset.
   mode: queued
   max: 10
   trace:

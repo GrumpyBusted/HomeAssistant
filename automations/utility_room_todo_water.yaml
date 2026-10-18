@@ -1,7 +1,7 @@
-- id: "1770993693621"
+- id: utility_room_todo_water
   alias: Bryggers todo vand
   description: |
-    Overvåg om der er vand under vasken bryggerset, send beskeder hvis der opstår lækage
+    Overvåger for vand under vasken i bryggerset og sender besked ved lækage.
   mode: queued
   max: 10
   trace:

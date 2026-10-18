@@ -1,0 +1,75 @@
+- id: iphone_location
+  alias: iPhone lokation
+  description: |
+    Anmoder om opdatering af iPhone-lokation, hvis iPhone-sensorerne ikke er blevet opdateret i over en time.
+  mode: single
+  trace:
+    stored_traces: 20
+
+  triggers:
+    - trigger: time_pattern
+      minutes: /10
+
+  conditions:
+    - condition: template
+      value_template: |-
+        {{ stale_locations | count > 0 }}
+
+  actions:
+    - repeat:
+        for_each: "{{ stale_locations }}"
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: |-
+                      {{ repeat.item == 'sensor.anders_iphone_location_last_updated' }}
+                sequence:
+                  - action: notify.mobile_app_anders_iphone
+                    data:
+                      message: request_location_update
+
+              - conditions:
+                  - condition: template
+                    value_template: |-
+                      {{ repeat.item == 'sensor.monique_iphone_location_last_updated' }}
+                sequence:
+                  - action: notify.mobile_app_monique_iphone
+                    data:
+                      message: request_location_update
+
+              - conditions:
+                  - condition: template
+                    value_template: |-
+                      {{ repeat.item == 'sensor.emil_iphone_location_last_updated' }}
+                sequence:
+                  - action: notify.mobile_app_emil_iphone
+                    data:
+                      message: request_location_update
+
+              - conditions:
+                  - condition: template
+                    value_template: |-
+                      {{ repeat.item == 'sensor.charlie_iphone_location_last_updated' }}
+                sequence:
+                  - action: notify.mobile_app_charlie_iphone
+                    data:
+                      message: request_location_update
+
+  variables:
+    iphone_sensors:
+      - sensor.anders_iphone_location_last_updated
+      - sensor.monique_iphone_location_last_updated
+      - sensor.emil_iphone_location_last_updated
+      - sensor.charlie_iphone_location_last_updated
+    stale_locations: |-
+      {% set ns = namespace(stale=[]) %} {% for e in iphone_sensors %}
+        {% set s = states(e) %}
+        {% if s not in ['unknown', 'unavailable', ''] %}
+          {% set age = (now() - (s | as_datetime)).total_seconds() %}
+          {% if age > 3600 and age < 4200 %}
+            {% set ns.stale = ns.stale + [e] %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+      {{ ns.stale }}

@@ -1,7 +1,7 @@
-- id: "1769871939427"
+- id: kitchen_presence_sensor
   alias: Køkken tilstedeværelsessensor
   description: |
-    Automatik til at styre køkken tilstedeværelsessensor
+    Styrer logikken for tilstedeværelsessensoren i køkkenet.
   mode: queued
   max: 10
   trace:

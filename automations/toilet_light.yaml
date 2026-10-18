@@ -1,7 +1,7 @@
-- id: "1747340588102"
+- id: toilet_light
   alias: Toilet lys
   description: |
-    Automatik til at styre lys på toilettet
+    Styrer belysningen på toilettet.
   mode: queued
   max: 10
   trace:

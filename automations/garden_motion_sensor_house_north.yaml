@@ -1,7 +1,7 @@
-- id: "1760878885972"
+- id: garden_motion_sensor_house_north
   alias: Have bevægelsessensor hus nord
   description: |
-    Håndtering af bevægelsessensoren i haven på nord siden af huset
+    Håndterer bevægelsessensoren på nordsiden af huset.
   mode: queued
   max: 10
   trace:

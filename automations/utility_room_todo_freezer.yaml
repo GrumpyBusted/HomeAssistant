@@ -1,7 +1,7 @@
-- id: "1770535740851"
+- id: utility_room_todo_freezer
   alias: Bryggers todo fryser
   description: |
-    Overvåg fryser i bryggerset, send beskeder hvis der opstår fejl
+    Overvåger fryseren i bryggerset og sender besked, hvis der opstår en fejl.
   mode: queued
   max: 10
   trace:

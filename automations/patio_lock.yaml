@@ -1,7 +1,7 @@
-- id: "1761840992462"
+- id: patio_lock
   alias: Terrasse lås
   description: |
-    Automatik til at styre terrasse dør låsen
+    Styrer låsen på terrassedøren.
   mode: queued
   max: 10
   trace:

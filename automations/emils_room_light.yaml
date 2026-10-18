@@ -1,7 +1,7 @@
-- id: "1735852365839"
+- id: emils_room_light
   alias: Emils værelse lys
   description: |
-    Automatik til at styre lys på Emils værelse
+    Styrer belysningen på Emils værelse.
   mode: queued
   max: 10
   trace:

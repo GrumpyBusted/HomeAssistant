@@ -1,7 +1,7 @@
-- id: "1771052556655"
+- id: home_monitor_automation_unused
   alias: Hjem overvåg automation ubrugt
   description: |
-    Overvåg automations som ikke har trigget inden for cutoff (default 7 dage med undtagelser
+    Identificerer automations, der ikke har været brugt, så de kan undersøges eller eventuelt slettes.
   mode: single
   trace:
     stored_traces: 50

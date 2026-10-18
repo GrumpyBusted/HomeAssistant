@@ -1,7 +1,7 @@
-- id: "1768156511533"
+- id: storage_ventilation_system
   alias: Loftrum ventilationsanlæg
   description: |
-    Styring af varme genveks ventilationsanlæg
+    Styrer ventilationsanlægget med varmegenvinding i loftsrummet.
   mode: queued
   max: 10
   trace:

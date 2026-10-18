@@ -1,7 +1,7 @@
-- id: "1737311363654"
+- id: bathroom_heating
   alias: Badeværelse varme
   description: |
-    Automatik til at styre varmen på badeværelset
+    Styrer varmen på badeværelset.
   mode: queued
   max: 10
   trace:

@@ -1,0 +1,39 @@
+- id: home_todo_blind_motionblinds
+  alias: Hjem todo rullegardiner (Motionblinds)
+  description: |
+    Kontrollerer batteristatus for Motionblinds-rullegardiner og opretter relevante todo-opgaver.
+  mode: restart
+  trace:
+    stored_traces: 30
+
+  triggers:
+    - trigger: numeric_state
+      entity_id:
+        - sensor.emils_room_blind_battery
+      below: 5
+      for: 00:03:00
+
+    - trigger: numeric_state
+      entity_id:
+        - sensor.emils_room_blind_battery
+      above: 70
+      for: 00:03:00
+
+    - trigger: time
+      at: 03:09:00
+
+  conditions: []
+
+  actions:
+    - variables:
+        sensors:
+          - entity_id: sensor.emils_room_blind_battery
+            battery_type: Genopladelig batteri med USB-C
+    - repeat:
+        for_each: "{{ sensors }}"
+        sequence:
+          - action: script.create_todo_battery_task
+            data:
+              entity_id: "{{ repeat.item.entity_id }}"
+              type: "{{ repeat.item.battery_type | default('') }}"
+              threshold: 50

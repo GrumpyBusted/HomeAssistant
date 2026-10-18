@@ -1,7 +1,7 @@
-- id: "1760882456215"
+- id: garden_light_house_east
   alias: Have lys hus øst
   description: |
-    Automatik til at styre lys i haven på øst siden af huset
+    Styrer havebelysningen på østsiden af huset.
   mode: queued
   max: 10
   trace:

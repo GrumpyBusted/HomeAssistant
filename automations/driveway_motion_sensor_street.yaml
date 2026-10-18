@@ -1,7 +1,7 @@
-- id: "1760878547397"
+- id: driveway_motion_sensor_street
   alias: Indkørsel bevægelsessensor vej
   description: |
-    Håndtering af bevægelsessensoren i indkørslen ved vejen
+    Håndterer bevægelsessensoren ved vejen i indkørslen.
   mode: queued
   max: 10
   trace:

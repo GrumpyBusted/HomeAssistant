@@ -1,7 +1,7 @@
-- id: "1768144156024"
+- id: living_room_robot_vacuum_cleaning
   alias: Stue robotstøvsuger rengøring
   description: |
-    Styring af robotstøvsuger for at gør rent i stuen
+    Styrer robotstøvsugerens rengøring i stuen.
   mode: queued
   max: 10
   trace:

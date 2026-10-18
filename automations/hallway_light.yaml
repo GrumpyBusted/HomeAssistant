@@ -1,7 +1,7 @@
-- id: "1735851968042"
+- id: hallway_light
   alias: Gang lys
   description: |
-    Automatik til at styre lys i gangen
+    Styrer belysningen i gangen.
   mode: queued
   max: 10
   trace:

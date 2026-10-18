@@ -1,7 +1,7 @@
-- id: "1763846508906"
+- id: utility_room_lock
   alias: Bryggers lås
   description: |
-    Automatik til at låse bryggersdøren op og i baseret på hvem der er hjemme
+    Låser bryggersdøren op eller i afhængigt af, hvem der er hjemme.
   mode: queued
   max: 10
   trace:

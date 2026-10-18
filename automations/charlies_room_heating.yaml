@@ -1,7 +1,7 @@
-- id: "1737309773463"
+- id: charlies_room_heating
   alias: Charlies værelse varme
   description: |
-    Automatik til at styre varmen på Charlies værelse
+    Styrer varmen på Charlies værelse.
   mode: queued
   max: 10
   trace:

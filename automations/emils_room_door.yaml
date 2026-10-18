@@ -1,7 +1,7 @@
-- id: 0D38E6F4-98AB-4A12-B5CC-4EEEDFC56D14
-  alias: Emils værelses dør
+- id: emils_room_door
+  alias: Emils værelse dør
   description: |
-    Automatik til at styre timer til emils værelses dør
+    Styrer timeren for Emils værelsesdør og sender en advarsel, hvis døren har været åben længe, vinduet er åbent, og der er varmebehov.
   mode: queued
   max: 10
   trace:
@@ -17,6 +17,16 @@
       entity_id: binary_sensor.emils_room_door
       to: "on"
       id: opened
+
+    - trigger: state
+      entity_id: binary_sensor.emils_room_door_long_open
+      to: "on"
+      id: door_open
+
+    - trigger: state
+      entity_id: binary_sensor.emils_room_window
+      to: "on"
+      id: window_open
 
   conditions: []
 
@@ -39,3 +49,39 @@
                 entity_id: timer.emils_room_door_timer
               data:
                 duration: 00:02:00
+
+        - conditions:
+            - condition: trigger
+              id:
+                - door_open
+                - window_open
+            - condition: state
+              entity_id: binary_sensor.emils_room_door_long_open
+              state: "on"
+            - condition: state
+              entity_id: binary_sensor.emils_room_window
+              state: "on"
+            - condition: numeric_state
+              entity_id: sensor.home_heat_need
+              above: 0.5
+          sequence:
+            - if:
+                - condition: state
+                  entity_id: binary_sensor.emil_home
+                  state: "on"
+              then:
+                - action: script.push_notification
+                  data:
+                    type: warning
+                    title: Advarsel
+                    id: emils_room_door_open
+                    recipient: emil
+                    message: Luk døren til dit værelse når vinduet er åbent!
+              else:
+                - action: script.push_notification
+                  data:
+                    type: warning
+                    title: Advarsel
+                    id: emils_room_door_open
+                    recipient: home
+                    message: Luk døren til Emils værelse når vinduet er åbent!

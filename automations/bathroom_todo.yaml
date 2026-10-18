@@ -1,7 +1,7 @@
 - id: bathroom_todo
   alias: Badeværelse todo
   description: |
-    Opret todo opgaver vedrørende sæbe og duft påfyldning på badeværelset
+    Opretter todo-opgaver om genopfyldning af sæbe og duft på badeværelset.
   mode: queued
   max: 10
   trace:

@@ -1,0 +1,25 @@
+- id: home_configuration_backup
+  alias: Hjem konfigurationsbackup
+  description: |
+    Sender Home Assistant-konfigurationsfiler til et GitHub-repository.
+  mode: single
+  trace:
+    stored_traces: 20
+
+  triggers:
+    - trigger: time
+      at: "23:00:00"
+
+    - trigger: event
+      event_type: event_homeassistant_restarted
+
+    - trigger: event
+      event_type: homeassistant_close
+
+    - trigger: event
+      event_type: homeassistant_stop
+
+  conditions: []
+
+  actions:
+    - action: shell_command.pushupdates_to_github

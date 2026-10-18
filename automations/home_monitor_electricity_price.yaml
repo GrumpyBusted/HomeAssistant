@@ -1,7 +1,7 @@
-- id: "1770311389520"
-  alias: Todo strømpriser
+- id: home_monitor_electricity_price
+  alias: Hjem overvåg strømpriser
   description: |
-    Overvåg om strømpriser er tilgængelige og valide
+    Kontrollerer, at strømpriserne er tilgængelige og gyldige.
   mode: restart
   trace:
     stored_traces: 50

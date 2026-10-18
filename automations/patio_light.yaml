@@ -1,7 +1,7 @@
-- id: "1735847242174"
+- id: patio_light
   alias: Terrasse lys
   description: |
-    Automatik til at styre lys på terrassen
+    Styrer belysningen på terrassen.
   mode: queued
   max: 10
   trace:

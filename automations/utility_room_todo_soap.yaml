@@ -1,7 +1,7 @@
-- id: 8151FA15-BEC6-4EED-B0A7-923B19F5F075
+- id: utility_room_todo_soap
   alias: Bryggers todo sæbe
   description: |
-    Opret todo opgaver vedrørende sæbe i bryggers
+    Opretter todo-opgaver vedrørende sæbe i bryggerset.
   mode: queued
   max: 10
   trace:

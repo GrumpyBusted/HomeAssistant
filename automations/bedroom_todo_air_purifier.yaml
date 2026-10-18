@@ -1,7 +1,7 @@
-- id: "1771090242421"
+- id: bedroom_todo_air_purifier
   alias: Soveværelse todo blæser
   description: |
-    Opret todo opgaver vedrørende blæser på soveværelse
+    Opretter todo-opgaver vedrørende blæseren i soveværelset.
   mode: queued
   max: 10
   trace:

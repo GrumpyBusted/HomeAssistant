@@ -1,7 +1,7 @@
-- id: "1742241186159"
+- id: utility_room_todo_washer
   alias: Bryggers todo vaskemaskine
   description: |
-    Opret todo opgaver vedrørende vaskemaskine
+    Opretter todo-opgaver vedrørende vaskemaskinen.
   mode: queued
   max: 10
   trace:

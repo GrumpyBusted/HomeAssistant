@@ -1,7 +1,7 @@
-- id: "1738962148356"
-  alias: Garage 3D Printer
+- id: garage_3d_printer
+  alias: Garage 3D-printer
   description: |
-    Automatik til at slukke for 3D printer
+    Slukker for 3D-printeren i garagen efter automationsreglerne.
   mode: queued
   max: 10
   trace:

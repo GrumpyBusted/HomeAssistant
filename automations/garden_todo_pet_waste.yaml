@@ -1,9 +1,11 @@
-- id: 5F83CBEE-2210-443F-AE7A-F6A4369ED341
+- id: garden_todo_pet_waste
   alias: Have todo kæledyr afføring
   description: |
-    Opret todo opgaver vedrørende opsamling af hunde afføring i haven
+    Opretter todo-opgaver om opsamling af hundeafføring i haven.
   mode: queued
   max: 10
+  trace:
+    stored_traces: 25
 
   triggers:
     - trigger: state

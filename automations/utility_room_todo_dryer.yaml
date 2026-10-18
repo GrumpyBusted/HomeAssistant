@@ -1,7 +1,7 @@
-- id: "1769344314831"
+- id: utility_room_todo_dryer
   alias: Bryggers todo tørretumbler
   description: |
-    Opret todo opgaver vedrørende tørretumbler
+    Opretter todo-opgaver vedrørende tørretumbleren.
   mode: queued
   max: 10
   trace:

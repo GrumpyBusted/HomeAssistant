@@ -1,7 +1,7 @@
-- id: "1770229021068"
+- id: charlies_room_blind
   alias: Charlies værelse rullegardin
   description: |
-    Automatik for rullegardin på Charlies værelse
+    Styrer rullegardinet på Charlies værelse.
   mode: queued
   max: 10
   trace:

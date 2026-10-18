@@ -1,9 +1,11 @@
-- id: E7821BBF-FBCA-4E52-9092-5EBCE04D4476
+- id: home_todo_central_heating
   alias: Hjem todo centralvarme
   description: |
-    Opret todo opgaver vedrørende centralvarme
+    Opretter todo-opgaver vedrørende centralvarmen.
   mode: queued
   max: 10
+  trace:
+    stored_traces: 25
 
   triggers:
     - trigger: event

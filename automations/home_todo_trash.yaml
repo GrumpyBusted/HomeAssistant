@@ -1,7 +1,7 @@
-- id: "1740779558756"
+- id: home_todo_trash
   alias: Hjem todo affald
   description: |
-    Automation til at oprette todo for at tømme affald og tage affaldscontainer på til vejen
+    Opretter todo-opgaver om tømning af affald og om at sætte affaldsbeholderne ud til vejen.
   mode: queued
   max: 10
   trace:

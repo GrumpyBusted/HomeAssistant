@@ -1,7 +1,7 @@
-- id: "1770505461525"
+- id: driveway_ev_charger
   alias: Indkørsel billader
   description: |
-    Disable entities på billader
+    Deaktiverer de relevante entiteter for billaderen.
   mode: single
   trace:
     stored_traces: 100
@@ -9,6 +9,12 @@
   triggers:
     - trigger: state
       entity_id: sensor.driveway_ev_charger_state_description_safe
+
+    - trigger: state
+      entity_id: sensor.driveway_ev_charger_state_description_safe
+      to: Locked, car connected
+      for: "00:03:00"
+      id: car_connected
 
   conditions: []
 
@@ -31,3 +37,51 @@
         - action: homeassistant.enable_entity
           data:
             entity_id: switch.driveway_ev_charger_pause
+
+    - if:
+        - condition: trigger
+          id: car_connected
+        - condition: state
+          entity_id: sensor.driveway_ev_charger_state_description_safe
+          state: Locked, car connected
+        - condition: not
+          conditions:
+            - condition: or
+              conditions:
+                - condition: and
+                  conditions:
+                    - condition: state
+                      entity_id: device_tracker.volvo_xc40_location
+                      state: home
+                    - condition: state
+                      entity_id: sensor.volvo_xc40_charging_connection_state
+                      state: connected
+                - condition: and
+                  conditions:
+                    - condition: state
+                      entity_id: sensor.ford_explorer_ev_tracker_safe
+                      state: home
+                    - condition: state
+                      entity_id: sensor.ford_explorer_ev_el_plug_safe
+                      state: CONNECTED
+      then:
+        - if:
+            - condition: state
+              entity_id: binary_sensor.someone_home
+              state: "on"
+          then:
+            - action: script.push_notification
+              data:
+                type: warning
+                title: Advarsel
+                id: driveway_ev_charger_connected_unknown
+                recipient: home
+                message: Der er en ukendt bil tilsluttet til vores billader i indkørslen
+          else:
+            - action: script.push_notification
+              data:
+                type: warning
+                title: Advarsel
+                id: driveway_ev_charger_connected_unknown
+                recipient: all
+                message: Der er en ukendt bil tilsluttet til vores billader i indkørslen

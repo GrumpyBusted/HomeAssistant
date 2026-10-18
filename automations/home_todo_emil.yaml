@@ -1,9 +1,11 @@
-- id: 7CD2799A-4E37-411D-9C28-B1A9558418EF
+- id: home_todo_emil
   alias: Hjem todo Emil
   description: |
-    Opret todo opgaver til Emil
+    Opretter todo-opgaver til Emil.
   mode: queued
   max: 10
+  trace:
+    stored_traces: 25
 
   triggers:
     - trigger: time

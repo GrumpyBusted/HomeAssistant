@@ -1,7 +1,7 @@
-- id: "1769854798414"
+- id: living_room_door
   alias: Stue dør
   description: |
-    Automatik til at styre timer til stue dør
+    Styrer timeren for døren i stuen.
   mode: queued
   max: 10
   trace:

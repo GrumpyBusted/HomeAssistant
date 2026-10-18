@@ -1,7 +1,7 @@
-- id: "1769872488563"
+- id: toilet_motion_sensor
   alias: Toilet bevægelsessensor
   description: |
-    Håndtering af bevægelsessensoren på toilettet
+    Håndterer bevægelsessensoren på toilettet.
   mode: queued
   max: 10
   trace:

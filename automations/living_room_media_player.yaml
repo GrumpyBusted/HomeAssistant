@@ -1,7 +1,7 @@
-- id: "1769257682123"
+- id: living_room_media_player
   alias: Stue medieafspiller
   description: |
-    Styring af tilbehør til medie afspilning i Stuen
+    Styrer tilbehør til medieafspilning i stuen.
   mode: queued
   max: 10
   trace:

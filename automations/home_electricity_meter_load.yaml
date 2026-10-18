@@ -1,7 +1,7 @@
-- id: "1764365776080"
-  alias: Hjem elektricitet måler indlæs
+- id: home_electricity_meter_load
+  alias: Hjem elmåler indlæsning
   description: |
-    Indlæs elektricitet måler aflæsninger og opdater sensor
+    Indlæser elmålerens aflæsninger og opdaterer sensoren.
   mode: queued
   max: 10
   trace:

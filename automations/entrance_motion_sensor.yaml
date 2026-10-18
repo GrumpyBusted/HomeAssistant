@@ -1,7 +1,7 @@
-- id: "1769872582999"
+- id: entrance_motion_sensor
   alias: Entre bevægelsessensor
   description: |
-    Håndtering af bevægelsessensoren i entreen
+    Håndterer bevægelsessensoren i entreen.
   mode: queued
   max: 10
   trace:

@@ -1,7 +1,7 @@
 - id: bathroom_motion_sensor
   alias: Badeværelse bevægelsessensor
   description: |
-    Håndtering af bevægelsessensoren på badeværelset
+    Håndterer bevægelsessensoren på badeværelset.
   mode: queued
   max: 10
   trace:

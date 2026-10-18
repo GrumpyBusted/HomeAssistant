@@ -1,7 +1,7 @@
-- id: "1760883022741"
+- id: driveway_light_entrance
   alias: Indkørsel lys entre
   description: |
-    Automatik til at styre lys i indkørslen ved hoveddøren
+    Styrer belysningen ved hoveddøren og indkørslen.
   mode: queued
   max: 10
   trace:

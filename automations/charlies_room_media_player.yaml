@@ -1,7 +1,7 @@
-- id: "1769931237193"
+- id: charlies_room_media_player
   alias: Charlies værelse medieafspiller
   description: |
-    Styring af tilbehør til medie afspilning på Charlies værelse
+    Styrer tilbehør til medieafspilning på Charlies værelse.
   mode: queued
   max: 10
   trace:

@@ -1,7 +1,7 @@
-- id: "1769872044331"
+- id: hallway_presence_sensor
   alias: Gang tilstedeværelsessensor
   description: |
-    Automatik til at styre gang tilstedeværelsessensor
+    Styrer logikken for tilstedeværelsessensoren i gangen.
   mode: queued
   max: 10
   trace:

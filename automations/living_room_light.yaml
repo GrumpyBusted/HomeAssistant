@@ -1,7 +1,7 @@
-- id: "1735603602121"
+- id: living_room_light
   alias: Stue lys
   description: |
-    Automatik til at styre lys i stuen
+    Styrer belysningen i stuen.
   mode: queued
   max: 10
   trace:

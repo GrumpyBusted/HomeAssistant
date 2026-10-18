@@ -1,7 +1,7 @@
-- id: "1770996223230"
+- id: kitchen_todo_water
   alias: Køkken todo vand
   description: |
-    Overvåg om der er vand under vasken i køkkenet, send beskeder hvis der opstår lækage
+    Overvåger for vand under køkkenvasken og sender besked ved lækage.
   mode: queued
   max: 10
   trace:

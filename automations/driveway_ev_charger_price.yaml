@@ -1,0 +1,25 @@
+- id: driveway_ev_charger_price
+  alias: Indkørsel billader pris
+  description: |
+    Opdaterer elprisen, der anvendes af billaderen.
+  mode: single
+  trace:
+    stored_traces: 10
+
+  triggers:
+    - trigger: state
+      entity_id: sensor.energy_price
+
+    - trigger: template
+      value_template: |-
+        {% set last = state_attr('automation.driveway_ev_charger_price', 'last_triggered') %} 
+        {{ last is none or ( now() - last ).total_seconds() > 3600 }}
+
+  conditions: []
+
+  actions:
+    - action: number.set_value
+      data:
+        value: "{{ states('sensor.energy_price') }}"
+      target:
+        entity_id: number.driveway_ev_charger_energy_price

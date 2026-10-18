@@ -1,7 +1,7 @@
-- id: "1771697802150"
+- id: utility_room_dryer
   alias: Bryggers tørretumbler
   description: |
-    Skaber tørretumbler status udfra strømforbrug
+    Registrerer tørretumblerens status ud fra strømforbruget.
   mode: queued
   max: 10
   trace:

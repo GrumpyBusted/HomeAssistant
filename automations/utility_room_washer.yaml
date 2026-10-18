@@ -1,7 +1,7 @@
-- id: "1771692983110"
+- id: utility_room_washer
   alias: Bryggers vaskemaskine
   description: |
-    Skaber vaskemaskine status udfra strømforbrug
+    Registrerer vaskemaskinens status ud fra strømforbruget.
   mode: queued
   max: 10
   trace:

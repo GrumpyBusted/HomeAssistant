@@ -1,7 +1,7 @@
-- id: "1771090096437"
+- id: emils_room_todo_air_purifier
   alias: Emils værelse todo blæser
   description: |
-    Opret todo opgaver vedrørende blæser på Emils værelse
+    Opretter todo-opgaver vedrørende blæseren på Emils værelse.
   mode: queued
   max: 10
   trace:

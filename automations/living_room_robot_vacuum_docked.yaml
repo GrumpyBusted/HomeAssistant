@@ -1,7 +1,7 @@
-- id: "1768131852214"
-  alias: Stue robotstøvsuger docked
+- id: living_room_robot_vacuum_docked
+  alias: Stue robotstøvsuger på ladestationen
   description: |
-    Automatic til at kontrollere robotstøvsuger
+    Håndterer robotstøvsugerens tilstand, når den står på ladestationen.
   mode: queued
   max: 10
   trace:

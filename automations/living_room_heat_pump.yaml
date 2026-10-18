@@ -1,7 +1,7 @@
-- id: "1735738251165"
+- id: living_room_heat_pump
   alias: Stue varmepumpe
   description: |
-    Styring af varmepumpe i stuen, for at varme hurtigere op hvis den ønskede temperatur er væsentligt koldere end den aktuelle.
+    Styrer varmepumpen i stuen for at varme rummet hurtigere op, når den ønskede temperatur er væsentligt højere end den aktuelle.
   mode: queued
   max: 10
   trace:

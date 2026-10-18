@@ -1,7 +1,7 @@
-- id: "1748709891445"
+- id: utility_room_light
   alias: Bryggers lys
   description: |
-    Automatik til at styre lys i bryggerset
+    Styrer belysningen i bryggerset.
   mode: queued
   max: 10
   trace:

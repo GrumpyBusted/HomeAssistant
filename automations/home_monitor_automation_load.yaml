@@ -1,7 +1,7 @@
-- id: "1770922045690"
-  alias: Hjem overvåg automation med højt forbrug
+- id: home_monitor_automation_load
+  alias: Hjem overvåg automation højt forbrug
   description: |
-    Overvåg automations som trigger for meget inden for 24 timer
+    Overvåger automations, der udløses usædvanligt ofte inden for 24 timer.
   mode: single
   trace:
     stored_traces: 50

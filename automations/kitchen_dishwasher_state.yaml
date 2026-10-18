@@ -1,11 +1,11 @@
-- id: 86B91ADE-884A-4655-975E-0028F103AE6C"1769369132822
+- id: kitchen_dishwasher_state
   alias: Køkken opvaskemaskine status
   description: |
-    Styring af status på opvaskemaskine
+    Opdaterer opvaskemaskinens status.
   mode: queued
   max: 10
   trace:
-    stored_traces: 300
+    stored_traces: 100
 
   triggers:
     - trigger: state

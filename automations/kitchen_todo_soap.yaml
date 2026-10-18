@@ -1,7 +1,7 @@
-- id: 8EE6B489-E179-40F3-ACAC-B331F8DBC153
+- id: kitchen_todo_soap
   alias: Køkken todo sæbe
   description: |
-    Opret todo opgaver vedrørende sæbe i køkkenet
+    Opretter todo-opgaver vedrørende sæbe i køkkenet.
   mode: queued
   max: 10
   trace:

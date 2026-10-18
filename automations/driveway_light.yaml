@@ -1,7 +1,7 @@
-- id: "1737916297775"
+- id: driveway_light
   alias: Indkørsel lys
   description: |
-    Automatik til at styre lys i indkørsel
+    Styrer belysningen i indkørslen.
   mode: queued
   max: 10
   trace:

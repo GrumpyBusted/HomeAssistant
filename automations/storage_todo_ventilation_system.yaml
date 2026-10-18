@@ -1,7 +1,7 @@
-- id: "1771357000655"
+- id: storage_todo_ventilation_system
   alias: Loftrum todo ventilationsanlæg
   description: |
-    Opret todo opgaver vedrørende filter m.m. på ventilationsanlæget i loftrummet
+    Opretter todo-opgaver om blandt andet filterskift på ventilationsanlægget i loftsrummet.
   mode: queued
   max: 10
   trace:

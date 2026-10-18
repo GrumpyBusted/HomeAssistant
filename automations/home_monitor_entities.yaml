@@ -1,7 +1,7 @@
-- id: "1770473789903"
+- id: home_monitor_entities
   alias: Hjem overvåg enheder
   description: |
-    Overvåg alle enheder og sikre de er tilgængelige
+    Overvåger entiteter og kontrollerer, om de er tilgængelige.
   mode: single
   trace:
     stored_traces: 50

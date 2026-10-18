@@ -1,7 +1,7 @@
-- id: "1741115279443"
-  alias: Stue todo Canon printer
+- id: living_room_todo_printer
+  alias: Stue todo printer
   description: |
-    Kontroller blæk status på Canon printer
+    Kontrollerer blækstatus for Canon-printeren og opretter relevante todo-opgaver.
   mode: restart
   trace:
     stored_traces: 20

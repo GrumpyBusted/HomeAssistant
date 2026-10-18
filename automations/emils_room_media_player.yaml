@@ -1,7 +1,7 @@
-- id: "1769930000823"
+- id: emils_room_media_player
   alias: Emils værelse medieafspiller
   description: |
-    Styring af tilbehør til medie afspilning på Emils værelse
+    Styrer tilbehør til medieafspilning på Emils værelse.
   mode: queued
   max: 10
   trace:

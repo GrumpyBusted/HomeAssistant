@@ -1,7 +1,7 @@
-- id: "1737312016227"
+- id: living_room_heating
   alias: Stue varme
   description: |
-    Automatik til at styre varmen i stuen
+    Styrer varmen i stuen.
   mode: queued
   max: 10
   trace:

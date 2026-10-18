@@ -1,7 +1,7 @@
-- id: "1736083584615"
+- id: bedroom_light
   alias: Soveværelse lys
   description: |
-    Automatik til at styre lys på soveværelset
+    Styrer belysningen i soveværelset.
   mode: queued
   max: 10
   trace:

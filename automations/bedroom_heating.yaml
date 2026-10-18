@@ -1,7 +1,7 @@
-- id: "1737310160740"
+- id: bedroom_heating
   alias: Soveværelse varme
   description: |
-    Automatik til at styre varmen i soveværelse
+    Styrer varmen i soveværelset.
   mode: queued
   max: 10
   trace:
