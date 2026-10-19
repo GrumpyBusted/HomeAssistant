@@ -1460,8 +1460,9 @@ bedroom_blind_down:
   max: 10
 light_turn_on_effect:
   alias: Lys tænd effekt
-  description: Tænder et lys med den første effekt, der matcher inputtet. Hvis ingen
-    effekt matcher, anvendes den angivne fallback-farve og lysstyrke.
+  description: Tænder lys med den første effekt, der matcher søgeteksten. Hvis ingen
+    effekt matcher, anvendes eventuelt angivet fallback-farve og lysstyrke, og lys
+    mode sættes til color.
   mode: parallel
   max: 10
   fields:
@@ -1471,61 +1472,64 @@ light_turn_on_effect:
       required: true
       selector:
         entity:
-          domain:
-          - light
-          multiple: false
+          domain: light
+          multiple: true
+    entity_id_mode:
+      name: Lys mode
+      description: Mode-entities, der styrer de valgte lys.
+      required: true
+      selector:
+        entity:
+          domain: select
+          multiple: true
     effect:
       name: Effekt
-      description: Søgetekst i effektens navn. Finder den første effekt, der indeholder
-        teksten, uanset store og små bogstaver.
+      description: Søgetekst i effektens navn.
       required: true
       selector:
         text: {}
-    brightness_pct:
-      name: Fallback lysstyrke
-      description: Lysstyrke i procent, hvis effekten ikke findes.
-      required: false
-      default: 100
-      selector:
-        number:
-          min: 1
-          max: 100
-          step: 1
-          unit_of_measurement: '%'
-          mode: slider
-    rgb_color:
-      name: Fallback farve
-      description: RGB-farve, hvis effekten ikke findes.
-      required: false
-      default:
-      - 255
-      - 255
-      - 255
-      selector:
-        color_rgb: {}
   sequence:
   - variables:
-      matched_effect: "{% set effects = state_attr(entity_id, 'effect_list') or []
-        %} {% set search = effect | trim | lower %} {% set ns = namespace(match='')
-        %} {% for item in effects %}\n  {% if search in (item | lower) and ns.match
-        == '' %}\n    {% set ns.match = item %}\n  {% endif %}\n{% endfor %} {{ ns.match
-        }}"
-  - action: light.turn_on
-    data:
-      entity_id: '{{ entity_id }}'
-      brightness_pct: '{{ brightness | default(100) | int(100) }}'
-      rgb_color: '{{ rgb_color | default([255, 255, 255]) }}'
-  - delay:
-      seconds: 3
-  - if:
-    - condition: template
-      value_template: '{{ matched_effect | trim != '''' }}'
-    then:
-    - action: light.set_effect
-      target:
-        entity_id: '{{ entity_id }}'
-      data:
-        effect: '{{ matched_effect }}'
+      matched_effect: "{% set effects = state_attr(entity_id[0] if entity_id is sequence\n
+        \ and entity_id is not string else entity_id, 'effect_list') or [] %}\n{%
+        set search = effect | default('') | trim | lower %} {% set ns = namespace(match='')
+        %} {% if search != '' %}\n  {% for item in effects %}\n    {% if search in
+        (item | lower) and ns.match == '' %}\n      {% set ns.match = item %}\n    {%
+        endif %}\n  {% endfor %}\n{% endif %} {{ ns.match }}"
+  - variables:
+      reset_effect: "{% set effects = state_attr(entity_id[0] if entity_id is sequence\n
+        \ and entity_id is not string else entity_id, 'effect_list') or [] %}\n{%
+        set ns = namespace(match='') %} {% for item in effects %}\n  {% if item !=
+        matched_effect and ns.match == '' %}\n    {% set ns.match = item %}\n  {%
+        endif %}\n{% endfor %} {{ ns.match }}"
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ matched_effect | trim != '''' }}'
+      sequence:
+      - action: light.turn_off
+        target:
+          entity_id: '{{ entity_id }}'
+      - action: light.turn_on
+        target:
+          entity_id: '{{ entity_id }}'
+        data:
+          brightness_pct: 10
+      - action: light.set_effect
+        data:
+          effect: '{{ reset_effect }}'
+        target:
+          entity_id: '{{ entity_id }}'
+      - action: select.select_option
+        target:
+          entity_id: '{{ entity_id_mode }}'
+        data:
+          option: effect
+      - action: light.set_effect
+        data:
+          effect: '{{ matched_effect }}'
+        target:
+          entity_id: '{{ entity_id }}'
 emils_room_light_switch:
   alias: Emils værelse lys tænd og sluk
   description: Tænd og slut lys på Emils værelse, script til at blive brugt i iPhone

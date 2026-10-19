@@ -109,12 +109,12 @@
 
     - trigger: numeric_state
       entity_id: sensor.home_outside_illuminance
-      above: 5000
+      above: 8000
       for: "00:03:00"
 
     - trigger: numeric_state
       entity_id: sensor.home_outside_illuminance
-      below: 5000
+      below: 8000
       for: "00:03:00"
 
     - trigger: numeric_state
@@ -640,7 +640,7 @@
                   state: "on"
                 - condition: numeric_state
                   entity_id: sensor.home_outside_illuminance
-                  below: 5000
+                  below: 8000
                 - condition: template
                   value_template: "{{ force == false }}"
               sequence:

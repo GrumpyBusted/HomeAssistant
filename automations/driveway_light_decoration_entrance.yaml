@@ -31,9 +31,8 @@
                     - action: script.light_turn_on_effect
                       data:
                         entity_id: light.driveway_light_entrance_decoration
+                        entity_id_mode: select.driveway_light_entrance_decoration_mode
                         effect: Stripes
-                        brightness_pct: 100
-                        rgb_color: [255, 69, 0]
                 - conditions:
                     - condition: template
                       value_template: "{{ '12-01' <= date <= '12-26' }}"
@@ -41,9 +40,8 @@
                     - action: script.light_turn_on_effect
                       data:
                         entity_id: light.driveway_light_entrance_decoration
+                        entity_id_mode: select.driveway_light_entrance_decoration_mode
                         effect: Sparkle
-                        brightness_pct: 100
-                        rgb_color: [0, 180, 30]
                 - conditions:
                     - condition: template
                       value_template: "{{ date >= '12-30' or date == '01-01' }}"
@@ -51,12 +49,9 @@
                     - action: script.light_turn_on_effect
                       data:
                         entity_id: light.driveway_light_entrance_decoration
+                        entity_id_mode: select.driveway_light_entrance_decoration_mode
                         effect: Rainbow
-                        brightness_pct: 100
-                        rgb_color: [0, 100, 255]
       default:
         - action: light.turn_off
-          data:
-            transition: 1
           target:
             entity_id: light.driveway_light_entrance_decoration
