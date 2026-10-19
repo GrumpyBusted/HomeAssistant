@@ -41,7 +41,7 @@
           automation.kitchen_robot_vacuum_cleaning: 200
           automation.kitchen_todo_dishwasher: 250
           automation.living_room_heat_pump: 200
-          automation.living_room_media_player_set_state: 150
+          automation.living_room_media_player_state: 150
           automation.storage_light: 32
           automation.storage_ventilation_system: 150
           automation.technic_room_light: 32

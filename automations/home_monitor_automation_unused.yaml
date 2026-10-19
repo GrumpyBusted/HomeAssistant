@@ -21,7 +21,7 @@
           automation.home_watch_data_folder: 32
           automation.home_water_meter_save: 32
           automation.home_water_meter_load: 32
-          automation.charlies_room_media_player_set_state: 32
+          automation.charlies_room_media_player_state: 32
           automation.charlies_room_media_player: 32
           automation.emils_room_blind_stop: 999
           automation.charlies_room_blind_stop: 999
@@ -30,10 +30,10 @@
           automation.driveway_todo_mailbox: 9999
           automation.kitchen_fridge: 9999
           automation.living_room_tv: 9999
-          automation.home_monitor_system: 9999
+          automation.home_monitor_home_assistant: 9999
           automation.storage_light: 999
           automation.technic_room_light: 999
-          automation.emils_set_bedtime: 22
+          automation.emils_bedtime: 32
         offenders: |-
           {% set ns = namespace(offenders=[]) %}
           {% for a in states.automation | list %}
