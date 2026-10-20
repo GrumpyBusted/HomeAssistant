@@ -28,7 +28,7 @@
           sequence:
             - action: timer.cancel
               target:
-                entity_id: timer.living_room_door_timer
+                entity_id: timer.living_room_door_sensor_timer
 
         - conditions:
             - condition: trigger
@@ -36,6 +36,6 @@
           sequence:
             - action: timer.start
               target:
-                entity_id: timer.living_room_door_timer
+                entity_id: timer.living_room_door_sensor_timer
               data:
                 duration: 00:02:00

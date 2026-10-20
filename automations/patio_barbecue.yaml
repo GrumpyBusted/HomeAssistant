@@ -21,7 +21,7 @@
     - trigger: event
       event_type: timer.finished
       event_data:
-        entity_id: timer.patio_barbeque_hot_timer
+        entity_id: timer.patio_temperature_sensor_barbeque_hot_timer
       id: timer_finished
 
     - trigger: state
@@ -39,7 +39,7 @@
           sequence:
             - action: timer.start
               target:
-                entity_id: timer.patio_barbeque_hot_timer
+                entity_id: timer.patio_temperature_sensor_barbeque_hot_timer
               data:
                 duration: "03:00:00"
 
@@ -49,7 +49,7 @@
           sequence:
             - action: timer.cancel
               target:
-                entity_id: timer.patio_barbeque_hot_timer
+                entity_id: timer.patio_temperature_sensor_barbeque_hot_timer
 
         - conditions:
             - condition: trigger
@@ -72,6 +72,6 @@
                   Terrasse: {{ states('sensor.patio_temperature_sensor_temperature') }} °C.
             - action: timer.start
               target:
-                entity_id: timer.patio_barbeque_hot_timer
+                entity_id: timer.patio_temperature_sensor_barbeque_hot_timer
               data:
                 duration: "01:00:00"
