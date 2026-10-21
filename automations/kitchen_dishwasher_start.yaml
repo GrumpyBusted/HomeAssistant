@@ -19,8 +19,8 @@
       entity_id: binary_sensor.kitchen_dishwasher_door_safe
       state: "off"
     - condition: numeric_state
-      entity_id: input_number.kitchen_dishwasher_dirty_score
-      above: 40
+      entity_id: sensor.kitchen_dishwasher_full
+      above: 70
 
   actions:
     - action: switch.turn_on

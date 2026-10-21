@@ -41,4 +41,4 @@
                 duration: "00:00:15"
             - action: counter.increment
               target:
-                entity_id: counter.utility_room_door_open
+                entity_id: counter.utility_room_door_sensor_open

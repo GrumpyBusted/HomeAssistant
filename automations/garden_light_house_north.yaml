@@ -9,25 +9,25 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.garden_house_north_presence
+      entity_id: binary_sensor.garden_presence_house_north
       from: "off"
       to: "on"
       id: detected_north
 
     - trigger: state
-      entity_id: binary_sensor.garden_house_north_presence
+      entity_id: binary_sensor.garden_presence_house_north
       from: "on"
       to: "off"
       id: cleared_north
 
     - trigger: state
-      entity_id: binary_sensor.garden_house_east_presence
+      entity_id: binary_sensor.garden_presence_house_east
       from: "off"
       to: "on"
       id: detected_east
 
     - trigger: state
-      entity_id: binary_sensor.garden_house_east_presence
+      entity_id: binary_sensor.garden_presence_house_east
       from: "on"
       to: "off"
       id: cleared_east
@@ -59,10 +59,10 @@
                 - cleared_north
                 - cleared_east
             - condition: state
-              entity_id: binary_sensor.garden_house_north_presence
+              entity_id: binary_sensor.garden_presence_house_north
               state: "off"
             - condition: state
-              entity_id: binary_sensor.garden_house_east_presence
+              entity_id: binary_sensor.garden_presence_house_east
               state: "off"
           sequence:
             - action: light.turn_off

@@ -46,7 +46,7 @@
         - binary_sensor.monique_home
         - binary_sensor.emil_home
         - binary_sensor.charlie_home
-        - input_boolean.house_sitter
+        - input_boolean.home_house_sitter
       from: "off"
       to: "on"
       id: someone_home

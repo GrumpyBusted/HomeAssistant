@@ -174,7 +174,7 @@
               entity_id: binary_sensor.charlie_home
               state: "off"
             - condition: state
-              entity_id: input_boolean.house_sitter
+              entity_id: input_boolean.home_house_sitter
               state: "off"
           sequence:
             - action: light.turn_off

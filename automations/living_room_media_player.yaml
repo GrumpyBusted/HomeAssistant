@@ -9,25 +9,25 @@
 
   triggers:
     - trigger: state
-      entity_id: sensor.living_room_apple_tv_media_player_safe
+      entity_id: sensor.living_room_media_player_safe
       to: "off"
       id: "off"
       for: 00:00:03
 
     - trigger: state
-      entity_id: sensor.living_room_apple_tv_media_player_safe
+      entity_id: sensor.living_room_media_player_safe
       to: idle
       id: waiting
 
     - trigger: state
-      entity_id: sensor.living_room_apple_tv_media_player_safe
+      entity_id: sensor.living_room_media_player_safe
       to:
         - playing
         - buffering
       id: playing
 
     - trigger: state
-      entity_id: sensor.living_room_apple_tv_media_player_safe
+      entity_id: sensor.living_room_media_player_safe
       to: paused
       id: paused
 
@@ -118,12 +118,12 @@
                     - condition: not
                       conditions:
                         - condition: state
-                          entity_id: sensor.living_room_apple_tv_media_player_safe
+                          entity_id: sensor.living_room_media_player_safe
                           state: "off"
                   then:
                     - action: media_player.turn_off
                       target:
-                        entity_id: media_player.living_room_apple_tv_media_player
+                        entity_id: media_player.living_room_media_player
                 - if:
                     - condition: state
                       entity_id: light.living_room_light_strip_receiver
@@ -169,12 +169,12 @@
       default:
         - if:
             - condition: state
-              entity_id: sensor.living_room_apple_tv_media_player_safe
+              entity_id: sensor.living_room_media_player_safe
               state: "off"
           then:
             - action: media_player.turn_on
               target:
-                entity_id: media_player.living_room_apple_tv_media_player
+                entity_id: media_player.living_room_media_player
             - delay:
                 seconds: 30
         - parallel:

@@ -27,11 +27,11 @@
               id: family_home
             - condition: template
               value_template: |-
-                {{ now() > (states.input_boolean.house_sitter.last_updated + timedelta(minutes=15)) }}
+                {{ now() > (states.input_boolean.home_house_sitter.last_updated + timedelta(minutes=15)) }}
           sequence:
             - action: input_boolean.turn_off
               target:
-                entity_id: input_boolean.house_sitter
+                entity_id: input_boolean.home_house_sitter
 
         - conditions:
             - condition: trigger
@@ -48,4 +48,4 @@
           sequence:
             - action: input_boolean.turn_on
               target:
-                entity_id: input_boolean.house_sitter
+                entity_id: input_boolean.home_house_sitter

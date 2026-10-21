@@ -15,7 +15,7 @@
       entity_id: binary_sensor.parent_home
 
     - trigger: state
-      entity_id: input_boolean.house_sitter
+      entity_id: input_boolean.home_house_sitter
 
     - trigger: numeric_state
       entity_id: sensor.bedroom_air_quality_score
@@ -54,7 +54,7 @@
               entity_id: binary_sensor.parent_home
               state: "off"
             - condition: state
-              entity_id: input_boolean.house_sitter
+              entity_id: input_boolean.home_house_sitter
               state: "off"
           sequence: []
 

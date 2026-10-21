@@ -12,7 +12,7 @@
       entity_id: sensor.home_target_maximum_temperature
 
     - trigger: state
-      entity_id: sensor.storage_ventilation_desired_level
+      entity_id: sensor.storage_ventilation_system_desired_level
 
     - trigger: state
       entity_id: binary_sensor.someone_home
@@ -46,7 +46,7 @@
                   entity_id: binary_sensor.everyone_sleeping
                   state: "on"
                 - condition: state
-                  entity_id: sensor.storage_ventilation_desired_level
+                  entity_id: sensor.storage_ventilation_system_desired_level
                   state: "1"
           sequence:
             - action: climate.set_fan_mode
@@ -63,7 +63,7 @@
 
         - conditions:
             - condition: state
-              entity_id: sensor.storage_ventilation_desired_level
+              entity_id: sensor.storage_ventilation_system_desired_level
               state: "4"
           sequence:
             - action: climate.set_fan_mode
@@ -80,7 +80,7 @@
 
         - conditions:
             - condition: state
-              entity_id: sensor.storage_ventilation_desired_level
+              entity_id: sensor.storage_ventilation_system_desired_level
               state: "3"
           sequence:
             - action: climate.set_fan_mode
@@ -97,7 +97,7 @@
 
         - conditions:
             - condition: state
-              entity_id: sensor.storage_ventilation_desired_level
+              entity_id: sensor.storage_ventilation_system_desired_level
               state: "2"
           sequence:
             - action: climate.set_fan_mode

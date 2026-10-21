@@ -166,6 +166,7 @@
               state:
                 - emptying
                 - clean
+                - finished
           sequence:
             - action: input_select.select_option
               target:

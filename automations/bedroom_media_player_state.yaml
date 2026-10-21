@@ -9,12 +9,12 @@
 
   triggers:
     - trigger: state
-      entity_id: sensor.bedroom_apple_tv_media_player_safe
+      entity_id: sensor.bedroom_media_player_safe
       to: playing
       id: started
 
     - trigger: state
-      entity_id: sensor.bedroom_apple_tv_media_player_safe
+      entity_id: sensor.bedroom_media_player_safe
       to:
         - buffering
         - idle
@@ -22,7 +22,7 @@
       id: ended
 
     - trigger: state
-      entity_id: sensor.bedroom_apple_tv_media_player_safe
+      entity_id: sensor.bedroom_media_player_safe
       to: "off"
       for: 00:00:03
       id: "off"
@@ -71,7 +71,7 @@
             - condition: trigger
               id: timeout
             - condition: state
-              entity_id: sensor.bedroom_apple_tv_media_player_safe
+              entity_id: sensor.bedroom_media_player_safe
               state:
                 - idle
                 - paused

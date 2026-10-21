@@ -125,7 +125,7 @@
                 - opened
                 - closed
             - condition: state
-              entity_id: binary_sensor.bedroom_presence_sensor_occupancy
+              entity_id: binary_sensor.bedroom_presence
               state: "on"
           sequence:
             - action: input_boolean.turn_on
@@ -136,7 +136,7 @@
             - condition: trigger
               id: opened
             - condition: state
-              entity_id: binary_sensor.bedroom_presence_sensor_occupancy
+              entity_id: binary_sensor.bedroom_presence
               state: "off"
           sequence:
             - action: input_boolean.turn_on

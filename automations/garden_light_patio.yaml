@@ -9,13 +9,13 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.garden_garage_north_presence
+      entity_id: binary_sensor.garden_presence_garage_north
       from: "off"
       to: "on"
       id: detected
 
     - trigger: state
-      entity_id: binary_sensor.garden_garage_north_presence
+      entity_id: binary_sensor.garden_presence_garage_north
       from: "on"
       to: "off"
       id: cleared
@@ -45,7 +45,7 @@
                 - condition: trigger
                   id: cleared
                 - condition: state
-                  entity_id: binary_sensor.garden_garage_north_presence
+                  entity_id: binary_sensor.garden_presence_garage_north
                   state: "off"
           sequence:
             - action: light.turn_off

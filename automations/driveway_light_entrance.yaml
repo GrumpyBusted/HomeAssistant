@@ -9,13 +9,13 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.driveway_entrance_presence
+      entity_id: binary_sensor.driveway_presence_entrance
       from: "off"
       to: "on"
       id: detected_entrance
 
     - trigger: state
-      entity_id: binary_sensor.driveway_entrance_presence
+      entity_id: binary_sensor.driveway_presence_entrance
       from: "on"
       to: "off"
       id: cleared_entrance

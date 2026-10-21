@@ -28,7 +28,7 @@
           sequence:
             - action: media_player.turn_off
               target:
-                entity_id: media_player.emils_room_apple_tv_media_player
+                entity_id: media_player.emils_room_media_player
 
         - conditions:
             - condition: trigger
@@ -42,4 +42,4 @@
           sequence:
             - action: media_player.turn_off
               target:
-                entity_id: media_player.emils_room_apple_tv_media_player
+                entity_id: media_player.emils_room_media_player

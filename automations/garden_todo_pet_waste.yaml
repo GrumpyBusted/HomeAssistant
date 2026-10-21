@@ -42,7 +42,7 @@
                 entity_id: todo.todo_smart_todo
                 is_active: |-
                   {% set m = (now().timestamp() - as_timestamp(states('input_datetime.garden_pet_waste_last_removed'))) / 60 %}
-                  {% set c = states('counter.utility_room_door_open') | int(0) - states('input_number.garden_pet_waste_door_count_last_removed') | int(0) %}
+                  {% set c = states('counter.utility_room_door_sensor_open') | int(0) - states('input_number.garden_pet_waste_door_count_last_removed') | int(0) %}
                   {{ (c >= 2 and m >= 48 * 60) or (c >= 10 and m >= 12 * 60) }}
 
         - conditions:
@@ -58,4 +58,4 @@
               target:
                 entity_id: input_number.garden_pet_waste_door_count_last_removed
               data:
-                value: "{{ states('counter.utility_room_door_open') | int(0) }}"
+                value: "{{ states('counter.utility_room_door_sensor_open') | int(0) }}"
