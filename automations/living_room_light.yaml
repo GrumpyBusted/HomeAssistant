@@ -47,13 +47,13 @@
       id: rotary
 
     - trigger: state
-      entity_id: binary_sensor.everyone_sleeping
+      entity_id: binary_sensor.home_sleeping_everyone
       from: "off"
       to: "on"
       id: sleeping
 
     - trigger: state
-      entity_id: binary_sensor.everyone_sleeping
+      entity_id: binary_sensor.home_sleeping_everyone
       to: "off"
 
     - trigger: state
@@ -278,7 +278,7 @@
                   entity_id: binary_sensor.someone_home
                   state: "on"
                 - condition: state
-                  entity_id: binary_sensor.everyone_sleeping
+                  entity_id: binary_sensor.home_sleeping_everyone
                   state: "off"
                 - condition: template
                   value_template: "{{ force == false }}"

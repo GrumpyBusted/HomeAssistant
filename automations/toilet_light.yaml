@@ -34,7 +34,7 @@
             - condition: trigger
               id: detected
             - condition: state
-              entity_id: binary_sensor.everyone_sleeping
+              entity_id: binary_sensor.home_sleeping_everyone
               state: "on"
           sequence:
             - action: light.turn_on

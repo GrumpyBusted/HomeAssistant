@@ -9,7 +9,7 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.everyone_sleeping
+      entity_id: binary_sensor.home_sleeping_everyone
 
     - trigger: state
       entity_id: binary_sensor.someone_home
@@ -44,7 +44,7 @@
               entity_id: binary_sensor.someone_home
               state: "on"
             - condition: state
-              entity_id: binary_sensor.everyone_sleeping
+              entity_id: binary_sensor.home_sleeping_everyone
               state: "off"
             - condition: not
               conditions:
@@ -67,7 +67,7 @@
                   entity_id: binary_sensor.someone_home
                   state: "off"
                 - condition: state
-                  entity_id: binary_sensor.everyone_sleeping
+                  entity_id: binary_sensor.home_sleeping_everyone
                   state: "on"
           sequence:
             - action: switch.turn_off

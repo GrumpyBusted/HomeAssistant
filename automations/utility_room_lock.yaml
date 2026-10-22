@@ -15,7 +15,7 @@
       id: no_one_home
 
     - trigger: state
-      entity_id: binary_sensor.everyone_sleeping
+      entity_id: binary_sensor.home_sleeping_everyone
       from: "off"
       to: "on"
       id: sleeping
@@ -73,7 +73,7 @@
                   entity_id: binary_sensor.someone_home
                   state: "off"
                 - condition: state
-                  entity_id: binary_sensor.everyone_sleeping
+                  entity_id: binary_sensor.home_sleeping_everyone
                   state: "on"
           sequence:
             - action: script.push_notification

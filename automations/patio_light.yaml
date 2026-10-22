@@ -46,7 +46,7 @@
       id: locked
 
     - trigger: state
-      entity_id: binary_sensor.everyone_sleeping
+      entity_id: binary_sensor.home_sleeping_everyone
       from: "off"
       to: "on"
       id: sleeping
