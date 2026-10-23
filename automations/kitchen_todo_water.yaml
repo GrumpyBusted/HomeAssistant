@@ -9,13 +9,13 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.kitchen_sink_water_leak_sensor
+      entity_id: binary_sensor.kitchen_water_leak_sensor_sink
       to: "on"
       for: 00:00:30
       id: leak
 
     - trigger: state
-      entity_id: binary_sensor.kitchen_sink_water_leak_sensor
+      entity_id: binary_sensor.kitchen_water_leak_sensor_sink
       to: "off"
       for: 00:30:00
 
@@ -43,5 +43,5 @@
         subject: Vand på gulvet under køkkenvasken
         entity_id: todo.todo_smart_todo
         description: Vand lækage sensoren der ligger under opvaskemaskinen ved vasken i køkkenet har registret vand.
-        related_entity_id: binary_sensor.kitchen_sink_water_leak_sensor
-        is_active: "{{ is_state('binary_sensor.kitchen_sink_water_leak_sensor', 'on') }}"
+        related_entity_id: binary_sensor.kitchen_water_leak_sensor_sink
+        is_active: "{{ is_state('binary_sensor.kitchen_water_leak_sensor_sink', 'on') }}"

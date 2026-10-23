@@ -9,15 +9,15 @@
   triggers:
     - trigger: numeric_state
       entity_id:
-        - sensor.kitchen_sink_water_leak_sensor_battery
-        - sensor.utility_room_sink_water_leak_sensor_battery
+        - sensor.kitchen_water_leak_sensor_sink_battery
+        - sensor.utility_room_water_leak_sensor_sink_battery
       below: 10
       for: 00:03:00
 
     - trigger: numeric_state
       entity_id:
-        - sensor.kitchen_sink_water_leak_sensor_battery
-        - sensor.utility_room_sink_water_leak_sensor_battery
+        - sensor.kitchen_water_leak_sensor_sink_battery
+        - sensor.utility_room_water_leak_sensor_sink_battery
       above: 70
       for: 00:03:00
 
@@ -29,9 +29,9 @@
   actions:
     - variables:
         sensors:
-          - entity_id: sensor.kitchen_sink_water_leak_sensor_battery
+          - entity_id: sensor.kitchen_water_leak_sensor_sink_battery
             location: under opvaskemaskinen
-          - entity_id: sensor.utility_room_sink_water_leak_sensor_battery
+          - entity_id: sensor.utility_room_water_leak_sensor_sink_battery
             location: under skabet, mellem rør
     - repeat:
         for_each: "{{ sensors }}"
