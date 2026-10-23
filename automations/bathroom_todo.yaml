@@ -48,16 +48,16 @@
           sequence:
             - action: script.create_todo_task
               data:
-                subject: Tilføj WC-duft på bathroomtet
-                description: Indsæt en ny WC-duftpind i gæste-bathroomtet.
+                subject: Tilføj WC-duft på badeværelset
+                description: Indsæt en ny WC-duftpind i toilettet på badeværelset.
                 related_entity_id: input_number.bathroom_freshener_last_count
                 entity_id: todo.todo_smart_todo
                 is_active: "{{ states('counter.bathroom_motion_sensor_count') | int(0) > states('input_number.bathroom_freshener_last_count') | int(0) + 100 }}"
 
             - action: script.create_todo_task
               data:
-                subject: Fyld sæbe på dispenser på bathroomtet
-                description: Hæld mere sæbe på sæbedispenser på gæste-bathroomtet.
+                subject: Fyld sæbe på dispenser på badeværelset
+                description: Hæld mere sæbe på sæbedispenser på badeværelset.
                 related_entity_id: input_number.bathroom_soap_last_count
                 entity_id: todo.todo_smart_todo
                 is_active: "{{ states('counter.bathroom_motion_sensor_count') | int(0) > states('input_number.bathroom_soap_last_count') | int(0) + 150 }}"

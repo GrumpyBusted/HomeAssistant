@@ -47,7 +47,7 @@
             location_permission: sensor.emil_iphone_location_permission
             connection_type: sensor.emil_iphone_connection_type
             device_tracker: device_tracker.emil_iphone
-            notify: notify.mobile_app_emil_iphone
+            notify: notify.mobile_app_iphone
           - name: Charlie
             location_permission: sensor.charlie_iphone_location_permission
             connection_type: sensor.charlie_iphone_connection_type
