@@ -9,7 +9,7 @@
 
   triggers:
     - trigger: time
-      at: sensor.energy_price_dishwasher_start
+      at: sensor.kitchen_dishwasher_cheapest_start_time
 
   conditions:
     - condition: state

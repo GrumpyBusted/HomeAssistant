@@ -12,7 +12,7 @@
       entity_id: sensor.bedroom_air_purifier_mode
 
     - trigger: state
-      entity_id: binary_sensor.parent_home
+      entity_id: binary_sensor.home_parent
 
     - trigger: state
       entity_id: input_boolean.home_house_sitter
@@ -51,7 +51,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: binary_sensor.parent_home
+              entity_id: binary_sensor.home_parent
               state: "off"
             - condition: state
               entity_id: input_boolean.home_house_sitter

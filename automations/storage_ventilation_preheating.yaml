@@ -12,7 +12,7 @@
       entity_id: binary_sensor.home_sleeping_everyone
 
     - trigger: state
-      entity_id: binary_sensor.someone_home
+      entity_id: binary_sensor.home_someone
 
     - trigger: numeric_state
       entity_id: sensor.home_outside_current_temperature
@@ -41,7 +41,7 @@
               entity_id: sensor.home_outside_current_temperature
               below: 1
             - condition: state
-              entity_id: binary_sensor.someone_home
+              entity_id: binary_sensor.home_someone
               state: "on"
             - condition: state
               entity_id: binary_sensor.home_sleeping_everyone
@@ -64,7 +64,7 @@
                   entity_id: sensor.home_outside_current_temperature
                   above: 3
                 - condition: state
-                  entity_id: binary_sensor.someone_home
+                  entity_id: binary_sensor.home_someone
                   state: "off"
                 - condition: state
                   entity_id: binary_sensor.home_sleeping_everyone

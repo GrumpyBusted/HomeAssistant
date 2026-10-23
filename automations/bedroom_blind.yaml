@@ -45,12 +45,12 @@
       id: wake_up_delay
 
     - trigger: state
-      entity_id: binary_sensor.parent_home
+      entity_id: binary_sensor.home_parent
       to: "on"
-      id: parent_home
+      id: home_parent
 
     - trigger: state
-      entity_id: binary_sensor.parent_home
+      entity_id: binary_sensor.home_parent
       to: "off"
       id: parent_leave
 
@@ -143,10 +143,10 @@
 
         - conditions:
             - condition: state
-              entity_id: binary_sensor.house_sitter_home
+              entity_id: binary_sensor.home_house_sitter
               state: "on"
             - condition: state
-              entity_id: binary_sensor.parent_home
+              entity_id: binary_sensor.home_parent
               state: "off"
           sequence:
             - action: timer.pause
@@ -178,7 +178,7 @@
 
         - conditions:
             - condition: trigger
-              id: parent_home
+              id: home_parent
           sequence:
             - action: input_number.set_value
               target:
@@ -192,7 +192,7 @@
                 - dark_outside
                 - parent_leave
             - condition: state
-              entity_id: binary_sensor.parent_home
+              entity_id: binary_sensor.home_parent
               state: "off"
             - condition: state
               entity_id: binary_sensor.home_outside_light
@@ -210,7 +210,7 @@
                 - light_outside
                 - parent_leave
             - condition: state
-              entity_id: binary_sensor.parent_home
+              entity_id: binary_sensor.home_parent
               state: "off"
             - condition: state
               entity_id: binary_sensor.home_outside_light

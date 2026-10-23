@@ -1,5 +1,5 @@
-- id: driveway_light_decoration_house
-  alias: Indkørsel lys dekorationer hus
+- id: house_decoration
+  alias: Hus lys dekorationer
   description: |
     Styrer dekorationsbelysningen på huset efter tidspunkt og sæson.
   mode: queued
@@ -31,13 +31,13 @@
                     - action: script.light_turn_on_effect
                       data:
                         entity_id:
-                          - light.driveway_light_decoration_house
+                          - light.house_decoration
                         entity_id_mode:
-                          - select.driveway_light_decoration_house_1_mode
-                          - select.driveway_light_decoration_house_2
-                          - select.driveway_light_decoration_house_3_mode
-                          - select.driveway_light_decoration_house_4_mode
-                          - select.driveway_light_decoration_house_5_mode
+                          - select.house_decoration_1_mode
+                          - select.house_decoration_2_mode
+                          - select.house_decoration_3_mode
+                          - select.house_decoration_4_mode
+                          - select.house_decoration_5_mode
                         effect: Stripes
                 - conditions:
                     - condition: template
@@ -46,13 +46,13 @@
                     - action: script.light_turn_on_effect
                       data:
                         entity_id:
-                          - light.driveway_light_decoration_house
+                          - light.house_decoration
                         entity_id_mode:
-                          - select.driveway_light_decoration_house_1_mode
-                          - select.driveway_light_decoration_house_2
-                          - select.driveway_light_decoration_house_3_mode
-                          - select.driveway_light_decoration_house_4_mode
-                          - select.driveway_light_decoration_house_5_mode
+                          - select.house_decoration_1_mode
+                          - select.house_decoration_2_mode
+                          - select.house_decoration_3_mode
+                          - select.house_decoration_4_mode
+                          - select.house_decoration_5_mode
                         effect: Sparkle
                 - conditions:
                     - condition: template
@@ -61,13 +61,13 @@
                     - action: script.light_turn_on_effect
                       data:
                         entity_id:
-                          - light.driveway_light_decoration_house
+                          - light.house_decoration
                         entity_id_mode:
-                          - select.driveway_light_decoration_house_1_mode
-                          - select.driveway_light_decoration_house_2
-                          - select.driveway_light_decoration_house_3_mode
-                          - select.driveway_light_decoration_house_4_mode
-                          - select.driveway_light_decoration_house_5_mode
+                          - select.house_decoration_1_mode
+                          - select.house_decoration_2_mode
+                          - select.house_decoration_3_mode
+                          - select.house_decoration_4_mode
+                          - select.house_decoration_5_mode
                         effect: Rainbow
         - conditions:
             - condition: state
@@ -81,11 +81,11 @@
                   sequence:
                     - action: light.turn_on
                       target:
-                        entity_id: light.driveway_light_decoration_house
+                        entity_id: light.house_decoration
                       data:
                         brightness_pct: 70
                         rgb_color: [0, 180, 30]
       default:
         - action: light.turn_off
           target:
-            entity_id: light.driveway_light_decoration_house
+            entity_id: light.house_decoration

@@ -80,7 +80,7 @@
                 "type": "{{ state_attr('sensor.tado_device_types', 'types').get(device.type, device.type) }}",
                 "location": "{{ state_attr('sensor.tado_device_locations', 'locations').get(device.serialNumber, device.serialNumber) }}",
                 "entity_id": "{{ state_attr('sensor.tado_device_ids', 'ids').get(device.serialNumber, device.serialNumber) }}",
-                "battery": "{{ state_attr('sensor.tado_device_batterys', 'batterys').get(device.type, device.type) }}"
+                "battery": "{{ state_attr('sensor.tado_device_batteries', 'batterys').get(device.type, device.type) }}"
               }{% if not loop.last %},{% endif %}
             {% endfor %}
             {% if not loop.last %},{% endif %}

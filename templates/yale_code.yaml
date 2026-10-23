@@ -1,0 +1,11 @@
+- sensor:
+    - name: "Yale Code"
+      unique_id: yale_code
+      state: ""
+      icon: mdi:key-variant
+      attributes:
+        anders: !secret yale_code_anders
+        monique: !secret yale_code_monique
+        emil: !secret yale_code_emil
+        charlie: !secret yale_code_charlie
+        family: !secret yale_code_family

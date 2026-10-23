@@ -1,6 +1,6 @@
 - sensor:
-    - name: energy_price_optimal_window_start
-      unique_id: ADDA8D93-A8FC-4F02-9A0C-F6E9451A8CAA
+    - name: "Bryggers hvidevare billigst starttidspunkt"
+      unique_id: utility_room_appliance_cheapest_start_time
       device_class: timestamp
       icon: "mdi:clock-outline"
       state: >-
@@ -56,7 +56,7 @@
             Friendly time difference rounded to nearest 15 minutes.
             Format H:MM (no leading zero)
           #} 
-          {% set ts = states('sensor.energy_price_optimal_window_start') %} 
+          {% set ts = states('sensor.utility_room_appliance_cheapest_start_time') %} 
           {% if ts in ['unknown', 'unavailable', none] %}
             {{ none }}
           {% else %}
@@ -82,65 +82,9 @@
 
 
         local_time: >-
-          {% set ts = best.start if best is defined else states('sensor.energy_price_optimal_window_start') %} {% if ts in ['unknown', 'unavailable', none] %}
+          {% set ts = best.start if best is defined else states('sensor.utility_room_appliance_cheapest_start_time') %} {% if ts in ['unknown', 'unavailable', none] %}
             {{ none }}
           {% else %}
             {{ as_datetime(ts) | as_local }}
           {% endif %}
 
-
-- sensor:
-    - name: energy_price_dishwasher_start
-      unique_id: energy_price_dishwasher_start
-      device_class: timestamp
-      icon: mdi:dishwasher
-      state: |-
-        {% set today = state_attr('sensor.energy_data_service', 'raw_today') or [] %}
-        {% set tomorrow = state_attr('sensor.energy_data_service', 'raw_tomorrow') or [] %}
-        {% set data = today + tomorrow %}
-
-        {% if not data %}
-          {{ none }}
-        {% else %}
-          {% set current = now() %}
-          {% set today_21 = today_at('21:00') %}
-          {% set today_09 = today_at('09:00') %}
-
-          {% if current < today_09 %}
-            {# Efter midnat og før kl. 9: nu til kl. 9 i dag #}
-            {% set earliest = current %}
-            {% set deadline = today_09 %}
-          {% elif current < today_21 %}
-            {# Kl. 9 til 21: kl. 21 i dag til kl. 9 i morgen #}
-            {% set earliest = today_21 %}
-            {% set deadline = today_09 + timedelta(days=1) %}
-          {% else %}
-            {# Fra kl. 21: nu til kl. 9 i morgen #}
-            {% set earliest = current %}
-            {% set deadline = today_09 + timedelta(days=1) %}
-          {% endif %}
-
-          {% set best = namespace(price=999999, start=none) %}
-
-          {% for row in data | sort(attribute='hour') %}
-            {% set start_time = row.hour %}
-            {% set end_time = start_time + timedelta(hours=4) %}
-
-            {% if start_time >= earliest and end_time <= deadline %}
-              {% set segment = data
-                | selectattr('hour', '>=', start_time)
-                | selectattr('hour', '<', end_time)
-                | list %}
-
-              {% if segment | length > 0 %}
-                {% set avg = (segment | map(attribute='price') | sum) / 4 %}
-                {% if avg < best.price %}
-                  {% set best.price = avg %}
-                  {% set best.start = start_time %}
-                {% endif %}
-              {% endif %}
-            {% endif %}
-          {% endfor %}
-
-          {{ best.start if best.start is not none else none }}
-        {% endif %}

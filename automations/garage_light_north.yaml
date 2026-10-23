@@ -1,7 +1,7 @@
-- id: garden_light_house_north
-  alias: Have lys hus nord
+- id: garage_light_north
+  alias: Garage lys nord
   description: |
-    Styrer havebelysningen på nordsiden af huset.
+    Styrer havebelysningen nord for garagen.
   mode: queued
   max: 10
   trace:
@@ -9,28 +9,28 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.garden_presence_house_north
+      entity_id: binary_sensor.house_presence_west
+      from: "off"
+      to: "on"
+      id: detected_west
+
+    - trigger: state
+      entity_id: binary_sensor.house_presence_west
+      from: "on"
+      to: "off"
+      id: cleared_west
+
+    - trigger: state
+      entity_id: binary_sensor.garage_presence_north
       from: "off"
       to: "on"
       id: detected_north
 
     - trigger: state
-      entity_id: binary_sensor.garden_presence_house_north
+      entity_id: binary_sensor.garage_presence_north
       from: "on"
       to: "off"
       id: cleared_north
-
-    - trigger: state
-      entity_id: binary_sensor.garden_presence_house_east
-      from: "off"
-      to: "on"
-      id: detected_east
-
-    - trigger: state
-      entity_id: binary_sensor.garden_presence_house_east
-      from: "on"
-      to: "off"
-      id: cleared_east
 
   conditions: []
 
@@ -39,8 +39,8 @@
         - conditions:
             - condition: trigger
               id:
+                - detected_west
                 - detected_north
-                - detected_east
             - condition: state
               entity_id: binary_sensor.home_outside_light
               state: "off"
@@ -51,22 +51,22 @@
                 color_temp_kelvin: 2700
                 transition: 1
               target:
-                entity_id: light.garden_light_house_north
+                entity_id: light.garage_light_north
 
         - conditions:
             - condition: trigger
               id:
+                - cleared_west
                 - cleared_north
-                - cleared_east
             - condition: state
-              entity_id: binary_sensor.garden_presence_house_north
+              entity_id: binary_sensor.house_presence_west
               state: "off"
             - condition: state
-              entity_id: binary_sensor.garden_presence_house_east
+              entity_id: binary_sensor.garage_presence_north
               state: "off"
           sequence:
             - action: light.turn_off
               data:
                 transition: 1
               target:
-                entity_id: light.garden_light_house_north
+                entity_id: light.garage_light_north

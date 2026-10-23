@@ -64,18 +64,18 @@
                 description: |-
                   Sidste gang Emil vaskede tøj var 
                   {% set weekdays = ['mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag', 'søndag'] %}
-                  {% set dt = as_datetime(states('input_datetime.home_emil_wash_clothes_last_done')) %}
+                  {% set dt = as_datetime(states('input_datetime.emil_home_wash_clothes_last_done')) %}
                   {{ weekdays[dt.weekday()] }} {{ dt.strftime('%-d/%-m-%Y kl. %H:%M') }}
-                related_entity_id: input_datetime.home_emil_wash_clothes_last_done
+                related_entity_id: input_datetime.emil_home_wash_clothes_last_done
                 entity_id: todo.todo_smart_todo
                 is_active: |-
-                  {% set dt = as_local(as_datetime(states('input_datetime.home_emil_wash_clothes_last_done'))) %} {{ now() >= dt + timedelta(days=7) or (now().weekday() == 3 and now() >= dt + timedelta(days=3)) }}
+                  {% set dt = as_local(as_datetime(states('input_datetime.emil_home_wash_clothes_last_done'))) %} {{ now() >= dt + timedelta(days=7) or (now().weekday() == 3 and now() >= dt + timedelta(days=3)) }}
         - conditions:
             - condition: trigger
               id: todo_wash_close_completed
           sequence:
             - action: input_datetime.set_datetime
               target:
-                entity_id: input_datetime.home_emil_wash_clothes_last_done
+                entity_id: input_datetime.emil_home_wash_clothes_last_done
               data:
                 datetime: "{{ (now() | as_local).strftime('%Y-%m-%d %H:%M:%S') }}"

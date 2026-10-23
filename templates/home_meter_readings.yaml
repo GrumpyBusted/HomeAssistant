@@ -1,14 +1,14 @@
 - sensor:
-    - name: home_meter_readings_electricity
-      unique_id: 276CD996-CE6A-4E82-9E01-11914786EED8
+    - name: "Hjem måleraflæsning EL"
+      unique_id: home_meter_readings_electricity
       device_class: energy
       state_class: total_increasing
       unit_of_measurement: kWh
       icon: "mdi:meter-electric"
       state: "0"
 - sensor:
-    - name: home_meter_readings_water
-      unique_id: 2DE105B5-B9EC-408C-8084-C00805D9838D
+    - name: "Hjem måleraflæsning vand"
+      unique_id: home_meter_readings_water
       device_class: water
       state_class: total_increasing
       unit_of_measurement: m³

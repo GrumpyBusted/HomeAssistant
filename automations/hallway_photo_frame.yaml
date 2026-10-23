@@ -9,7 +9,7 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.someone_home
+      entity_id: binary_sensor.home_someone
 
     - trigger: state
       entity_id: select.bedroom_state
@@ -61,7 +61,7 @@
             - condition: or
               conditions:
                 - condition: state
-                  entity_id: binary_sensor.someone_home
+                  entity_id: binary_sensor.home_someone
                   state: "off"
                 - condition: and
                   conditions:
@@ -91,7 +91,7 @@
                       entity_id: binary_sensor.emil_home
                       state: "off"
                     - condition: state
-                      entity_id: binary_sensor.parent_home
+                      entity_id: binary_sensor.home_parent
                       state: "off"
           sequence:
             - action: media_player.turn_off

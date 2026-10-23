@@ -1,7 +1,7 @@
-- id: garden_light_patio
-  alias: Have lys terrasse
+- id: patio_light_west
+  alias: Terrasse lys vest
   description: |
-    Styrer havebelysningen ved terrassen.
+    Styrer havebelysningen vest for terrassen.
   mode: queued
   max: 10
   trace:
@@ -9,13 +9,13 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.garden_presence_garage_north
+      entity_id: binary_sensor.garage_presence_north
       from: "off"
       to: "on"
       id: detected
 
     - trigger: state
-      entity_id: binary_sensor.garden_presence_garage_north
+      entity_id: binary_sensor.garage_presence_north
       from: "on"
       to: "off"
       id: cleared
@@ -37,7 +37,7 @@
                 color_temp_kelvin: 2700
                 transition: 1
               target:
-                entity_id: light.garden_light_patio
+                entity_id: light.patio_light_west
 
         - conditions:
             - condition: and
@@ -45,11 +45,11 @@
                 - condition: trigger
                   id: cleared
                 - condition: state
-                  entity_id: binary_sensor.garden_presence_garage_north
+                  entity_id: binary_sensor.garage_presence_north
                   state: "off"
           sequence:
             - action: light.turn_off
               data:
                 transition: 1
               target:
-                entity_id: light.garden_light_patio
+                entity_id: light.patio_light_west

@@ -29,7 +29,7 @@
       id: button_3
 
     - trigger: state
-      entity_id: binary_sensor.someone_home
+      entity_id: binary_sensor.home_someone
       from: "on"
       to: "off"
       id: no_one_home
@@ -49,7 +49,7 @@
         - input_boolean.home_house_sitter
       from: "off"
       to: "on"
-      id: someone_home
+      id: home_someone
 
     - trigger: state
       entity_id: binary_sensor.hallway_presence
@@ -125,7 +125,7 @@
             - condition: trigger
               id: lights_on
             - condition: state
-              entity_id: binary_sensor.someone_home
+              entity_id: binary_sensor.home_someone
               state: "off"
           sequence:
             - variables:
@@ -133,7 +133,7 @@
 
         - conditions:
             - condition: trigger
-              id: someone_home
+              id: home_someone
             - condition: state
               entity_id: binary_sensor.bedroom_door
               state: "on"
@@ -159,7 +159,7 @@
 
         - conditions:
             - condition: trigger
-              id: someone_home
+              id: home_someone
             - condition: state
               entity_id: binary_sensor.hallway_light
               state: "off"
@@ -292,7 +292,7 @@
               entity_id: light.hallway_light_mirror
               state: "off"
             - condition: state
-              entity_id: binary_sensor.someone_home
+              entity_id: binary_sensor.home_someone
               state: "on"
           sequence:
             - variables:

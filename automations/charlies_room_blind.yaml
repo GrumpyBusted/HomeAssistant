@@ -91,7 +91,7 @@
 
         - conditions:
             - condition: state
-              entity_id: binary_sensor.house_sitter_home
+              entity_id: binary_sensor.home_house_sitter
               state: "on"
           sequence: []
 

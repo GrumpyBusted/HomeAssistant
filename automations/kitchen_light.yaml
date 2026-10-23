@@ -54,7 +54,7 @@
       id: button_4_short
 
     - trigger: state
-      entity_id: binary_sensor.someone_home
+      entity_id: binary_sensor.home_someone
       to: "off"
       id: no_one_home
 
@@ -75,7 +75,7 @@
       entity_id: input_select.living_room_robot_vacuum_current_cleaning
 
     - trigger: state
-      entity_id: binary_sensor.someone_home
+      entity_id: binary_sensor.home_someone
 
     - trigger: state
       entity_id: binary_sensor.home_sleeping_everyone
@@ -201,7 +201,7 @@
             - condition: trigger
               id: lights_on
             - condition: state
-              entity_id: binary_sensor.someone_home
+              entity_id: binary_sensor.home_someone
               state: "off"
           sequence:
             - action: input_select.select_option
@@ -291,7 +291,7 @@
                   entity_id: input_select.living_room_robot_vacuum_current_cleaning
                   state: kitchen_cleaning
                 - condition: state
-                  entity_id: binary_sensor.someone_home
+                  entity_id: binary_sensor.home_someone
                   state: "on"
                 - condition: state
                   entity_id: binary_sensor.home_sleeping_everyone

@@ -20,7 +20,7 @@
       to: idle
 
     - trigger: state
-      entity_id: binary_sensor.someone_sleeping
+      entity_id: binary_sensor.home_sleeping_someone
       to: "off"
 
     - trigger: state
@@ -85,7 +85,7 @@
               entity_id: input_select.living_room_robot_vacuum_current_cleaning
               state: none
             - condition: state
-              entity_id: binary_sensor.someone_sleeping
+              entity_id: binary_sensor.home_sleeping_someone
               state: "off"
             - condition: state
               entity_id: binary_sensor.living_room_door_sensor_door

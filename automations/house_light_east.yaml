@@ -1,5 +1,5 @@
-- id: garden_light_house_east
-  alias: Have lys hus øst
+- id: house_light_east
+  alias: Hus lys øst
   description: |
     Styrer havebelysningen på østsiden af huset.
   mode: queued
@@ -9,25 +9,25 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.garden_presence_house_east
+      entity_id: binary_sensor.house_presence_east
       from: "off"
       to: "on"
       id: detected_east
 
     - trigger: state
-      entity_id: binary_sensor.garden_presence_house_east
+      entity_id: binary_sensor.house_presence_east
       from: "on"
       to: "off"
       id: cleared_east
 
     - trigger: state
-      entity_id: binary_sensor.driveway_presence_entrance
+      entity_id: binary_sensor.house_presence_entrance
       from: "off"
       to: "on"
       id: detected_entrance
 
     - trigger: state
-      entity_id: binary_sensor.driveway_presence_entrance
+      entity_id: binary_sensor.house_presence_entrance
       from: "on"
       to: "off"
       id: cleared_entrance
@@ -51,7 +51,7 @@
                 color_temp_kelvin: 2700
                 transition: 1
               target:
-                entity_id: light.garden_light_house_east
+                entity_id: light.house_light_east
 
         - conditions:
             - condition: trigger
@@ -59,14 +59,14 @@
                 - cleared_east
                 - cleared_entrance
             - condition: state
-              entity_id: binary_sensor.garden_presence_house_east
+              entity_id: binary_sensor.house_presence_east
               state: "off"
             - condition: state
-              entity_id: binary_sensor.driveway_presence_entrance
+              entity_id: binary_sensor.house_presence_entrance
               state: "off"
           sequence:
             - action: light.turn_off
               data:
                 transition: 1
               target:
-                entity_id: light.garden_light_house_east
+                entity_id: light.house_light_east

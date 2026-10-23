@@ -33,11 +33,11 @@
     - trigger: event
       event_type: timer.finished
       event_data:
-        entity_id: timer.people_home_meal_timer
+        entity_id: timer.home_people_meal_timer
       id: meal_done
 
     - trigger: state
-      entity_id: number.people_home
+      entity_id: number.home_people
       id: people_changed
 
     - trigger: state
@@ -120,15 +120,15 @@
           sequence:
             - action: timer.start
               target:
-                entity_id: timer.people_home_meal_timer
+                entity_id: timer.home_people_meal_timer
               data:
                 duration: 02:00:00
             - action: input_number.set_value
               target:
-                entity_id: input_number.people_home_meal
+                entity_id: input_number.home_people_meal
               data:
                 value: |-
-                  {{ states('number.people_home') | int(0) }}
+                  {{ states('number.home_people') | int(0) }}
 
         - conditions:
             - condition: trigger
@@ -139,7 +139,7 @@
                 entity_id: input_number.kitchen_dishwasher_dirty_score
               data:
                 value: |-
-                  {{ states('input_number.kitchen_dishwasher_dirty_score') | int(0) + states('input_number.people_home_meal') | int(0) }}
+                  {{ states('input_number.kitchen_dishwasher_dirty_score') | int(0) + states('input_number.home_people_meal') | int(0) }}
 
         - conditions:
             - condition: trigger
@@ -147,7 +147,7 @@
           sequence:
             - action: input_number.set_value
               target:
-                entity_id: input_number.people_home_meal
+                entity_id: input_number.home_people_meal
               data:
                 value: |-
-                  {{ max(states('input_number.people_home_meal') | int(0), states('number.people_home') | int(0)) }}
+                  {{ max(states('input_number.home_people_meal') | int(0), states('number.home_people') | int(0)) }}

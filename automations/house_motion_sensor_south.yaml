@@ -1,7 +1,7 @@
-- id: garden_motion_sensor_garage_north
-  alias: Have bevægelsessensor garage nord
+- id: house_motion_sensor_south
+  alias: Hus bevægelsessensor syd
   description: |
-    Håndterer bevægelsessensoren nord for garagen.
+    Håndterer bevægelsessensoren på sydsiden af huset.
   mode: queued
   max: 10
   trace:
@@ -9,13 +9,13 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.garden_motion_sensor_garage_north_occupancy
+      entity_id: binary_sensor.house_motion_sensor_south_occupancy
       from: "off"
       to: "on"
       id: detected
 
     - trigger: state
-      entity_id: binary_sensor.garden_motion_sensor_garage_north_occupancy
+      entity_id: binary_sensor.house_motion_sensor_south_occupancy
       from: "on"
       to: "off"
       id: cleared
@@ -30,7 +30,7 @@
           sequence:
             - action: timer.cancel
               target:
-                entity_id: timer.garden_motion_sensor_garage_north_timer
+                entity_id: timer.house_motion_sensor_south_timer
 
         - conditions:
             - condition: trigger
@@ -40,4 +40,4 @@
               data:
                 duration: 00:03:00
               target:
-                entity_id: timer.garden_motion_sensor_garage_north_timer
+                entity_id: timer.house_motion_sensor_south_timer

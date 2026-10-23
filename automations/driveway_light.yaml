@@ -21,37 +21,37 @@
       id: cleared_street
 
     - trigger: state
-      entity_id: binary_sensor.driveway_presence_house_south
+      entity_id: binary_sensor.house_presence_south
       from: "off"
       to: "on"
       id: detected_south
 
     - trigger: state
-      entity_id: binary_sensor.driveway_presence_house_south
+      entity_id: binary_sensor.house_presence_south
       from: "on"
       to: "off"
       id: cleared_south
 
     - trigger: state
-      entity_id: binary_sensor.driveway_presence_entrance
+      entity_id: binary_sensor.house_presence_entrance
       from: "off"
       to: "on"
       id: detected_entrance
 
     - trigger: state
-      entity_id: binary_sensor.driveway_presence_entrance
+      entity_id: binary_sensor.house_presence_entrance
       from: "on"
       to: "off"
       id: cleared_entrance
 
     - trigger: state
-      entity_id: binary_sensor.garden_presence_house_east
+      entity_id: binary_sensor.house_presence_east
       from: "off"
       to: "on"
       id: detected_east
 
     - trigger: state
-      entity_id: binary_sensor.garden_presence_house_east
+      entity_id: binary_sensor.house_presence_east
       from: "on"
       to: "off"
       id: cleared_east
@@ -160,13 +160,13 @@
               entity_id: binary_sensor.driveway_presence_street
               state: "off"
             - condition: state
-              entity_id: binary_sensor.driveway_presence_house_south
+              entity_id: binary_sensor.house_presence_south
               state: "off"
             - condition: state
-              entity_id: binary_sensor.driveway_presence_entrance
+              entity_id: binary_sensor.house_presence_entrance
               state: "off"
             - condition: state
-              entity_id: binary_sensor.garden_presence_house_east
+              entity_id: binary_sensor.house_presence_east
               state: "off"
             - condition: state
               entity_id: binary_sensor.home_light_ambience_evening
@@ -334,13 +334,13 @@
                       entity_id: binary_sensor.driveway_presence_street
                       state: "off"
                     - condition: state
-                      entity_id: binary_sensor.driveway_presence_house_south
+                      entity_id: binary_sensor.house_presence_south
                       state: "off"
                     - condition: state
-                      entity_id: binary_sensor.driveway_presence_entrance
+                      entity_id: binary_sensor.house_presence_entrance
                       state: "off"
                     - condition: state
-                      entity_id: binary_sensor.garden_presence_house_east
+                      entity_id: binary_sensor.house_presence_east
                       state: "off"
           sequence:
             - action: light.turn_off

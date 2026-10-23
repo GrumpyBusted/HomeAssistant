@@ -67,7 +67,7 @@
       then:
         - if:
             - condition: state
-              entity_id: binary_sensor.someone_home
+              entity_id: binary_sensor.home_someone
               state: "on"
           then:
             - action: script.push_notification

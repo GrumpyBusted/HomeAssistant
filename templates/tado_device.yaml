@@ -1,20 +1,20 @@
 - sensor:
     - name: "Tado Device Types"
-      unique_id: 05D4CDF1-9E4B-481A-8F0F-13684D95B8FF
+      unique_id: taod_device_types
       state: "OK"
       attributes:
-        types: >-
+        types: |-
           {{ {
             "VA04": "Smart Radiator Thermostat X",
             "RU04": "Smart Thermostat X",
             "SU04": "Wireless Temperature Sensor X"
           } }}
 
-    - name: "Tado Device Batterys"
-      unique_id: 72EC545E-66DC-4E91-A3EE-372E3F7D5C06
+    - name: "Tado Device Batteries"
+      unique_id: tado_device_batteries
       state: "OK"
       attributes:
-        batterys: >-
+        batterys: |-
           {{ {
             "VA04": "Genopladelig batteripakke",
             "RU04": "3 * AAA",
@@ -22,10 +22,10 @@
           } }}
 
     - name: "Tado Device Locations"
-      unique_id: B90FDCCE-2C4D-4F76-B2EF-00D3FFEBEE97
+      unique_id: tado_device_locations
       state: "OK"
       attributes:
-        locations: >-
+        locations: |-
           {{ {
             "VA3283445504": "Gulv",          
             "VA1355245056": "Radiator",      
@@ -48,10 +48,10 @@
           } }}
 
     - name: "Tado Device Ids"
-      unique_id: B2F0AF02-75FA-4697-AA5E-886F055D5A80
+      unique_id: tado_device_ids
       state: "OK"
       attributes:
-        ids: >-
+        ids: |-
           {{ {
             "VA3283445504": "climate.bathroom_radiator_thermostat_floor",          
             "VA1355245056": "climate.bathroom_radiator_thermostat_wall",      
@@ -72,4 +72,3 @@
             "SU2008052224": "sensor.living_room_temperature_sensor_temperature",              
             "SU3709368576": "sensor.charlies_room_temperature_sensor_temperature"               
           } }}
-

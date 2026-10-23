@@ -1,7 +1,7 @@
-- id: driveway_light_house_south
-  alias: Indkørsel lys hus syd
+- id: house_light_south
+  alias: Hus lys syd
   description: |
-    Styrer belysningen på sydsiden af huset ved indkørslen.
+    Styrer belysningen på sydsiden af huset.
   mode: queued
   max: 10
   trace:
@@ -9,25 +9,25 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.driveway_presence_house_south
+      entity_id: binary_sensor.house_presence_south
       from: "off"
       to: "on"
       id: detected_south
 
     - trigger: state
-      entity_id: binary_sensor.driveway_presence_house_south
+      entity_id: binary_sensor.house_presence_south
       from: "on"
       to: "off"
       id: cleared_south
 
     - trigger: state
-      entity_id: binary_sensor.driveway_presence_entrance
+      entity_id: binary_sensor.house_presence_entrance
       from: "off"
       to: "on"
       id: detected_entrance
 
     - trigger: state
-      entity_id: binary_sensor.driveway_presence_entrance
+      entity_id: binary_sensor.house_presence_entrance
       from: "on"
       to: "off"
       id: cleared_entrance
@@ -45,13 +45,13 @@
       id: cleared_street
 
     - trigger: state
-      entity_id: binary_sensor.garden_presence_house_west
+      entity_id: binary_sensor.house_presence_west
       from: "off"
       to: "on"
       id: detected_west
 
     - trigger: state
-      entity_id: binary_sensor.garden_presence_house_west
+      entity_id: binary_sensor.house_presence_west
       from: "on"
       to: "off"
       id: cleared_west
@@ -77,7 +77,7 @@
                 color_temp_kelvin: 2700
                 transition: 1
               target:
-                entity_id: light.driveway_light_house_south
+                entity_id: light.house_light_south
 
         - conditions:
             - condition: trigger
@@ -87,20 +87,20 @@
                 - cleared_street
                 - cleared_west
             - condition: state
-              entity_id: binary_sensor.driveway_presence_house_south
+              entity_id: binary_sensor.house_presence_south
               state: "off"
             - condition: state
-              entity_id: binary_sensor.driveway_presence_entrance
+              entity_id: binary_sensor.house_presence_entrance
               state: "off"
             - condition: state
               entity_id: binary_sensor.driveway_presence_street
               state: "off"
             - condition: state
-              entity_id: binary_sensor.garden_presence_house_west
+              entity_id: binary_sensor.house_presence_west
               state: "off"
           sequence:
             - action: light.turn_off
               data:
                 transition: 1
               target:
-                entity_id: light.driveway_light_house_south
+                entity_id: light.house_light_south

@@ -15,7 +15,7 @@
       entity_id: sensor.storage_ventilation_system_desired_level
 
     - trigger: state
-      entity_id: binary_sensor.someone_home
+      entity_id: binary_sensor.home_someone
 
     - trigger: state
       entity_id: binary_sensor.home_sleeping_everyone
@@ -40,7 +40,7 @@
             - condition: or
               conditions:
                 - condition: state
-                  entity_id: binary_sensor.someone_home
+                  entity_id: binary_sensor.home_someone
                   state: "off"
                 - condition: state
                   entity_id: binary_sensor.home_sleeping_everyone

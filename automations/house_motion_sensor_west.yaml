@@ -1,7 +1,7 @@
-- id: driveway_motion_sensor_entrance
-  alias: Indkørsel bevægelsessensor entre
+- id: house_motion_sensor_west
+  alias: Hus bevægelsessensor vest
   description: |
-    Håndterer bevægelsessensoren ved hoveddøren i indkørslen.
+    Håndterer bevægelsessensoren på vestsiden af huset.
   mode: queued
   max: 10
   trace:
@@ -9,13 +9,13 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.driveway_motion_sensor_entrance_occupancy
+      entity_id: binary_sensor.house_motion_sensor_west_occupancy
       from: "off"
       to: "on"
       id: detected
 
     - trigger: state
-      entity_id: binary_sensor.driveway_motion_sensor_entrance_occupancy
+      entity_id: binary_sensor.house_motion_sensor_west_occupancy
       from: "on"
       to: "off"
       id: cleared
@@ -30,7 +30,7 @@
           sequence:
             - action: timer.cancel
               target:
-                entity_id: timer.driveway_motion_sensor_entrance_timer
+                entity_id: timer.house_motion_sensor_west_timer
 
         - conditions:
             - condition: trigger
@@ -40,4 +40,4 @@
               data:
                 duration: 00:03:00
               target:
-                entity_id: timer.driveway_motion_sensor_entrance_timer
+                entity_id: timer.house_motion_sensor_west_timer

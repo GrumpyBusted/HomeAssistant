@@ -33,7 +33,7 @@
       id: charlie_home
 
     - trigger: state
-      entity_id: binary_sensor.someone_home
+      entity_id: binary_sensor.home_someone
       from: "on"
       to: "off"
       id: no_one_home
@@ -73,7 +73,7 @@
           sequence:
             - action: lock.unlock
               data:
-                code: "{{ states('sensor.yale_code_anders') }}"
+                code: "{{ state_attr('sensor.yale_code', 'anders') }}"
               target:
                 entity_id: lock.entrance_lock
 
@@ -86,7 +86,7 @@
           sequence:
             - action: lock.unlock
               data:
-                code: "{{ states('sensor.yale_code_monique') }}"
+                code: "{{ state_attr('sensor.yale_code', 'monique') }}"
               target:
                 entity_id: lock.entrance_lock
 
@@ -99,7 +99,7 @@
           sequence:
             - action: lock.unlock
               data:
-                code: "{{ states('sensor.yale_code_emil') }}"
+                code: "{{ state_attr('sensor.yale_code', 'emil') }}"
               target:
                 entity_id: lock.entrance_lock
 
@@ -112,7 +112,7 @@
           sequence:
             - action: lock.unlock
               data:
-                code: "{{ states('sensor.yale_code_charlie') }}"
+                code: "{{ state_attr('sensor.yale_code', 'charlie') }}"
               target:
                 entity_id: lock.entrance_lock
 
@@ -146,7 +146,7 @@
             - condition: or
               conditions:
                 - condition: state
-                  entity_id: binary_sensor.someone_home
+                  entity_id: binary_sensor.home_someone
                   state: "off"
                 - condition: state
                   entity_id: binary_sensor.home_sleeping_everyone

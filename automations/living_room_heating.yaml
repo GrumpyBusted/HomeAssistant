@@ -9,7 +9,7 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.someone_home
+      entity_id: binary_sensor.home_someone
 
     - trigger: state
       entity_id: sensor.living_room_target_temperature
@@ -28,7 +28,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: binary_sensor.someone_home
+              entity_id: binary_sensor.home_someone
               state: "off"
             - condition: state
               entity_id: timer.living_room_heating_manual_timer

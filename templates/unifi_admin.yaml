@@ -1,0 +1,7 @@
+- sensor:
+    - name: "Unifi Admin User"
+      unique_id: unifi_admin_user
+      state: !secret unifi_username
+      icon: mdi:account
+      attributes:
+        password: !secret unifi_password

@@ -21,7 +21,7 @@
       to: "off"
 
     - trigger: state
-      entity_id: binary_sensor.someone_sleeping
+      entity_id: binary_sensor.home_sleeping_someone
       to: "off"
 
     - trigger: state
@@ -62,7 +62,7 @@
               entity_id: binary_sensor.living_room_media_player
               state: "off"
             - condition: state
-              entity_id: binary_sensor.someone_sleeping
+              entity_id: binary_sensor.home_sleeping_someone
               state: "off"
             - condition: state
               entity_id: binary_sensor.monique_sleep_window

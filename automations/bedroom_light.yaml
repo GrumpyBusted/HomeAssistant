@@ -33,7 +33,7 @@
       id: button_4
 
     - trigger: state
-      entity_id: binary_sensor.parent_home
+      entity_id: binary_sensor.home_parent
       to: "off"
       id: parents_leave
 
@@ -224,7 +224,7 @@
                 - parents_leave
                 - house_sitter_leave
             - condition: state
-              entity_id: binary_sensor.parent_home
+              entity_id: binary_sensor.home_parent
               state: "off"
             - condition: state
               entity_id: input_boolean.home_house_sitter
@@ -240,7 +240,7 @@
             - condition: trigger
               id: lights_on
             - condition: state
-              entity_id: binary_sensor.parent_home
+              entity_id: binary_sensor.home_parent
               state: "off"
             - condition: state
               entity_id: input_boolean.home_house_sitter

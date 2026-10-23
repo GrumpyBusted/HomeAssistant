@@ -33,7 +33,7 @@
       id: timeout
 
     - trigger: state
-      entity_id: binary_sensor.someone_home
+      entity_id: binary_sensor.home_someone
       to: "off"
       id: away
 

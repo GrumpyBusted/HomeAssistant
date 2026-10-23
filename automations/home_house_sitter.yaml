@@ -9,10 +9,10 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.family_home
+      entity_id: binary_sensor.home_family
       from: "off"
       to: "on"
-      id: family_home
+      id: home_family
 
     - trigger: state
       entity_id:
@@ -24,7 +24,7 @@
     - choose:
         - conditions:
             - condition: trigger
-              id: family_home
+              id: home_family
             - condition: template
               value_template: |-
                 {{ now() > (states.input_boolean.home_house_sitter.last_updated + timedelta(minutes=15)) }}
@@ -37,7 +37,7 @@
             - condition: trigger
               id: unlock
             - condition: state
-              entity_id: binary_sensor.family_home
+              entity_id: binary_sensor.home_family
               state: "off"
             - condition: template
               value_template: |-

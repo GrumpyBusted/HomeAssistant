@@ -1,7 +1,7 @@
-- id: driveway_motion_sensor_house_south
-  alias: Indkørsel bevægelsessensor hus syd
+- id: house_motion_sensor_east
+  alias: Hus bevægelsessensor øst
   description: |
-    Håndterer bevægelsessensoren på sydsiden af huset ved indkørslen.
+    Håndterer bevægelsessensoren på østsiden af huset.
   mode: queued
   max: 10
   trace:
@@ -9,13 +9,13 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.driveway_motion_sensor_house_south_occupancy
+      entity_id: binary_sensor.house_motion_sensor_east_occupancy
       from: "off"
       to: "on"
       id: detected
 
     - trigger: state
-      entity_id: binary_sensor.driveway_motion_sensor_house_south_occupancy
+      entity_id: binary_sensor.house_motion_sensor_east_occupancy
       from: "on"
       to: "off"
       id: cleared
@@ -30,7 +30,7 @@
           sequence:
             - action: timer.cancel
               target:
-                entity_id: timer.driveway_motion_sensor_house_south_timer
+                entity_id: timer.house_motion_sensor_east_timer
 
         - conditions:
             - condition: trigger
@@ -40,4 +40,4 @@
               data:
                 duration: 00:03:00
               target:
-                entity_id: timer.driveway_motion_sensor_house_south_timer
+                entity_id: timer.house_motion_sensor_east_timer

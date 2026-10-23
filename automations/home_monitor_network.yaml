@@ -100,8 +100,8 @@
           sequence:
             - action: shell_command.unifi_speedtest
               data:
-                user: "{{ states('sensor.unifi_admin_username') }}"
-                password: "{{ states('sensor.unifi_admin_password') }}"
+                user: "{{ states('sensor.unifi_admin_user') }}"
+                password: "{{ state_attr('sensor.unifi_admin_user', 'password') }}"
               response_variable: response
             - action: system_log.write
               data:

@@ -1,7 +1,7 @@
-- id: driveway_light_entrance
-  alias: Indkørsel lys entre
+- id: house_light_entrance
+  alias: Hus lys entre
   description: |
-    Styrer belysningen ved hoveddøren og indkørslen.
+    Styrer belysningen ved hoveddøren.
   mode: queued
   max: 10
   trace:
@@ -9,13 +9,13 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.driveway_presence_entrance
+      entity_id: binary_sensor.house_presence_entrance
       from: "off"
       to: "on"
       id: detected_entrance
 
     - trigger: state
-      entity_id: binary_sensor.driveway_presence_entrance
+      entity_id: binary_sensor.house_presence_entrance
       from: "on"
       to: "off"
       id: cleared_entrance
@@ -28,7 +28,7 @@
             - condition: trigger
               id: detected_entrance
             - condition: state
-              entity_id: light.driveway_light_entrance_decoration
+              entity_id: light.house_decoration
               state: "on"
           sequence:
             - action: light.turn_on
@@ -38,9 +38,9 @@
                 color_temp_kelvin: 2300
               target:
                 entity_id:
-                  - light.driveway_light_entrance_spot_1
-                  - light.driveway_light_entrance_spot_2
-                  - light.driveway_light_entrance_spot_3
+                  - light.house_light_entrance_spot_1
+                  - light.house_light_entrance_spot_2
+                  - light.house_light_entrance_spot_3
 
         - conditions:
             - condition: trigger
@@ -56,9 +56,9 @@
                 color_temp_kelvin: 2700
               target:
                 entity_id:
-                  - light.driveway_light_entrance_spot_1
-                  - light.driveway_light_entrance_spot_2
-                  - light.driveway_light_entrance_spot_3
+                  - light.house_light_entrance_spot_1
+                  - light.house_light_entrance_spot_2
+                  - light.house_light_entrance_spot_3
 
         - conditions:
             - condition: trigger
@@ -69,6 +69,6 @@
                 transition: 1
               target:
                 entity_id:
-                  - light.driveway_light_entrance_spot_1
-                  - light.driveway_light_entrance_spot_2
-                  - light.driveway_light_entrance_spot_3
+                  - light.house_light_entrance_spot_1
+                  - light.house_light_entrance_spot_2
+                  - light.house_light_entrance_spot_3

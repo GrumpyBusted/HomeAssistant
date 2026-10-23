@@ -19,17 +19,17 @@
       id: cleared_inside
 
     - trigger: state
-      entity_id: binary_sensor.driveway_presence_entrance
+      entity_id: binary_sensor.house_presence_entrance
       to: "on"
       id: detected_outside
 
     - trigger: state
-      entity_id: binary_sensor.driveway_presence_entrance
+      entity_id: binary_sensor.house_presence_entrance
       to: "off"
       id: cleared_outside
 
     - trigger: state
-      entity_id: binary_sensor.someone_home
+      entity_id: binary_sensor.home_someone
       to: "off"
       id: no_one_home
 
@@ -72,7 +72,7 @@
               entity_id: binary_sensor.entrance_presence
               state: "off"
             - condition: state
-              entity_id: binary_sensor.driveway_presence_entrance
+              entity_id: binary_sensor.house_presence_entrance
               state: "off"
           sequence:
             - variables:

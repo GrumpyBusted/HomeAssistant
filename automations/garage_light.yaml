@@ -25,7 +25,7 @@
       id: button_4
 
     - trigger: state
-      entity_id: binary_sensor.someone_home
+      entity_id: binary_sensor.home_someone
       from: "on"
       to: "off"
       id: no_one_home
@@ -53,7 +53,7 @@
       id: closed
 
     - trigger: state
-      entity_id: binary_sensor.someone_home
+      entity_id: binary_sensor.home_someone
       from: "on"
       to: "off"
       id: no_one_home

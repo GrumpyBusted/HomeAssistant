@@ -1,5 +1,5 @@
-- id: driveway_light_decoration_entrance
-  alias: Indkørsel lys dekorationer entre
+- id: house_decoration_entrance
+  alias: Hus dekorationer entre
   description: |
     Styrer dekorationsbelysningen ved indgangen efter tidspunkt og sæson.
   mode: queued
@@ -30,8 +30,8 @@
                   sequence:
                     - action: script.light_turn_on_effect
                       data:
-                        entity_id: light.driveway_light_entrance_decoration
-                        entity_id_mode: select.driveway_light_entrance_decoration_mode
+                        entity_id: light.house_decoration_entrance
+                        entity_id_mode: select.house_decoration_entrance_mode
                         effect: Stripes
                 - conditions:
                     - condition: template
@@ -39,8 +39,8 @@
                   sequence:
                     - action: script.light_turn_on_effect
                       data:
-                        entity_id: light.driveway_light_entrance_decoration
-                        entity_id_mode: select.driveway_light_entrance_decoration_mode
+                        entity_id: light.house_decoration_entrance
+                        entity_id_mode: select.house_decoration_entrance_mode
                         effect: Sparkle
                 - conditions:
                     - condition: template
@@ -48,10 +48,10 @@
                   sequence:
                     - action: script.light_turn_on_effect
                       data:
-                        entity_id: light.driveway_light_entrance_decoration
-                        entity_id_mode: select.driveway_light_entrance_decoration_mode
+                        entity_id: light.house_decoration_entrance
+                        entity_id_mode: select.house_decoration_entrance_mode
                         effect: Rainbow
       default:
         - action: light.turn_off
           target:
-            entity_id: light.driveway_light_entrance_decoration
+            entity_id: light.house_decoration_entrance
