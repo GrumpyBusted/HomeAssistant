@@ -107,7 +107,7 @@
           sequence:
             - action: light.turn_on
               target:
-                entity_id: light.bedroom_lights
+                entity_id: light.bedroom_light_group
               data:
                 transition: 1
                 color_temp_kelvin: 2700
@@ -135,7 +135,7 @@
           sequence:
             - action: light.turn_off
               target:
-                entity_id: light.bedroom_lights
+                entity_id: light.bedroom_light_group
               data:
                 transition: 1
 
@@ -153,7 +153,7 @@
           sequence:
             - action: light.turn_on
               target:
-                entity_id: light.bedroom_lights
+                entity_id: light.bedroom_light_group
               data:
                 transition: 1
                 color_temp_kelvin: 2700
@@ -165,7 +165,7 @@
           sequence:
             - action: light.turn_off
               target:
-                entity_id: light.bedroom_lights
+                entity_id: light.bedroom_light_group
               data:
                 transition: 1
 
@@ -181,7 +181,7 @@
           sequence:
             - action: light.turn_on
               target:
-                entity_id: light.bedroom_lights
+                entity_id: light.bedroom_light_group
               data:
                 transition: 30
                 color_temp_kelvin: 2700
@@ -232,7 +232,7 @@
           sequence:
             - action: light.turn_off
               target:
-                entity_id: light.bedroom_lights
+                entity_id: light.bedroom_light_group
               data:
                 transition: 1
 
@@ -248,7 +248,7 @@
           sequence:
             - action: light.turn_off
               target:
-                entity_id: light.bedroom_lights
+                entity_id: light.bedroom_light_group
               data:
                 transition: 1
 
@@ -282,6 +282,6 @@
           sequence:
             - action: light.turn_off
               target:
-                entity_id: light.bedroom_lights
+                entity_id: light.bedroom_light_group
               data:
                 transition: 10

@@ -27,7 +27,7 @@
       id: door_closed
 
     - trigger: state
-      entity_id: binary_sensor.kitchen_dishwasher_vibration_sensor
+      entity_id: binary_sensor.kitchen_vibration_sensor_dishwasher
       to: "on"
       id: door_motion
 

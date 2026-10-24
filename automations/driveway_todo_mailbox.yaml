@@ -9,12 +9,12 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.driveway_mailbox_vibration_sensor
+      entity_id: binary_sensor.driveway_vibration_sensor_mailbox
       to: "on"
       id: new_post
 
     - trigger: state
-      entity_id: binary_sensor.driveway_mailbox_vibration_sensor
+      entity_id: binary_sensor.driveway_vibration_sensor_mailbox
       to: unavailable
       for: 00:03:00
       id: sensor_unavailable
@@ -31,7 +31,7 @@
               data:
                 subject: Tøm postkasse
                 description: Der er nye breve i postkassen ved vejen
-                related_entity_id: binary_sensor.driveway_mailbox_vibration_sensor
+                related_entity_id: binary_sensor.driveway_vibration_sensor_mailbox
                 entity_id: todo.todo_smart_todo
 
         - conditions:
@@ -42,5 +42,5 @@
               data:
                 subject: Der kan være noget i postkassen
                 description: Sensoren på postkasssen har været utilgængelig i længere tid og der kan derfor være post i postkassen ved vejen
-                related_entity_id: binary_sensor.driveway_mailbox_vibration_sensor
+                related_entity_id: binary_sensor.driveway_vibration_sensor_mailbox
                 entity_id: todo.todo_smart_todo

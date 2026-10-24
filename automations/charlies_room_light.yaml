@@ -86,7 +86,7 @@
                   target:
                     entity_id:
                       - light.charlies_room_light_desk_right
-                      - light.charlies_room_light_desk_mid
+                      - light.charlies_room_light_desk_middle
                       - light.charlies_room_light_desk_left
                   data:
                     transition: 1
@@ -105,7 +105,7 @@
                   target:
                     entity_id:
                       - light.charlies_room_light_desk_right
-                      - light.charlies_room_light_desk_mid
+                      - light.charlies_room_light_desk_middle
                       - light.charlies_room_light_desk_left
                   data:
                     transition: 1
@@ -129,7 +129,7 @@
               target:
                 entity_id:
                   - light.charlies_room_light_desk_right
-                  - light.charlies_room_light_desk_mid
+                  - light.charlies_room_light_desk_middle
                   - light.charlies_room_light_desk_left
               data:
                 transition: 1
@@ -161,7 +161,7 @@
           sequence:
             - action: light.turn_off
               target:
-                entity_id: light.charlies_room_lights
+                entity_id: light.charlies_room_light_group
               data:
                 transition: 1
 
@@ -179,7 +179,7 @@
           sequence:
             - action: light.turn_off
               target:
-                entity_id: light.charlies_room_lights
+                entity_id: light.charlies_room_light_group
               data:
                 transition: 1
 
@@ -207,7 +207,7 @@
               target:
                 entity_id:
                   - light.charlies_room_light_desk_left
-                  - light.charlies_room_light_desk_mid
+                  - light.charlies_room_light_desk_middle
                   - light.charlies_room_light_desk_right
                   - light.charlies_room_light_dresser
               data:
