@@ -1,0 +1,33 @@
+- id: kitchen_dishwasher
+  alias: Køkken opvaskemaskine
+  description: |
+    Deaktiverer de relevante entiteter for opvaskemaskinen.
+  mode: single
+  trace:
+    stored_traces: 100
+
+  triggers:
+    - trigger: state
+      entity_id: sensor.kitchen_dishwasher
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: sensor.kitchen_dishwasher
+              state:
+                - unavailable
+                - "off"
+          sequence:
+            - action: homeassistant.disable_entity
+              data:
+                entity_id:
+                  - sensor.kitchen_dishwasher_start_in
+
+      default:
+        - action: homeassistant.enable_entity
+          data:
+            entity_id:
+              - sensor.kitchen_dishwasher_start_in

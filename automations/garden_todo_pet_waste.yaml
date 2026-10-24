@@ -41,9 +41,9 @@
                 related_entity_id: input_datetime.garden_pet_waste_last_removed
                 entity_id: todo.todo_smart_todo
                 is_active: |-
-                  {% set m = (now().timestamp() - as_timestamp(states('input_datetime.garden_pet_waste_last_removed'))) / 60 %}
+                  {% set h = (now().timestamp() - as_timestamp(states('input_datetime.garden_pet_waste_last_removed'))) / 60 / 60 %}
                   {% set c = states('counter.utility_room_door_sensor_open') | int(0) - states('input_number.garden_pet_waste_door_count_last_removed') | int(0) %}
-                  {{ (c >= 2 and m >= 48 * 60) or (c >= 10 and m >= 12 * 60) }}
+                  {{ (c >= 4 and h >= 48) or (c >= 20 and h >= 15) }}
 
         - conditions:
             - condition: trigger

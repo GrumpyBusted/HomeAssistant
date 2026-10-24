@@ -395,7 +395,7 @@
       friendly_name: Stue lys skænk højre
       supported_features: 44
       state: 'on'
-    light.living_room_light_coffee_table_1:
+    light.living_room_decoration_coffee_table_1:
       effect_list:
       - 0 Christmas Spiri
       supported_color_modes:
@@ -416,7 +416,7 @@
       friendly_name: Stue lys sofabord 1
       supported_features: 4
       state: 'on'
-    light.living_room_light_coffee_table_2:
+    light.living_room_decoration_coffee_table_2:
       effect_list:
       - 0 Christmas Spiri
       supported_color_modes:

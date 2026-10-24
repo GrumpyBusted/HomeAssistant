@@ -1,4 +1,4 @@
-- id: home_todo_water_sensor
+- id: home_todo_water_leak_sensor
   alias: Hjem todo vandsensor
   description: |
     Kontrollerer batteristatus for Aqara-vandsensorer og opretter relevante todo-opgaver.

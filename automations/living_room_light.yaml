@@ -262,6 +262,9 @@
         - variables:
             force: true
 
+    - variables:
+        date: "{{ now().strftime('%m-%d') }}"
+
     - parallel:
         - choose:
             - conditions:
@@ -668,8 +671,7 @@
                     transition: 1
                   target:
                     entity_id:
-                      - light.living_room_light_coffee_table_1
-                      - light.living_room_light_coffee_table_2
+                      - light.living_room_decoration_coffee_table
 
             - conditions:
                 - condition: numeric_state
@@ -683,8 +685,39 @@
                     transition: 1
                   target:
                     entity_id:
-                      - light.living_room_light_coffee_table_1
-                      - light.living_room_light_coffee_table_2
+                      - light.living_room_decoration_coffee_table
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: lounging
+                - condition: template
+                  value_template: "{{ '10-15' <= date <= '10-31' }}"
+              sequence:
+                - action: script.light_turn_on_effect
+                  data:
+                    entity_id: light.living_room_decoration_coffee_table
+                    entity_id_mode:
+                      - select.living_room_decoration_coffee_table_1_mode
+                      - select.living_room_decoration_coffee_table_2_mode
+                    effect: Stripes
+                    brightness_pct: 100
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: lounging
+                - condition: template
+                  value_template: "{{ '12-01' <= date <= '12-26' }}"
+              sequence:
+                - action: script.light_turn_on_effect
+                  data:
+                    entity_id: light.living_room_decoration_coffee_table
+                    entity_id_mode:
+                      - select.living_room_decoration_coffee_table_1_mode
+                      - select.living_room_decoration_coffee_table_2_mode
+                    effect: Christmas
+                    brightness_pct: 100
 
             - conditions:
                 - condition: state
@@ -698,8 +731,38 @@
                     brightness_pct: 80
                   target:
                     entity_id:
-                      - light.living_room_light_coffee_table_1
-                      - light.living_room_light_coffee_table_2
+                      - light.living_room_decoration_coffee_table
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: dining
+                - condition: template
+                  value_template: "{{ '10-15' <= date <= '10-31' }}"
+              sequence:
+                - action: script.light_turn_on_effect
+                  data:
+                    entity_id: light.living_room_decoration_coffee_table
+                    entity_id_mode:
+                      - select.living_room_decoration_coffee_table_1_mode
+                      - select.living_room_decoration_coffee_table_2_mode
+                    effect: Stripes
+                    brightness_pct: 5
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: dining
+                - condition: template
+                  value_template: "{{ '12-01' <= date <= '12-26' }}"
+              sequence:
+                - action: script.light_turn_on_effect
+                  data:
+                    entity_id: light.living_room_decoration_coffee_table
+                    entity_id_mode:
+                      - select.living_room_decoration_coffee_table_1_mode
+                      - select.living_room_decoration_coffee_table_2_mode
+                    effect: Sparkle
 
             - conditions:
                 - condition: state
@@ -713,8 +776,7 @@
                     brightness_pct: 100
                   target:
                     entity_id:
-                      - light.living_room_light_coffee_table_1
-                      - light.living_room_light_coffee_table_2
+                      - light.living_room_decoration_coffee_table
 
           default:
             - action: light.turn_off
@@ -722,8 +784,7 @@
                 transition: 1
               target:
                 entity_id:
-                  - light.living_room_light_coffee_table_1
-                  - light.living_room_light_coffee_table_2
+                  - light.living_room_decoration_coffee_table
 
         - choose:
             - conditions:

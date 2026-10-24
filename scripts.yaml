@@ -716,7 +716,7 @@ push_notification:
           - notifier: notify.mobile_app_monique_iphone
             distance: sensor.monique_distance_home
             sleeping: binary_sensor.monique_sleeping
-          - notifier: notify.mobile_app_iphone
+          - notifier: notify.mobile_app_emil_iphone
             distance: sensor.emil_distance_home
             sleeping: binary_sensor.emil_sleeping
           - notifier: notify.mobile_app_charlie_iphone
@@ -1338,7 +1338,7 @@ living_room_light_sofa_toggle:
           sequence: []
         - conditions:
             - condition: state
-              entity_id: light.living_room_light_coffee_table_1
+              entity_id: light.living_room_decoration_coffee_table_1
               state: "on"
           sequence:
             - action: light.turn_off
@@ -1346,8 +1346,8 @@ living_room_light_sofa_toggle:
                 transition: 1
               target:
                 entity_id:
-                  - light.living_room_light_coffee_table_1
-                  - light.living_room_light_coffee_table_2
+                  - light.living_room_decoration_coffee_table_1
+                  - light.living_room_decoration_coffee_table_2
       default:
         - action: light.turn_on
           data:
@@ -1356,8 +1356,8 @@ living_room_light_sofa_toggle:
             brightness_pct: 80
           target:
             entity_id:
-              - light.living_room_light_coffee_table_1
-              - light.living_room_light_coffee_table_2
+              - light.living_room_decoration_coffee_table_1
+              - light.living_room_decoration_coffee_table_2
   mode: queued
   max: 10
 bedroom_blind_up:
@@ -1416,6 +1416,18 @@ light_turn_on_effect:
       required: true
       selector:
         text: {}
+    brightness_pct:
+      name: Lysstyrke
+      description: Lysstyrke i procent (1-100).
+      required: false
+      default: 0
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: 1
+          unit_of_measurement: "%"
+          mode: slider
   sequence:
     - variables:
         matched_effect:
@@ -1451,6 +1463,16 @@ light_turn_on_effect:
                 effect: "{{ matched_effect }}"
               target:
                 entity_id: "{{ entity_id }}"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ brightness_pct | default(0) | int > 0 }}"
+          sequence:
+            - action: light.set_brightness
+              target:
+                entity_id: "{{ entity_id }}"
+              data:
+                brightness_pct: "{{ brightness_pct | int }}"
 emils_room_light_switch:
   alias: Emils værelse lys tænd og sluk
   description: Tænd og slut lys på Emils værelse, script til at blive brugt i iPhone widget

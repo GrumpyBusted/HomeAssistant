@@ -126,7 +126,9 @@
             - action: light.turn_on
               continue_on_error: true
               target:
-                entity_id: light.driveway_lights_group
+                entity_id:
+                  - light.driveway_lights_group
+                  - light.driveway_light_left_1
               data:
                 brightness_pct: 100
                 color_temp_kelvin: 3000

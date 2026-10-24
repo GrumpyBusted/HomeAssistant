@@ -60,7 +60,7 @@
                 både Standardfilter (tynde blå) og Pollenfilter (tykke hvide)
               {% else %}
                 Standardfilter (tynde blå)
-              {% endif %} på ventilationsanlægget på loftet. Husk at nulstille filter alarm til 90 dage.
+              {% endif %} på ventilationsanlægget på loftet. Husk at nulstille filter alarm til 90 dage, også på Nilan systemet.
             related_entity_id: sensor.storage_ventilation_system_days_left_until_filter_change
             entity_id: todo.todo_smart_todo
             is_active: "{{ states('sensor.storage_ventilation_system_days_left_until_filter_change') | int(99) < 1 }}"

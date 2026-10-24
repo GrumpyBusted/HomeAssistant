@@ -43,7 +43,7 @@
                     value_template: |-
                       {{ repeat.item == 'sensor.emil_iphone_location_last_updated' }}
                 sequence:
-                  - action: notify.mobile_app_iphone
+                  - action: notify.mobile_app_emil_iphone
                     data:
                       message: request_location_update
 
