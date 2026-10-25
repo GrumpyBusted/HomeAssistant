@@ -16,19 +16,19 @@
       id: daily
 
     - trigger: numeric_state
-      entity_id: sensor.internet_speed_ping
+      entity_id: sensor.home_internet_speed_ping
       above: 20
       for: "00:03:00"
       id: ping_high
 
     - trigger: numeric_state
-      entity_id: sensor.internet_speed_upload
+      entity_id: sensor.home_internet_speed_upload
       below: 100
       for: "00:03:00"
       id: upload_low
 
     - trigger: numeric_state
-      entity_id: sensor.internet_speed_download
+      entity_id: sensor.home_internet_speed_download
       below: 100
       for: "00:03:00"
       id: download_low
@@ -45,7 +45,7 @@
               data:
                 level: warning
                 message: |-
-                  Høj ping opdaget: {{ states('sensor.internet_speed_ping') }} ms
+                  Høj ping opdaget: {{ states('sensor.home_internet_speed_ping') }} ms
             - action: script.push_notification
               data:
                 type: info
@@ -54,7 +54,7 @@
                 id: home_monitor_network_ping_high
                 title: Høj ping opdaget
                 message: |-
-                  Høj ping opdaget på {{ states('sensor.internet_speed_ping') }} ms
+                  Høj ping opdaget på {{ states('sensor.home_internet_speed_ping') }} ms
 
         - conditions:
             - condition: trigger
@@ -64,7 +64,7 @@
               data:
                 level: warning
                 message: |-
-                  Lav LAN upload opdaget: {{ states('sensor.internet_speed_upload') }} Mbps
+                  Lav LAN upload opdaget: {{ states('sensor.home_internet_speed_upload') }} Mbps
             - action: script.push_notification
               data:
                 type: info
@@ -73,7 +73,7 @@
                 id: home_monitor_network_upload_low
                 title: Lav LAN upload opdaget
                 message: |-
-                  Lav LAN upload opdaget på {{ states('sensor.internet_speed_upload') }} Mbps
+                  Lav LAN upload opdaget på {{ states('sensor.home_internet_speed_upload') }} Mbps
 
         - conditions:
             - condition: trigger
@@ -83,7 +83,7 @@
               data:
                 level: warning
                 message: |-
-                  Lav LAN download opdaget: {{ states('sensor.internet_speed_download') }} Mbps
+                  Lav LAN download opdaget: {{ states('sensor.home_internet_speed_download') }} Mbps
             - action: script.push_notification
               data:
                 type: info
@@ -92,7 +92,7 @@
                 id: home_monitor_network_udownload_low
                 title: Lav LAN download opdaget
                 message: |-
-                  Lav LAN download opdaget på {{ states('sensor.internet_speed_download') }} Mbps
+                  Lav LAN download opdaget på {{ states('sensor.home_internet_speed_download') }} Mbps
 
         - conditions:
             - condition: trigger
@@ -139,9 +139,9 @@
                 max_latency: 25
                 max_cpu: 80
                 max_memory: 90
-                download: "{{ states('sensor.internet_speed_download') | float(0) }}"
-                upload: "{{ states('sensor.internet_speed_upload') | float(0) }}"
-                ping: "{{ states('sensor.internet_speed_ping') | float(0) }}"
+                download: "{{ states('sensor.home_internet_speed_download') | float(0) }}"
+                upload: "{{ states('sensor.home_internet_speed_upload') | float(0) }}"
+                ping: "{{ states('sensor.home_internet_speed_ping') | float(0) }}"
                 wan_google: "{{ states('sensor.technic_room_cloud_gateway_google_wan_latency') | float(0) }}"
                 wan_cloudflare: "{{ states('sensor.technic_room_cloud_gateway_cloudflare_wan_latency') | float(0) }}"
                 unifi_devices:
@@ -149,10 +149,10 @@
                   - sensor.emils_room_network_switch_state
                   - sensor.garage_network_switch_state
                   - sensor.living_room_network_switch_state
-                  - sensor.hallway_accesspoint_state
-                  - sensor.living_room_accesspoint_state
-                  - sensor.garage_accesspoint_state
-                  - sensor.patio_accesspoint_state
+                  - sensor.hallway_access_point_state
+                  - sensor.living_room_access_point_state
+                  - sensor.garage_access_point_state
+                  - sensor.patio_access_point_state
                 unifi_problems: |-
                   {% set ns = namespace(list=[]) %}
                   {% for state_sensor  in unifi_devices %}

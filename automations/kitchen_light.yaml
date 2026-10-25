@@ -178,7 +178,7 @@
                       data:
                         brightness_pct: "{{ (state_attr('event.kitchen_switch_rotary', 'steps')|float / 3.60)|round(0) }}"
                       target:
-                        entity_id: light.kitchen_lights
+                        entity_id: light.kitchen_light_group
                 - conditions:
                     - condition: state
                       entity_id: event.kitchen_switch_rotary
@@ -189,13 +189,13 @@
                       data:
                         brightness_step_pct: "{{ (state_attr('event.kitchen_switch_rotary', 'steps')|float / 3.60)|round(0) }}"
                       target:
-                        entity_id: "{{ state_attr('light.kitchen_lights', 'entity_id') |  expand() | selectattr('state', 'eq', 'on') |  map(attribute='entity_id') | list }}"
+                        entity_id: "{{ state_attr('light.kitchen_light_group', 'entity_id') |  expand() | selectattr('state', 'eq', 'on') |  map(attribute='entity_id') | list }}"
               default:
                 - action: light.turn_on
                   data:
                     brightness_step_pct: "{{ (state_attr('event.kitchen_switch_rotary', 'steps')|float / -3.60)|round(0) }}"
                   target:
-                    entity_id: "{{ state_attr('light.kitchen_lights', 'entity_id') | expand() | selectattr('state', 'eq', 'on') | map(attribute='entity_id') | list }}"
+                    entity_id: "{{ state_attr('light.kitchen_light_group', 'entity_id') | expand() | selectattr('state', 'eq', 'on') | map(attribute='entity_id') | list }}"
 
         - conditions:
             - condition: trigger
@@ -305,7 +305,7 @@
                     xy_color: [0.17, 0.70]
                     brightness_pct: 100
                   target:
-                    entity_id: light.kitchen_light_strip_countertop
+                    entity_id: light.kitchen_light_countertop
 
             - conditions:
                 - condition: state
@@ -331,7 +331,7 @@
                     color_temp_kelvin: 2500
                     brightness_pct: 30
                   target:
-                    entity_id: light.kitchen_light_strip_countertop
+                    entity_id: light.kitchen_light_countertop
 
             - conditions:
                 - condition: state
@@ -358,7 +358,7 @@
                     color_temp_kelvin: 1800
                     brightness_pct: 15
                   target:
-                    entity_id: light.kitchen_light_strip_countertop
+                    entity_id: light.kitchen_light_countertop
 
             - conditions:
                 - condition: state
@@ -385,7 +385,7 @@
                   data:
                     transition: 1
                   target:
-                    entity_id: light.kitchen_light_strip_countertop
+                    entity_id: light.kitchen_light_countertop
 
             - conditions:
                 - condition: state
@@ -414,7 +414,7 @@
                     color_temp_kelvin: 2300
                     brightness_pct: 10
                   target:
-                    entity_id: light.kitchen_light_strip_countertop
+                    entity_id: light.kitchen_light_countertop
 
             - conditions:
                 - condition: state
@@ -437,7 +437,7 @@
                     color_temp_kelvin: 2700
                     brightness_pct: 80
                   target:
-                    entity_id: light.kitchen_light_strip_countertop
+                    entity_id: light.kitchen_light_countertop
 
             - conditions:
                 - condition: state
@@ -455,7 +455,7 @@
                   data:
                     transition: 1
                   target:
-                    entity_id: light.kitchen_light_strip_countertop
+                    entity_id: light.kitchen_light_countertop
 
             - conditions:
                 - condition: state
@@ -481,7 +481,7 @@
                     color_temp_kelvin: 2300
                     brightness_pct: 50
                   target:
-                    entity_id: light.kitchen_light_strip_countertop
+                    entity_id: light.kitchen_light_countertop
 
             - conditions:
                 - condition: state
@@ -499,7 +499,7 @@
                   data:
                     transition: 1
                   target:
-                    entity_id: light.kitchen_light_strip_countertop
+                    entity_id: light.kitchen_light_countertop
 
             - conditions:
                 - condition: state
@@ -510,7 +510,7 @@
                   data:
                     transition: 1
                   target:
-                    entity_id: light.kitchen_light_strip_countertop
+                    entity_id: light.kitchen_light_countertop
 
             - conditions:
                 - condition: state
@@ -523,7 +523,7 @@
                     color_temp_kelvin: 2700
                     brightness_pct: 80
                   target:
-                    entity_id: light.kitchen_light_strip_countertop
+                    entity_id: light.kitchen_light_countertop
 
             - conditions:
                 - condition: state
@@ -536,7 +536,7 @@
                     color_temp_kelvin: 2300
                     brightness_pct: 50
                   target:
-                    entity_id: light.kitchen_light_strip_countertop
+                    entity_id: light.kitchen_light_countertop
 
             - conditions:
                 - condition: state
@@ -549,7 +549,7 @@
                     color_temp_kelvin: 2700
                     brightness_pct: 80
                   target:
-                    entity_id: light.kitchen_light_strip_countertop
+                    entity_id: light.kitchen_light_countertop
 
             - conditions:
                 - condition: state
@@ -562,7 +562,7 @@
                     color_temp_kelvin: 3000
                     brightness_pct: 100
                   target:
-                    entity_id: light.kitchen_light_strip_countertop
+                    entity_id: light.kitchen_light_countertop
 
         - choose:
             - conditions:

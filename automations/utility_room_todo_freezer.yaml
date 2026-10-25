@@ -9,7 +9,7 @@
 
   triggers:
     - trigger: numeric_state
-      entity_id: sensor.utility_room_freezer_temperature_sensor_temperature
+      entity_id: sensor.utility_room_temperature_sensor_freezer_temperature
       above: -17
       id: freezer_to_warm
 
@@ -32,7 +32,7 @@
                 id: utility_room_freezer_temperature
                 persistent: false
                 recipient: home
-                message: Fryseren i bryggerset er for varmt, temperaturen er {{ states('sensor.utility_room_freezer_temperature_sensor_temperature') | round(1) }} °C, skal være under -17 °C
+                message: Fryseren i bryggerset er for varmt, temperaturen er {{ states('sensor.utility_room_temperature_sensor_freezer_temperature') | round(1) }} °C, skal være under -17 °C
 
         - conditions:
             - condition: trigger
@@ -43,6 +43,6 @@
                 subject: Indstil temperatur på fryseren i bryggerset
                 entity_id: todo.todo_smart_todo
                 description: |-
-                  Fryseren i bryggersets temperaturen er {{ states('sensor.utility_room_freezer_temperature_sensor_temperature') | round(1) }} °C, bør være -18 °C
-                related_entity_id: sensor.utility_room_freezer_temperature_sensor_temperature
-                is_active: "{{ not (-22 <= (states('sensor.utility_room_freezer_temperature_sensor_temperature') | float(0)) <= -17) }}"
+                  Fryseren i bryggersets temperaturen er {{ states('sensor.utility_room_temperature_sensor_freezer_temperature') | round(1) }} °C, bør være -18 °C
+                related_entity_id: sensor.utility_room_temperature_sensor_freezer_temperature
+                is_active: "{{ not (-22 <= (states('sensor.utility_room_temperature_sensor_freezer_temperature') | float(0)) <= -17) }}"

@@ -41,13 +41,13 @@
       id: timeout
 
     - trigger: state
-      entity_id: light.garage_3d_printer_power
+      entity_id: light.garage_3d_printer_group_power
       from: "on"
       to: "off"
       id: "off"
 
     - trigger: state
-      entity_id: light.garage_3d_printer_power
+      entity_id: light.garage_3d_printer_group_power
       from: "off"
       to: "on"
       id: "on"

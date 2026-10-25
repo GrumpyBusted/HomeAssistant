@@ -395,7 +395,7 @@
       friendly_name: Stue lys skænk højre
       supported_features: 44
       state: 'on'
-    light.living_room_decoration_coffee_table_1:
+    light.living_room_decoration_sofa_1:
       effect_list:
       - 0 Christmas Spiri
       supported_color_modes:
@@ -416,7 +416,7 @@
       friendly_name: Stue lys sofabord 1
       supported_features: 4
       state: 'on'
-    light.living_room_decoration_coffee_table_2:
+    light.living_room_decoration_sofa_2:
       effect_list:
       - 0 Christmas Spiri
       supported_color_modes:
@@ -437,7 +437,7 @@
       friendly_name: Stue lys sofabord 2
       supported_features: 4
       state: 'on'
-    light.living_room_light_dining_table_spot_cabinet:
+    light.living_room_light_dining_cabinet:
       min_color_temp_kelvin: 2202
       max_color_temp_kelvin: 6535
       min_mireds: 153
@@ -470,7 +470,7 @@
       friendly_name: Stue lys spisebord spot skænk
       supported_features: 44
       state: 'on'
-    light.living_room_light_dining_table_spot_sofa:
+    light.living_room_light_dining_sofa:
       min_color_temp_kelvin: 2202
       max_color_temp_kelvin: 6535
       min_mireds: 153
@@ -536,7 +536,7 @@
       friendly_name: Stue lys Escher
       supported_features: 44
       state: 'on'
-    light.living_room_light_strip_glass_cabinet:
+    light.living_room_light_glass_cabinet:
       min_color_temp_kelvin: 2000
       max_color_temp_kelvin: 6535
       min_mireds: 153
@@ -577,7 +577,7 @@
       friendly_name: Stue lys glasskab
       supported_features: 44
       state: 'on'
-    light.living_room_light_strip_receiver:
+    light.living_room_light_receiver:
       min_color_temp_kelvin: 2000
       max_color_temp_kelvin: 6535
       min_mireds: 153
@@ -618,7 +618,7 @@
       friendly_name: Stue lys anlæg
       supported_features: 44
       state: 'on'
-    light.living_room_light_strip_skylight:
+    light.living_room_light_skylight:
       min_color_temp_kelvin: 2000
       max_color_temp_kelvin: 6535
       min_mireds: 153
@@ -659,7 +659,7 @@
       friendly_name: Stue lys ovenlys
       supported_features: 44
       state: 'on'
-    light.living_room_light_table_lamp_cabinet:
+    light.living_room_light_lamp_cabinet:
       min_color_temp_kelvin: 2000
       max_color_temp_kelvin: 6535
       min_mireds: 153
@@ -685,7 +685,7 @@
       friendly_name: Stue lys bordlampe skænk
       supported_features: 40
       state: 'on'
-    light.living_room_light_table_lamp_sofa:
+    light.living_room_light_lamp_sofa:
       min_color_temp_kelvin: 2000
       max_color_temp_kelvin: 6535
       min_mireds: 153
@@ -859,7 +859,7 @@
       friendly_name: Stue lys vindue højre
       supported_features: 44
       state: 'on'
-    light.living_room_smart_plug_christmas_elf_house:
+    light.living_room_smart_plug_elf_house:
       supported_color_modes:
       - onoff
       color_mode: onoff
@@ -918,7 +918,7 @@
       friendly_name: Stue lys TV
       supported_features: 44
       state: 'on'
-    light.living_room_light_gradient_tube_tv:
+    light.living_room_light_tube_tv:
       effect: 'off'
       color_mode: xy
       brightness: 180
@@ -957,7 +957,7 @@
       - 0.704
     light.patio_light_sofa:
       state: 'off'
-    light.patio_light_dining_table:
+    light.patio_light_dining:
       state: 'off'
   icon: mdi:pine-tree-box
 - id: '1766000728406'

@@ -89,7 +89,7 @@
               continue_on_error: true
               target:
                 entity_id:
-                  - light.driveway_lights_group
+                  - light.driveway_light_group
                   - light.driveway_light_left_1
                   - light.driveway_light_right_1
               data:
@@ -108,7 +108,7 @@
               continue_on_error: true
               target:
                 entity_id:
-                  - light.driveway_lights_group
+                  - light.driveway_light_group
                   - light.driveway_light_left_1
                   - light.driveway_light_right_1
               data:
@@ -127,7 +127,7 @@
               continue_on_error: true
               target:
                 entity_id:
-                  - light.driveway_lights_group
+                  - light.driveway_light_group
                   - light.driveway_light_left_1
               data:
                 brightness_pct: 100
@@ -349,6 +349,6 @@
               continue_on_error: true
               target:
                 entity_id:
-                  - light.driveway_lights_group
+                  - light.driveway_light_group
                   - light.driveway_light_left_1
                   - light.driveway_light_right_1

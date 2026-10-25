@@ -11,8 +11,8 @@
       entity_id:
         - sensor.bathroom_temperature_sensor_battery
         - sensor.patio_temperature_sensor_battery
-        - sensor.patio_temperature_sensor_barbeque_battery
-        - sensor.utility_room_freezer_temperature_sensor_battery
+        - sensor.patio_temperature_sensor_barbecue_battery
+        - sensor.utility_room_temperature_sensor_freezer_battery
       below: 10
       for: 00:03:00
 
@@ -20,8 +20,8 @@
       entity_id:
         - sensor.bathroom_temperature_sensor_battery
         - sensor.patio_temperature_sensor_battery
-        - sensor.patio_temperature_sensor_barbeque_battery
-        - sensor.utility_room_freezer_temperature_sensor_battery
+        - sensor.patio_temperature_sensor_barbecue_battery
+        - sensor.utility_room_temperature_sensor_freezer_battery
       above: 20
       for: 00:03:00
 
@@ -29,8 +29,8 @@
       entity_id:
         - sensor.bathroom_temperature_sensor_battery
         - sensor.patio_temperature_sensor_battery
-        - sensor.patio_temperature_sensor_barbeque_battery
-        - sensor.utility_room_freezer_temperature_sensor_battery
+        - sensor.patio_temperature_sensor_barbecue_battery
+        - sensor.utility_room_temperature_sensor_freezer_battery
       above: 70
       for: 00:03:00
 
@@ -48,12 +48,12 @@
           - entity_id: sensor.patio_temperature_sensor_battery
             location: på kontakten over sofa
             temperature: "{{ states('sensor.patio_temperature_sensor_temperature') }}"
-          - entity_id: sensor.patio_temperature_sensor_barbeque_battery
+          - entity_id: sensor.patio_temperature_sensor_barbecue_battery
             location: i skabet under grillen
-            temperature: "{{ states('sensor.patio_temperature_sensor_barbeque_temperature') }}"
-          - entity_id: sensor.utility_room_freezer_temperature_sensor_battery
+            temperature: "{{ states('sensor.patio_temperature_sensor_barbecue_temperature') }}"
+          - entity_id: sensor.utility_room_temperature_sensor_freezer_battery
             location: i kummefryseren
-            temperature: "{{ states('sensor.utility_room_freezer_temperature_sensor_temperature') }}"
+            temperature: "{{ states('sensor.utility_room_temperature_sensor_freezer_temperature') }}"
     - repeat:
         for_each: "{{ sensors }}"
         sequence:

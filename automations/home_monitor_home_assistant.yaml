@@ -8,104 +8,104 @@
 
   triggers:
     - trigger: numeric_state
-      entity_id: sensor.technic_room_system_monitor_swap_usage
+      entity_id: sensor.system_monitor_swap_usage
       above: 10
       for:
         minutes: 2
       id: high_swap_usage
 
     - trigger: numeric_state
-      entity_id: sensor.technic_room_system_monitor_swap_usage
+      entity_id: sensor.system_monitor_swap_usage
       above: 30
       id: critical_swap_usage
 
     - trigger: numeric_state
-      entity_id: sensor.technic_room_system_monitor_processor_temperature
+      entity_id: sensor.system_monitor_processor_temperature
       above: 65
       for:
         minutes: 2
       id: high_cpu_temperature
 
     - trigger: numeric_state
-      entity_id: sensor.technic_room_system_monitor_processor_temperature
+      entity_id: sensor.system_monitor_processor_temperature
       above: 75
       id: critical_cpu_temperature
 
     - trigger: numeric_state
-      entity_id: sensor.technic_room_system_monitor_processor_use
+      entity_id: sensor.system_monitor_processor_use
       above: 70
       for:
         seconds: 60
       id: high_cpu_usage
 
     - trigger: numeric_state
-      entity_id: sensor.technic_room_system_monitor_processor_use
+      entity_id: sensor.system_monitor_processor_use
       above: 90
       id: critical_cpu_usage
 
     - trigger: numeric_state
-      entity_id: sensor.technic_room_system_monitor_memory_usage
+      entity_id: sensor.system_monitor_memory_usage
       above: 85
       for:
         minutes: 2
       id: high_ram_usage
 
     - trigger: numeric_state
-      entity_id: sensor.technic_room_system_monitor_memory_usage
+      entity_id: sensor.system_monitor_memory_usage
       above: 92
       id: critical_ram_usage
 
     - trigger: numeric_state
-      entity_id: sensor.technic_room_system_monitor_disk_usage
+      entity_id: sensor.system_monitor_disk_usage
       above: 80
       for:
         minutes: 5
       id: high_disk_usage
 
     - trigger: numeric_state
-      entity_id: sensor.technic_room_system_monitor_disk_usage
+      entity_id: sensor.system_monitor_disk_usage
       above: 90
       id: critical_disk_usage
 
     - trigger: time
       at:
-        entity_id: sensor.technic_room_system_monitor_last_boot
+        entity_id: sensor.system_monitor_last_boot
         offset: 04:02:00
       id: system_booted
 
     - trigger: numeric_state
-      entity_id: sensor.technic_room_system_monitor_load_1_min
+      entity_id: sensor.system_monitor_load_1_min
       above: 4
       for:
         minutes: 2
       id: high_load_1
 
     - trigger: numeric_state
-      entity_id: sensor.technic_room_system_monitor_load_1_min
+      entity_id: sensor.system_monitor_load_1_min
       above: 6
       id: critical_load_1
 
     - trigger: numeric_state
-      entity_id: sensor.technic_room_system_monitor_load_5_min
+      entity_id: sensor.system_monitor_load_5_min
       above: 4
       for:
         minutes: 5
       id: high_load_5
 
     - trigger: numeric_state
-      entity_id: sensor.technic_room_system_monitor_load_5_min
+      entity_id: sensor.system_monitor_load_5_min
       above: 6
       id: critical_load_5
 
     - trigger: numeric_state
-      entity_id: sensor.technic_room_system_monitor_load_15_min
+      entity_id: sensor.system_monitor_load_15_min
       above: 4
       for:
         minutes: 10
       id: high_load_15
 
     - trigger: numeric_state
-      entity_id: sensor.technic_room_system_monitor_load_15_min
+      entity_id: sensor.system_monitor_load_15_min
       above: 6
       id: critical_load_15
 
@@ -249,7 +249,7 @@
                 title: "Home Assistant: System genstartet"
                 message: |-
                   Home Assistant er blevet genstartet for et øjeblik siden. 
-                  Sidste genstart: {{ states('sensor.technic_room_system_monitor_last_boot') | as_datetime | as_local }}
+                  Sidste genstart: {{ states('sensor.system_monitor_last_boot') | as_datetime | as_local }}
                 notification_type: warning
 
         - conditions:

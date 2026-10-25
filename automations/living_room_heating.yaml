@@ -73,7 +73,7 @@
             temperature: "{{ states('sensor.living_room_desired_temperature') | float(21.0) }}"
             entities:
               - climate.living_room_radiator_thermostat_bookcase
-              - climate.living_room_radiator_thermostat_dining_table
+              - climate.living_room_radiator_thermostat_dining
               - climate.living_room_radiator_thermostat_sofa
               - climate.kitchen_radiator_thermostat
             target_sensor: sensor.living_room_target_temperature

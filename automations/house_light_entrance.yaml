@@ -38,9 +38,9 @@
                 color_temp_kelvin: 2300
               target:
                 entity_id:
-                  - light.house_light_entrance_spot_1
-                  - light.house_light_entrance_spot_2
-                  - light.house_light_entrance_spot_3
+                  - light.house_light_entrance_1
+                  - light.house_light_entrance_2
+                  - light.house_light_entrance_3
 
         - conditions:
             - condition: trigger
@@ -56,9 +56,9 @@
                 color_temp_kelvin: 2700
               target:
                 entity_id:
-                  - light.house_light_entrance_spot_1
-                  - light.house_light_entrance_spot_2
-                  - light.house_light_entrance_spot_3
+                  - light.house_light_entrance_1
+                  - light.house_light_entrance_2
+                  - light.house_light_entrance_3
 
         - conditions:
             - condition: trigger
@@ -69,6 +69,6 @@
                 transition: 1
               target:
                 entity_id:
-                  - light.house_light_entrance_spot_1
-                  - light.house_light_entrance_spot_2
-                  - light.house_light_entrance_spot_3
+                  - light.house_light_entrance_1
+                  - light.house_light_entrance_2
+                  - light.house_light_entrance_3

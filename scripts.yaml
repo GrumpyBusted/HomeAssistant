@@ -1175,16 +1175,16 @@ living_room_light_rotary:
       level: debug
   - variables:
       include:
-      - light.living_room_light_coffee_table_1
-      - light.living_room_light_coffee_table_2
+      - light.living_room_light_sofa_1
+      - light.living_room_light_sofa_2
       exclude:
-      - light.living_room_smart_plug_christmas_elf_house
+      - light.living_room_smart_plug_elf_house
       - light.living_room_smart_plug_receiver_accessories
-      - light.living_room_light_strip_receiver
-      lights: "{% \n  set lights = \n    state_attr('light.living_room_lights', 'entity_id')
-        | list\n%} \n{% \n  set a = (lights + include) \n    | reject('in', exclude)
-        \n    | unique \n    | list \n    | expand() \n%} \n{% set o = a | selectattr('state',
-        'eq', 'on') | list %} \n{% if not o %}\n  {{ a | map(attribute='entity_id')
+      - light.living_room_light_receiver
+      lights: "{% \n  set lights = \n    state_attr('light.living_room_light_group',
+        'entity_id') | list\n%} \n{% \n  set a = (lights + include) \n    | reject('in',
+        exclude) \n    | unique \n    | list \n    | expand() \n%} \n{% set o = a
+        | selectattr('state', 'eq', 'on') | list %} \n{% if not o %}\n  {{ a | map(attribute='entity_id')
         | list }}\n{% else %}\n  {{ o | map(attribute='entity_id') | list }}\n{% endif
         %}"
   - action: system_log.write
@@ -1406,7 +1406,7 @@ living_room_light_sofa_toggle:
       sequence: []
     - conditions:
       - condition: state
-        entity_id: light.living_room_decoration_coffee_table_1
+        entity_id: light.living_room_decoration_sofa_1
         state: 'on'
       sequence:
       - action: light.turn_off
@@ -1414,8 +1414,8 @@ living_room_light_sofa_toggle:
           transition: 1
         target:
           entity_id:
-          - light.living_room_decoration_coffee_table_1
-          - light.living_room_decoration_coffee_table_2
+          - light.living_room_decoration_sofa_1
+          - light.living_room_decoration_sofa_2
     default:
     - action: light.turn_on
       data:
@@ -1424,8 +1424,8 @@ living_room_light_sofa_toggle:
         brightness_pct: 80
       target:
         entity_id:
-        - light.living_room_decoration_coffee_table_1
-        - light.living_room_decoration_coffee_table_2
+        - light.living_room_decoration_sofa_1
+        - light.living_room_decoration_sofa_2
   mode: queued
   max: 10
 bedroom_blind_up:
@@ -1569,7 +1569,7 @@ emils_room_light_switch:
         data:
           transition: 1
         target:
-          entity_id: light.emils_room_lights
+          entity_id: light.emils_room_light_group
     default:
     - action: light.turn_on
       data:
@@ -1577,4 +1577,4 @@ emils_room_light_switch:
         color_temp_kelvin: 2700
         brightness_pct: 80
       target:
-        entity_id: light.emils_room_lights
+        entity_id: light.emils_room_light_group

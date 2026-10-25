@@ -85,15 +85,15 @@
 
     - trigger: numeric_state
       entity_id:
-        - cover.living_room_skylight_cover_north
-        - cover.living_room_skylight_cover_south
+        - cover.living_room_skylight_blind_north
+        - cover.living_room_skylight_blind_south
       attribute: current_position
       above: 50
 
     - trigger: numeric_state
       entity_id:
-        - cover.living_room_skylight_cover_north
-        - cover.living_room_skylight_cover_south
+        - cover.living_room_skylight_blind_north
+        - cover.living_room_skylight_blind_south
       attribute: current_position
       below: 50
 
@@ -293,7 +293,7 @@
                     brightness_pct: 50
                   target:
                     entity_id:
-                      - light.living_room_light_strip_skylight
+                      - light.living_room_light_skylight
 
             - conditions:
                 - condition: state
@@ -305,18 +305,18 @@
                     transition: 1
                   target:
                     entity_id:
-                      - light.living_room_light_strip_skylight
+                      - light.living_room_light_skylight
 
             - conditions:
                 - condition: numeric_state
                   entity_id: sensor.home_outside_illuminance
                   above: 1000
                 - condition: numeric_state
-                  entity_id: cover.living_room_skylight_cover_north
+                  entity_id: cover.living_room_skylight_blind_north
                   attribute: current_position
                   above: 50
                 - condition: numeric_state
-                  entity_id: cover.living_room_skylight_cover_south
+                  entity_id: cover.living_room_skylight_blind_south
                   attribute: current_position
                   above: 50
                 - condition: template
@@ -327,7 +327,7 @@
                     transition: 1
                   target:
                     entity_id:
-                      - light.living_room_light_strip_skylight
+                      - light.living_room_light_skylight
 
             - conditions:
                 - condition: numeric_state
@@ -355,7 +355,7 @@
                     brightness_pct: 15
                   target:
                     entity_id:
-                      - light.living_room_light_strip_skylight
+                      - light.living_room_light_skylight
 
             - conditions:
                 - condition: numeric_state
@@ -382,7 +382,7 @@
                     brightness_pct: 30
                   target:
                     entity_id:
-                      - light.living_room_light_strip_skylight
+                      - light.living_room_light_skylight
 
             - conditions:
                 - condition: state
@@ -396,7 +396,7 @@
                     brightness_pct: 80
                   target:
                     entity_id:
-                      - light.living_room_light_strip_skylight
+                      - light.living_room_light_skylight
 
             - conditions:
                 - condition: state
@@ -410,7 +410,7 @@
                     brightness_pct: 75
                   target:
                     entity_id:
-                      - light.living_room_light_strip_skylight
+                      - light.living_room_light_skylight
 
             - conditions:
                 - condition: state
@@ -424,7 +424,7 @@
                     brightness_pct: 50
                   target:
                     entity_id:
-                      - light.living_room_light_strip_skylight
+                      - light.living_room_light_skylight
 
             - conditions:
                 - condition: state
@@ -438,7 +438,7 @@
                     brightness_pct: 100
                   target:
                     entity_id:
-                      - light.living_room_light_strip_skylight
+                      - light.living_room_light_skylight
 
         - choose:
             - conditions:
@@ -458,8 +458,7 @@
                   target:
                     entity_id:
                       - light.living_room_light_strip_tv
-                      - light.living_room_light_gradient_tube_tv
-
+                      - light.living_room_light_tube_tv
             - conditions:
                 - condition: numeric_state
                   entity_id: sensor.home_outside_illuminance
@@ -487,8 +486,7 @@
                   target:
                     entity_id:
                       - light.living_room_light_strip_tv
-                      - light.living_room_light_gradient_tube_tv
-
+                      - light.living_room_light_tube_tv
             - conditions:
                 - condition: numeric_state
                   entity_id: sensor.home_outside_illuminance
@@ -515,8 +513,7 @@
                   target:
                     entity_id:
                       - light.living_room_light_strip_tv
-                      - light.living_room_light_gradient_tube_tv
-
+                      - light.living_room_light_tube_tv
             - conditions:
                 - condition: state
                   entity_id: input_select.living_room_light_mode
@@ -530,8 +527,7 @@
                   target:
                     entity_id:
                       - light.living_room_light_strip_tv
-                      - light.living_room_light_gradient_tube_tv
-
+                      - light.living_room_light_tube_tv
             - conditions:
                 - condition: state
                   entity_id: input_select.living_room_light_mode
@@ -545,7 +541,7 @@
                   target:
                     entity_id:
                       - light.living_room_light_strip_tv
-                      - light.living_room_light_gradient_tube_tv
+                      - light.living_room_light_tube_tv
           default:
             - action: light.turn_off
               data:
@@ -553,7 +549,7 @@
               target:
                 entity_id:
                   - light.living_room_light_strip_tv
-                  - light.living_room_light_gradient_tube_tv
+                  - light.living_room_light_tube_tv
 
         - choose:
             - conditions:
@@ -572,8 +568,8 @@
                     transition: 1
                   target:
                     entity_id:
-                      - light.living_room_light_dining_table_spot_cabinet
-                      - light.living_room_light_dining_table_spot_sofa
+                      - light.living_room_light_dining_cabinet
+                      - light.living_room_light_dining_sofa
 
             - conditions:
                 - condition: numeric_state
@@ -587,8 +583,8 @@
                     transition: 1
                   target:
                     entity_id:
-                      - light.living_room_light_dining_table_spot_cabinet
-                      - light.living_room_light_dining_table_spot_sofa
+                      - light.living_room_light_dining_cabinet
+                      - light.living_room_light_dining_sofa
 
             - conditions:
                 - condition: numeric_state
@@ -613,8 +609,8 @@
                     transition: 1
                   target:
                     entity_id:
-                      - light.living_room_light_dining_table_spot_cabinet
-                      - light.living_room_light_dining_table_spot_sofa
+                      - light.living_room_light_dining_cabinet
+                      - light.living_room_light_dining_sofa
 
             - conditions:
                 - condition: state
@@ -628,8 +624,8 @@
                     brightness_pct: 100
                   target:
                     entity_id:
-                      - light.living_room_light_dining_table_spot_cabinet
-                      - light.living_room_light_dining_table_spot_sofa
+                      - light.living_room_light_dining_cabinet
+                      - light.living_room_light_dining_sofa
 
             - conditions:
                 - condition: state
@@ -643,16 +639,16 @@
                     brightness_pct: 100
                   target:
                     entity_id:
-                      - light.living_room_light_dining_table_spot_cabinet
-                      - light.living_room_light_dining_table_spot_sofa
+                      - light.living_room_light_dining_cabinet
+                      - light.living_room_light_dining_sofa
           default:
             - action: light.turn_off
               data:
                 transition: 1
               target:
                 entity_id:
-                  - light.living_room_light_dining_table_spot_cabinet
-                  - light.living_room_light_dining_table_spot_sofa
+                  - light.living_room_light_dining_cabinet
+                  - light.living_room_light_dining_sofa
 
         - choose:
             - conditions:
@@ -671,7 +667,7 @@
                     transition: 1
                   target:
                     entity_id:
-                      - light.living_room_decoration_coffee_table
+                      - light.living_room_decoration_sofa
 
             - conditions:
                 - condition: numeric_state
@@ -685,7 +681,7 @@
                     transition: 1
                   target:
                     entity_id:
-                      - light.living_room_decoration_coffee_table
+                      - light.living_room_decoration_sofa
 
             - conditions:
                 - condition: state
@@ -696,10 +692,10 @@
               sequence:
                 - action: script.light_turn_on_effect
                   data:
-                    entity_id: light.living_room_decoration_coffee_table
+                    entity_id: light.living_room_decoration_sofa
                     entity_id_mode:
-                      - select.living_room_decoration_coffee_table_1_mode
-                      - select.living_room_decoration_coffee_table_2_mode
+                      - select.living_room_decoration_sofa_1_mode
+                      - select.living_room_decoration_sofa_2_mode
                     effect: Stripes
                     brightness_pct: 100
 
@@ -712,10 +708,10 @@
               sequence:
                 - action: script.light_turn_on_effect
                   data:
-                    entity_id: light.living_room_decoration_coffee_table
+                    entity_id: light.living_room_decoration_sofa
                     entity_id_mode:
-                      - select.living_room_decoration_coffee_table_1_mode
-                      - select.living_room_decoration_coffee_table_2_mode
+                      - select.living_room_decoration_sofa_1_mode
+                      - select.living_room_decoration_sofa_2_mode
                     effect: Christmas
                     brightness_pct: 100
 
@@ -731,7 +727,7 @@
                     brightness_pct: 80
                   target:
                     entity_id:
-                      - light.living_room_decoration_coffee_table
+                      - light.living_room_decoration_sofa
 
             - conditions:
                 - condition: state
@@ -742,10 +738,10 @@
               sequence:
                 - action: script.light_turn_on_effect
                   data:
-                    entity_id: light.living_room_decoration_coffee_table
+                    entity_id: light.living_room_decoration_sofa
                     entity_id_mode:
-                      - select.living_room_decoration_coffee_table_1_mode
-                      - select.living_room_decoration_coffee_table_2_mode
+                      - select.living_room_decoration_sofa_1_mode
+                      - select.living_room_decoration_sofa_2_mode
                     effect: Stripes
                     brightness_pct: 5
 
@@ -758,10 +754,10 @@
               sequence:
                 - action: script.light_turn_on_effect
                   data:
-                    entity_id: light.living_room_decoration_coffee_table
+                    entity_id: light.living_room_decoration_sofa
                     entity_id_mode:
-                      - select.living_room_decoration_coffee_table_1_mode
-                      - select.living_room_decoration_coffee_table_2_mode
+                      - select.living_room_decoration_sofa_1_mode
+                      - select.living_room_decoration_sofa_2_mode
                     effect: Sparkle
 
             - conditions:
@@ -776,7 +772,7 @@
                     brightness_pct: 100
                   target:
                     entity_id:
-                      - light.living_room_decoration_coffee_table
+                      - light.living_room_decoration_sofa
 
           default:
             - action: light.turn_off
@@ -784,7 +780,7 @@
                 transition: 1
               target:
                 entity_id:
-                  - light.living_room_decoration_coffee_table
+                  - light.living_room_decoration_sofa
 
         - choose:
             - conditions:
@@ -812,11 +808,11 @@
                       - light.living_room_light_escher
                       - light.living_room_light_window_left
                       - light.living_room_light_window_right
-                      - light.living_room_light_strip_glass_cabinet
+                      - light.living_room_light_glass_cabinet
                       - light.living_room_smart_plug_lamp
-                      - light.living_room_smart_plug_christmas_elf_house
-                      - light.living_room_light_table_lamp_cabinet
-                      - light.living_room_light_table_lamp_sofa
+                      - light.living_room_smart_plug_elf_house
+                      - light.living_room_light_lamp_cabinet
+                      - light.living_room_light_lamp_sofa
 
             - conditions:
                 - condition: numeric_state
@@ -850,11 +846,11 @@
                       - light.living_room_light_escher
                       - light.living_room_light_window_left
                       - light.living_room_light_window_right
-                      - light.living_room_light_strip_glass_cabinet
+                      - light.living_room_light_glass_cabinet
                       - light.living_room_smart_plug_lamp
-                      - light.living_room_smart_plug_christmas_elf_house
-                      - light.living_room_light_table_lamp_cabinet
-                      - light.living_room_light_table_lamp_sofa
+                      - light.living_room_smart_plug_elf_house
+                      - light.living_room_light_lamp_cabinet
+                      - light.living_room_light_lamp_sofa
 
             - conditions:
                 - condition: state
@@ -882,15 +878,15 @@
                       target:
                         entity_id:
                           - light.living_room_smart_plug_lamp
-                          - light.living_room_smart_plug_christmas_elf_house
+                          - light.living_room_smart_plug_elf_house
                     - action: light.turn_off
                       data:
                         transition: 1
                       target:
                         entity_id:
-                          - light.living_room_light_strip_glass_cabinet
-                          - light.living_room_light_table_lamp_cabinet
-                          - light.living_room_light_table_lamp_sofa
+                          - light.living_room_light_glass_cabinet
+                          - light.living_room_light_lamp_cabinet
+                          - light.living_room_light_lamp_sofa
 
             - conditions:
                 - condition: state
@@ -909,9 +905,9 @@
                           - light.living_room_light_bookcase_right
                           - light.living_room_light_cabinet_left
                           - light.living_room_light_cabinet_right
-                          - light.living_room_light_strip_glass_cabinet
-                          - light.living_room_light_table_lamp_cabinet
-                          - light.living_room_light_table_lamp_sofa
+                          - light.living_room_light_glass_cabinet
+                          - light.living_room_light_lamp_cabinet
+                          - light.living_room_light_lamp_sofa
                     - action: light.turn_on
                       data:
                         transition: 1
@@ -924,7 +920,7 @@
                       target:
                         entity_id:
                           - light.living_room_smart_plug_lamp
-                          - light.living_room_smart_plug_christmas_elf_house
+                          - light.living_room_smart_plug_elf_house
                     - action: light.turn_off
                       data:
                         transition: 1
@@ -960,14 +956,14 @@
                         brightness_pct: 50
                       target:
                         entity_id:
-                          - light.living_room_light_strip_glass_cabinet
-                          - light.living_room_light_table_lamp_cabinet
-                          - light.living_room_light_table_lamp_sofa
+                          - light.living_room_light_glass_cabinet
+                          - light.living_room_light_lamp_cabinet
+                          - light.living_room_light_lamp_sofa
                     - action: light.turn_on
                       target:
                         entity_id:
                           - light.living_room_smart_plug_lamp
-                          - light.living_room_smart_plug_christmas_elf_house
+                          - light.living_room_smart_plug_elf_house
                     - action: light.turn_off
                       data:
                         transition: 1
@@ -1000,11 +996,11 @@
                           - light.living_room_light_escher
                           - light.living_room_light_window_left
                           - light.living_room_light_window_right
-                          - light.living_room_light_strip_glass_cabinet
-                          - light.living_room_light_table_lamp_cabinet
-                          - light.living_room_light_table_lamp_sofa
+                          - light.living_room_light_glass_cabinet
+                          - light.living_room_light_lamp_cabinet
+                          - light.living_room_light_lamp_sofa
                     - action: light.turn_on
                       target:
                         entity_id:
                           - light.living_room_smart_plug_lamp
-                          - light.living_room_smart_plug_christmas_elf_house
+                          - light.living_room_smart_plug_elf_house

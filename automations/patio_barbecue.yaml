@@ -9,19 +9,19 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.patio_barbeque_hot
+      entity_id: binary_sensor.patio_barbecue_hot
       to: "on"
-      id: barbeque_on
+      id: barbecue_on
 
     - trigger: state
-      entity_id: binary_sensor.patio_barbeque_hot
+      entity_id: binary_sensor.patio_barbecue_hot
       to: "off"
-      id: barbeque_off
+      id: barbecue_off
 
     - trigger: event
       event_type: timer.finished
       event_data:
-        entity_id: timer.patio_temperature_sensor_barbeque_hot_timer
+        entity_id: timer.patio_temperature_sensor_barbecue_hot_timer
       id: timer_finished
 
     - trigger: state
@@ -35,21 +35,21 @@
     - choose:
         - conditions:
             - condition: trigger
-              id: barbeque_on
+              id: barbecue_on
           sequence:
             - action: timer.start
               target:
-                entity_id: timer.patio_temperature_sensor_barbeque_hot_timer
+                entity_id: timer.patio_temperature_sensor_barbecue_hot_timer
               data:
                 duration: "03:00:00"
 
         - conditions:
             - condition: trigger
-              id: barbeque_off
+              id: barbecue_off
           sequence:
             - action: timer.cancel
               target:
-                entity_id: timer.patio_temperature_sensor_barbeque_hot_timer
+                entity_id: timer.patio_temperature_sensor_barbecue_hot_timer
 
         - conditions:
             - condition: trigger
@@ -57,21 +57,21 @@
                 - nobody_home
                 - timer_finished
             - condition: state
-              entity_id: binary_sensor.patio_barbeque_hot
+              entity_id: binary_sensor.patio_barbecue_hot
               state: "on"
           sequence:
             - action: script.push_notification
               data:
                 type: warning
                 title: Grillen er stadig varm
-                id: patio_barbeque_warning
+                id: patio_barbecue_warning
                 recipient: home
                 message: |
                   Grillen er stadig væsentligt varmere end terrassen.
-                  Grill: {{ states('sensor.patio_temperature_sensor_barbeque_temperature') }} °C.
+                  Grill: {{ states('sensor.patio_temperature_sensor_barbecue_temperature') }} °C.
                   Terrasse: {{ states('sensor.patio_temperature_sensor_temperature') }} °C.
             - action: timer.start
               target:
-                entity_id: timer.patio_temperature_sensor_barbeque_hot_timer
+                entity_id: timer.patio_temperature_sensor_barbecue_hot_timer
               data:
                 duration: "01:00:00"

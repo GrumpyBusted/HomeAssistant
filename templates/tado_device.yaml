@@ -64,7 +64,7 @@
             "VA0380921600": "climate.bedroom_radiator_thermostat",       
             "VA3214501632": "climate.living_room_radiator_thermostat_bookcase",      
             "VA2912511744": "climate.living_room_radiator_thermostat_sofa",      
-            "VA4237190656": "climate.living_room_radiator_thermostat_dining_table", 
+            "VA4237190656": "climate.living_room_radiator_thermostat_dining", 
             "VA1929864960": "climate.toilet_radiator_thermostat",          
             "RU1998022400": "climate.utility_room_temperature_sensor",              
             "SU3237438976": "sensor.emils_room_temperature_sensor_temperature",              
