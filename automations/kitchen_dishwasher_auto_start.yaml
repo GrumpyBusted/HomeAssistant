@@ -1,0 +1,39 @@
+- id: kitchen_dishwasher_auto_start
+  alias: Køkken opvaskemaskine automatik start
+  description: |
+    Aktiverer automatisk start, når opvaskemaskinens er fyldt.
+  mode: single
+  trace:
+    stored_traces: 100
+
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.kitchen_dishwasher_full
+      above: 70
+      id: full
+
+    - trigger: state
+      entity_id: input_select.kitchen_dishwasher_state
+      to:
+        - finished
+        - dirty
+      id: done
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: full
+          sequence:
+            - action: input_boolean.turn_on
+              data:
+                entity_id: input_boolean.kitchen_dishwasher_auto_start
+        - conditions:
+            - condition: trigger
+              id: done
+          sequence:
+            - action: input_boolean.turn_off
+              data:
+                entity_id: input_boolean.kitchen_dishwasher_auto_start

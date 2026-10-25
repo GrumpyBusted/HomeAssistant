@@ -80,7 +80,7 @@
             - parallel:
                 - action: light.turn_on
                   target:
-                    entity_id: light.charlies_room_smart_plug_string_lights
+                    entity_id: light.charlies_room_smart_plug_string_light
 
                 - action: light.turn_on
                   target:
@@ -99,7 +99,7 @@
             - parallel:
                 - action: light.turn_on
                   target:
-                    entity_id: light.charlies_room_smart_plug_string_lights
+                    entity_id: light.charlies_room_smart_plug_string_light
 
                 - action: light.turn_on
                   target:
@@ -153,7 +153,7 @@
           sequence:
             - action: light.toggle
               target:
-                entity_id: light.charlies_room_smart_plug_string_lights
+                entity_id: light.charlies_room_smart_plug_string_light
 
         - conditions:
             - condition: trigger
@@ -194,7 +194,7 @@
           sequence:
             - action: light.turn_on
               target:
-                entity_id: light.charlies_room_smart_plug_string_lights
+                entity_id: light.charlies_room_smart_plug_string_light
 
         - conditions:
             - condition: trigger

@@ -18,9 +18,9 @@
     - condition: state
       entity_id: binary_sensor.kitchen_dishwasher_door_safe
       state: "off"
-    - condition: numeric_state
-      entity_id: sensor.kitchen_dishwasher_full
-      above: 70
+    - condition: state
+      entity_id: input_boolean.kitchen_dishwasher_auto_start
+      state: "on"
 
   actions:
     - action: switch.turn_on

@@ -1,0 +1,29 @@
+- id: storage_todo_door
+  alias: Loftrum todo dør
+  description: |
+    Opretter todo-opgaver om døren til loftrummet står åben.
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.technic_room_door
+
+    - trigger: state
+      entity_id: binary_sensor.storage_door
+
+    - trigger: time
+      at: "03:39:00"
+
+  conditions: []
+
+  actions:
+    - action: script.create_todo_task
+      data:
+        subject: Luk døren til loftrummet
+        description: Døren ud til det store opbevaringsrum på loftet er åben, luk den.
+        related_entity_id: binary_sensor.storage_door
+        entity_id: todo.todo_smart_todo
+        is_active: "{{ is_state('binary_sensor.storage_door', 'on') and is_state('binary_sensor.technic_room_door', 'off') }}"

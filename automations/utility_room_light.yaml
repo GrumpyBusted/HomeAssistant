@@ -64,9 +64,20 @@
 
         - conditions:
             - condition: trigger
-              id:
-                - no_one_home
-                - cleared
+              id: cleared
+            - condition: state
+              entity_id: binary_sensor.technic_room_door
+              state: "on"
+          sequence:
+            - action: light.turn_off
+              target:
+                entity_id: light.utility_room_light_group
+              data:
+                transition: 1
+
+        - conditions:
+            - condition: trigger
+              id: no_one_home
           sequence:
             - action: light.turn_off
               target:
