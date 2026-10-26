@@ -133,6 +133,9 @@
         - conditions:
             - condition: trigger
               id: meal_done
+            - condition: state
+              entity_id: input_select.kitchen_dishwasher_state
+              state: dirty
           sequence:
             - action: input_number.set_value
               target:
