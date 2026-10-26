@@ -15,7 +15,7 @@
     - trigger: state
       entity_id: input_select.kitchen_dishwasher_state
       to:
-        - finished
+        - finishing
         - dirty
       id: done
 

@@ -39,7 +39,7 @@
             entity_id: timer.home_monitor_entities_timer
         - variables:
             exclude_entities:
-              - light.living_room_smart_plug_christmas_elf_house
+              - light.living_room_smart_plug_elf_house
               - light.charlies_room_light_bed_lamp
               - light.charlies_room_light_dresser
               - sensor.living_room_printer_black_bk

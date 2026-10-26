@@ -20,6 +20,18 @@
       to: "off"
       id: cleared
 
+    - trigger: state
+      entity_id: binary_sensor.kitchen_presence
+      from: "off"
+      to: "on"
+      id: present
+
+    - trigger: state
+      entity_id: binary_sensor.kitchen_presence
+      from: "on"
+      to: "off"
+      id: away
+
   conditions: []
 
   actions:
@@ -28,11 +40,6 @@
             - condition: trigger
               id: detected
           sequence:
-            - action: input_datetime.set_datetime
-              target:
-                entity_id: input_datetime.kitchen_presence_sensor_start
-              data:
-                datetime: "{{ now() }}"
             - action: timer.cancel
               target:
                 entity_id: timer.kitchen_presence_sensor_timer
@@ -45,6 +52,26 @@
         - conditions:
             - condition: trigger
               id: cleared
+          sequence:
+            - action: timer.start
+              target:
+                entity_id: timer.kitchen_presence_sensor_timer
+              data:
+                duration: 00:03:00
+
+        - conditions:
+            - condition: trigger
+              id: present
+          sequence:
+            - action: input_datetime.set_datetime
+              target:
+                entity_id: input_datetime.kitchen_presence_sensor_start
+              data:
+                datetime: "{{ now() }}"
+
+        - conditions:
+            - condition: trigger
+              id: away
           sequence:
             - action: input_number.set_value
               target:
@@ -62,8 +89,3 @@
                 value: |-
                   {% set start = states('input_datetime.kitchen_presence_sensor_start') | as_datetime | as_local %}
                   {{ ((as_timestamp(now()) - as_timestamp(start)) / 60) | round(0) | int }}
-            - action: timer.start
-              target:
-                entity_id: timer.kitchen_presence_sensor_timer
-              data:
-                duration: 00:03:00

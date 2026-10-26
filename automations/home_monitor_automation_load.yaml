@@ -16,7 +16,7 @@
     - variables:
         default_limit: 100
         custom_limits:
-          automation.bathroom_motion_sensor: 300
+          automation.bathroom_motion_sensor: 400
           automation.bedroom_presence_sensor: 200
           automation.bedroom_air_purifier: 400
           automation.driveway_light: 300

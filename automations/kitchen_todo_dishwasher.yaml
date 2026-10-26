@@ -24,28 +24,34 @@
       id: problem
 
     - trigger: numeric_state
-      entity_id: sensor.kitchen_dishwasher_powerdisk_level
+      entity_id: sensor.kitchen_dishwasher_powerdisk_level_safe
       below: 4
+      for: "00:05:00"
 
     - trigger: numeric_state
-      entity_id: sensor.kitchen_dishwasher_powerdisk_level
+      entity_id: sensor.kitchen_dishwasher_powerdisk_level_safe
       above: 80
+      for: "00:05:00"
 
     - trigger: numeric_state
-      entity_id: sensor.kitchen_dishwasher_salt_level
+      entity_id: sensor.kitchen_dishwasher_salt_level_safe
       below: 15
+      for: "00:05:00"
 
     - trigger: numeric_state
-      entity_id: sensor.kitchen_dishwasher_salt_level
+      entity_id: sensor.kitchen_dishwasher_salt_level_safe
       above: 80
+      for: "00:05:00"
 
     - trigger: numeric_state
-      entity_id: sensor.kitchen_dishwasher_rinse_aid_level
+      entity_id: sensor.kitchen_dishwasher_rinse_aid_level_safe
       below: 33
+      for: "00:05:00"
 
     - trigger: numeric_state
-      entity_id: sensor.kitchen_dishwasher_rinse_aid_level
+      entity_id: sensor.kitchen_dishwasher_rinse_aid_level_safe
       above: 80
+      for: "00:05:00"
 
   conditions: []
 
