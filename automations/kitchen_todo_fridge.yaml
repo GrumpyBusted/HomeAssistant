@@ -135,6 +135,7 @@
                 entity_id: todo.todo_smart_todo
                 description: Køleskabet i køkkenets temperaturen er {{ states('sensor.kitchen_fridge_fridge_temperature') | round(1) }} °C, bør være 3 °C
                 related_entity_id: sensor.kitchen_fridge_fridge_temperature
+                must_replace: true
                 is_active: "{{ not (2 <= (states('sensor.kitchen_fridge_fridge_temperature') | float(0)) <= 5) }}"
             - action: script.create_todo_task
               data:
@@ -142,4 +143,5 @@
                 entity_id: todo.todo_smart_todo
                 description: Fryseren i køkkenets temperaturen er {{ states('sensor.kitchen_fridge_freezer_temperature') | round(1) }} °C, bør være -18 °C
                 related_entity_id: sensor.kitchen_fridge_freezer_temperature
+                must_replace: true
                 is_active: "{{ not (-22 <= (states('sensor.kitchen_fridge_freezer_temperature') | float(0)) <= -17) }}"

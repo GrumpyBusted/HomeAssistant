@@ -45,4 +45,5 @@
                 description: |-
                   Fryseren i bryggersets temperaturen er {{ states('sensor.utility_room_temperature_sensor_freezer_temperature') | round(1) }} °C, bør være -18 °C
                 related_entity_id: sensor.utility_room_temperature_sensor_freezer_temperature
+                must_replace: true
                 is_active: "{{ not (-22 <= (states('sensor.utility_room_temperature_sensor_freezer_temperature') | float(0)) <= -17) }}"

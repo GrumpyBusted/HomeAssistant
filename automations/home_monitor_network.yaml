@@ -1,61 +1,50 @@
 - id: home_monitor_network
   alias: Hjem overvåg netværk
-  description: |
+  description: |-
     Overvåger internetforbindelsen og netværksenhederne.
-  mode: single
+  mode: parallel
+  max: 10
+  max_exceeded: silent
   trace:
-    stored_traces: 20
+    stored_traces: 30
 
   triggers:
     - trigger: time_pattern
-      hours: /1
+      hours: "/1"
       id: hourly
 
     - trigger: time
-      at: 03:24:00
+      at: "03:24:00"
       id: daily
-
-    - trigger: numeric_state
-      entity_id: sensor.home_internet_speed_ping
-      above: 20
-      for: "00:03:00"
-      id: ping_high
 
     - trigger: numeric_state
       entity_id: sensor.home_internet_speed_upload
       below: 100
-      for: "00:03:00"
+      for: "00:05:00"
       id: upload_low
 
     - trigger: numeric_state
       entity_id: sensor.home_internet_speed_download
       below: 100
-      for: "00:03:00"
+      for: "00:05:00"
       id: download_low
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_cloud_gateway_google_wan_latency
+      above: 25
+      for: "00:05:00"
+      id: google_latency_high
+
+    - trigger: numeric_state
+      entity_id: sensor.technic_room_cloud_gateway_cloudflare_wan_latency
+      above: 25
+      for: "00:05:00"
+      id: cloudflare_latency_high
 
   conditions: []
 
   actions:
     - choose:
-        - conditions:
-            - condition: trigger
-              id: ping_high
-          sequence:
-            - action: system_log.write
-              data:
-                level: warning
-                message: |-
-                  Høj ping opdaget: {{ states('sensor.home_internet_speed_ping') }} ms
-            - action: script.push_notification
-              data:
-                type: info
-                recipient: none
-                persistent: true
-                id: home_monitor_network_ping_high
-                title: Høj ping opdaget
-                message: |-
-                  Høj ping opdaget på {{ states('sensor.home_internet_speed_ping') }} ms
-
         - conditions:
             - condition: trigger
               id: upload_low
@@ -64,16 +53,18 @@
               data:
                 level: warning
                 message: |-
-                  Lav LAN upload opdaget: {{ states('sensor.home_internet_speed_upload') }} Mbps
+                  Lav LAN-upload: {{ states('sensor.home_internet_speed_upload') }} Mbps
+
             - action: script.push_notification
               data:
                 type: info
                 recipient: none
                 persistent: true
                 id: home_monitor_network_upload_low
-                title: Lav LAN upload opdaget
+                title: Lav LAN-upload
                 message: |-
-                  Lav LAN upload opdaget på {{ states('sensor.home_internet_speed_upload') }} Mbps
+                  LAN-upload har været under 100 Mbps i mindst 5 minutter.
+                  Aktuel værdi: {{ states('sensor.home_internet_speed_upload') }} Mbps
 
         - conditions:
             - condition: trigger
@@ -83,16 +74,60 @@
               data:
                 level: warning
                 message: |-
-                  Lav LAN download opdaget: {{ states('sensor.home_internet_speed_download') }} Mbps
+                  Lav LAN-download: {{ states('sensor.home_internet_speed_download') }} Mbps
+
             - action: script.push_notification
               data:
                 type: info
                 recipient: none
                 persistent: true
-                id: home_monitor_network_udownload_low
-                title: Lav LAN download opdaget
+                id: home_monitor_network_download_low
+                title: Lav LAN-download
                 message: |-
-                  Lav LAN download opdaget på {{ states('sensor.home_internet_speed_download') }} Mbps
+                  LAN-download har været under 100 Mbps i mindst 5 minutter.
+                  Aktuel værdi: {{ states('sensor.home_internet_speed_download') }} Mbps
+
+        - conditions:
+            - condition: trigger
+              id: google_latency_high
+          sequence:
+            - action: system_log.write
+              data:
+                level: warning
+                message: |-
+                  Høj Google WAN-latency: {{ states('sensor.technic_room_cloud_gateway_google_wan_latency') }} ms
+
+            - action: script.push_notification
+              data:
+                type: info
+                recipient: none
+                persistent: true
+                id: home_monitor_network_google_latency
+                title: Høj Google WAN-latency
+                message: |-
+                  Google WAN-latency har været over 25 ms i mindst 5 minutter.
+                  Aktuel værdi: {{ states('sensor.technic_room_cloud_gateway_google_wan_latency') }} ms
+
+        - conditions:
+            - condition: trigger
+              id: cloudflare_latency_high
+          sequence:
+            - action: system_log.write
+              data:
+                level: warning
+                message: |-
+                  Høj Cloudflare WAN-latency: {{ states('sensor.technic_room_cloud_gateway_cloudflare_wan_latency') }} ms
+
+            - action: script.push_notification
+              data:
+                type: info
+                recipient: none
+                persistent: true
+                id: home_monitor_network_cloudflare_latency
+                title: Høj Cloudflare WAN-latency
+                message: |-
+                  Cloudflare WAN-latency har været over 25 ms i mindst 5 minutter.
+                  Aktuel værdi: {{ states('sensor.technic_room_cloud_gateway_cloudflare_wan_latency') }} ms
 
         - conditions:
             - condition: trigger
@@ -103,42 +138,74 @@
                 user: "{{ states('sensor.unifi_admin_user') }}"
                 password: "{{ state_attr('sensor.unifi_admin_user', 'password') }}"
               response_variable: response
-            - action: system_log.write
-              data:
-                level: debug
-                message: |-
-                  Response: {{ response }}
+
             - variables:
                 speedtest: |-
-                  {% if response.stdout is defined %}
+                  {% if response is mapping and response.stdout is defined and response.stdout | length > 0 %}
                     {{ response.stdout | from_json }}
                   {% else %}
-                    {}
+                    {{ {} }}
                   {% endif %}
-                wan_upload: "{{ speedtest.xput_upload | float(0.0) }}"
-                wan_download: "{{ speedtest.xput_download | float(0.0) }}"
-            - action: input_number.set_value
-              target:
-                entity_id: input_number.technic_room_last_wan_download
-              data:
-                value: "{{ wan_download }}"
-            - action: input_number.set_value
-              target:
-                entity_id: input_number.technic_room_last_wan_upload
-              data:
-                value: "{{ wan_upload }}"
+
+            - if:
+                - condition: template
+                  value_template: "{{ speedtest is mapping }}"
+              then:
+                - variables:
+                    wan_upload: "{{ speedtest.get('xput_upload', 0) | float(0) }}"
+                    wan_download: "{{ speedtest.get('xput_download', 0) | float(0) }}"
+
+                - if:
+                    - condition: template
+                      value_template: "{{ wan_download | float(0) > 0 and wan_upload | float(0) > 0 }}"
+                  then:
+                    - action: input_number.set_value
+                      target:
+                        entity_id: input_number.technic_room_last_wan_download
+                      data:
+                        value: "{{ wan_download }}"
+
+                    - action: input_number.set_value
+                      target:
+                        entity_id: input_number.technic_room_last_wan_upload
+                      data:
+                        value: "{{ wan_upload }}"
+
+                    - if:
+                        - condition: template
+                          value_template: "{{ wan_download | float(0) < 800 or wan_upload | float(0) < 800 }}"
+                      then:
+                        - action: system_log.write
+                          data:
+                            level: warning
+                            message: |-
+                              Lav WAN-hastighed ved daglig test.
+                              Download: {{ wan_download }} Mbps.
+                              Upload: {{ wan_upload }} Mbps.
+
+                        - action: script.push_notification
+                          data:
+                            type: info
+                            recipient: none
+                            persistent: true
+                            id: home_monitor_network_wan_speed
+                            title: Lav WAN-hastighed
+                            message: |-
+                              Daglig hastighedstest viser lav WAN-hastighed.
+                              Download: {{ wan_download }} Mbps.
+                              Upload: {{ wan_upload }} Mbps.
 
         - conditions:
             - condition: trigger
               id: hourly
           sequence:
             - variables:
+                max_cpu: 80
+                max_memory: 90
                 wan_min_speed: 800
                 min_speed: 30
                 max_ping: 50
                 max_latency: 25
-                max_cpu: 80
-                max_memory: 90
                 download: "{{ states('sensor.home_internet_speed_download') | float(0) }}"
                 upload: "{{ states('sensor.home_internet_speed_upload') | float(0) }}"
                 ping: "{{ states('sensor.home_internet_speed_ping') | float(0) }}"
@@ -153,59 +220,61 @@
                   - sensor.living_room_access_point_state
                   - sensor.garage_access_point_state
                   - sensor.patio_access_point_state
+
                 unifi_problems: |-
                   {% set ns = namespace(list=[]) %}
-                  {% for state_sensor  in unifi_devices %}
-                    {% set base = state_sensor | regex_replace('_state$', '') %}
-                    {% set cpu_sensor = base ~ '_cpu_utilization' %}
-                    {% set memory_sensor = base ~ '_memory_utilization' %}
-                    {% set state = states(state_sensor) | lower %}
-                    {% set cpu = states(cpu_sensor) | float(0) %}
-                    {% set memory = states(memory_sensor) | float(0) %}
-                    {% set dev_id = device_id(state_sensor) %}
+                  {% for entity in unifi_devices %}
+                    {% set base = entity | regex_replace('_state$', '') %}
+                    {% set cpu_entity = base ~ '_cpu_utilization' %}
+                    {% set memory_entity = base ~ '_memory_utilization' %}
+                    {% set state = states(entity) | lower %}
+                    {% set cpu_raw = states(cpu_entity) %}
+                    {% set memory_raw = states(memory_entity) %}
+                    {% set dev_id = device_id(entity) %}
                     {% if dev_id %}
-                      {% set dev_name = device_attr(dev_id,'name_by_user') if device_attr(dev_id,'name_by_user') else device_attr(dev_id,'name') %}
+                      {% set name = device_attr(dev_id, 'name_by_user') or device_attr(dev_id, 'name') %}
                     {% else %}
-                      {% set dev_name = base %}
+                      {% set name = base %}
                     {% endif %}
                     {% set issues = [] %}
                     {% if state in ['disconnected', 'offline'] %}
                       {% set issues = issues + ['ikke forbundet (' ~ state ~ ')'] %}
                     {% endif %}
-                    {% if cpu > max_cpu %}
-                      {% set issues = issues + ['CPU ' ~ cpu ~ '%'] %}
+                    {% if is_number(cpu_raw) and cpu_raw | float(0) > max_cpu %}
+                      {% set issues = issues + ['CPU ' ~ cpu_raw ~ '%'] %}
                     {% endif %}
-                    {% if memory > max_memory %}
-                      {% set issues = issues + ['Hukommelse ' ~ memory ~ '%'] %}
+                    {% if is_number(memory_raw) and memory_raw | float(0) > max_memory %}
+                      {% set issues = issues + ['Hukommelse ' ~ memory_raw ~ '%'] %}
                     {% endif %}
                     {% if issues | length > 0 %}
-                      {% set ns.list = ns.list + [dev_name ~ ': ' ~ issues | join(', ')] %}
+                      {% set ns.list = ns.list + [name ~ ': ' ~ issues | join(', ')] %}
                     {% endif %}
                   {% endfor %}
                   {{ ns.list }}
+
                 problems: |-
-                  {% set wan_download_val = states('input_number.technic_room_last_wan_download') | float(0) %}
-                  {% set wan_upload_val = states('input_number.technic_room_last_wan_upload') | float(0) %}
                   {% set issues = [] %}
-                  {% if wan_download_val > 0 and wan_download_val < wan_min_speed %}
-                    {% set issues = issues + ['WAN Download under ' ~ wan_min_speed ~ ' Mbps (' ~ wan_download_val ~ ')'] %}
+                  {% set wan_download = states('input_number.technic_room_last_wan_download') %}
+                  {% set wan_upload = states('input_number.technic_room_last_wan_upload') %}
+                  {% if is_number(wan_download) and wan_download | float(0) > 0 and wan_download | float(0) < wan_min_speed %}
+                    {% set issues = issues + ['WAN Download under ' ~ wan_min_speed ~ ' Mbps (' ~ wan_download ~ ')'] %}
                   {% endif %}
-                  {% if wan_upload_val > 0 and wan_upload_val < wan_min_speed %}
-                    {% set issues = issues + ['WAN Upload under ' ~ wan_min_speed ~ ' Mbps (' ~ wan_upload_val ~ ')'] %}
+                  {% if is_number(wan_upload) and wan_upload | float(0) > 0 and wan_upload | float(0) < wan_min_speed %}
+                    {% set issues = issues + ['WAN Upload under ' ~ wan_min_speed ~ ' Mbps (' ~ wan_upload ~ ')'] %}
                   {% endif %}
-                  {% if download < min_speed %}
+                  {% if is_number(states('sensor.home_internet_speed_download')) and download < min_speed %}
                     {% set issues = issues + ['LAN Download under ' ~ min_speed ~ ' Mbps (' ~ download ~ ')'] %}
                   {% endif %}
-                  {% if upload < min_speed %}
+                  {% if is_number(states('sensor.home_internet_speed_upload')) and upload < min_speed %}
                     {% set issues = issues + ['LAN Upload under ' ~ min_speed ~ ' Mbps (' ~ upload ~ ')'] %}
                   {% endif %}
-                  {% if ping > max_ping %}
+                  {% if is_number(states('sensor.home_internet_speed_ping')) and ping > max_ping %}
                     {% set issues = issues + ['Ping for høj (' ~ ping ~ ' ms)'] %}
                   {% endif %}
-                  {% if wan_google > max_latency %}
+                  {% if is_number(states('sensor.technic_room_cloud_gateway_google_wan_latency')) and wan_google > max_latency %}
                     {% set issues = issues + ['Google WAN latency høj (' ~ wan_google ~ ' ms)'] %}
                   {% endif %}
-                  {% if wan_cloudflare > max_latency %}
+                  {% if is_number(states('sensor.technic_room_cloud_gateway_cloudflare_wan_latency')) and wan_cloudflare > max_latency %}
                     {% set issues = issues + ['Cloudflare WAN latency høj (' ~ wan_cloudflare ~ ' ms)'] %}
                   {% endif %}
                   {% if unifi_problems | count > 0 %}
@@ -222,6 +291,7 @@
                     level: warning
                     message: |-
                       Netværksproblem: {{ problems }}
+
                 - action: script.push_notification
                   data:
                     type: info

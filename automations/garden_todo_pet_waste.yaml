@@ -17,6 +17,10 @@
       hours: "/1"
       id: check_pet_waste
 
+    - trigger: state
+      entity_id: binary_sensor.home_outside_light
+      id: light
+
     - trigger: event
       event_type: todo_item_completed
       event_data:
@@ -32,6 +36,7 @@
               id:
                 - door_opened
                 - check_pet_waste
+                - light
           sequence:
             - action: script.create_todo_task
               data:
@@ -43,7 +48,7 @@
                 is_active: |-
                   {% set h = (now().timestamp() - as_timestamp(states('input_datetime.garden_pet_waste_last_removed'))) / 60 / 60 %}
                   {% set c = states('counter.utility_room_door_sensor_open') | int(0) - states('input_number.garden_pet_waste_door_count_last_removed') | int(0) %}
-                  {{ (c >= 4 and h >= 48) or (c >= 20 and h >= 15) }}
+                  {{ ((c >= 4 and h >= 48) or (c >= 15 and h >= 15)) and is_state('binary_sensor.home_outside_light', 'on') }}
 
         - conditions:
             - condition: trigger

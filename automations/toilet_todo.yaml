@@ -30,6 +30,12 @@
         related: input_number.toilet_soap_last_count
       id: soap_completed
 
+    - trigger: event
+      event_type: todo_item_completed
+      event_data:
+        related: input_number.toilet_towel_last_count
+      id: towel_completed
+
   conditions: []
 
   actions:
@@ -60,7 +66,28 @@
                 description: Hæld mere sæbe på sæbedispenser på gæste-toilettet.
                 related_entity_id: input_number.toilet_soap_last_count
                 entity_id: todo.todo_smart_todo
+                must_replace: true
                 is_active: "{{ states('counter.toilet_motion_sensor_count') | int(0) > states('input_number.toilet_soap_last_count') | int(0) + 150 }}"
+
+            - variables:
+                towel_days: >
+                  {% set last_changed = states('input_datetime.toilet_towel_last_changed') %} {% if last_changed not in ['unknown', 'unavailable', ''] %}
+                    {{ (as_timestamp(now()) - as_timestamp(as_datetime(last_changed))) | int(0) // 86400 }}
+                  {% else %}
+                    999
+                  {% endif %}
+
+
+            - action: script.create_todo_task
+              data:
+                subject: Skift håndklæder på toilettet
+                description: Skift de små håndklæder på gæste-toilettet, de blev sidst skiftet for {{ towel_days }} dage siden.
+                related_entity_id: input_number.toilet_towel_last_count
+                entity_id: todo.todo_smart_todo
+                is_active: |-
+                  {% set c = states('counter.toilet_motion_sensor_count') | int(0) %}
+                  {% set l = states('input_number.toilet_towel_last_count') | int(0) %}
+                  {{ (0 < towel_days < 10 and (c - l) > 20) or (towel_days >= 10 and (c - l) > 2) }}
 
         - conditions:
             - condition: trigger
@@ -81,3 +108,18 @@
                 entity_id: input_number.toilet_soap_last_count
               data:
                 value: "{{ states('counter.toilet_motion_sensor_count') | int(0) }}"
+
+        - conditions:
+            - condition: trigger
+              id: towel_completed
+          sequence:
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.toilet_towel_last_count
+              data:
+                value: "{{ states('counter.toilet_motion_sensor_count') | int(0) }}"
+            - action: input_datetime.set_datetime
+              target:
+                entity_id: input_datetime.toilet_towel_last_changed
+              data:
+                datetime: "{{ now() }}"
