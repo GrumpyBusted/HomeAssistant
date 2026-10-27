@@ -20,10 +20,12 @@
     - trigger: numeric_state
       entity_id: sensor.bedroom_air_quality_score
       above: 52
+      for: "00:03:00"
 
     - trigger: numeric_state
       entity_id: sensor.bedroom_air_quality_score
       below: 50
+      for: "00:03:00"
 
     - trigger: state
       entity_id: binary_sensor.bedroom_window

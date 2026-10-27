@@ -20,28 +20,27 @@
           automation.bedroom_presence_sensor: 200
           automation.bedroom_air_purifier: 400
           automation.driveway_light: 300
-          automation.house_light_south: 300
-          automation.house_motion_sensor_entrance: 1000
-          automation.house_motion_sensor_south: 1000
           automation.driveway_motion_sensor_street: 1000
           automation.entrance_light: 200
-          automation.garden_motion_sensor_north: 1000
+          automation.garage_light_north: 200
+          automation.garage_motion_sensor_north: 200
+          automation.house_motion_sensor_entrance: 1000
+          automation.house_motion_sensor_south: 1000
           automation.house_motion_sensor_east: 1000
           automation.house_motion_sensor_west: 1000
           automation.house_motion_sensor_north: 1000
+          automation.house_light_south: 300
           automation.house_light_east: 150
-          automation.garage_light_north: 200
           automation.house_light_west: 200
-          automation.patio_light_garden: 200
           automation.hallway_light: 200
           automation.hallway_presence_sensor: 200
-          automation.home_monitor_log: 2000
           automation.kitchen_light: 200
           automation.kitchen_presence_sensor: 200
           automation.kitchen_robot_vacuum_cleaning: 200
           automation.kitchen_todo_dishwasher: 250
           automation.living_room_heat_pump: 200
           automation.living_room_media_player_state: 150
+          automation.patio_light_garden: 200
           automation.storage_light: 32
           automation.storage_ventilation_system: 150
           automation.technic_room_light: 32
