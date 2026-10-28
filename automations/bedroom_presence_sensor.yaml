@@ -114,7 +114,7 @@
         - conditions:
             - condition: trigger
               id: timeout
-            - trigger: state
+            - condition: state
               entity_id: binary_sensor.bedroom_presence_sensor_occupancy
               state: "off"
           sequence:
