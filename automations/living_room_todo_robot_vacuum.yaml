@@ -2,7 +2,8 @@
   alias: Stue todo robotstøvsuger
   description: |
     Kontrollerer Roborock-robotstøvsugerens status og opretter relevante todo-opgaver.
-  mode: restart
+  mode: queued
+  max: 10
   trace:
     stored_traces: 30
 
@@ -11,6 +12,7 @@
       entity_id:
         - sensor.living_room_robot_vacuum_dock_error
         - sensor.living_room_robot_vacuum_error
+      for: "00:00:03"
 
     - trigger: time
       at: "03:23:00"
