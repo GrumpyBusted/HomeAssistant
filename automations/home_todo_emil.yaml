@@ -9,7 +9,7 @@
 
   triggers:
     - trigger: time
-      at: "17:16:00"
+      at: "12:00:00"
       id: daily
 
     - trigger: state
@@ -32,7 +32,7 @@
     - trigger: event
       event_type: todo_item_completed
       event_data:
-        related: input_datetime.home_emil_wash_clothes_last_done
+        related: input_datetime.emil_home_wash_clothes_last_done
       id: todo_wash_close_completed
 
   conditions: []

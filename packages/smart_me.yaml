@@ -15,7 +15,7 @@ rest:
         unique_id: 64310A37-5562-4207-B4BD-8FC21E4DF551
         unit_of_measurement: "kWh"
         device_class: "energy"
-        state_class: "total_increasing"
+        state_class: "total"
         value_template: |-
           {{ value_json.CounterReading | round(2) }}
         json_attributes:

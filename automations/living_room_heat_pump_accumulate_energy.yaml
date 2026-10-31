@@ -1,0 +1,43 @@
+- id: living_room_heat_pump_accumulate_energy
+  alias: Stue varmepumpe opsamle energi
+  description: |
+    Opsamler varme inklusive standby og køling ved daglig nulstilling.
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
+
+  triggers:
+    - trigger: state
+      entity_id:
+        - sensor.living_room_heat_pump_daily_heating_total_energy
+        - sensor.living_room_heat_pump_daily_cooling_energy
+
+  conditions:
+    - condition: template
+      value_template: |-
+        {{
+          trigger.from_state is not none
+          and trigger.to_state is not none
+          and is_number(trigger.from_state.state)
+          and is_number(trigger.to_state.state)
+          and trigger.from_state.state | float(0) > trigger.to_state.state | float(0)
+          and trigger.to_state.state | float(0) < 0.1
+        }}
+
+  actions:
+    - variables:
+        previous: "{{ trigger.from_state.state | float(0) }}"
+        helper: |-
+          {% if trigger.entity_id == 'sensor.living_room_heat_pump_daily_cooling_energy' %}
+            input_number.living_room_heat_pump_cooling_accumulated_energy
+          {% else %}
+            input_number.living_room_heat_pump_heating_accumulated_energy
+          {% endif %}
+
+    - action: input_number.set_value
+      target:
+        entity_id: "{{ helper | trim }}"
+      data:
+        value: |-
+          {{ states(helper | trim) | float(0) + previous }}
