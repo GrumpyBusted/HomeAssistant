@@ -76,6 +76,9 @@
       entity_id: binary_sensor.kitchen_window
 
     - trigger: state
+      entity_id: binary_sensor.monique_living_room_in_sofa
+
+    - trigger: state
       entity_id: input_select.living_room_robot_vacuum_current_cleaning
       to: living_room_cleaning
 
@@ -791,6 +794,124 @@
 
             - conditions:
                 - condition: state
+                  entity_id: binary_sensor.monique_living_room_in_sofa
+                  state: "on"
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
+                - action: light.turn_on
+                  data:
+                    transition: 1
+                    color_temp_kelvin: 2700
+                    brightness_pct: 90
+                  target:
+                    entity_id:
+                      - light.living_room_light_window_left
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: "off"
+              sequence:
+                - action: light.turn_off
+                  data:
+                    transition: 1
+                  target:
+                    entity_id:
+                      - light.living_room_light_window_left
+
+            - conditions:
+                - condition: numeric_state
+                  entity_id: sensor.home_outside_illuminance
+                  below: 100
+                - condition: or
+                  conditions:
+                    - condition: state
+                      entity_id: binary_sensor.patio_door_long_open
+                      state: "on"
+                    - condition: state
+                      entity_id: binary_sensor.living_room_window
+                      state: "on"
+                    - condition: state
+                      entity_id: binary_sensor.kitchen_window
+                      state: "on"
+                - condition: template
+                  value_template: "{{ force == false }}"
+              sequence:
+                - action: light.turn_off
+                  data:
+                    transition: 1
+                  target:
+                    entity_id:
+                      - light.living_room_light_window_left
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: standard
+              sequence:
+                - parallel:
+                    - action: light.turn_on
+                      data:
+                        transition: 1
+                        color_temp_kelvin: 2700
+                        brightness_pct: 80
+                      target:
+                        entity_id:
+                          - light.living_room_light_window_left
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: dining
+              sequence:
+                - parallel:
+                    - action: light.turn_off
+                      data:
+                        transition: 1
+                      target:
+                        entity_id:
+                          - light.living_room_light_window_left
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: lounging
+              sequence:
+                - parallel:
+                    - action: light.turn_on
+                      data:
+                        transition: 1
+                        color_temp_kelvin: 2700
+                        brightness_pct: 60
+                      target:
+                        entity_id:
+                          - light.living_room_light_window_left
+
+            - conditions:
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: all
+              sequence:
+                - parallel:
+                    - action: light.turn_on
+                      data:
+                        transition: 1
+                        color_temp_kelvin: 3000
+                        brightness_pct: 100
+                      target:
+                        entity_id:
+                          - light.living_room_light_window_left
+
+        - choose:
+            - conditions:
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: custom
+              sequence: []
+
+            - conditions:
+                - condition: state
                   entity_id: input_select.living_room_light_mode
                   state: "off"
               sequence:
@@ -806,7 +927,6 @@
                       - light.living_room_light_tv_left
                       - light.living_room_light_tv_right
                       - light.living_room_light_escher
-                      - light.living_room_light_window_left
                       - light.living_room_light_window_right
                       - light.living_room_light_glass_cabinet
                       - light.living_room_smart_plug_lamp
@@ -844,7 +964,6 @@
                       - light.living_room_light_tv_left
                       - light.living_room_light_tv_right
                       - light.living_room_light_escher
-                      - light.living_room_light_window_left
                       - light.living_room_light_window_right
                       - light.living_room_light_glass_cabinet
                       - light.living_room_smart_plug_lamp
@@ -872,7 +991,6 @@
                           - light.living_room_light_tv_left
                           - light.living_room_light_tv_right
                           - light.living_room_light_escher
-                          - light.living_room_light_window_left
                           - light.living_room_light_window_right
                     - action: light.turn_on
                       target:
@@ -928,7 +1046,6 @@
                         entity_id:
                           - light.living_room_light_tv_right
                           - light.living_room_light_escher
-                          - light.living_room_light_window_left
                           - light.living_room_light_window_right
 
             - conditions:
@@ -941,13 +1058,12 @@
                       data:
                         transition: 1
                         color_temp_kelvin: 2700
-                        brightness_pct: 75
+                        brightness_pct: 60
                       target:
                         entity_id:
                           - light.living_room_light_tv_left
                           - light.living_room_light_tv_right
                           - light.living_room_light_escher
-                          - light.living_room_light_window_left
                           - light.living_room_light_window_right
                     - action: light.turn_on
                       data:
@@ -994,7 +1110,6 @@
                           - light.living_room_light_tv_left
                           - light.living_room_light_tv_right
                           - light.living_room_light_escher
-                          - light.living_room_light_window_left
                           - light.living_room_light_window_right
                           - light.living_room_light_glass_cabinet
                           - light.living_room_light_lamp_cabinet
