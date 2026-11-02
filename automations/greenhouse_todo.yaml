@@ -48,3 +48,4 @@
                 description: |-
                   Vand planterne i drivhuset, og evt dem uden for drivhuset.
                 entity_id: todo.todo_smart_todo
+                is_active: false

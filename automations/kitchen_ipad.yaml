@@ -1,0 +1,112 @@
+- id: kitchen_ipad
+  alias: Køkken iPad
+  description: |
+    Styrer af iPad i køkkenet, hvad den visser.
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 50
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.kitchen_presence
+      to: "on"
+      id: detected
+
+    - trigger: state
+      entity_id: binary_sensor.kitchen_presence
+      to: "off"
+      id: cleared
+
+    - trigger: state
+      entity_id: binary_sensor.bedroom_sleeping
+      to: "on"
+      id: sleeping
+
+    - trigger: state
+      entity_id: binary_sensor.bedroom_sleeping
+      to: "off"
+      id: wake
+
+    - trigger: state
+      entity_id: binary_sensor.entrance_doorbell_ringing
+      to: "on"
+      id: doorbell
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: detected
+          sequence:
+            - action: notify.mobile_app_familie_ipad
+              data:
+                message: kiosk_hide_screensaver
+
+        - conditions:
+            - condition: trigger
+              id: cleared
+          sequence:
+            - action: notify.mobile_app_familie_ipad
+              data:
+                message: kiosk_show_screensaver
+
+        - conditions:
+            - condition: trigger
+              id: sleeping
+          sequence:
+            - action: notify.mobile_app_familie_ipad
+              data:
+                message: kiosk_set_brightness
+                data:
+                  level: 5
+
+        - conditions:
+            - condition: trigger
+              id: wake
+          sequence:
+            - action: notify.mobile_app_familie_ipad
+              data:
+                message: kiosk_set_brightness
+                data:
+                  level: 50
+
+        - conditions:
+            - condition: trigger
+              id: doorbell
+            - condition: state
+              entity_id: binary_sensor.kitchen_presence
+              state: "on"
+          sequence:
+            - action: button.press
+              target:
+                entity_id: button.entrance_doorbell_start_p2p_stream
+              continue_on_error: true
+            - variables:
+                brightness: "{{ states('sensor.family_ipad_kiosk_brightness') | int(50) }}"
+            - action: notify.mobile_app_familie_ipad
+              data:
+                message: kiosk_set_brightness
+                data:
+                  level: 100
+            - action: notify.mobile_app_familie_ipad
+              data:
+                message: kiosk_show_camera
+                data:
+                  entity_id: camera.entrance_doorbell_camera
+            - delay:
+                seconds: 60
+            - action: notify.mobile_app_familie_ipad
+              data:
+                message: kiosk_hide_camera
+            - action: button.press
+              target:
+                entity_id: button.entrance_doorbell_stop_p2p_stream
+              continue_on_error: true
+            - action: notify.mobile_app_familie_ipad
+              data:
+                message: kiosk_set_brightness
+                data:
+                  level: "{{ brightness }}"
