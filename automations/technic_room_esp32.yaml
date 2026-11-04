@@ -1,0 +1,31 @@
+- id: technic_room_esp32
+  alias: Teknikrum ESP32
+  description: |
+    Deaktiverer de relevante entiteter for ESP32 i teknikrummet.
+  mode: restart
+  trace:
+    stored_traces: 30
+
+  triggers:
+    - trigger: state
+      entity_id: sensor.ford_explorer_ev_el_plug_safe
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: sensor.ford_explorer_ev_el_plug_safe
+              state: CONNECTED
+          sequence:
+            - action: homeassistant.enable_entity
+              data:
+                entity_id:
+                  - switch.technic_room_esp32_irk
+
+      default:
+        - action: homeassistant.disable_entity
+          data:
+            entity_id:
+              - switch.technic_room_esp32_irk

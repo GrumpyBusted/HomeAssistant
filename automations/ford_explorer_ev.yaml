@@ -2,7 +2,7 @@
   alias: Ford Explorer EV
   description: |
     Deaktiverer de relevante entiteter for Ford Explorer EV.
-  mode: single
+  mode: restart
   trace:
     stored_traces: 100
 
