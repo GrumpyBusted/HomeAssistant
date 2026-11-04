@@ -8,24 +8,49 @@
 
   triggers:
     - trigger: state
-      entity_id: sensor.ford_explorer_ev_el_plug_safe
+      entity_id: switch.technic_room_esp32_ble_advertising
+
+    - trigger: state
+      entity_id: timer.technic_room_esp32_timer
+      to: idle
+      id: timeout
 
   conditions: []
 
   actions:
     - choose:
         - conditions:
-            - condition: state
-              entity_id: sensor.ford_explorer_ev_el_plug_safe
-              state: CONNECTED
+            - condition: trigger
+              id: timeout
           sequence:
+            - action: switch.turn_off
+              data:
+                entity_id: switch.technic_room_esp32_ble_advertising
+
+        - conditions:
+            - condition: state
+              entity_id: switch.technic_room_esp32_ble_advertising
+              state: "on"
+          sequence:
+            - action: timer.start
+              data:
+                entity_id: timer.technic_room_esp32_timer
+                duration: "01:00:00"
             - action: homeassistant.enable_entity
               data:
                 entity_id:
-                  - switch.technic_room_esp32_irk
+                  - sensor.technic_room_esp32_irk
+                  - sensor.technic_room_esp32_device_ble_mac
+                  - sensor.technic_room_esp32_esp32_ble_mac
 
-      default:
-        - action: homeassistant.disable_entity
-          data:
-            entity_id:
-              - switch.technic_room_esp32_irk
+        - conditions:
+            - condition: state
+              entity_id: switch.technic_room_esp32_ble_advertising
+              state: "off"
+          sequence:
+            - action: homeassistant.disable_entity
+              data:
+                entity_id:
+                  - sensor.technic_room_esp32_irk
+                  - sensor.technic_room_esp32_device_ble_mac
+                  - sensor.technic_room_esp32_esp32_ble_mac

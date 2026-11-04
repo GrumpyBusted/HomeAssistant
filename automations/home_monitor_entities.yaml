@@ -43,12 +43,21 @@
               - light.living_room_smart_plug_elf_house
               - light.charlies_room_light_bed_lamp
               - light.charlies_room_light_dresser
-              - sensor.living_room_printer_black_bk
-              - sensor.living_room_printer_black_pgbk
-              - sensor.living_room_printer_cyan
-              - sensor.living_room_printer_magenta
-              - sensor.living_room_printer_photo_blue
-              - sensor.living_room_printer_yellow
+            ignore_unknown_patterns:
+              - ".*_private_ble_device_.*"
+              - ".*_lqi$"
+              - '^button\..*'
+              - '^image\.entrance_doorbell_event_image$'
+              - '^number\..*_transition_time$'
+              - '^person\.mosquitto$'
+              - '^remote\..*_photo_frame_.*'
+              - '^scene\.driveway_light_.*'
+              - '^select\..*_group_scene$'
+              - '^sensor\.living_room_printer_.*'
+              - '^stt\.home_assistant_cloud$'
+              - '^tts\.google_translate_en_com$'
+              - '^update\..*'
+
             entities: |-
               {% set unavailable = states
                 | rejectattr('domain', 'in', ['button', 'event', 'update'])
@@ -58,23 +67,15 @@
               %}
 
               {% set unknown = states
-                | selectattr('domain', 'in', [
-                    'media_player',
-                    'sensor',
-                    'binary_sensor',
-                    'climate',
-                    'cover',
-                    'lock'
-                  ])
                 | selectattr('state', 'eq', 'unknown')
                 | rejectattr(
                     'entity_id',
                     'search',
-                    '_lqi$'
+                    ignore_unknown_patterns | join('|')
                   )
                 | map(attribute='entity_id')
                 | list
-              %}
+              %}              
 
               {% if trigger.id == 'daily_check' %}
                 {% set lqi_unknown = states
@@ -93,10 +94,11 @@
                 | list
               %}
               {{ entities | to_json }}
-            message: |-
+            devices: |-
               {% set ns = namespace(result={}) %}
               {% for e in entities | trim | from_json %}
                 {% set dev_id = device_id(e) if device_id(e) else '[NO_DEVICE]' %}
+
                 {% if dev_id not in ns.result %}
                   {% if dev_id == '[NO_DEVICE]' %}
                     {% set dev_name = '[NO_DEVICE]' %}
@@ -109,6 +111,7 @@
                     %}
                     {% set dev_area_name = area_name(device_attr(dev_id, 'area_id')) %}
                   {% endif %}
+
                   {% set ns.result = dict(
                     ns.result,
                     **{
@@ -121,12 +124,14 @@
                     }
                   ) %}
                 {% endif %}
+
                 {% set ent_obj = {
                   "entity_id": e,
-                  "friendly_name": state_attr(e, 'friendly_name'),
+                  "friendly_name": state_attr(e, 'friendly_name') or e,
                   "state": states(e),
                   "last_changed": states[e].last_changed.isoformat()
                 } %}
+
                 {% set ns.result = dict(
                   ns.result,
                   **{
@@ -139,32 +144,26 @@
                   }
                 ) %}
               {% endfor %}
-              {% set devices = ns.result.values() | list %}
-              count_devices: {{ devices | count }}
-              count_entities: {{ entities | count }}
-              devices:
-              {% for dev in devices %}
-                - device_id: "{{ dev.device_id }}"
-                  name: "{{ dev.name }}"
-                  area: "{{ dev.area }}"
-                  entities:
-                  {% for ent in dev.entities %}
-                    - entity_id: "{{ ent.entity_id }}"
-                      friendly_name: "{{ ent.friendly_name }}"
-                      state: "{{ ent.state }}"
-                      last_changed: "{{ ent.last_changed }}"
-                  {% endfor %}
-              {% endfor %}
-        - if:
-            - condition: template
-              value_template: |-
-                {{ entities | trim | from_json | length > 0}}
-          then:
-            - action: script.push_notification
-              data:
-                type: info
-                recipient: none
-                persistent: true
-                id: home_assistant_monitor_unavailable_entities
-                title: "{{ entities | trim | from_json | length }} sensorer er ikke tilgængelige i HomeAssistant"
-                message: "{{ message }}"
+              {{ ns.result.values() | list | to_json }}
+
+        - repeat:
+            for_each: "{{ devices | trim | from_json }}"
+            sequence:
+              - action: script.push_notification
+                data:
+                  type: info
+                  recipient: none
+                  persistent: true
+                  id: "home_assistant_monitor_unavailable_entities_{{ repeat.item.device_id }}"
+                  title: |-
+                    {{ repeat.item.name }}: {{ repeat.item.entities | length }} entities kræver opmærksomhed
+                  message: |-
+                    Device: {{ repeat.item.name }}
+                    Område: {{ repeat.item.area }}
+
+                    {% for ent in repeat.item.entities %}
+                    - {{ ent.friendly_name }}
+                      Entity: {{ ent.entity_id }}
+                      State: {{ ent.state }}
+                      Last changed: {{ ent.last_changed }}
+                    {% endfor %}

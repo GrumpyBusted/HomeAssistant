@@ -1,0 +1,50 @@
+- id: private_ble_device
+  alias: Privat bluetooth-enhed
+  description: |
+    Deaktiverer de relevante entiteter for bluetooth-enheder, f.eks. iPhone og Apple Watch.
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
+
+  triggers:
+    - trigger: state
+      entity_id:
+        - device_tracker.anders_iphone_private_ble_device
+        - device_tracker.anders_apple_watch_private_ble_device
+        - device_tracker.monique_iphone_private_ble_device
+        - device_tracker.monique_apple_watch_private_ble_device
+        - device_tracker.emil_iphone_private_ble_device
+        - device_tracker.emil_apple_watch_private_ble_device
+        - device_tracker.charlie_iphone_private_ble_device
+        - device_tracker.charlie_apple_watch_private_ble_device
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.to_state.state == 'home' }}"
+          sequence:
+            - action: homeassistant.enable_entity
+              target:
+                entity_id: |-
+                  {{ trigger.entity_id | replace('device_tracker.', 'sensor.') | replace('_private_ble_device', '_private_ble_device_estimated_distance') }}
+            - action: homeassistant.enable_entity
+              target:
+                entity_id: |-
+                  {{ trigger.entity_id | replace('device_tracker.', 'sensor.') | replace('_private_ble_device', '_room') }}
+
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.to_state.state == 'not_home' }}"
+          sequence:
+            - action: homeassistant.disable_entity
+              target:
+                entity_id: |-
+                  {{ trigger.entity_id | replace('device_tracker.', 'sensor.') | replace('_private_ble_device', '_private_ble_device_estimated_distance') }}
+            - action: homeassistant.disable_entity
+              target:
+                entity_id: |-
+                  {{ trigger.entity_id | replace('device_tracker.', 'sensor.') | replace('_private_ble_device', '_room') }}
