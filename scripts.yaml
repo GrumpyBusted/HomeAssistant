@@ -1241,6 +1241,7 @@ cleanup_todo_tasks:
         data:
           entity_id: '{{ entity_id }}'
           todo_id: '{{ delete[repeat.index - 1] }}'
+        continue_on_error: true
   - stop: All Done
     response_variable: output
 create_todo_battery_task:
