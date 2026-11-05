@@ -50,6 +50,7 @@
           automation.utility_room_washer: 400
           automation.utility_room_todo_soap: 200
           automation.utility_room_heating: 200
+          automation.private_ble_device: 200
     - action: sql.query
       data:
         query: |-
