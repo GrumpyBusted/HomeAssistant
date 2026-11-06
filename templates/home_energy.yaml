@@ -6,7 +6,7 @@
       attributes:
         car: "{{ states('sensor.home_energy_car_monthly') | float(0) }}"
         greenhouse: "{{ states('sensor.home_energy_greenhouse_monthly') | float(0) }}"
-        laundry: "{{ states('sensor.home_energy_laundry_monthly') | float(0) }}"
+        laundry: "{{ states('sensor.home_energy_appliance_monthly') | float(0) }}"
         climate: "{{ states('sensor.home_energy_climate_monthly') | float(0) }}"
         heating: "{{ states('sensor.home_energy_heating_monthly') | float(0) }}"
         other: "{{ states('sensor.home_energy_other_monthly') | float(0) }}"
@@ -19,7 +19,7 @@
       attributes:
         car: "{{ state_attr('sensor.home_energy_car_monthly', 'last_period') | float(0) }}"
         greenhouse: "{{ state_attr('sensor.home_energy_greenhouse_monthly', 'last_period') | float(0) }}"
-        laundry: "{{ state_attr('sensor.home_energy_laundry_monthly', 'last_period') | float(0) }}"
+        laundry: "{{ state_attr('sensor.home_energy_appliance_monthly', 'last_period') | float(0) }}"
         climate: "{{ state_attr('sensor.home_energy_climate_monthly', 'last_period') | float(0) }}"
         heating: "{{ state_attr('sensor.home_energy_heating_monthly', 'last_period') | float(0) }}"
         other: "{{ state_attr('sensor.home_energy_other_monthly', 'last_period') | float(0) }}"
@@ -32,7 +32,7 @@
       attributes:
         car: "{{ states('sensor.home_energy_car_yearly') | float(0) }}"
         greenhouse: "{{ states('sensor.home_energy_greenhouse_yearly') | float(0) }}"
-        laundry: "{{ states('sensor.home_energy_laundry_yearly') | float(0) }}"
+        laundry: "{{ states('sensor.home_energy_appliance_yearly') | float(0) }}"
         climate: "{{ states('sensor.home_energy_climate_yearly') | float(0) }}"
         heating: "{{ states('sensor.home_energy_heating_yearly') | float(0) }}"
         other: "{{ states('sensor.home_energy_other_yearly') | float(0) }}"
@@ -45,7 +45,7 @@
       attributes:
         car: "{{ state_attr('sensor.home_energy_car_yearly', 'last_period') | float(0) }}"
         greenhouse: "{{ state_attr('sensor.home_energy_greenhouse_yearly', 'last_period') | float(0) }}"
-        laundry: "{{ state_attr('sensor.home_energy_laundry_yearly', 'last_period') | float(0) }}"
+        laundry: "{{ state_attr('sensor.home_energy_appliance_yearly', 'last_period') | float(0) }}"
         climate: "{{ state_attr('sensor.home_energy_climate_yearly', 'last_period') | float(0) }}"
         heating: "{{ state_attr('sensor.home_energy_heating_yearly', 'last_period') | float(0) }}"
         other: "{{ state_attr('sensor.home_energy_other_yearly', 'last_period') | float(0) }}"

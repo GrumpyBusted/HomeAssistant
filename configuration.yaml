@@ -21,16 +21,6 @@ automation ui: !include automations.yaml
 automation manual: !include_dir_merge_list automations/
 script custom: !include_dir_merge_named ./scripts
 
-panel_custom:
-  - name: developer-tools
-    sidebar_title: Developer Tools
-    sidebar_icon: mdi:hammer-wrench
-    url_path: developer-tools
-    embed_iframe: true
-    require_admin: true
-    config:
-      url: /config/tools/yaml
-
 harvest:
 
 logger:
