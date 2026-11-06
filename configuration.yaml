@@ -25,8 +25,8 @@ panel_custom:
   - name: developer-tools
     sidebar_title: Developer Tools
     sidebar_icon: mdi:hammer-wrench
-    url_path: developer-tools
-    module_url: /api/hassio/app/entrypoint.js
+    url_path: tools
+    module_url: config/tools/yaml
     embed_iframe: true
     require_admin: true
 
