@@ -25,10 +25,11 @@ panel_custom:
   - name: developer-tools
     sidebar_title: Developer Tools
     sidebar_icon: mdi:hammer-wrench
-    url_path: tools
-    module_url: config/tools/yaml
+    url_path: developer-tools
     embed_iframe: true
     require_admin: true
+    config:
+      url: /config/tools/yaml
 
 harvest:
 
