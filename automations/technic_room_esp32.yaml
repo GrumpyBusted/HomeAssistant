@@ -2,7 +2,8 @@
   alias: Teknikrum ESP32
   description: |
     Deaktiverer de relevante entiteter for ESP32 i teknikrummet.
-  mode: restart
+  mode: queued
+  max: 10
   trace:
     stored_traces: 30
 
@@ -48,6 +49,9 @@
               entity_id: switch.technic_room_esp32_ble_advertising
               state: "off"
           sequence:
+            - action: timer.cancel
+              data:
+                entity_id: timer.technic_room_esp32_timer
             - action: homeassistant.disable_entity
               data:
                 entity_id:

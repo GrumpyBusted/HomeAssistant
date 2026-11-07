@@ -1,0 +1,47 @@
+- id: kitchen_dishwasher_accumulate_energy
+  alias: Køkken opvaskemaskine opsamle energi
+  description: |
+    Akkumulerer energiforbrug ved nulstilling eller
+    når energisensoren bliver utilgængelig.
+  mode: queued
+  max: 5
+  trace:
+    stored_traces: 30
+
+  triggers:
+    - trigger: state
+      entity_id: sensor.kitchen_dishwasher_energy_consumption_safe
+      for: "00:00:30"
+
+  actions:
+    - variables:
+        previous: |-
+          {{ trigger.from_state.state | float(0)
+             if trigger.from_state is not none
+             and is_number(trigger.from_state.state) else none }}
+        current: |-
+          {{ trigger.to_state.state | float(0)
+             if trigger.to_state is not none
+             and is_number(trigger.to_state.state) else none }}
+    - variables:
+        change: |-
+          {% if previous is none and current is none %}
+            0
+          {% elif previous is none %}
+            {{ 0 - current }}
+          {% elif current is none %}
+            {{ previous }}
+          {% else %}
+            {{ [previous - current, 0] | max }}
+          {% endif %}
+
+    - if:
+        - condition: template
+          value_template: "{{ change | float(0) != 0 }}"
+      then:
+        - action: input_number.set_value
+          target:
+            entity_id: input_number.kitchen_dishwasher_accumulated_energy
+          data:
+            value: |-
+              {{ states('input_number.kitchen_dishwasher_accumulated_energy') | float(0) + change }}
