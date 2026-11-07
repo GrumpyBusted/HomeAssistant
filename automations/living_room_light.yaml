@@ -690,8 +690,9 @@
                 - condition: state
                   entity_id: input_select.living_room_light_mode
                   state: lounging
-                - condition: template
-                  value_template: "{{ '10-15' <= date <= '10-31' }}"
+                - condition: state
+                  entity_id: sensor.home_light_ambience
+                  state: halloween
               sequence:
                 - action: script.light_turn_on_effect
                   data:
@@ -706,8 +707,9 @@
                 - condition: state
                   entity_id: input_select.living_room_light_mode
                   state: lounging
-                - condition: template
-                  value_template: "{{ '12-01' <= date <= '12-26' }}"
+                - condition: state
+                  entity_id: sensor.home_light_ambience
+                  state: christmas
               sequence:
                 - action: script.light_turn_on_effect
                   data:
@@ -736,8 +738,9 @@
                 - condition: state
                   entity_id: input_select.living_room_light_mode
                   state: dining
-                - condition: template
-                  value_template: "{{ '10-15' <= date <= '10-31' }}"
+                - condition: state
+                  entity_id: sensor.home_light_ambience
+                  state: halloween
               sequence:
                 - action: script.light_turn_on_effect
                   data:
@@ -752,8 +755,9 @@
                 - condition: state
                   entity_id: input_select.living_room_light_mode
                   state: dining
-                - condition: template
-                  value_template: "{{ '12-01' <= date <= '12-26' }}"
+                - condition: state
+                  entity_id: sensor.home_light_ambience
+                  state: christmas
               sequence:
                 - action: script.light_turn_on_effect
                   data:

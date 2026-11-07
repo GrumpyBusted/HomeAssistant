@@ -9,14 +9,13 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.home_light_ambience
+      entity_id:
+        - binary_sensor.home_light_ambience
+        - binary_sensor.home_light_ambience_evening
 
   conditions: []
 
   actions:
-    - variables:
-        date: "{{ now().strftime('%m-%d') }}"
-
     - choose:
         - conditions:
             - condition: state
@@ -25,8 +24,9 @@
           sequence:
             - choose:
                 - conditions:
-                    - condition: template
-                      value_template: "{{ '10-15' <= date <= '10-31' }}"
+                    - condition: state
+                      entity_id: sensor.home_light_ambience
+                      state: halloween
                   sequence:
                     - action: script.light_turn_on_effect
                       data:
@@ -38,10 +38,13 @@
                           - select.house_decoration_3_mode
                           - select.house_decoration_4_mode
                           - select.house_decoration_5_mode
+                          - select.house_decoration_6_mode
                         effect: Stripes
+
                 - conditions:
-                    - condition: template
-                      value_template: "{{ '12-01' <= date <= '12-26' }}"
+                    - condition: state
+                      entity_id: sensor.home_light_ambience
+                      state: christmas
                   sequence:
                     - action: script.light_turn_on_effect
                       data:
@@ -53,10 +56,13 @@
                           - select.house_decoration_3_mode
                           - select.house_decoration_4_mode
                           - select.house_decoration_5_mode
+                          - select.house_decoration_6_mode
                         effect: Sparkle
+
                 - conditions:
-                    - condition: template
-                      value_template: "{{ date >= '12-30' or date == '01-01' }}"
+                    - condition: state
+                      entity_id: sensor.home_light_ambience
+                      state: new_years
                   sequence:
                     - action: script.light_turn_on_effect
                       data:
@@ -68,23 +74,21 @@
                           - select.house_decoration_3_mode
                           - select.house_decoration_4_mode
                           - select.house_decoration_5_mode
+                          - select.house_decoration_6_mode
                         effect: Rainbow
+
         - conditions:
             - condition: state
-              entity_id: binary_sensor.home_light_ambience_morning
-              state: "on"
+              entity_id: sensor.home_light_ambience
+              state: christmas
           sequence:
-            - choose:
-                - conditions:
-                    - condition: template
-                      value_template: "{{ '12-01' <= date <= '12-26' }}"
-                  sequence:
-                    - action: light.turn_on
-                      target:
-                        entity_id: light.house_decoration
-                      data:
-                        brightness_pct: 70
-                        rgb_color: [0, 180, 30]
+            - action: light.turn_on
+              target:
+                entity_id: light.house_decoration
+              data:
+                brightness_pct: 70
+                rgb_color: [0, 180, 30]
+
       default:
         - action: light.turn_off
           target:

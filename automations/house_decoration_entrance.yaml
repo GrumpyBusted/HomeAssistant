@@ -25,8 +25,9 @@
           sequence:
             - choose:
                 - conditions:
-                    - condition: template
-                      value_template: "{{ '10-15' <= date <= '10-31' }}"
+                    - condition: state
+                      entity_id: sensor.home_light_ambience
+                      state: halloween
                   sequence:
                     - action: script.light_turn_on_effect
                       data:
@@ -34,8 +35,9 @@
                         entity_id_mode: select.house_decoration_entrance_mode
                         effect: Stripes
                 - conditions:
-                    - condition: template
-                      value_template: "{{ '12-01' <= date <= '12-26' }}"
+                    - condition: state
+                      entity_id: sensor.home_light_ambience
+                      state: christmas
                   sequence:
                     - action: script.light_turn_on_effect
                       data:
@@ -43,8 +45,9 @@
                         entity_id_mode: select.house_decoration_entrance_mode
                         effect: Sparkle
                 - conditions:
-                    - condition: template
-                      value_template: "{{ date >= '12-30' or date == '01-01' }}"
+                    - condition: state
+                      entity_id: sensor.home_light_ambience
+                      state: new_years
                   sequence:
                     - action: script.light_turn_on_effect
                       data:
