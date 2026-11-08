@@ -1,0 +1,60 @@
+- id: entrance_doorbell_stream
+  alias: Entre dørklokke streaming
+  description: |
+    Starter P2P-streaming ved bevægelse og stopper efter en time.
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 100
+
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.entrance_motion_sensor_motion
+      to: "on"
+      id: motion
+
+    - trigger: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.entrance_doorbell_stream_timer
+      id: timer_finished
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: motion
+            - condition: state
+              entity_id: camera.entrance_doorbell_camera
+              state: streaming
+          sequence:
+            - action: timer.start
+              target:
+                entity_id: timer.entrance_doorbell_stream_timer
+              data:
+                duration: "01:00:00"
+
+        - conditions:
+            - condition: trigger
+              id: motion
+          sequence:
+            - action: button.press
+              target:
+                entity_id: button.entrance_doorbell_start_p2p_stream
+              continue_on_error: true
+            - action: timer.start
+              target:
+                entity_id: timer.entrance_doorbell_stream_timer
+              data:
+                duration: "01:00:00"
+
+        - conditions:
+            - condition: trigger
+              id: timer_finished
+            - condition: state
+              entity_id: camera.entrance_doorbell_camera
+              state: streaming
+          sequence:
+            - action: button.press
+              target:
+                entity_id: button.entrance_doorbell_stop_p2p_stream

@@ -22,38 +22,41 @@
             - condition: state
               entity_id: binary_sensor.home_light_ambience
               state: "on"
+            - condition: state
+              entity_id: sensor.home_light_ambience
+              state: halloween
           sequence:
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: sensor.home_light_ambience
-                      state: halloween
-                  sequence:
-                    - action: script.light_turn_on_effect
-                      data:
-                        entity_id: light.house_decoration_entrance
-                        entity_id_mode: select.house_decoration_entrance_mode
-                        effect: Stripes
-                - conditions:
-                    - condition: state
-                      entity_id: sensor.home_light_ambience
-                      state: christmas
-                  sequence:
-                    - action: script.light_turn_on_effect
-                      data:
-                        entity_id: light.house_decoration_entrance
-                        entity_id_mode: select.house_decoration_entrance_mode
-                        effect: Sparkle
-                - conditions:
-                    - condition: state
-                      entity_id: sensor.home_light_ambience
-                      state: new_years
-                  sequence:
-                    - action: script.light_turn_on_effect
-                      data:
-                        entity_id: light.house_decoration_entrance
-                        entity_id_mode: select.house_decoration_entrance_mode
-                        effect: Rainbow
+            - action: script.light_turn_on_effect
+              data:
+                entity_id: light.house_decoration_entrance
+                entity_id_mode: select.house_decoration_entrance_mode
+                effect: Stripes
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.home_light_ambience
+              state: "on"
+            - condition: state
+              entity_id: sensor.home_light_ambience
+              state: christmas
+          sequence:
+            - action: script.light_turn_on_effect
+              data:
+                entity_id: light.house_decoration_entrance
+                entity_id_mode: select.house_decoration_entrance_mode
+                effect: Sparkle
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.home_light_ambience
+              state: "on"
+            - condition: state
+              entity_id: sensor.home_light_ambience
+              state: new_years
+          sequence:
+            - action: script.light_turn_on_effect
+              data:
+                entity_id: light.house_decoration_entrance
+                entity_id_mode: select.house_decoration_entrance_mode
+                effect: Rainbow
       default:
         - action: light.turn_off
           target:

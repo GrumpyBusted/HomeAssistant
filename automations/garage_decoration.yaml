@@ -1,0 +1,83 @@
+- id: garage_decoration
+  alias: Garage dekorationer
+  description: |
+    Styrer dekorationsbelysningen på garagen efter tidspunkt og sæson.
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 20
+
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.home_light_ambience_morning
+        - binary_sensor.home_light_ambience_evening
+
+  conditions: []
+
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.home_light_ambience_evening
+              state: "on"
+            - condition: state
+              entity_id: sensor.home_light_ambience
+              state: halloween
+          sequence:
+            - action: script.light_turn_on_effect
+              data:
+                entity_id: light.garage_decoration
+                entity_id_mode:
+                  - select.garage_decoration_1_mode
+                effect: Stripes
+
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.home_light_ambience_evening
+              state: "on"
+            - condition: state
+              entity_id: sensor.home_light_ambience
+              state: christmas
+          sequence:
+            - action: script.light_turn_on_effect
+              data:
+                entity_id: light.garage_decoration
+                entity_id_mode:
+                  - select.garage_decoration_1_mode
+                effect: Sparkle
+
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.home_light_ambience_evening
+              state: "on"
+            - condition: state
+              entity_id: sensor.home_light_ambience
+              state: new_years
+          sequence:
+            - action: script.light_turn_on_effect
+              data:
+                entity_id: light.garage_decoration
+                entity_id_mode:
+                  - select.garage_decoration_1_mode
+                effect: Rainbow
+
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.home_light_ambience_morning
+              state: "on"
+            - condition: state
+              entity_id: sensor.home_light_ambience
+              state: christmas
+          sequence:
+            - action: light.turn_on
+              target:
+                entity_id: light.garage_decoration
+              data:
+                brightness_pct: 70
+                rgb_color: [0, 180, 30]
+
+      default:
+        - action: light.turn_off
+          target:
+            entity_id: light.garage_decoration

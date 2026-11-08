@@ -1,5 +1,5 @@
 - id: house_decoration
-  alias: Hus lys dekorationer
+  alias: Hus dekorationer
   description: |
     Styrer dekorationsbelysningen på huset efter tidspunkt og sæson.
   mode: queued
@@ -10,7 +10,7 @@
   triggers:
     - trigger: state
       entity_id:
-        - binary_sensor.home_light_ambience
+        - binary_sensor.home_light_ambience_morning
         - binary_sensor.home_light_ambience_evening
 
   conditions: []
@@ -21,63 +21,69 @@
             - condition: state
               entity_id: binary_sensor.home_light_ambience_evening
               state: "on"
+            - condition: state
+              entity_id: sensor.home_light_ambience
+              state: halloween
           sequence:
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: sensor.home_light_ambience
-                      state: halloween
-                  sequence:
-                    - action: script.light_turn_on_effect
-                      data:
-                        entity_id:
-                          - light.house_decoration
-                        entity_id_mode:
-                          - select.house_decoration_1_mode
-                          - select.house_decoration_2_mode
-                          - select.house_decoration_3_mode
-                          - select.house_decoration_4_mode
-                          - select.house_decoration_5_mode
-                          - select.house_decoration_6_mode
-                        effect: Stripes
-
-                - conditions:
-                    - condition: state
-                      entity_id: sensor.home_light_ambience
-                      state: christmas
-                  sequence:
-                    - action: script.light_turn_on_effect
-                      data:
-                        entity_id:
-                          - light.house_decoration
-                        entity_id_mode:
-                          - select.house_decoration_1_mode
-                          - select.house_decoration_2_mode
-                          - select.house_decoration_3_mode
-                          - select.house_decoration_4_mode
-                          - select.house_decoration_5_mode
-                          - select.house_decoration_6_mode
-                        effect: Sparkle
-
-                - conditions:
-                    - condition: state
-                      entity_id: sensor.home_light_ambience
-                      state: new_years
-                  sequence:
-                    - action: script.light_turn_on_effect
-                      data:
-                        entity_id:
-                          - light.house_decoration
-                        entity_id_mode:
-                          - select.house_decoration_1_mode
-                          - select.house_decoration_2_mode
-                          - select.house_decoration_3_mode
-                          - select.house_decoration_4_mode
-                          - select.house_decoration_5_mode
-                          - select.house_decoration_6_mode
-                        effect: Rainbow
+            - action: script.light_turn_on_effect
+              data:
+                entity_id:
+                  - light.house_decoration
+                entity_id_mode:
+                  - select.house_decoration_1_mode
+                  - select.house_decoration_2_mode
+                  - select.house_decoration_3_mode
+                  - select.house_decoration_4_mode
+                  - select.house_decoration_5_mode
+                  - select.house_decoration_6_mode
+                effect: Stripes
 
         - conditions:
+            - condition: state
+              entity_id: binary_sensor.home_light_ambience_evening
+              state: "on"
+            - condition: state
+              entity_id: sensor.home_light_ambience
+              state: christmas
+          sequence:
+            - action: script.light_turn_on_effect
+              data:
+                entity_id:
+                  - light.house_decoration
+                entity_id_mode:
+                  - select.house_decoration_1_mode
+                  - select.house_decoration_2_mode
+                  - select.house_decoration_3_mode
+                  - select.house_decoration_4_mode
+                  - select.house_decoration_5_mode
+                  - select.house_decoration_6_mode
+                effect: Sparkle
+
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.home_light_ambience_evening
+              state: "on"
+            - condition: state
+              entity_id: sensor.home_light_ambience
+              state: new_years
+          sequence:
+            - action: script.light_turn_on_effect
+              data:
+                entity_id:
+                  - light.house_decoration
+                entity_id_mode:
+                  - select.house_decoration_1_mode
+                  - select.house_decoration_2_mode
+                  - select.house_decoration_3_mode
+                  - select.house_decoration_4_mode
+                  - select.house_decoration_5_mode
+                  - select.house_decoration_6_mode
+                effect: Rainbow
+
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.home_light_ambience_morning
+              state: "on"
             - condition: state
               entity_id: sensor.home_light_ambience
               state: christmas

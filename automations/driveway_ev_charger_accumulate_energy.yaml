@@ -1,0 +1,40 @@
+- id: driveway_ev_charger_accumulate_energy
+  alias: Indkørsel billader energiopsamling
+  description: |
+    Akkumulerer energi fra Wallbox på tværs af opladninger.
+  mode: queued
+  max: 10
+
+  triggers:
+    - trigger: state
+      entity_id: sensor.driveway_ev_charger_added_energy
+      for: "00:01:00"
+
+  conditions:
+    - condition: template
+      value_template: |-
+        {{ trigger.from_state is not none and
+           trigger.to_state is not none and
+           is_number(trigger.from_state.state) and
+           is_number(trigger.to_state.state) }}
+
+  actions:
+    - variables:
+        previous: "{{ trigger.from_state.state | float(0) }}"
+        current: "{{ trigger.to_state.state | float(0) }}"
+
+    - if:
+        - condition: template
+          value_template: "{{ previous > current }}"
+      then:
+        - action: input_number.set_value
+          target:
+            entity_id: input_number.driveway_ev_charger_accumulated_last
+          data:
+            value: "{{ current }}"
+
+        - action: input_number.set_value
+          target:
+            entity_id: input_number.driveway_ev_charger_accumulated_energy
+          data:
+            value: "{{ states('input_number.driveway_ev_charger_accumulated_energy') | float(0) + previous }}"

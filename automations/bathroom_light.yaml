@@ -67,7 +67,7 @@
                 flash: short
               target:
                 entity_id: light.bathroom_light
-            - delay: "00:00:03"
+            - delay: "00:00:10"
             - if:
                 - condition: state
                   entity_id: binary_sensor.bathroom_presence
