@@ -76,7 +76,7 @@
       entity_id: binary_sensor.kitchen_window
 
     - trigger: state
-      entity_id: binary_sensor.monique_living_room_in_sofa
+      entity_id: sensor.monique_living_room_area
 
     - trigger: state
       entity_id: input_select.living_room_robot_vacuum_current_cleaning
@@ -798,8 +798,8 @@
 
             - conditions:
                 - condition: state
-                  entity_id: binary_sensor.monique_living_room_in_sofa
-                  state: "on"
+                  entity_id: sensor.monique_living_room_area
+                  state: "Sofa"
                 - condition: template
                   value_template: "{{ force == false }}"
               sequence:
