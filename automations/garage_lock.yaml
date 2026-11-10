@@ -30,15 +30,24 @@
       to: idle
       id: auto_locking_expired
 
+    - trigger: state
+      entity_id: lock.garage_lock
+      to: unlocked
+      for: "00:01:00"
+      id: unlocked
+
+    - trigger: state
+      entity_id:
+        - sensor.anders_room
+        - sensor.monique_room
+        - sensor.emil_room
+        - sensor.charlie_room
+      to: Garage
+      id: person_at_garage
+
   conditions: []
 
   actions:
-    - action: homeassistant.update_entity
-      data:
-        entity_id: lock.garage_lock
-    - delay:
-        seconds: 3
-
     - choose:
         - conditions:
             - condition: or
@@ -56,10 +65,41 @@
               target:
                 entity_id: lock.garage_lock
             - action: timer.start
-              data:
-                duration: 00:00:10
               target:
                 entity_id: timer.garage_lock_timer
+              data:
+                duration: 00:00:10
+
+        - conditions:
+            - condition: trigger
+              id: person_at_garage
+            - condition: state
+              entity_id: lock.garage_lock
+              state: locked
+          sequence:
+            - variables:
+                person: "{{ trigger.entity_id.split('.')[1].replace('_room', '') }}"
+            - action: lock.unlock
+              target:
+                entity_id: lock.garage_lock
+              data:
+                code: "{{ state_attr('sensor.yale_code', person) }}"
+
+        - conditions:
+            - condition: trigger
+              id: unlocked
+            - condition: state
+              entity_id: lock.garage_lock
+              state: unlocked
+          sequence:
+            - action: lock.lock
+              target:
+                entity_id: lock.garage_lock
+            - action: timer.start
+              target:
+                entity_id: timer.garage_lock_timer
+              data:
+                duration: 00:00:10
 
         - conditions:
             - condition: trigger

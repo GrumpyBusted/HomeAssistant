@@ -33,13 +33,6 @@
   conditions: []
 
   actions:
-    - action: homeassistant.update_entity
-      data:
-        entity_id: lock.utility_room_lock
-
-    - delay:
-        seconds: 3
-
     - choose:
         - conditions:
             - condition: trigger

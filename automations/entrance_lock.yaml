@@ -9,28 +9,14 @@
 
   triggers:
     - trigger: state
-      entity_id: binary_sensor.anders_home
+      entity_id:
+        - binary_sensor.anders_home
+        - binary_sensor.monique_home
+        - binary_sensor.emil_home
+        - binary_sensor.charlie_home
       from: "off"
       to: "on"
-      id: anders_home
-
-    - trigger: state
-      entity_id: binary_sensor.monique_home
-      from: "off"
-      to: "on"
-      id: monique_home
-
-    - trigger: state
-      entity_id: binary_sensor.emil_home
-      from: "off"
-      to: "on"
-      id: emil_home
-
-    - trigger: state
-      entity_id: binary_sensor.charlie_home
-      from: "off"
-      to: "on"
-      id: charlie_home
+      id: person_home
 
     - trigger: state
       entity_id: binary_sensor.home_someone
@@ -54,67 +40,30 @@
       to: idle
       id: auto_locking_expired
 
+    - trigger: state
+      entity_id: lock.entrance_lock
+      to: unlocked
+      for: "00:01:00"
+      id: unlocked
+
   conditions: []
 
   actions:
-    - action: homeassistant.update_entity
-      data:
-        entity_id: lock.entrance_lock
-    - delay:
-        seconds: 3
-
     - choose:
         - conditions:
             - condition: trigger
-              id: anders_home
+              id: person_home
             - condition: state
               entity_id: lock.entrance_lock
               state: locked
           sequence:
+            - variables:
+                person: "{{ trigger.entity_id.split('.')[1].replace('_room', '') }}"
             - action: lock.unlock
-              data:
-                code: "{{ state_attr('sensor.yale_code', 'anders') }}"
               target:
                 entity_id: lock.entrance_lock
-
-        - conditions:
-            - condition: trigger
-              id: monique_home
-            - condition: state
-              entity_id: lock.entrance_lock
-              state: locked
-          sequence:
-            - action: lock.unlock
               data:
-                code: "{{ state_attr('sensor.yale_code', 'monique') }}"
-              target:
-                entity_id: lock.entrance_lock
-
-        - conditions:
-            - condition: trigger
-              id: emil_home
-            - condition: state
-              entity_id: lock.entrance_lock
-              state: locked
-          sequence:
-            - action: lock.unlock
-              data:
-                code: "{{ state_attr('sensor.yale_code', 'emil') }}"
-              target:
-                entity_id: lock.entrance_lock
-
-        - conditions:
-            - condition: trigger
-              id: charlie_home
-            - condition: state
-              entity_id: lock.entrance_lock
-              state: locked
-          sequence:
-            - action: lock.unlock
-              data:
-                code: "{{ state_attr('sensor.yale_code', 'charlie') }}"
-              target:
-                entity_id: lock.entrance_lock
+                code: "{{ state_attr('sensor.yale_code', person) }}"
 
         - conditions:
             - condition: or
@@ -136,6 +85,22 @@
                 duration: 00:00:10
               target:
                 entity_id: timer.entrance_lock_timer
+
+        - conditions:
+            - condition: trigger
+              id: unlocked
+            - condition: state
+              entity_id: lock.entrance_lock
+              state: unlocked
+          sequence:
+            - action: lock.lock
+              target:
+                entity_id: lock.entrance_lock
+            - action: timer.start
+              target:
+                entity_id: timer.entrance_lock_timer
+              data:
+                duration: 00:00:10
 
         - conditions:
             - condition: trigger
