@@ -242,16 +242,14 @@
 
         - if:
             - condition: template
-              value_template: >
+              value_template: |-
                 {{ not is_state('media_player.living_room_tv_media_player', 'off') }}
-
 
           then:
             - if:
                 - condition: template
-                  value_template: >
+                  value_template: |-
                     {{ state_attr('media_player.living_room_tv_media_player', 'source') != 'HDMI 3 (eARC/ARC)' }}
-
 
               then:
                 - action: media_player.select_source
@@ -262,17 +260,14 @@
 
         - if:
             - condition: template
-              value_template: >
+              value_template: |-
                 {{ not is_state('media_player.living_room_receiver', 'off') }}
-
 
           then:
             - if:
                 - condition: template
-                  value_template: >
+                  value_template: |-
                     {{ state_attr('media_player.living_room_receiver', 'source') != 'Apple TV' }}
-
-
               then:
                 - action: media_player.select_source
                   target:

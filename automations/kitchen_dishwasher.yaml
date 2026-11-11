@@ -24,6 +24,6 @@
                 entity_id: sensor.kitchen_dishwasher_energy_consumption
 
       default:
-        - action: homeassistant.enable_entity_safe
+        - action: homeassistant.enable_entity
           data:
             entity_id: sensor.kitchen_dishwasher_energy_consumption
