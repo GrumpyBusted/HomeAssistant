@@ -7,6 +7,9 @@
   trace:
     stored_traces: 100
 
+  # Det er bevidst at entrance_yale_lock bruges til at kontrollerer status og entrance_lock (Bluetooth) til action.
+  # Bluetooth versionen er hurtigst til at opdaterer, men sensorer sendes ikke stabilt via bluetooth.
+
   triggers:
     - trigger: state
       entity_id:
@@ -41,9 +44,9 @@
       id: auto_locking_expired
 
     - trigger: state
-      entity_id: lock.entrance_lock
+      entity_id: lock.entrance_yale_lock
       to: unlocked
-      for: "00:01:00"
+      for: "00:03:00"
       id: unlocked
 
   conditions: []
@@ -54,7 +57,7 @@
             - condition: trigger
               id: person_home
             - condition: state
-              entity_id: lock.entrance_lock
+              entity_id: lock.entrance_yale_lock
               state: locked
           sequence:
             - variables:
@@ -74,7 +77,7 @@
                     - sleeping
                     - bedroom_going_to_sleep
             - condition: state
-              entity_id: lock.entrance_lock
+              entity_id: lock.entrance_yale_lock
               state: unlocked
           sequence:
             - action: lock.lock
@@ -90,7 +93,7 @@
             - condition: trigger
               id: unlocked
             - condition: state
-              entity_id: lock.entrance_lock
+              entity_id: lock.entrance_yale_lock
               state: unlocked
           sequence:
             - action: lock.lock
@@ -104,9 +107,17 @@
 
         - conditions:
             - condition: trigger
+              id: jammed
+          sequence:
+            - action: homeassistant.update_entity
+              data:
+                entity_id: lock.entrance_lock
+
+        - conditions:
+            - condition: trigger
               id: auto_locking_expired
             - condition: state
-              entity_id: lock.entrance_lock
+              entity_id: lock.entrance_yale_lock
               state: unlocked
             - condition: or
               conditions:
