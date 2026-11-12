@@ -38,6 +38,7 @@
           automation.kitchen_presence_sensor: 200
           automation.kitchen_robot_vacuum_cleaning: 200
           automation.kitchen_todo_dishwasher: 250
+          automation.living_room_light: 500
           automation.living_room_heat_pump: 200
           automation.living_room_media_player_state: 150
           automation.patio_light_garden: 200

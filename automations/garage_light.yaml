@@ -118,7 +118,6 @@
         - conditions:
             - condition: trigger
               id:
-                - locked
                 - no_one_home
                 - sleeping
           sequence:
@@ -131,10 +130,15 @@
 
         - conditions:
             - condition: trigger
-              id: closed
+              id:
+                - closed
+                - locked
             - condition: state
               entity_id: lock.garage_lock
               state: locked
+            - condition: state
+              entity_id: binary_sensor.garage_door
+              state: "off"
           sequence:
             - action: light.turn_off
               target:
