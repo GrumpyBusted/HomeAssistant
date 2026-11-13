@@ -21,6 +21,7 @@
           automation.bedroom_air_purifier: 400
           automation.driveway_light: 300
           automation.driveway_motion_sensor_street: 1000
+          automation.driveway_ev_charger_accumulate_energy: 200
           automation.entrance_light: 200
           automation.garage_light_north: 200
           automation.garage_motion_sensor_north: 200
