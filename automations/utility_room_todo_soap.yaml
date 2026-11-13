@@ -18,7 +18,11 @@
         related: input_number.utility_room_soap_seconds_last_change
       id: completed
 
-  conditions: []
+  conditions:
+    - condition: template
+      value_template: |-
+        {{ this.attributes.last_triggered is none or
+           (now() - this.attributes.last_triggered).total_seconds() >= 60 }}
 
   actions:
     - choose:
