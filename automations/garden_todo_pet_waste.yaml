@@ -19,7 +19,13 @@
 
     - trigger: state
       entity_id: binary_sensor.home_outside_light
+      to: "on"
       id: light
+
+    - trigger: state
+      entity_id: binary_sensor.home_outside_light
+      to: "off"
+      id: dark
 
     - trigger: event
       event_type: todo_item_completed
@@ -52,6 +58,32 @@
                   {% set h = (now().timestamp() - as_timestamp(states('input_datetime.garden_pet_waste_last_removed'))) / 60 / 60 %}
                   {% set c = states('counter.utility_room_door_sensor_open') | int(0) - states('input_number.garden_pet_waste_door_count_last_removed') | int(0) %}
                   {{ ((c >= 4 and h >= 48) or (c >= 15 and h >= 15)) }}
+
+        - conditions:
+            - condition: trigger
+              id: dark
+          sequence:
+            - variables:
+                existing: |-
+                  {% set todos = state_attr('todo.todo_smart_todo', 'all_todos') | default([]) | rejectattr('status', 'equalto', 'completed') | list %} 
+                  {% if todo_entity_id is not none %}
+                    {{ todos
+                      | selectattr('description', 'search', 'input_datetime.garden_pet_waste_last_removed' | trim)
+                      | map(attribute='todo_id')
+                      | list }}
+                  {% else %}
+                    {{ todos
+                      | selectattr('subject', 'equalto', subject | trim)
+                      | map(attribute='todo_id')
+                      | list }}
+                  {% endif %}
+            - repeat:
+                for_each: "{{ existing }}"
+                sequence:
+                  - action: ms365_todo.delete_todo
+                    data:
+                      entity_id: todo.todo_smart_todo
+                      todo_id: "{{ repeat.item }}"
 
         - conditions:
             - condition: trigger

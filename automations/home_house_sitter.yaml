@@ -16,8 +16,8 @@
 
     - trigger: state
       entity_id:
-        - sensor.entrance_yale_lock_operator
-        - sensor.utility_room_yale_lock_operator
+        - sensor.entrance_lock_cloud_operator
+        - sensor.utility_room_lock_cloud_operator
       id: unlock
 
   actions:

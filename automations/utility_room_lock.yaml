@@ -47,7 +47,6 @@
             - action: lock.lock
               target:
                 entity_id: lock.utility_room_lock
-
             - action: timer.start
               target:
                 entity_id: timer.utility_room_lock_timer

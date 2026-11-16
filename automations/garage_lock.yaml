@@ -7,9 +7,6 @@
   trace:
     stored_traces: 100
 
-  # Det er bevidst at garage_yale_lock bruges til at kontrollerer status og ragege_lock (Bluetooth) til action.
-  # Bluetooth versionen er hurtigst til at opdaterer, men sensorer sendes ikke stabilt via bluetooth.
-
   triggers:
     - trigger: state
       entity_id: binary_sensor.home_someone
@@ -34,7 +31,7 @@
       id: auto_locking_expired
 
     - trigger: state
-      entity_id: lock.garage_yale_lock
+      entity_id: lock.garage_lock
       to: unlocked
       for: "00:01:00"
       id: unlocked
@@ -61,7 +58,7 @@
                     - sleeping
                     - bedroom_going_to_sleep
             - condition: state
-              entity_id: lock.garage_yale_lock
+              entity_id: lock.garage_lock
               state: unlocked
           sequence:
             - action: lock.lock
@@ -77,22 +74,21 @@
             - condition: trigger
               id: person_at_garage
             - condition: state
-              entity_id: lock.garage_yale_lock
+              entity_id: lock.garage_lock
               state: locked
           sequence:
-            - variables:
-                person: "{{ trigger.entity_id.split('.')[1].replace('_room', '') }}"
-            - action: lock.unlock
-              target:
-                entity_id: lock.garage_lock
+            - action: script.operate_lock
               data:
-                code: "{{ state_attr('sensor.yale_code', person) }}"
+                operation: unlock
+                cloud_lock: lock.garage_lock_cloud
+                bluetooth_lock: lock.garage_lock_bluetooth
+                person: "{{ trigger.entity_id.split('.')[1].replace('_room', '') }}"
 
         - conditions:
             - condition: trigger
               id: unlocked
             - condition: state
-              entity_id: lock.garage_yale_lock
+              entity_id: lock.garage_lock
               state: unlocked
           sequence:
             - action: lock.lock
@@ -108,7 +104,7 @@
             - condition: trigger
               id: auto_locking_expired
             - condition: state
-              entity_id: lock.garage_yale_lock
+              entity_id: lock.garage_lock
               state: unlocked
             - condition: or
               conditions:

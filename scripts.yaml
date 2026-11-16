@@ -1579,3 +1579,256 @@ emils_room_light_switch:
         brightness_pct: 80
       target:
         entity_id: light.emils_room_light_group
+operate_lock:
+  alias: Betjen lås
+  description: 'Robust kontrol af lås/lås op for Yale Doorman låse
+
+    '
+  mode: queued
+  max: 5
+  fields:
+    operation:
+      name: Operation
+      description: Lås eller lås op.
+      required: true
+      selector:
+        select:
+          options:
+          - lock
+          - unlock
+    cloud_lock:
+      name: Cloud lock
+      description: Lock entity from the Yale Cloud integration.
+      required: true
+      selector:
+        entity:
+          domain: lock
+    bluetooth_lock:
+      name: Bluetooth lock
+      description: Lock entity from the Yale Bluetooth integration.
+      required: false
+      selector:
+        entity:
+          domain: lock
+    person:
+      name: Person
+      description: Find koden ud fra personen.
+      required: false
+      selector:
+        text:
+    code:
+      name: Code
+      description: Adgangskode.
+      required: false
+      selector:
+        text:
+  variables:
+    access_code: "{% if code is defined and code | string | trim != '' %}\n  {{ code
+      }}\n{% elif person is defined and person | string | trim != '' %}\n  {{ state_attr('sensor.yale_code',
+      person | lower) | default('', true) }}\n{% else %}\n  {{ '' }}\n{% endif %}\n"
+    expected_state: '{{ ''locked'' if operation == ''lock'' else ''unlocked'' }}
+
+      '
+    cloud_entity: '{{ cloud_lock }}'
+    bluetooth_entity: '{{ bluetooth_lock | default('''', true) }}'
+    wake_button: "{{\n  device_entities(device_id(cloud_lock))\n  | select('match',
+      '^button\\.')\n  | select('search', 'wake', ignorecase=True)\n  | list\n  |
+      first\n  | default('')\n}}\n"
+  sequence:
+  - if:
+    - condition: template
+      value_template: '{{ wake_button != '''' }}'
+    then:
+    - action: button.press
+      continue_on_error: true
+      target:
+        entity_id: '{{ wake_button }}'
+  - if:
+    - condition: template
+      value_template: '{{ bluetooth_entity != '''' and not is_state(bluetooth_entity,
+        expected_state) }}
+
+        '
+    then:
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: '{{ operation == ''lock'' }}'
+        sequence:
+        - action: lock.lock
+          continue_on_error: true
+          target:
+            entity_id: '{{ bluetooth_entity }}'
+      - conditions:
+        - condition: template
+          value_template: '{{ operation == ''unlock'' and access_code != '''' }}'
+        sequence:
+        - action: lock.unlock
+          continue_on_error: true
+          target:
+            entity_id: '{{ bluetooth_entity }}'
+          data:
+            code: '{{ access_code }}'
+      - conditions:
+        - condition: template
+          value_template: '{{ operation == ''unlock'' }}'
+        sequence:
+        - action: lock.unlock
+          continue_on_error: true
+          target:
+            entity_id: '{{ bluetooth_entity }}'
+  - delay:
+      seconds: 2
+  - if:
+    - condition: template
+      value_template: '{{ not is_state(cloud_entity, expected_state) }}
+
+        '
+    then:
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: '{{ operation == ''lock'' }}'
+        sequence:
+        - action: lock.lock
+          continue_on_error: true
+          target:
+            entity_id: '{{ cloud_entity }}'
+      - conditions:
+        - condition: template
+          value_template: '{{ operation == ''unlock'' and access_code != '''' }}'
+        sequence:
+        - action: lock.unlock
+          continue_on_error: true
+          target:
+            entity_id: '{{ cloud_entity }}'
+          data:
+            code: '{{ access_code }}'
+      - conditions:
+        - condition: template
+          value_template: '{{ operation == ''unlock'' }}'
+        sequence:
+        - action: lock.unlock
+          continue_on_error: true
+          target:
+            entity_id: '{{ cloud_entity }}'
+  - action: homeassistant.update_entity
+    continue_on_error: true
+    target:
+      entity_id: '{{ [cloud_entity, bluetooth_entity] | reject(''equalto'', '''')
+        | list }}
+
+        '
+  - delay:
+      milliseconds: 500
+  - if:
+    - condition: template
+      value_template: "{% if has_value(cloud_entity) %}\n  {{ not is_state(cloud_entity,
+        expected_state) }}\n{% elif bluetooth_entity != '' and has_value(bluetooth_entity)
+        %}\n  {{ not is_state(bluetooth_entity, expected_state) }}\n{% else %}\n  false\n{%
+        endif %}\n"
+    then:
+    - delay:
+        seconds: 5
+    - if:
+      - condition: template
+        value_template: '{{ wake_button != '''' }}'
+      then:
+      - action: button.press
+        continue_on_error: true
+        target:
+          entity_id: '{{ wake_button }}'
+    - delay:
+        seconds: 2
+    - if:
+      - condition: template
+        value_template: '{{ bluetooth_entity != '''' and not is_state(bluetooth_entity,
+          expected_state) }}
+
+          '
+      then:
+      - choose:
+        - conditions:
+          - condition: template
+            value_template: '{{ operation == ''lock'' }}'
+          sequence:
+          - action: lock.lock
+            continue_on_error: true
+            target:
+              entity_id: '{{ bluetooth_entity }}'
+        - conditions:
+          - condition: template
+            value_template: '{{ operation == ''unlock'' and access_code != '''' }}'
+          sequence:
+          - action: lock.unlock
+            continue_on_error: true
+            target:
+              entity_id: '{{ bluetooth_entity }}'
+            data:
+              code: '{{ access_code }}'
+        - conditions:
+          - condition: template
+            value_template: '{{ operation == ''unlock'' }}'
+          sequence:
+          - action: lock.unlock
+            continue_on_error: true
+            target:
+              entity_id: '{{ bluetooth_entity }}'
+    - delay:
+        seconds: 2
+    - if:
+      - condition: template
+        value_template: '{{ not is_state(cloud_entity, expected_state) }}
+
+          '
+      then:
+      - choose:
+        - conditions:
+          - condition: template
+            value_template: '{{ operation == ''lock'' }}'
+          sequence:
+          - action: lock.lock
+            continue_on_error: true
+            target:
+              entity_id: '{{ cloud_entity }}'
+        - conditions:
+          - condition: template
+            value_template: '{{ operation == ''unlock'' and access_code != '''' }}'
+          sequence:
+          - action: lock.unlock
+            continue_on_error: true
+            target:
+              entity_id: '{{ cloud_entity }}'
+            data:
+              code: '{{ access_code }}'
+        - conditions:
+          - condition: template
+            value_template: '{{ operation == ''unlock'' }}'
+          sequence:
+          - action: lock.unlock
+            continue_on_error: true
+            target:
+              entity_id: '{{ cloud_entity }}'
+    - action: homeassistant.update_entity
+      continue_on_error: true
+      target:
+        entity_id: '{{ [cloud_entity, bluetooth_entity] | reject(''equalto'', '''')
+          | list }}
+
+          '
+    - delay:
+        milliseconds: 500
+    - if:
+      - condition: template
+        value_template: '{{ not is_state(cloud_entity, expected_state) and (bluetooth_entity
+          == '''' or not is_state(bluetooth_entity, expected_state)) }}
+
+          '
+      then:
+      - action: persistent_notification.create
+        data:
+          title: Yale Doorman command failed
+          message: "Unable to confirm {{ operation }} operation on lock\nCloud lock:
+            \     {{ cloud_entity }} \nBluetooth lock:  {{ bluetooth_entity }} \nCloud
+            state:     {{ states(cloud_entity) }} \nBluetooth state: {{ states(bluetooth_entity)
+            }} \nExpected state:  {{ expected_state }}"
