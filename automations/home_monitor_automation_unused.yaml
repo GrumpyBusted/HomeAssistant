@@ -35,6 +35,8 @@
           automation.technic_room_light: 999
           automation.emils_bedtime: 32
           automation.driveway_ev_charger_unlock: 14
+          automation.bedroom_air_purifier: 32
+          automation.technic_room_esp32: 999
         offenders: |-
           {% set ns = namespace(offenders=[]) %}
           {% for a in states.automation | list %}

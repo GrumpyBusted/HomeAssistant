@@ -1677,6 +1677,10 @@ operate_lock:
           continue_on_error: true
           target:
             entity_id: '{{ bluetooth_entity }}'
+  - action: homeassistant.update_entity
+    continue_on_error: true
+    target:
+      entity_id: '{{ cloud_entity }}'
   - delay:
       seconds: 2
   - if:
@@ -1732,16 +1736,6 @@ operate_lock:
         seconds: 5
     - if:
       - condition: template
-        value_template: '{{ wake_button != '''' }}'
-      then:
-      - action: button.press
-        continue_on_error: true
-        target:
-          entity_id: '{{ wake_button }}'
-    - delay:
-        seconds: 2
-    - if:
-      - condition: template
         value_template: '{{ bluetooth_entity != '''' and not is_state(bluetooth_entity,
           expected_state) }}
 
@@ -1774,6 +1768,10 @@ operate_lock:
             continue_on_error: true
             target:
               entity_id: '{{ bluetooth_entity }}'
+    - action: homeassistant.update_entity
+      continue_on_error: true
+      target:
+        entity_id: '{{ cloud_entity }}'
     - delay:
         seconds: 2
     - if:
@@ -1809,26 +1807,3 @@ operate_lock:
             continue_on_error: true
             target:
               entity_id: '{{ cloud_entity }}'
-    - action: homeassistant.update_entity
-      continue_on_error: true
-      target:
-        entity_id: '{{ [cloud_entity, bluetooth_entity] | reject(''equalto'', '''')
-          | list }}
-
-          '
-    - delay:
-        milliseconds: 500
-    - if:
-      - condition: template
-        value_template: '{{ not is_state(cloud_entity, expected_state) and (bluetooth_entity
-          == '''' or not is_state(bluetooth_entity, expected_state)) }}
-
-          '
-      then:
-      - action: persistent_notification.create
-        data:
-          title: Yale Doorman command failed
-          message: "Unable to confirm {{ operation }} operation on lock\nCloud lock:
-            \     {{ cloud_entity }} \nBluetooth lock:  {{ bluetooth_entity }} \nCloud
-            state:     {{ states(cloud_entity) }} \nBluetooth state: {{ states(bluetooth_entity)
-            }} \nExpected state:  {{ expected_state }}"
