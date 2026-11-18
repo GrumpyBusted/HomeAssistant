@@ -37,6 +37,7 @@
           automation.driveway_ev_charger_unlock: 14
           automation.bedroom_air_purifier: 32
           automation.technic_room_esp32: 999
+          automation.utility_room_todo_dryer: 32
         offenders: |-
           {% set ns = namespace(offenders=[]) %}
           {% for a in states.automation | list %}
