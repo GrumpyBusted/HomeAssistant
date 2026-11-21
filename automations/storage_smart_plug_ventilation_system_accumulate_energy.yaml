@@ -1,0 +1,40 @@
+- id: storage_smart_plug_ventilation_system_accumulate_energy
+  alias: Loftrum strømstik ventilationsanlæg opsamle energi
+  description: |
+    Akkumulerer energiforbrug, når Meross-stikkets energitæller nulstilles.
+
+  mode: queued
+  max: 10
+  trace:
+    stored_traces: 30
+
+  triggers:
+    - trigger: state
+      entity_id:
+        - sensor.storage_smart_plug_ventilation_system_energy
+      for: "00:01:00"
+
+  conditions:
+    - condition: template
+      value_template: |-
+        {{ trigger.from_state is not none and
+           trigger.to_state is not none and
+           is_number(trigger.from_state.state) and
+           is_number(trigger.to_state.state) }}
+
+  actions:
+    - variables:
+        previous: "{{ trigger.from_state.state | float(0) }}"
+        current: "{{ trigger.to_state.state | float(0) }}"
+
+    - if:
+        - condition: template
+          value_template: "{{ previous > current }}"
+      then:
+        - action: input_number.set_value
+          target:
+            entity_id: input_number.storage_smart_plug_ventilation_system_accumulated_energy
+          data:
+            value: >-
+              {{ states('input_number.storage_smart_plug_ventilation_system_accumulated_energy') | float(0) + previous }}
+
