@@ -61,7 +61,7 @@
               data:
                 message: kiosk_set_brightness
                 data:
-                  level: 5
+                  level: 15
 
         - conditions:
             - condition: trigger
