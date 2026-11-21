@@ -14,7 +14,7 @@
         - sensor.patio_temperature_sensor_barbecue_battery
         - sensor.utility_room_temperature_sensor_freezer_battery
       below: 10
-      for: 00:03:00
+      for: 01:00:00
 
     - trigger: numeric_state
       entity_id:
