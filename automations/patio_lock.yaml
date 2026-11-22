@@ -70,7 +70,7 @@
               target:
                 entity_id: timer.patio_lock_timer
               data:
-                duration: "00:00:10"
+                duration: "00:01:00"
 
         - conditions:
             - condition: trigger
@@ -78,6 +78,14 @@
             - condition: state
               entity_id: lock.patio_lock
               state: unlocked
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: binary_sensor.home_someone
+                  state: "off"
+                - condition: state
+                  entity_id: binary_sensor.home_sleeping_everyone
+                  state: "on"
           sequence:
             - action: script.push_notification
               data:

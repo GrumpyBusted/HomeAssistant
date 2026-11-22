@@ -61,7 +61,7 @@
               target:
                 entity_id: timer.utility_room_lock_timer
               data:
-                duration: "00:00:10"
+                duration: "00:01:00"
 
         - conditions:
             - condition: trigger

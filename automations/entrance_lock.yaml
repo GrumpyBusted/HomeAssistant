@@ -85,7 +85,7 @@
                 entity_id: lock.entrance_lock
             - action: timer.start
               data:
-                duration: 00:00:10
+                duration: 00:01:00
               target:
                 entity_id: timer.entrance_lock_timer
 
