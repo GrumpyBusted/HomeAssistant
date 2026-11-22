@@ -1129,8 +1129,9 @@ create_todo_task:
         for_each: '{{ existing }}'
         sequence:
         - action: ms365_todo.complete_todo
-          data:
+          target:
             entity_id: '{{ entity_id }}'
+          data:
             todo_id: '{{ repeat.item }}'
             completed: true
   - if:
@@ -1138,8 +1139,9 @@ create_todo_task:
       value_template: '{{ active and (existing_count == 0 or must_replace) }}'
     then:
     - action: ms365_todo.new_todo
-      data:
+      target:
         entity_id: '{{ entity_id }}'
+      data:
         subject: '{{ subject }}'
         description: '{{ todo_description }}'
         due: '{{ utcnow().date().isoformat() }}'
@@ -1238,8 +1240,9 @@ cleanup_todo_tasks:
       count: '{{ delete | length }}'
       sequence:
       - action: ms365_todo.delete_todo
-        data:
+        target:
           entity_id: '{{ entity_id }}'
+        data:
           todo_id: '{{ delete[repeat.index - 1] }}'
         continue_on_error: true
   - stop: All Done

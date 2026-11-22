@@ -81,8 +81,9 @@
                 for_each: "{{ existing }}"
                 sequence:
                   - action: ms365_todo.delete_todo
-                    data:
+                    target:
                       entity_id: todo.todo_smart_todo
+                    data:
                       todo_id: "{{ repeat.item }}"
 
         - conditions:

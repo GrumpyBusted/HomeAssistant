@@ -1,0 +1,491 @@
+- trigger:
+    - platform: state
+      entity_id: sensor.driveway_ev_charger_added_energy
+  sensor:
+    - name: Indkørsel billader total energi
+      unique_id: driveway_ev_charger_total_energy
+      icon: mdi:lightning-bolt
+      device_class: energy
+      state_class: total_increasing
+      unit_of_measurement: kWh
+      state: |-
+        {% set current = states('sensor.driveway_ev_charger_added_energy') | float(none) %}
+        {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+        {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+        {% set total = this.state | float(0) %}
+        {% if not is_number(current) %}
+          {{ total }}
+        {% elif current < previous %}
+          {{ accumulated + previous + current }}
+        {% else %}
+          {{ accumulated + current }}
+        {% endif %}
+      attributes:
+        previous_reading: |-
+          {% set current = states('sensor.driveway_ev_charger_added_energy') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% if is_number(current) %}
+            {{ current }}
+          {% else %}
+            {{ previous }}
+          {% endif %}
+        accumulated: |-
+          {% set current = states('sensor.driveway_ev_charger_added_energy') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+          {% if is_number(current) and current < previous %}
+            {{ accumulated + previous }}
+          {% else %}
+            {{ accumulated }}
+          {% endif %}
+
+- trigger:
+    - platform: state
+      entity_id: sensor.greenhouse_smart_plug_heating_energy
+  sensor:
+    - name: Drivhus strømstik varme total energi
+      unique_id: greenhouse_smart_plug_heating_total_energy
+      icon: mdi:lightning-bolt
+      device_class: energy
+      state_class: total_increasing
+      unit_of_measurement: kWh
+      state: |-
+        {% set current = states('sensor.greenhouse_smart_plug_heating_energy') | float(none) %}
+        {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+        {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+        {% set total = this.state | float(0) %}
+        {% if not is_number(current) %}
+          {{ total }}
+        {% elif current < previous %}
+          {{ accumulated + previous + current }}
+        {% else %}
+          {{ accumulated + current }}
+        {% endif %}
+      attributes:
+        previous_reading: |-
+          {% set current = states('sensor.greenhouse_smart_plug_heating_energy') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% if is_number(current) %}
+            {{ current }}
+          {% else %}
+            {{ previous }}
+          {% endif %}
+        accumulated: |-
+          {% set current = states('sensor.greenhouse_smart_plug_heating_energy') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+          {% if is_number(current) and current < previous %}
+            {{ accumulated + previous }}
+          {% else %}
+            {{ accumulated }}
+          {% endif %}
+
+- trigger:
+    - platform: state
+      entity_id: sensor.home_heat_pump_accumulated_consumption
+  sensor:
+    - name: Hjem varmepumpe total energi
+      unique_id: home_heat_pump_total_energy
+      icon: mdi:lightning-bolt
+      device_class: energy
+      state_class: total_increasing
+      unit_of_measurement: kWh
+      state: |-
+        {% set current = states('sensor.home_heat_pump_accumulated_consumption') | float(none) %}
+        {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+        {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+        {% set total = this.state | float(0) %}
+        {% if not is_number(current) %}
+          {{ total }}
+        {% elif current < previous %}
+          {{ accumulated + previous + current }}
+        {% else %}
+          {{ accumulated + current }}
+        {% endif %}
+      attributes:
+        previous_reading: |-
+          {% set current = states('sensor.home_heat_pump_accumulated_consumption') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% if is_number(current) %}
+            {{ current }}
+          {% else %}
+            {{ previous }}
+          {% endif %}
+        accumulated: |-
+          {% set current = states('sensor.home_heat_pump_accumulated_consumption') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+          {% if is_number(current) and current < previous %}
+            {{ accumulated + previous }}
+          {% else %}
+            {{ accumulated }}
+          {% endif %}
+
+- trigger:
+    - platform: state
+      entity_id: sensor.kitchen_dishwasher_energy_consumption_safe
+  sensor:
+    - name: Køkken opvaskemaskine total energi
+      unique_id: kitchen_dishwasher_total_energy
+      icon: mdi:lightning-bolt
+      device_class: energy
+      state_class: total_increasing
+      unit_of_measurement: kWh
+      state: |-
+        {% set current = states('sensor.kitchen_dishwasher_energy_consumption_safe') | float(none) %}
+        {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+        {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+        {% set total = this.state | float(0) %}
+        {% if not is_number(current) %}
+          {{ total }}
+        {% elif current < previous %}
+          {{ accumulated + previous + current }}
+        {% else %}
+          {{ accumulated + current }}
+        {% endif %}
+      attributes:
+        previous_reading: |-
+          {% set current = states('sensor.kitchen_dishwasher_energy_consumption_safe') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% if is_number(current) %}
+            {{ current }}
+          {% else %}
+            {{ previous }}
+          {% endif %}
+        accumulated: |-
+          {% set current = states('sensor.kitchen_dishwasher_energy_consumption_safe') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+          {% if is_number(current) and current < previous %}
+            {{ accumulated + previous }}
+          {% else %}
+            {{ accumulated }}
+          {% endif %}
+
+- trigger:
+    - platform: state
+      entity_id: sensor.kitchen_fridge_energy
+  sensor:
+    - name: Køkken køleskab total energi
+      unique_id: kitchen_fridge_total_energy
+      icon: mdi:lightning-bolt
+      device_class: energy
+      state_class: total_increasing
+      unit_of_measurement: kWh
+      state: |-
+        {% set current = states('sensor.kitchen_fridge_energy') | float(none) %}
+        {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+        {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+        {% set total = this.state | float(0) %}
+        {% if not is_number(current) %}
+          {{ total }}
+        {% elif current < previous %}
+          {{ accumulated + previous + current }}
+        {% else %}
+          {{ accumulated + current }}
+        {% endif %}
+      attributes:
+        previous_reading: |-
+          {% set current = states('sensor.kitchen_fridge_energy') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% if is_number(current) %}
+            {{ current }}
+          {% else %}
+            {{ previous }}
+          {% endif %}
+        accumulated: |-
+          {% set current = states('sensor.kitchen_fridge_energy') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+          {% if is_number(current) and current < previous %}
+            {{ accumulated + previous }}
+          {% else %}
+            {{ accumulated }}
+          {% endif %}
+
+- trigger:
+    - platform: state
+      entity_id: sensor.living_room_heat_pump_daily_cooling_energy
+  sensor:
+    - name: Stue varmepumpe køling total energi
+      unique_id: living_room_heat_pump_cooling_total_energy
+      icon: mdi:lightning-bolt
+      device_class: energy
+      state_class: total_increasing
+      unit_of_measurement: kWh
+      state: |-
+        {% set current = states('sensor.living_room_heat_pump_daily_cooling_energy') | float(none) %}
+        {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+        {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+        {% set total = this.state | float(0) %}
+        {% if not is_number(current) %}
+          {{ total }}
+        {% elif current < previous %}
+          {{ accumulated + previous + current }}
+        {% else %}
+          {{ accumulated + current }}
+        {% endif %}
+      attributes:
+        previous_reading: |-
+          {% set current = states('sensor.living_room_heat_pump_daily_cooling_energy') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% if is_number(current) %}
+            {{ current }}
+          {% else %}
+            {{ previous }}
+          {% endif %}
+        accumulated: |-
+          {% set current = states('sensor.living_room_heat_pump_daily_cooling_energy') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+          {% if is_number(current) and current < previous %}
+            {{ accumulated + previous }}
+          {% else %}
+            {{ accumulated }}
+          {% endif %}
+
+- trigger:
+    - platform: state
+      entity_id: sensor.living_room_heat_pump_daily_heating_energy
+  sensor:
+    - name: Stue varmepumpe varme total energi
+      unique_id: living_room_heat_pump_heating_total_energy
+      icon: mdi:lightning-bolt
+      device_class: energy
+      state_class: total_increasing
+      unit_of_measurement: kWh
+      state: |-
+        {% set current = states('sensor.living_room_heat_pump_daily_heating_energy') | float(none) %}
+        {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+        {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+        {% set total = this.state | float(0) %}
+        {% if not is_number(current) %}
+          {{ total }}
+        {% elif current < previous %}
+          {{ accumulated + previous + current }}
+        {% else %}
+          {{ accumulated + current }}
+        {% endif %}
+      attributes:
+        previous_reading: |-
+          {% set current = states('sensor.living_room_heat_pump_daily_heating_energy') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% if is_number(current) %}
+            {{ current }}
+          {% else %}
+            {{ previous }}
+          {% endif %}
+        accumulated: |-
+          {% set current = states('sensor.living_room_heat_pump_daily_heating_energy') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+          {% if is_number(current) and current < previous %}
+            {{ accumulated + previous }}
+          {% else %}
+            {{ accumulated }}
+          {% endif %}
+
+- trigger:
+    - platform: state
+      entity_id: sensor.storage_smart_plug_ventilation_system_energy
+  sensor:
+    - name: Loftrum strømstik ventilationsanlæg total energi
+      unique_id: storage_smart_plug_ventilation_system_total_energy
+      icon: mdi:lightning-bolt
+      device_class: energy
+      state_class: total_increasing
+      unit_of_measurement: kWh
+      state: |-
+        {% set current = states('sensor.storage_smart_plug_ventilation_system_energy') | float(none) %}
+        {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+        {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+        {% set total = this.state | float(0) %}
+        {% if not is_number(current) %}
+          {{ total }}
+        {% elif current < previous %}
+          {{ accumulated + previous + current }}
+        {% else %}
+          {{ accumulated + current }}
+        {% endif %}
+      attributes:
+        previous_reading: |-
+          {% set current = states('sensor.storage_smart_plug_ventilation_system_energy') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% if is_number(current) %}
+            {{ current }}
+          {% else %}
+            {{ previous }}
+          {% endif %}
+        accumulated: |-
+          {% set current = states('sensor.storage_smart_plug_ventilation_system_energy') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+          {% if is_number(current) and current < previous %}
+            {{ accumulated + previous }}
+          {% else %}
+            {{ accumulated }}
+          {% endif %}
+
+- trigger:
+    - platform: state
+      entity_id: sensor.utility_room_smart_plug_dryer_summation_delivered
+  sensor:
+    - name: Bryggers strømstik tørretumbler total energi
+      unique_id: utility_room_smart_plug_dryer_total_energy
+      icon: mdi:lightning-bolt
+      device_class: energy
+      state_class: total_increasing
+      unit_of_measurement: kWh
+      state: |-
+        {% set current = states('sensor.utility_room_smart_plug_dryer_summation_delivered') | float(none) %}
+        {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+        {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+        {% set total = this.state | float(0) %}
+        {% if not is_number(current) %}
+          {{ total }}
+        {% elif current < previous %}
+          {{ accumulated + previous + current }}
+        {% else %}
+          {{ accumulated + current }}
+        {% endif %}
+      attributes:
+        previous_reading: |-
+          {% set current = states('sensor.utility_room_smart_plug_dryer_summation_delivered') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% if is_number(current) %}
+            {{ current }}
+          {% else %}
+            {{ previous }}
+          {% endif %}
+        accumulated: |-
+          {% set current = states('sensor.utility_room_smart_plug_dryer_summation_delivered') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+          {% if is_number(current) and current < previous %}
+            {{ accumulated + previous }}
+          {% else %}
+            {{ accumulated }}
+          {% endif %}
+
+- trigger:
+    - platform: state
+      entity_id: sensor.utility_room_smart_plug_washer_summation_delivered
+  sensor:
+    - name: Bryggers strømstik vaskemaskine total energi
+      unique_id: utility_room_smart_plug_washer_total_energy
+      icon: mdi:lightning-bolt
+      device_class: energy
+      state_class: total_increasing
+      unit_of_measurement: kWh
+      state: |-
+        {% set current = states('sensor.utility_room_smart_plug_washer_summation_delivered') | float(none) %}
+        {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+        {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+        {% set total = this.state | float(0) %}
+        {% if not is_number(current) %}
+          {{ total }}
+        {% elif current < previous %}
+          {{ accumulated + previous + current }}
+        {% else %}
+          {{ accumulated + current }}
+        {% endif %}
+      attributes:
+        previous_reading: |-
+          {% set current = states('sensor.utility_room_smart_plug_washer_summation_delivered') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% if is_number(current) %}
+            {{ current }}
+          {% else %}
+            {{ previous }}
+          {% endif %}
+        accumulated: |-
+          {% set current = states('sensor.utility_room_smart_plug_washer_summation_delivered') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+          {% if is_number(current) and current < previous %}
+            {{ accumulated + previous }}
+          {% else %}
+            {{ accumulated }}
+          {% endif %}
+
+- trigger:
+    - platform: state
+      entity_id: sensor.storage_smart_plug_ventilation_preheating_summation_delivered
+  sensor:
+    - name: Loftrum strømstik ventilation forvarme total energi
+      unique_id: storage_smart_plug_ventilation_preheating_total_energy
+      icon: mdi:lightning-bolt
+      device_class: energy
+      state_class: total_increasing
+      unit_of_measurement: kWh
+      state: |-
+        {% set current = states('sensor.storage_smart_plug_ventilation_preheating_summation_delivered') | float(none) %}
+        {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+        {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+        {% set total = this.state | float(0) %}
+        {% if not is_number(current) %}
+          {{ total }}
+        {% elif current < previous %}
+          {{ accumulated + previous + current }}
+        {% else %}
+          {{ accumulated + current }}
+        {% endif %}
+      attributes:
+        previous_reading: |-
+          {% set current = states('sensor.storage_smart_plug_ventilation_preheating_summation_delivered') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% if is_number(current) %}
+            {{ current }}
+          {% else %}
+            {{ previous }}
+          {% endif %}
+        accumulated: |-
+          {% set current = states('sensor.storage_smart_plug_ventilation_preheating_summation_delivered') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+          {% if is_number(current) and current < previous %}
+            {{ accumulated + previous }}
+          {% else %}
+            {{ accumulated }}
+          {% endif %}
+
+- trigger:
+    - platform: state
+      entity_id: sensor.technic_room_esp32_power_meter_heating_energy
+  sensor:
+    - name: Teknikrum ESP32 strømmåler varme total energi
+      unique_id: technic_room_esp32_power_meter_heating_total_energy
+      icon: mdi:lightning-bolt
+      device_class: energy
+      state_class: total_increasing
+      unit_of_measurement: kWh
+      state: |-
+        {% set current = states('sensor.technic_room_esp32_power_meter_heating_energy') | float(none) %}
+        {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+        {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+        {% set total = this.state | float(0) %}
+        {% if not is_number(current) %}
+          {{ total }}
+        {% elif current < previous %}
+          {{ accumulated + previous + current }}
+        {% else %}
+          {{ accumulated + current }}
+        {% endif %}
+      attributes:
+        previous_reading: |-
+          {% set current = states('sensor.technic_room_esp32_power_meter_heating_energy') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% if is_number(current) %}
+            {{ current }}
+          {% else %}
+            {{ previous }}
+          {% endif %}
+        accumulated: |-
+          {% set current = states('sensor.technic_room_esp32_power_meter_heating_energy') | float(none) %}
+          {% set previous = this.attributes.get('previous_reading', 0) | float(0) %}
+          {% set accumulated = this.attributes.get('accumulated', 0) | float(0) %}
+          {% if is_number(current) and current < previous %}
+            {{ accumulated + previous }}
+          {% else %}
+            {{ accumulated }}
+          {% endif %}
