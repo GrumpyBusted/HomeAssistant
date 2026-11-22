@@ -107,7 +107,6 @@
             - condition: trigger
               id:
                 - opened
-                - unlocked
           sequence:
             - action: light.turn_on
               target:

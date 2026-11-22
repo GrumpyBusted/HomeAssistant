@@ -21,9 +21,23 @@
       id: sleeping
 
     - trigger: state
-      entity_id: select.bedroom_state
-      to: wind_down
-      id: bedroom_going_to_sleep
+      entity_id: lock.patio_lock
+      to: unlocked
+      for: "00:01:00"
+      id: unlocked
+
+    - trigger: state
+      entity_id: binary_sensor.patio_lock_cloud_door
+      to: "off"
+      id: lifted
+
+    - trigger: state
+      entity_id:
+        - binary_sensor.living_room_light
+        - binary_sensor.patio_light
+      to: "off"
+      for: "00:00:10"
+      id: light_off
 
     - trigger: state
       entity_id: timer.patio_lock_timer
@@ -35,16 +49,19 @@
   actions:
     - choose:
         - conditions:
-            - condition: or
-              conditions:
-                - condition: trigger
-                  id:
-                    - no_one_home
-                    - sleeping
-                    - bedroom_going_to_sleep
+            - condition: trigger
+              id:
+                - no_one_home
+                - sleeping
+                - unlocked
+                - lifted
+                - light_off
             - condition: state
               entity_id: lock.patio_lock
               state: unlocked
+            - condition: state
+              entity_id: binary_sensor.patio_lock_cloud_door
+              state: "off"
           sequence:
             - action: lock.lock
               target:
@@ -53,7 +70,7 @@
               target:
                 entity_id: timer.patio_lock_timer
               data:
-                duration: "00:01:00"
+                duration: "00:00:10"
 
         - conditions:
             - condition: trigger
@@ -62,32 +79,11 @@
               entity_id: lock.patio_lock
               state: unlocked
           sequence:
-            - action: lock.lock
-              target:
-                entity_id: lock.patio_lock
-
-            - delay: "00:00:05"
-
-            - if:
-                - condition: not
-                  conditions:
-                    - condition: state
-                      entity_id: lock.patio_lock
-                      state: locked
-                - condition: or
-                  conditions:
-                    - condition: state
-                      entity_id: binary_sensor.home_someone
-                      state: "off"
-                    - condition: state
-                      entity_id: binary_sensor.home_sleeping_everyone
-                      state: "on"
-              then:
-                - action: script.push_notification
-                  data:
-                    type: warning
-                    title: Advarsel
-                    message: Terrassedøren kunne ikke låses automatisk!
-                    id: patio_lock_auto_warning
-                    recipient: home
-                    persistent: false
+            - action: script.push_notification
+              data:
+                type: warning
+                title: Advarsel
+                message: Terrassedøren kunne ikke låses automatisk!
+                id: patio_lock_auto_warning
+                recipient: home
+                persistent: false

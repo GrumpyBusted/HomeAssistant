@@ -1635,8 +1635,9 @@ operate_lock:
     cloud_entity: '{{ cloud_lock }}'
     bluetooth_entity: '{{ bluetooth_lock | default('''', true) }}'
     wake_button: "{{\n  device_entities(device_id(cloud_lock))\n  | select('match',
-      '^button\\.')\n  | select('search', 'wake', ignorecase=True)\n  | list\n  |
-      first\n  | default('')\n}}\n"
+      '^button\\..*_wake$') \n  | list\n  | first\n  | default('')\n}}\n"
+    door_sensor: "{{\n  device_entities(device_id(cloud_lock))\n  | select('match',
+      '^binary_sensor\\..*_door$') \n  | list\n  | first\n  | default('')\n}}\n"
   sequence:
   - if:
     - condition: template
@@ -1657,6 +1658,11 @@ operate_lock:
       - conditions:
         - condition: template
           value_template: '{{ operation == ''lock'' }}'
+        - condition: template
+          value_template: '{{ door_sensor != '''' and is_state(door_sensor, ''off'')
+            }}
+
+            '
         sequence:
         - action: lock.lock
           continue_on_error: true
@@ -1685,7 +1691,7 @@ operate_lock:
     target:
       entity_id: '{{ cloud_entity }}'
   - delay:
-      seconds: 2
+      seconds: 5
   - if:
     - condition: template
       value_template: '{{ not is_state(cloud_entity, expected_state) }}
@@ -1696,6 +1702,11 @@ operate_lock:
       - conditions:
         - condition: template
           value_template: '{{ operation == ''lock'' }}'
+        - condition: template
+          value_template: '{{ door_sensor != '''' and is_state(door_sensor, ''off'')
+            }}
+
+            '
         sequence:
         - action: lock.lock
           continue_on_error: true
@@ -1726,87 +1737,3 @@ operate_lock:
         | list }}
 
         '
-  - delay:
-      milliseconds: 500
-  - if:
-    - condition: template
-      value_template: "{% if has_value(cloud_entity) %}\n  {{ not is_state(cloud_entity,
-        expected_state) }}\n{% elif bluetooth_entity != '' and has_value(bluetooth_entity)
-        %}\n  {{ not is_state(bluetooth_entity, expected_state) }}\n{% else %}\n  false\n{%
-        endif %}\n"
-    then:
-    - delay:
-        seconds: 5
-    - if:
-      - condition: template
-        value_template: '{{ bluetooth_entity != '''' and not is_state(bluetooth_entity,
-          expected_state) }}
-
-          '
-      then:
-      - choose:
-        - conditions:
-          - condition: template
-            value_template: '{{ operation == ''lock'' }}'
-          sequence:
-          - action: lock.lock
-            continue_on_error: true
-            target:
-              entity_id: '{{ bluetooth_entity }}'
-        - conditions:
-          - condition: template
-            value_template: '{{ operation == ''unlock'' and access_code != '''' }}'
-          sequence:
-          - action: lock.unlock
-            continue_on_error: true
-            target:
-              entity_id: '{{ bluetooth_entity }}'
-            data:
-              code: '{{ access_code }}'
-        - conditions:
-          - condition: template
-            value_template: '{{ operation == ''unlock'' }}'
-          sequence:
-          - action: lock.unlock
-            continue_on_error: true
-            target:
-              entity_id: '{{ bluetooth_entity }}'
-    - action: homeassistant.update_entity
-      continue_on_error: true
-      target:
-        entity_id: '{{ cloud_entity }}'
-    - delay:
-        seconds: 2
-    - if:
-      - condition: template
-        value_template: '{{ not is_state(cloud_entity, expected_state) }}
-
-          '
-      then:
-      - choose:
-        - conditions:
-          - condition: template
-            value_template: '{{ operation == ''lock'' }}'
-          sequence:
-          - action: lock.lock
-            continue_on_error: true
-            target:
-              entity_id: '{{ cloud_entity }}'
-        - conditions:
-          - condition: template
-            value_template: '{{ operation == ''unlock'' and access_code != '''' }}'
-          sequence:
-          - action: lock.unlock
-            continue_on_error: true
-            target:
-              entity_id: '{{ cloud_entity }}'
-            data:
-              code: '{{ access_code }}'
-        - conditions:
-          - condition: template
-            value_template: '{{ operation == ''unlock'' }}'
-          sequence:
-          - action: lock.unlock
-            continue_on_error: true
-            target:
-              entity_id: '{{ cloud_entity }}'

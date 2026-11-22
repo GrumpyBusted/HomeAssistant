@@ -9,6 +9,15 @@
 
   triggers:
     - trigger: state
+      entity_id:
+        - sensor.anders_room
+        - sensor.monique_room
+        - sensor.emil_room
+        - sensor.charlie_room
+      to: Garage
+      id: person_at_garage
+
+    - trigger: state
       entity_id: binary_sensor.home_someone
       from: "on"
       to: "off"
@@ -21,55 +30,25 @@
       id: sleeping
 
     - trigger: state
-      entity_id: select.bedroom_state
-      to: wind_down
-      id: bedroom_going_to_sleep
-
-    - trigger: state
-      entity_id: timer.garage_lock_timer
-      to: idle
-      id: auto_locking_expired
-
-    - trigger: state
       entity_id: lock.garage_lock
       to: unlocked
       for: "00:01:00"
       id: unlocked
 
     - trigger: state
-      entity_id:
-        - sensor.anders_room
-        - sensor.monique_room
-        - sensor.emil_room
-        - sensor.charlie_room
-      to: Garage
-      id: person_at_garage
+      entity_id: binary_sensor.garage_lock_cloud_door
+      to: "off"
+      id: lifted
+
+    - trigger: state
+      entity_id: timer.garage_lock_timer
+      to: idle
+      id: auto_locking_expired
 
   conditions: []
 
   actions:
     - choose:
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: trigger
-                  id:
-                    - no_one_home
-                    - sleeping
-                    - bedroom_going_to_sleep
-            - condition: state
-              entity_id: lock.garage_lock
-              state: unlocked
-          sequence:
-            - action: lock.lock
-              target:
-                entity_id: lock.garage_lock
-            - action: timer.start
-              target:
-                entity_id: timer.garage_lock_timer
-              data:
-                duration: 00:00:10
-
         - conditions:
             - condition: trigger
               id: person_at_garage
@@ -86,10 +65,17 @@
 
         - conditions:
             - condition: trigger
-              id: unlocked
+              id:
+                - no_one_home
+                - sleeping
+                - lifted
+                - unlocked
             - condition: state
               entity_id: lock.garage_lock
               state: unlocked
+            - condition: state
+              entity_id: binary_sensor.garage_lock_cloud_door
+              state: "off"
           sequence:
             - action: lock.lock
               target:

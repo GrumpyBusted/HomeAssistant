@@ -7,9 +7,6 @@
   trace:
     stored_traces: 100
 
-  # Det er bevidst at entrance_yale_lock bruges til at kontrollerer status og entrance_lock (Bluetooth) til action.
-  # Bluetooth versionen er hurtigst til at opdaterer, men sensorer sendes ikke stabilt via bluetooth.
-
   triggers:
     - trigger: state
       entity_id:
@@ -34,20 +31,20 @@
       id: sleeping
 
     - trigger: state
-      entity_id: select.bedroom_state
-      to: wind_down
-      id: bedroom_going_to_sleep
+      entity_id: lock.entrance_lock
+      to: unlocked
+      for: "00:01:00"
+      id: unlocked
+
+    - trigger: state
+      entity_id: binary_sensor.entrance_lock_cloud_door
+      to: "off"
+      id: lifted
 
     - trigger: state
       entity_id: timer.entrance_lock_timer
       to: idle
       id: auto_locking_expired
-
-    - trigger: state
-      entity_id: lock.entrance_lock
-      to: unlocked
-      for: "00:03:00"
-      id: unlocked
 
   conditions: []
 
@@ -74,10 +71,14 @@
                   id:
                     - no_one_home
                     - sleeping
-                    - bedroom_going_to_sleep
+                    - unlocked
+                    - lifted
             - condition: state
               entity_id: lock.entrance_lock
               state: unlocked
+            - condition: state
+              entity_id: binary_sensor.entrance_lock_cloud_door
+              state: "off"
           sequence:
             - action: lock.lock
               target:
@@ -87,22 +88,6 @@
                 duration: 00:00:10
               target:
                 entity_id: timer.entrance_lock_timer
-
-        - conditions:
-            - condition: trigger
-              id: unlocked
-            - condition: state
-              entity_id: lock.entrance_lock
-              state: unlocked
-          sequence:
-            - action: lock.lock
-              target:
-                entity_id: lock.entrance_lock
-            - action: timer.start
-              target:
-                entity_id: timer.entrance_lock_timer
-              data:
-                duration: 00:00:10
 
         - conditions:
             - condition: trigger

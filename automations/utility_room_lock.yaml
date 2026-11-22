@@ -21,9 +21,15 @@
       id: sleeping
 
     - trigger: state
-      entity_id: select.bedroom_state
-      to: wind_down
-      id: bedroom_going_to_sleep
+      entity_id: lock.utility_room_lock
+      to: unlocked
+      for: "00:01:00"
+      id: unlocked
+
+    - trigger: state
+      entity_id: binary_sensor.utility_room_lock_cloud_door
+      to: "off"
+      id: lifted
 
     - trigger: state
       entity_id: timer.utility_room_lock_timer
@@ -39,10 +45,14 @@
               id:
                 - no_one_home
                 - sleeping
-                - bedroom_going_to_sleep
+                - lifted
+                - unlocked
             - condition: state
               entity_id: lock.utility_room_lock
               state: unlocked
+            - condition: state
+              entity_id: binary_sensor.utility_room_lock_cloud_door
+              state: "off"
           sequence:
             - action: lock.lock
               target:
