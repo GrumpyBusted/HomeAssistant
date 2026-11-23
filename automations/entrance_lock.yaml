@@ -37,14 +37,9 @@
       id: unlocked
 
     - trigger: state
-      entity_id: binary_sensor.entrance_lock_cloud_door
-      to: "off"
-      id: lifted
-
-    - trigger: state
-      entity_id: timer.entrance_lock_timer
-      to: idle
-      id: auto_locking_expired
+      entity_id: binary_sensor.entrance_lock_ready
+      to: "on"
+      id: ready
 
   conditions: []
 
@@ -53,62 +48,27 @@
         - conditions:
             - condition: trigger
               id: person_home
-            - condition: state
-              entity_id: lock.entrance_lock
-              state: locked
           sequence:
-            - action: script.operate_lock
+            - action: script.home_unlock_door
               data:
-                operation: unlock
+                lock: lock.entrance_lock
                 cloud_lock: lock.entrance_lock_cloud
                 bluetooth_lock: lock.entrance_lock_bluetooth
+                wake_button: button.entrance_lock_cloud_wake
                 person: "{{ trigger.entity_id.split('.')[1].replace('_room', '') }}"
 
         - conditions:
-            - condition: or
-              conditions:
-                - condition: trigger
-                  id:
-                    - no_one_home
-                    - sleeping
-                    - unlocked
-                    - lifted
-            - condition: state
-              entity_id: lock.entrance_lock
-              state: unlocked
-            - condition: state
-              entity_id: binary_sensor.entrance_lock_cloud_door
-              state: "off"
-          sequence:
-            - action: lock.lock
-              target:
-                entity_id: lock.entrance_lock
-            - action: timer.start
-              data:
-                duration: 00:01:00
-              target:
-                entity_id: timer.entrance_lock_timer
-
-        - conditions:
             - condition: trigger
-              id: auto_locking_expired
-            - condition: state
-              entity_id: lock.entrance_lock
-              state: unlocked
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: binary_sensor.home_someone
-                  state: "off"
-                - condition: state
-                  entity_id: binary_sensor.home_sleeping_everyone
-                  state: "on"
+              id:
+                - no_one_home
+                - sleeping
+                - unlocked
+                - ready
           sequence:
-            - action: script.push_notification
+            - action: script.home_lock_door
               data:
-                type: warning
-                title: Advarsel
-                message: Hoveddøren kunne ikke låses automatisk!
-                id: entrance_lock_auto_warning
-                recipient: home
-                persistent: false
+                lock: lock.entrance_lock
+                cloud_lock: lock.entrance_lock_cloud
+                bluetooth_lock: lock.entrance_lock_bluetooth
+                lock_ready: binary_sensor.entrance_lock_ready
+                wake_button: button.entrance_lock_cloud_wake

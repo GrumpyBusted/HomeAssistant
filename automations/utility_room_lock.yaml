@@ -27,14 +27,9 @@
       id: unlocked
 
     - trigger: state
-      entity_id: binary_sensor.utility_room_lock_cloud_door
-      to: "off"
-      id: lifted
-
-    - trigger: state
-      entity_id: timer.utility_room_lock_timer
-      to: idle
-      id: auto_locking_expired
+      entity_id: binary_sensor.utility_room_lock_ready
+      to: "on"
+      id: ready
 
   conditions: []
 
@@ -45,44 +40,13 @@
               id:
                 - no_one_home
                 - sleeping
-                - lifted
                 - unlocked
-            - condition: state
-              entity_id: lock.utility_room_lock
-              state: unlocked
-            - condition: state
-              entity_id: binary_sensor.utility_room_lock_cloud_door
-              state: "off"
+                - ready
           sequence:
-            - action: lock.lock
-              target:
-                entity_id: lock.utility_room_lock
-            - action: timer.start
-              target:
-                entity_id: timer.utility_room_lock_timer
+            - action: script.home_lock_door
               data:
-                duration: "00:01:00"
-
-        - conditions:
-            - condition: trigger
-              id: auto_locking_expired
-            - condition: state
-              entity_id: lock.utility_room_lock
-              state: unlocked
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: binary_sensor.home_someone
-                  state: "off"
-                - condition: state
-                  entity_id: binary_sensor.home_sleeping_everyone
-                  state: "on"
-          sequence:
-            - action: script.push_notification
-              data:
-                type: warning
-                title: Advarsel
-                message: Bryggers døren kunne ikke låses automatisk!
-                id: utility_room_lock_auto_warning
-                recipient: home
-                persistent: false
+                lock: lock.utility_room_lock
+                cloud_lock: lock.utility_room_lock_cloud
+                bluetooth_lock: lock.utility_room_lock_bluetooth
+                lock_ready: binary_sensor.utility_room_lock_ready
+                wake_button: button.utility_room_lock_cloud_wake

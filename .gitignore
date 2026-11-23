@@ -12,6 +12,7 @@
 !templates/
 !themes/
 !data/
+!esphome/
 
 # Allow specific file types globally
 !.gitignore

@@ -1,7 +1,7 @@
 - id: patio_lock
   alias: Terrasse lås
   description: |
-    Styrer låsen på terrassedøren.
+    Låser terrassedøren op eller i afhængigt af, hvem der er hjemme.
   mode: queued
   max: 10
   trace:
@@ -27,22 +27,19 @@
       id: unlocked
 
     - trigger: state
-      entity_id: binary_sensor.patio_lock_cloud_door
-      to: "off"
-      id: lifted
+      entity_id: binary_sensor.patio_lock_ready
+      to: "on"
+      id: ready
 
     - trigger: state
-      entity_id:
-        - binary_sensor.living_room_light
-        - binary_sensor.patio_light
+      entity_id: binary_sensor.living_room_light
       to: "off"
-      for: "00:00:10"
-      id: light_off
+      id: living_room_light_off
 
     - trigger: state
-      entity_id: timer.patio_lock_timer
-      to: idle
-      id: auto_locking_expired
+      entity_id: binary_sensor.living_room_door_long_open
+      to: "off"
+      id: living_room_door_closed
 
   conditions: []
 
@@ -51,47 +48,35 @@
         - conditions:
             - condition: trigger
               id:
-                - no_one_home
-                - sleeping
-                - unlocked
-                - lifted
-                - light_off
+                - living_room_light_off
+                - living_room_door_closed
             - condition: state
-              entity_id: lock.patio_lock
-              state: unlocked
+              entity_id: binary_sensor.living_room_light
+              state: "off"
             - condition: state
-              entity_id: binary_sensor.patio_lock_cloud_door
+              entity_id: binary_sensor.living_room_door_long_open
               state: "off"
           sequence:
-            - action: lock.lock
-              target:
-                entity_id: lock.patio_lock
-            - action: timer.start
-              target:
-                entity_id: timer.patio_lock_timer
+            - action: script.home_lock_door
               data:
-                duration: "00:01:00"
+                lock: lock.patio_lock
+                cloud_lock: lock.patio_lock_cloud
+                bluetooth_lock: lock.patio_lock_bluetooth
+                lock_ready: binary_sensor.patio_lock_ready
+                wake_button: button.patio_lock_cloud_wake
 
         - conditions:
             - condition: trigger
-              id: auto_locking_expired
-            - condition: state
-              entity_id: lock.patio_lock
-              state: unlocked
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: binary_sensor.home_someone
-                  state: "off"
-                - condition: state
-                  entity_id: binary_sensor.home_sleeping_everyone
-                  state: "on"
+              id:
+                - no_one_home
+                - sleeping
+                - unlocked
+                - ready
           sequence:
-            - action: script.push_notification
+            - action: script.home_lock_door
               data:
-                type: warning
-                title: Advarsel
-                message: Terrassedøren kunne ikke låses automatisk!
-                id: patio_lock_auto_warning
-                recipient: home
-                persistent: false
+                lock: lock.patio_lock
+                cloud_lock: lock.patio_lock_cloud
+                bluetooth_lock: lock.patio_lock_bluetooth
+                lock_ready: binary_sensor.patio_lock_ready
+                wake_button: button.patio_lock_cloud_wake

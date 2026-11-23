@@ -1,0 +1,468 @@
+- triggers:
+    - trigger: state
+      entity_id:
+        - lock.entrance_lock_cloud
+        - lock.entrance_lock_bluetooth
+      from: locked
+      to: unlocked
+      id: unlocked
+    - trigger: state
+      entity_id:
+        - lock.entrance_lock_cloud
+        - lock.entrance_lock_bluetooth
+      from: unlocked
+      to: locked
+      id: locked
+    - trigger: state
+      entity_id:
+        - lock.entrance_lock_cloud
+        - lock.entrance_lock_bluetooth
+      to:
+        - locking
+        - unlocking
+        - jammed
+    - trigger: homeassistant
+      event: start
+      id: startup
+  lock:
+    - name: Entre lås
+      unique_id: entrance_lock
+      icon: mdi:lock
+      state: |-
+        {% set cloud = states('lock.entrance_lock_cloud') %}
+        {% set bt = states('lock.entrance_lock_bluetooth') %}
+        {% if trigger.id == 'unlocked' %}
+          unlocked
+        {% elif trigger.id == 'locked' %}
+          locked
+        {% elif cloud == bt and cloud in ['locked', 'unlocked'] %}
+          {{ cloud }}
+        {% elif trigger.id == 'startup' %}
+          {% if cloud in ['locked', 'unlocked'] %}
+            {{ cloud }}
+          {% elif bt in ['locked', 'unlocked'] %}
+            {{ bt }}
+          {% else %}
+            unknown
+          {% endif %}
+        {% else %}
+          {{ this.state if this.state in ['locked', 'unlocked'] else 'unknown' }}
+        {% endif %}
+      availability: |-
+        {{
+          states('lock.entrance_lock_cloud') in ['locked', 'unlocked'] or
+          states('lock.entrance_lock_bluetooth') in ['locked', 'unlocked']
+        }}
+      lock:
+        action: script.home_lock_door
+        data:
+          lock: lock.entrance_lock
+          cloud_lock: lock.entrance_lock_cloud
+          bluetooth_lock: lock.entrance_lock_bluetooth
+          lock_ready: binary_sensor.entrance_lock_ready
+          wake_button: button.entrance_lock_cloud_wake
+      unlock:
+        action: script.home_unlock_door
+        data:
+          lock: lock.entrance_lock
+          cloud_lock: lock.entrance_lock_cloud
+          bluetooth_lock: lock.entrance_lock_bluetooth
+          wake_button: button.entrance_lock_cloud_wake
+- triggers:
+    - trigger: state
+      entity_id:
+        - lock.garage_lock_cloud
+        - lock.garage_lock_bluetooth
+      from: locked
+      to: unlocked
+      id: unlocked
+    - trigger: state
+      entity_id:
+        - lock.garage_lock_cloud
+        - lock.garage_lock_bluetooth
+      from: unlocked
+      to: locked
+      id: locked
+    - trigger: state
+      entity_id:
+        - lock.garage_lock_cloud
+        - lock.garage_lock_bluetooth
+      to:
+        - locking
+        - unlocking
+        - jammed
+    - trigger: homeassistant
+      event: start
+      id: startup
+  lock:
+    - name: Garage lås
+      unique_id: garage_lock
+      icon: mdi:lock
+      state: |-
+        {% set cloud = states('lock.garage_lock_cloud') %}
+        {% set bt = states('lock.garage_lock_bluetooth') %}
+        {% if trigger.id == 'unlocked' %}
+          unlocked
+        {% elif trigger.id == 'locked' %}
+          locked
+        {% elif cloud == bt and cloud in ['locked', 'unlocked'] %}
+          {{ cloud }}
+        {% elif trigger.id == 'startup' %}
+          {% if cloud in ['locked', 'unlocked'] %}
+            {{ cloud }}
+          {% elif bt in ['locked', 'unlocked'] %}
+            {{ bt }}
+          {% else %}
+            unknown
+          {% endif %}
+        {% else %}
+          {{ this.state if this.state in ['locked', 'unlocked'] else 'unknown' }}
+        {% endif %}
+      availability: |-
+        {{
+          states('lock.garage_lock_cloud') in ['locked', 'unlocked'] or
+          states('lock.garage_lock_bluetooth') in ['locked', 'unlocked']
+        }}
+      lock:
+        action: script.home_lock_door
+        data:
+          lock: lock.garage_lock
+          cloud_lock: lock.garage_lock_cloud
+          bluetooth_lock: lock.garage_lock_bluetooth
+          lock_ready: binary_sensor.garage_lock_ready
+          wake_button: button.garage_lock_cloud_wake
+      unlock:
+        action: script.home_unlock_door
+        data:
+          lock: lock.garage_lock
+          cloud_lock: lock.garage_lock_cloud
+          bluetooth_lock: lock.garage_lock_bluetooth
+          wake_button: button.garage_lock_cloud_wake
+- triggers:
+    - trigger: state
+      entity_id:
+        - lock.patio_lock_cloud
+        - lock.patio_lock_bluetooth
+      from: locked
+      to: unlocked
+      id: unlocked
+    - trigger: state
+      entity_id:
+        - lock.patio_lock_cloud
+        - lock.patio_lock_bluetooth
+      from: unlocked
+      to: locked
+      id: locked
+    - trigger: state
+      entity_id:
+        - lock.patio_lock_cloud
+        - lock.patio_lock_bluetooth
+      to:
+        - locking
+        - unlocking
+        - jammed
+    - trigger: homeassistant
+      event: start
+      id: startup
+  lock:
+    - name: Terrasse lås
+      unique_id: patio_lock
+      icon: mdi:lock
+      state: |-
+        {% set cloud = states('lock.patio_lock_cloud') %}
+        {% set bt = states('lock.patio_lock_bluetooth') %}
+        {% if trigger.id == 'unlocked' %}
+          unlocked
+        {% elif trigger.id == 'locked' %}
+          locked
+        {% elif cloud == bt and cloud in ['locked', 'unlocked'] %}
+          {{ cloud }}
+        {% elif trigger.id == 'startup' %}
+          {% if cloud in ['locked', 'unlocked'] %}
+            {{ cloud }}
+          {% elif bt in ['locked', 'unlocked'] %}
+            {{ bt }}
+          {% else %}
+            unknown
+          {% endif %}
+        {% else %}
+          {{ this.state if this.state in ['locked', 'unlocked'] else 'unknown' }}
+        {% endif %}
+      availability: |-
+        {{
+          states('lock.patio_lock_cloud') in ['locked', 'unlocked'] or
+          states('lock.patio_lock_bluetooth') in ['locked', 'unlocked']
+        }}
+      lock:
+        action: script.home_lock_door
+        data:
+          lock: lock.patio_lock
+          cloud_lock: lock.patio_lock_cloud
+          bluetooth_lock: lock.patio_lock_bluetooth
+          lock_ready: binary_sensor.patio_lock_ready
+          wake_button: button.patio_lock_cloud_wake
+      unlock:
+        action: script.home_unlock_door
+        data:
+          lock: lock.patio_lock
+          cloud_lock: lock.patio_lock_cloud
+          bluetooth_lock: lock.patio_lock_bluetooth
+          wake_button: button.patio_lock_cloud_wake
+- triggers:
+    - trigger: state
+      entity_id:
+        - lock.utility_room_lock_cloud
+        - lock.utility_room_lock_bluetooth
+      from: locked
+      to: unlocked
+      id: unlocked
+    - trigger: state
+      entity_id:
+        - lock.utility_room_lock_cloud
+        - lock.utility_room_lock_bluetooth
+      from: unlocked
+      to: locked
+      id: locked
+    - trigger: state
+      entity_id:
+        - lock.utility_room_lock_cloud
+        - lock.utility_room_lock_bluetooth
+      to:
+        - locking
+        - unlocking
+        - jammed
+    - trigger: homeassistant
+      event: start
+      id: startup
+  lock:
+    - name: Bryggers lås
+      unique_id: utility_room_lock
+      icon: mdi:lock
+      state: |-
+        {% set cloud = states('lock.utility_room_lock_cloud') %}
+        {% set bt = states('lock.utility_room_lock_bluetooth') %}
+        {% if trigger.id == 'unlocked' %}
+          unlocked
+        {% elif trigger.id == 'locked' %}
+          locked
+        {% elif cloud == bt and cloud in ['locked', 'unlocked'] %}
+          {{ cloud }}
+        {% elif trigger.id == 'startup' %}
+          {% if cloud in ['locked', 'unlocked'] %}
+            {{ cloud }}
+          {% elif bt in ['locked', 'unlocked'] %}
+            {{ bt }}
+          {% else %}
+            unknown
+          {% endif %}
+        {% else %}
+          {{ this.state if this.state in ['locked', 'unlocked'] else 'unknown' }}
+        {% endif %}
+      availability: |-
+        {{
+          states('lock.utility_room_lock_cloud') in ['locked', 'unlocked'] or
+          states('lock.utility_room_lock_bluetooth') in ['locked', 'unlocked']
+        }}
+      lock:
+        action: script.home_lock_door
+        data:
+          lock: lock.utility_room_lock
+          cloud_lock: lock.utility_room_lock_cloud
+          bluetooth_lock: lock.utility_room_lock_bluetooth
+          lock_ready: binary_sensor.utility_room_lock_ready
+          wake_button: button.utility_room_lock_cloud_wake
+      unlock:
+        action: script.home_unlock_door
+        data:
+          lock: lock.utility_room_lock
+          cloud_lock: lock.utility_room_lock_cloud
+          bluetooth_lock: lock.utility_room_lock_bluetooth
+          wake_button: button.utility_room_lock_cloud_wake
+- triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.entrance_lock_cloud_door
+        - binary_sensor.entrance_lock_bluetooth_door
+      from: "on"
+      to: "off"
+      id: ready
+    - trigger: state
+      entity_id:
+        - binary_sensor.entrance_lock_cloud_door
+        - binary_sensor.entrance_lock_bluetooth_door
+      from: "off"
+      to: "on"
+      id: not_ready
+    - trigger: homeassistant
+      event: start
+      id: startup
+  binary_sensor:
+    - name: Entre lås klar
+      unique_id: entrance_lock_ready
+      icon: mdi:lock-check
+      state: |-
+        {% set cloud = states('binary_sensor.entrance_lock_cloud_door') %}
+        {% set bt = states('binary_sensor.entrance_lock_bluetooth_door') %}
+        {% if trigger.id == 'ready' %}
+          on
+        {% elif trigger.id == 'not_ready' %}
+          off
+        {% elif trigger.id == 'startup' %}
+          {% if cloud in ['on', 'off'] %}
+            {{ 'off' if cloud == 'on' else 'on' }}
+          {% elif bt in ['on', 'off'] %}
+            {{ 'off' if bt == 'on' else 'on' }}
+          {% else %}
+            unknown
+          {% endif %}
+        {% elif cloud == bt and cloud in ['on', 'off'] %}
+          {{ 'off' if cloud == 'on' else 'on' }}
+        {% else %}
+          {{ this.state if this.state in ['on', 'off'] else 'unknown' }}
+        {% endif %}
+      availability: |-
+        {{
+          has_value('binary_sensor.entrance_lock_cloud_door') or
+          has_value('binary_sensor.entrance_lock_bluetooth_door')
+        }}
+- triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.garage_lock_cloud_door
+        - binary_sensor.garage_lock_bluetooth_door
+      from: "on"
+      to: "off"
+      id: ready
+    - trigger: state
+      entity_id:
+        - binary_sensor.garage_lock_cloud_door
+        - binary_sensor.garage_lock_bluetooth_door
+      from: "off"
+      to: "on"
+      id: not_ready
+    - trigger: homeassistant
+      event: start
+      id: startup
+  binary_sensor:
+    - name: Garage lås klar
+      unique_id: garage_lock_ready
+      icon: mdi:lock-check
+      state: |-
+        {% set cloud = states('binary_sensor.garage_lock_cloud_door') %}
+        {% set bt = states('binary_sensor.garage_lock_bluetooth_door') %}
+        {% if trigger.id == 'ready' %}
+          on
+        {% elif trigger.id == 'not_ready' %}
+          off
+        {% elif trigger.id == 'startup' %}
+          {% if cloud in ['on', 'off'] %}
+            {{ 'off' if cloud == 'on' else 'on' }}
+          {% elif bt in ['on', 'off'] %}
+            {{ 'off' if bt == 'on' else 'on' }}
+          {% else %}
+            unknown
+          {% endif %}
+        {% elif cloud == bt and cloud in ['on', 'off'] %}
+          {{ 'off' if cloud == 'on' else 'on' }}
+        {% else %}
+          {{ this.state if this.state in ['on', 'off'] else 'unknown' }}
+        {% endif %}
+      availability: |-
+        {{
+          has_value('binary_sensor.garage_lock_cloud_door') or
+          has_value('binary_sensor.garage_lock_bluetooth_door')
+        }}
+- triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.patio_lock_cloud_door
+        - binary_sensor.patio_lock_bluetooth_door
+      from: "on"
+      to: "off"
+      id: ready
+    - trigger: state
+      entity_id:
+        - binary_sensor.patio_lock_cloud_door
+        - binary_sensor.patio_lock_bluetooth_door
+      from: "off"
+      to: "on"
+      id: not_ready
+    - trigger: homeassistant
+      event: start
+      id: startup
+  binary_sensor:
+    - name: Terrasse lås klar
+      unique_id: patio_lock_ready
+      icon: mdi:lock-check
+      state: |-
+        {% set cloud = states('binary_sensor.patio_lock_cloud_door') %}
+        {% set bt = states('binary_sensor.patio_lock_bluetooth_door') %}
+        {% if trigger.id == 'ready' %}
+          on
+        {% elif trigger.id == 'not_ready' %}
+          off
+        {% elif trigger.id == 'startup' %}
+          {% if cloud in ['on', 'off'] %}
+            {{ 'off' if cloud == 'on' else 'on' }}
+          {% elif bt in ['on', 'off'] %}
+            {{ 'off' if bt == 'on' else 'on' }}
+          {% else %}
+            unknown
+          {% endif %}
+        {% elif cloud == bt and cloud in ['on', 'off'] %}
+          {{ 'off' if cloud == 'on' else 'on' }}
+        {% else %}
+          {{ this.state if this.state in ['on', 'off'] else 'unknown' }}
+        {% endif %}
+      availability: |-
+        {{
+          has_value('binary_sensor.patio_lock_cloud_door') or
+          has_value('binary_sensor.patio_lock_bluetooth_door')
+        }}
+- triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.utility_room_lock_cloud_door
+        - binary_sensor.utility_room_lock_bluetooth_door
+      from: "on"
+      to: "off"
+      id: ready
+    - trigger: state
+      entity_id:
+        - binary_sensor.utility_room_lock_cloud_door
+        - binary_sensor.utility_room_lock_bluetooth_door
+      from: "off"
+      to: "on"
+      id: not_ready
+    - trigger: homeassistant
+      event: start
+      id: startup
+  binary_sensor:
+    - name: Bryggers lås klar
+      unique_id: utility_room_lock_ready
+      icon: mdi:lock-check
+      state: |-
+        {% set cloud = states('binary_sensor.utility_room_lock_cloud_door') %}
+        {% set bt = states('binary_sensor.utility_room_lock_bluetooth_door') %}
+        {% if trigger.id == 'ready' %}
+          on
+        {% elif trigger.id == 'not_ready' %}
+          off
+        {% elif trigger.id == 'startup' %}
+          {% if cloud in ['on', 'off'] %}
+            {{ 'off' if cloud == 'on' else 'on' }}
+          {% elif bt in ['on', 'off'] %}
+            {{ 'off' if bt == 'on' else 'on' }}
+          {% else %}
+            unknown
+          {% endif %}
+        {% elif cloud == bt and cloud in ['on', 'off'] %}
+          {{ 'off' if cloud == 'on' else 'on' }}
+        {% else %}
+          {{ this.state if this.state in ['on', 'off'] else 'unknown' }}
+        {% endif %}
+      availability: |-
+        {{
+          has_value('binary_sensor.utility_room_lock_cloud_door') or
+          has_value('binary_sensor.utility_room_lock_bluetooth_door')
+        }}
