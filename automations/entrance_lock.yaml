@@ -2,73 +2,19 @@
   alias: Entre lås
   description: |
     Låser hoveddøren op eller i afhængigt af, hvem der er hjemme.
-  mode: queued
-  max: 10
-  trace:
-    stored_traces: 100
-
-  triggers:
-    - trigger: state
-      entity_id:
+  use_blueprint:
+    path: custom/home_lock.yaml
+    input:
+      lock: lock.entrance_lock
+      cloud_lock: lock.entrance_lock_cloud
+      bluetooth_lock: lock.entrance_lock_bluetooth
+      lock_ready: binary_sensor.entrance_lock_ready
+      wake_button: button.entrance_lock_cloud_wake
+      person_home_entities:
         - binary_sensor.anders_home
         - binary_sensor.monique_home
         - binary_sensor.emil_home
         - binary_sensor.charlie_home
-      from: "off"
-      to: "on"
-      id: person_home
-
-    - trigger: state
-      entity_id: binary_sensor.home_someone
-      from: "on"
-      to: "off"
-      id: no_one_home
-
-    - trigger: state
-      entity_id: binary_sensor.home_sleeping_everyone
-      from: "off"
-      to: "on"
-      id: sleeping
-
-    - trigger: state
-      entity_id: lock.entrance_lock
-      to: unlocked
-      for: "00:01:00"
-      id: unlocked
-
-    - trigger: state
-      entity_id: binary_sensor.entrance_lock_ready
-      to: "on"
-      id: ready
-
-  conditions: []
-
-  actions:
-    - choose:
-        - conditions:
-            - condition: trigger
-              id: person_home
-          sequence:
-            - action: script.home_unlock_door
-              data:
-                lock: lock.entrance_lock
-                cloud_lock: lock.entrance_lock_cloud
-                bluetooth_lock: lock.entrance_lock_bluetooth
-                wake_button: button.entrance_lock_cloud_wake
-                person: "{{ trigger.entity_id.split('.')[1].replace('_room', '') }}"
-
-        - conditions:
-            - condition: trigger
-              id:
-                - no_one_home
-                - sleeping
-                - unlocked
-                - ready
-          sequence:
-            - action: script.home_lock_door
-              data:
-                lock: lock.entrance_lock
-                cloud_lock: lock.entrance_lock_cloud
-                bluetooth_lock: lock.entrance_lock_bluetooth
-                lock_ready: binary_sensor.entrance_lock_ready
-                wake_button: button.entrance_lock_cloud_wake
+      enable_unlocked_trigger: true
+      enable_ready_trigger: true
+      trace_count: 100

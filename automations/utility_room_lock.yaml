@@ -2,51 +2,14 @@
   alias: Bryggers lås
   description: |
     Låser bryggersdøren op eller i afhængigt af, hvem der er hjemme.
-  mode: queued
-  max: 10
-  trace:
-    stored_traces: 100
-
-  triggers:
-    - trigger: state
-      entity_id: binary_sensor.home_someone
-      from: "on"
-      to: "off"
-      id: no_one_home
-
-    - trigger: state
-      entity_id: binary_sensor.home_sleeping_everyone
-      from: "off"
-      to: "on"
-      id: sleeping
-
-    - trigger: state
-      entity_id: lock.utility_room_lock
-      to: unlocked
-      for: "00:01:00"
-      id: unlocked
-
-    - trigger: state
-      entity_id: binary_sensor.utility_room_lock_ready
-      to: "on"
-      id: ready
-
-  conditions: []
-
-  actions:
-    - choose:
-        - conditions:
-            - condition: trigger
-              id:
-                - no_one_home
-                - sleeping
-                - unlocked
-                - ready
-          sequence:
-            - action: script.home_lock_door
-              data:
-                lock: lock.utility_room_lock
-                cloud_lock: lock.utility_room_lock_cloud
-                bluetooth_lock: lock.utility_room_lock_bluetooth
-                lock_ready: binary_sensor.utility_room_lock_ready
-                wake_button: button.utility_room_lock_cloud_wake
+  use_blueprint:
+    path: custom/home_lock.yaml
+    input:
+      lock: lock.utility_room_lock
+      cloud_lock: lock.utility_room_lock_cloud
+      bluetooth_lock: lock.utility_room_lock_bluetooth
+      lock_ready: binary_sensor.utility_room_lock_ready
+      wake_button: button.utility_room_lock_cloud_wake
+      enable_unlocked_trigger: true
+      enable_ready_trigger: true
+      trace_count: 100

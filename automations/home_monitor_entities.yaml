@@ -57,6 +57,7 @@
               - '^stt\.home_assistant_cloud$'
               - '^tts\.google_translate_en_com$'
               - '^update\..*'
+              - '^sensor\.living_room_robot_vacuum_current_room$'
 
             entities: |-
               {% set unavailable = states

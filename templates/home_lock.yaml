@@ -28,6 +28,7 @@
     - name: Entre lås
       unique_id: entrance_lock
       icon: mdi:lock
+      code_format: '^\d{6}$'
       state: |-
         {% set cloud = states('lock.entrance_lock_cloud') %}
         {% set bt = states('lock.entrance_lock_bluetooth') %}
@@ -98,6 +99,7 @@
     - name: Garage lås
       unique_id: garage_lock
       icon: mdi:lock
+      code_format: '^\d{6}$'
       state: |-
         {% set cloud = states('lock.garage_lock_cloud') %}
         {% set bt = states('lock.garage_lock_bluetooth') %}
@@ -168,6 +170,7 @@
     - name: Terrasse lås
       unique_id: patio_lock
       icon: mdi:lock
+      code_format: "^[1-4]{4}$"
       state: |-
         {% set cloud = states('lock.patio_lock_cloud') %}
         {% set bt = states('lock.patio_lock_bluetooth') %}
@@ -238,6 +241,7 @@
     - name: Bryggers lås
       unique_id: utility_room_lock
       icon: mdi:lock
+      code_format: '^\d{6}$'
       state: |-
         {% set cloud = states('lock.utility_room_lock_cloud') %}
         {% set bt = states('lock.utility_room_lock_bluetooth') %}
@@ -278,6 +282,7 @@
           cloud_lock: lock.utility_room_lock_cloud
           bluetooth_lock: lock.utility_room_lock_bluetooth
           wake_button: button.utility_room_lock_cloud_wake
+          code: "{{ code }}"
 - triggers:
     - trigger: state
       entity_id:

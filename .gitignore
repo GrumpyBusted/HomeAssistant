@@ -5,6 +5,7 @@
 
 # Allow specific directories so their contents can be included
 !automations/
+!blueprints/
 !custom_templates/
 !packages/
 !python_scripts/

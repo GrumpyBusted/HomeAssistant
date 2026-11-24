@@ -90,7 +90,7 @@
               entity_id: sensor.bedroom_air_purifier_mode
               state: heat
             - condition: state
-              entity_id: binary_sensor.bedroom_window_sensor_door
+              entity_id: binary_sensor.bedroom_window
               state: "off"
             - condition: state
               entity_id: select.bedroom_state
@@ -125,7 +125,7 @@
               entity_id: sensor.bedroom_air_quality_score
               below: 50
             - condition: state
-              entity_id: binary_sensor.bedroom_window_sensor_door
+              entity_id: binary_sensor.bedroom_window
               state: "off"
             - condition: state
               entity_id: select.bedroom_state
@@ -142,92 +142,25 @@
             - condition: template
               value_template: |-
                 {{ mode == 'off' }}
-          sequence: []
-
-        - conditions:
-            - condition: state
-              entity_id: select.bedroom_state
-              state:
-                - wind_down
-                - sleeping
-                - quiet_time
-                - wake_up_soon
           sequence:
-            - action: switch.turn_on
-              target:
-                entity_id: switch.bedroom_air_purifier_night_mode
-
-      default:
-        - action: switch.turn_off
-          target:
-            entity_id: switch.bedroom_air_purifier_night_mode
-
-    - choose:
-        - conditions:
-            - condition: template
-              value_template: |-
-                {{ mode == 'off' }}
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: climate.bedroom_air_purifier
-                  state: "off"
-          sequence:
-            - action: dyson_local.set_angle
+            - action: script.operate_air_purifier
               data:
-                entity_id: fan.bedroom_air_purifier_fan
+                climate_entity: climate.bedroom_air_purifier
+                operation: "off"
                 angle_low: 225
                 angle_high: 225
-
-            - action: climate.turn_off
-              target:
-                entity_id: climate.bedroom_air_purifier
-
-            - action: fan.turn_off
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
 
         - conditions:
             - condition: template
               value_template: |-
                 {{ mode == 'heat' }}
           sequence:
-            - action: climate.turn_on
-              target:
-                entity_id: climate.bedroom_air_purifier
-
-            - action: climate.set_temperature
-              target:
-                entity_id: climate.bedroom_air_purifier
+            - action: script.operate_air_purifier
               data:
-                temperature: "{{ min(states('sensor.bedroom_target_temperature') | float(0.0) + 3, 37) }}"
-                hvac_mode: heat
-
-            - action: fan.turn_on
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
-
-            - action: fan.set_preset_mode
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
-              data:
-                preset_mode: Auto
-
-            - action: fan.set_direction
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
-              data:
-                direction: forward
-
-            - action: fan.oscillate
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
-              data:
-                oscillating: "true"
-
-            - action: dyson_local.set_angle
-              data:
-                entity_id: fan.bedroom_air_purifier_fan
+                climate_entity: climate.bedroom_air_purifier
+                operation: "heat"
+                night_mode: "{{ states('select.bedroom_state') in ['wind_down', 'sleeping', 'quiet_time', 'wake_up_soon'] }}"
+                target_temperature: "{{ states('sensor.bedroom_target_temperature') | float(0.0) + 3 }}"
                 angle_low: 155
                 angle_high: 225
 
@@ -236,47 +169,12 @@
               value_template: |-
                 {{ mode == 'cool' }}
           sequence:
-            - action: climate.turn_on
-              target:
-                entity_id: climate.bedroom_air_purifier
-
-            - action: climate.set_temperature
-              target:
-                entity_id: climate.bedroom_air_purifier
+            - action: script.operate_air_purifier
               data:
-                temperature: "{{ max(1, states('sensor.bedroom_target_temperature') | float(0.0) - 3) }}"
-
-            - action: climate.set_hvac_mode
-              data:
-                hvac_mode: cool
-              target:
-                entity_id: climate.bedroom_air_purifier
-
-            - action: fan.turn_on
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
-
-            - action: fan.set_preset_mode
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
-              data:
-                preset_mode: Auto
-
-            - action: fan.set_direction
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
-              data:
-                direction: forward
-
-            - action: fan.oscillate
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
-              data:
-                oscillating: "true"
-
-            - action: dyson_local.set_angle
-              data:
-                entity_id: fan.bedroom_air_purifier_fan
+                climate_entity: climate.bedroom_air_purifier
+                operation: "cool"
+                night_mode: "{{ states('select.bedroom_state') in ['wind_down', 'sleeping', 'quiet_time', 'wake_up_soon'] }}"
+                target_temperature: "{{ states('sensor.bedroom_target_temperature') | float(0.0) - 3 }}"
                 angle_low: 155
                 angle_high: 225
 
@@ -285,37 +183,11 @@
               value_template: |-
                 {{ mode == 'fan' }}
           sequence:
-            - action: fan.turn_on
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
-
-            - action: fan.set_percentage
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
+            - action: script.operate_air_purifier
               data:
-                percentage: 100
-
-            - action: fan.set_preset_mode
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
-              data:
-                preset_mode: Normal
-
-            - action: fan.set_direction
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
-              data:
-                direction: forward
-
-            - action: fan.oscillate
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
-              data:
-                oscillating: "true"
-
-            - action: dyson_local.set_angle
-              data:
-                entity_id: fan.bedroom_air_purifier_fan
+                climate_entity: climate.bedroom_air_purifier
+                operation: "fan"
+                night_mode: "{{ states('select.bedroom_state') in ['wind_down', 'sleeping', 'quiet_time', 'wake_up_soon'] }}"
                 angle_low: 155
                 angle_high: 225
 
@@ -324,40 +196,10 @@
               value_template: |-
                 {{ mode == 'filter' }}
           sequence:
-            - action: climate.turn_on
-              target:
-                entity_id: climate.bedroom_air_purifier
-
-            - action: climate.set_hvac_mode
-              target:
-                entity_id: climate.bedroom_air_purifier
+            - action: script.operate_air_purifier
               data:
-                hvac_mode: cool
-
-            - action: fan.turn_on
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
-
-            - action: fan.set_preset_mode
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
-              data:
-                preset_mode: Auto
-
-            - action: fan.set_direction
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
-              data:
-                direction: reverse
-
-            - action: fan.oscillate
-              target:
-                entity_id: fan.bedroom_air_purifier_fan
-              data:
-                oscillating: "true"
-
-            - action: dyson_local.set_angle
-              data:
-                entity_id: fan.bedroom_air_purifier_fan
+                climate_entity: climate.bedroom_air_purifier
+                operation: "filter"
+                night_mode: "{{ states('select.bedroom_state') in ['wind_down', 'sleeping', 'quiet_time', 'wake_up_soon'] }}"
                 angle_low: 155
                 angle_high: 225

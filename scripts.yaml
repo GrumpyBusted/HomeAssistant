@@ -1587,8 +1587,8 @@ home_lock_door:
   description: 'Robust låsning af Yale Doorman og Håndtag låse via Bluetooth og Cloud.
 
     '
-  mode: queued
-  max: 5
+  mode: parallel
+  max: 10
   fields:
     lock:
       name: Lock
@@ -1683,7 +1683,7 @@ home_lock_door:
           type: warning
           title: Advarsel
           message: '{{ area_name(lock) | default(''Ukendt område'', true) }} døren
-            kunne ikke låses automatisk!'
+            er ikke låst!'
           id: '{{ lock }}_auto_warning'
           recipient: home
           persistent: false
@@ -1693,8 +1693,8 @@ home_unlock_door:
     Cloud.
 
     '
-  mode: queued
-  max: 5
+  mode: parallel
+  max: 10
   fields:
     lock:
       name: Lock
@@ -1739,7 +1739,7 @@ home_unlock_door:
   variables:
     access_code: "{% if code is defined and code | string | trim != '' %}\n  {{ code
       }}\n{% elif person is defined and person | string | trim != '' %}\n  {{ state_attr('sensor.yale_code',
-      person | lower) | default('', true) }}\n{% else %}\n  {{ '' }}\n{% endif %}"
+      person | lower) | default('', true) }}\n{% else %}\n  none \n{% endif %}"
   sequence:
   - action: button.press
     continue_on_error: true
@@ -1753,21 +1753,12 @@ home_unlock_door:
       - condition: template
         value_template: '{{ not is_state(bluetooth_lock, ''unlocked'') }}'
       then:
-      - if:
-        - condition: template
-          value_template: '{{ access_code != '''' }}'
-        then:
-        - action: lock.unlock
-          continue_on_error: true
-          target:
-            entity_id: '{{ bluetooth_lock }}'
-          data:
-            code: '{{ access_code }}'
-        else:
-        - action: lock.unlock
-          continue_on_error: true
-          target:
-            entity_id: '{{ bluetooth_lock }}'
+      - action: lock.unlock
+        continue_on_error: true
+        target:
+          entity_id: '{{ bluetooth_lock }}'
+        data:
+          code: '{{ access_code }}'
       - action: homeassistant.update_entity
         continue_on_error: true
         target:
@@ -1780,21 +1771,12 @@ home_unlock_door:
         value_template: "{{\n  not is_state(lock, 'unlocked') and\n  not is_state(cloud_lock,
           'unlocked')\n}}"
       then:
-      - if:
-        - condition: template
-          value_template: '{{ access_code != '''' }}'
-        then:
-        - action: lock.unlock
-          continue_on_error: true
-          target:
-            entity_id: '{{ cloud_lock }}'
-          data:
-            code: '{{ access_code }}'
-        else:
-        - action: lock.unlock
-          continue_on_error: true
-          target:
-            entity_id: '{{ cloud_lock }}'
+      - action: lock.unlock
+        continue_on_error: true
+        target:
+          entity_id: '{{ cloud_lock }}'
+        data:
+          code: '{{ access_code }}'
       - action: homeassistant.update_entity
         continue_on_error: true
         target:
@@ -1802,3 +1784,305 @@ home_unlock_door:
     - wait_template: '{{ is_state(lock, ''unlocked'') }}'
       timeout: 00:01:00
       continue_on_timeout: true
+operate_air_purifier:
+  alias: Betjen blæser
+  description: Styrer Dyson luftrenserens/blæserens driftstilstand, herunder varme,
+    køling, blæser og filtrering.
+  mode: parallel
+  max: 10
+  fields:
+    climate_entity:
+      name: Klimastyring
+      description: Vælg Dyson-enhedens climate-entity.
+      required: true
+      selector:
+        entity:
+          domain: climate
+    operation:
+      name: Handling
+      description: Vælg den ønskede driftstilstand.
+      required: true
+      selector:
+        select:
+          options:
+          - heat
+          - cool
+          - fan
+          - filter
+          - 'off'
+    target_temperature:
+      name: Temperatur
+      description: Ønskede rumtemperatur
+      default: 21
+      selector:
+        number:
+          min: 10
+          max: 30
+          step: 0.5
+          unit_of_measurement: °C
+          mode: box
+    angle_low:
+      name: Vinkel fra
+      description: Startvinkel for Dyson-blæserens oscillation.
+      required: false
+      selector:
+        number:
+          min: 5
+          max: 355
+          step: 1
+          unit_of_measurement: °
+          mode: box
+    angle_high:
+      name: Vinkel til
+      description: Slutvinkel for Dyson-blæserens oscillation.
+      required: false
+      selector:
+        number:
+          min: 5
+          max: 355
+          step: 1
+          unit_of_measurement: °
+          mode: box
+    night_mode:
+      name: Nattilstand
+      description: Aktiverer eller deaktiverer Dyson-enhedens nattilstand.
+      required: false
+      default: false
+      selector:
+        boolean:
+  sequence:
+  - variables:
+      device: '{{ device_id(climate_entity) }}'
+  - variables:
+      device_entity_list: '{{ device_entities(device) if device else [] }}'
+      fan_entity: "{{\n   device_entity_list | \n   select('match', '^fan\\\\.') |
+        \n   list | first | default('') \n}}"
+      focus_entity: "{{ \n   device_entity_list | select('match', '^switch\\\\.')
+        |\n   select('search', 'focus') |\n   list | first | default('') \n}}"
+      night_entity: "{{ \n   device_entity_list | select('match', '^switch\\\\.')
+        |\n   select('search', '_night_mode') |\n   list | first | default('') \n}}"
+  - if:
+    - condition: template
+      value_template: '{{ fan_entity == '''' }}'
+    then:
+    - stop: No fan entity found for this climate device
+      error: true
+  - if:
+    - condition: template
+      value_template: '{{ states(climate_entity) != ''off'' }}'
+    then:
+    - action: climate.turn_off
+      target:
+        entity_id: '{{ climate_entity }}'
+  - if:
+    - condition: template
+      value_template: '{{ states(fan_entity) != ''off'' }}'
+    then:
+    - action: fan.turn_off
+      target:
+        entity_id: '{{ fan_entity }}'
+  - delay: 00:00:03
+  - wait_template: "{{ \n   is_state(climate_entity, 'off') and\n   is_state(fan_entity,
+      'off') \n}}"
+    timeout: 00:01:00
+    continue_on_timeout: false
+  - if:
+    - condition: template
+      value_template: '{{ night_entity != '''' and operation != ''off'' }}'
+    then:
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: '{{ night_mode | default(false) | bool }}'
+        sequence:
+        - action: switch.turn_on
+          target:
+            entity_id: '{{ night_entity }}'
+      default:
+      - action: switch.turn_off
+        target:
+          entity_id: '{{ night_entity }}'
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ operation == ''heat'' }}'
+      sequence:
+      - action: climate.turn_on
+        target:
+          entity_id: '{{ climate_entity }}'
+      - action: climate.set_temperature
+        target:
+          entity_id: '{{ climate_entity }}'
+        data:
+          temperature: '{{ target_temperature | default(21, true) | float }}'
+          hvac_mode: heat
+      - action: climate.set_hvac_mode
+        target:
+          entity_id: '{{ climate_entity }}'
+        data:
+          hvac_mode: heat
+      - action: fan.turn_on
+        target:
+          entity_id: '{{ fan_entity }}'
+      - action: fan.set_preset_mode
+        target:
+          entity_id: '{{ fan_entity }}'
+        data:
+          preset_mode: Auto
+      - action: fan.oscillate
+        target:
+          entity_id: '{{ fan_entity }}'
+        data:
+          oscillating: true
+    - conditions:
+      - condition: template
+        value_template: '{{ operation == ''cool'' }}'
+      sequence:
+      - action: climate.turn_on
+        target:
+          entity_id: '{{ climate_entity }}'
+      - action: climate.set_temperature
+        target:
+          entity_id: '{{ climate_entity }}'
+        data:
+          temperature: '{{ target_temperature | default(21, true) | float }}'
+          hvac_mode: cool
+      - action: climate.set_hvac_mode
+        target:
+          entity_id: '{{ climate_entity }}'
+        data:
+          hvac_mode: cool
+      - action: fan.turn_on
+        target:
+          entity_id: '{{ fan_entity }}'
+      - action: fan.set_preset_mode
+        target:
+          entity_id: '{{ fan_entity }}'
+        data:
+          preset_mode: Auto
+      - action: fan.oscillate
+        target:
+          entity_id: '{{ fan_entity }}'
+        data:
+          oscillating: true
+    - conditions:
+      - condition: template
+        value_template: '{{ operation == ''fan'' }}'
+      sequence:
+      - action: climate.turn_on
+        target:
+          entity_id: '{{ climate_entity }}'
+      - action: climate.set_temperature
+        target:
+          entity_id: '{{ climate_entity }}'
+        data:
+          temperature: '{{ target_temperature | default(21, true) | float }}'
+          hvac_mode: cool
+      - action: climate.set_hvac_mode
+        target:
+          entity_id: '{{ climate_entity }}'
+        data:
+          hvac_mode: cool
+      - action: fan.turn_on
+        target:
+          entity_id: '{{ fan_entity }}'
+      - action: fan.set_percentage
+        target:
+          entity_id: '{{ fan_entity }}'
+        data:
+          percentage: 100
+      - action: fan.set_preset_mode
+        target:
+          entity_id: '{{ fan_entity }}'
+        data:
+          preset_mode: Normal
+      - action: fan.oscillate
+        target:
+          entity_id: '{{ fan_entity }}'
+        data:
+          oscillating: true
+    - conditions:
+      - condition: template
+        value_template: '{{ operation == ''filter'' }}'
+      sequence:
+      - action: climate.turn_on
+        target:
+          entity_id: '{{ climate_entity }}'
+      - action: climate.set_temperature
+        target:
+          entity_id: '{{ climate_entity }}'
+        data:
+          temperature: '{{ target_temperature | default(21, true) | float }}'
+          hvac_mode: cool
+      - action: climate.set_hvac_mode
+        target:
+          entity_id: '{{ climate_entity }}'
+        data:
+          hvac_mode: cool
+      - action: fan.turn_on
+        target:
+          entity_id: '{{ fan_entity }}'
+      - action: fan.set_preset_mode
+        target:
+          entity_id: '{{ fan_entity }}'
+        data:
+          preset_mode: Auto
+      - action: fan.oscillate
+        target:
+          entity_id: '{{ fan_entity }}'
+        data:
+          oscillating: true
+  - if:
+    - condition: template
+      value_template: "{{ \n   operation != 'off' and\n   (state_attr(fan_entity,
+        'supported_features') | int(0)) | bitwise_and(4) > 0 \n}}"
+    then:
+    - action: fan.set_direction
+      target:
+        entity_id: '{{ fan_entity }}'
+      data:
+        direction: '{{ ''reverse'' if operation == ''filter'' else ''forward'' }}'
+  - if:
+    - condition: template
+      value_template: '{{ operation != ''off'' and focus_entity != '''' }}'
+    then:
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: '{{ operation in [''cool'', ''fan''] }}'
+        sequence:
+        - action: switch.turn_on
+          target:
+            entity_id: '{{ focus_entity }}'
+      default:
+      - action: switch.turn_off
+        target:
+          entity_id: '{{ focus_entity }}'
+  - if:
+    - condition: template
+      value_template: '{{ angle_low is defined or angle_high is defined }}'
+    then:
+    - action: dyson_local.set_angle
+      data:
+        entity_id: '{{ fan_entity }}'
+        angle_low: '{{ angle_low | default(155) }}'
+        angle_high: '{{ angle_high | default(225) }}'
+  - if:
+    - condition: template
+      value_template: '{{ operation == ''off'' }}'
+    then:
+    - delay: 00:00:01
+    - if:
+      - condition: template
+        value_template: '{{ states(climate_entity) != ''off'' }}'
+      then:
+      - action: climate.turn_off
+        target:
+          entity_id: '{{ climate_entity }}'
+    - if:
+      - condition: template
+        value_template: '{{ states(fan_entity) != ''off'' }}'
+      then:
+      - action: fan.turn_off
+        target:
+          entity_id: '{{ fan_entity }}'
