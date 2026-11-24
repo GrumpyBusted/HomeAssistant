@@ -133,7 +133,7 @@
               data:
                 climate_entity: climate.emils_room_air_purifier
                 operation: "heat"
-                night_mode: "{{ is_state('select.emils_room_light', 'off') }}"
+                night_mode: "{{ is_state('binary_sensor.emils_room_light', 'off') }}"
                 target_temperature: "{{ states('sensor.emils_room_target_temperature') | float(0.0) + 3 }}"
 
         - conditions:
@@ -145,7 +145,7 @@
               data:
                 climate_entity: climate.emils_room_air_purifier
                 operation: "cool"
-                night_mode: "{{ is_state('select.emils_room_light', 'off') }}"
+                night_mode: "{{ is_state('binary_sensor.emils_room_light', 'off') }}"
                 target_temperature: "{{ states('sensor.emils_room_target_temperature') | float(0.0) - 3 }}"
 
         - conditions:
@@ -157,7 +157,7 @@
               data:
                 climate_entity: climate.emils_room_air_purifier
                 operation: "fan"
-                night_mode: "{{ is_state('select.emils_room_light', 'off') }}"
+                night_mode: "{{ is_state('binary_sensor.emils_room_light', 'off') }}"
 
         - conditions:
             - condition: template
@@ -168,4 +168,4 @@
               data:
                 climate_entity: climate.emils_room_air_purifier
                 operation: "filter"
-                night_mode: "{{ is_state('select.emils_room_light', 'off') }}"
+                night_mode: "{{ is_state('binary_sensor.emils_room_light', 'off') }}"
