@@ -3,16 +3,15 @@
   description: |
     Låser terrassedøren op eller i afhængigt af, hvem der er hjemme.
   use_blueprint:
-    path: custom/home_lock.yaml
+    path: custom/lock_control.yaml
     input:
       lock: lock.patio_lock
       cloud_lock: lock.patio_lock_cloud
       bluetooth_lock: lock.patio_lock_bluetooth
       lock_ready: binary_sensor.patio_lock_ready
       wake_button: button.patio_lock_cloud_wake
-      enable_unlocked_trigger: false
-      enable_ready_trigger: false
-      extra_lock_entities:
+      enable_auto_lock_trigger: false
+      extra_lock_triggers:
         - binary_sensor.living_room_light
         - binary_sensor.living_room_door_long_open
       trace_count: 50

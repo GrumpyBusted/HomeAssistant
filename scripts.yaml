@@ -1582,8 +1582,532 @@ emils_room_light_switch:
         brightness_pct: 80
       target:
         entity_id: light.emils_room_light_group
-home_lock_door:
-  alias: Hjem lås dør
+operate_air_purifier:
+  alias: Betjen blæser
+  description: Styrer Dyson luftrenserens/blæserens driftstilstand, herunder varme,
+    køling, blæser og filtrering.
+  mode: parallel
+  max: 10
+  fields:
+    climate_entity:
+      name: Klimastyring
+      description: Vælg Dyson-enhedens climate-entity.
+      required: true
+      selector:
+        entity:
+          domain: climate
+    operation:
+      name: Handling
+      description: Vælg den ønskede driftstilstand.
+      required: true
+      selector:
+        select:
+          options:
+          - heat
+          - cool
+          - fan
+          - filter
+          - 'off'
+    target_temperature:
+      name: Temperatur
+      description: Ønskede rumtemperatur
+      default: 21
+      selector:
+        number:
+          min: 10
+          max: 30
+          step: 0.5
+          unit_of_measurement: °C
+          mode: box
+    angle_low:
+      name: Vinkel fra
+      description: Startvinkel for Dyson-blæserens oscillation.
+      required: false
+      selector:
+        number:
+          min: 5
+          max: 355
+          step: 1
+          unit_of_measurement: °
+          mode: box
+    angle_high:
+      name: Vinkel til
+      description: Slutvinkel for Dyson-blæserens oscillation.
+      required: false
+      selector:
+        number:
+          min: 5
+          max: 355
+          step: 1
+          unit_of_measurement: °
+          mode: box
+    night_mode:
+      name: Nattilstand
+      description: Aktiverer eller deaktiverer Dyson-enhedens nattilstand.
+      required: false
+      default: false
+      selector:
+        boolean:
+  sequence:
+  - variables:
+      device: '{{ device_id(climate_entity) }}'
+  - variables:
+      device_entity_list: '{{ device_entities(device) if device else [] }}'
+      fan_entity: "{{\n   device_entity_list |\n   select('match', '^fan\\.') |\n
+        \  list | first | default('')\n}}"
+      focus_entity: "{{\n   device_entity_list | select('match', '^switch\\.') |\n
+        \  select('search', 'focus') |\n   list | first | default('')\n}}"
+      night_entity: "{{\n   device_entity_list | select('match', '^switch\\.') |\n
+        \  select('search', '_night_mode') |\n   list | first | default('')\n}}"
+  - if:
+    - condition: template
+      value_template: '{{ fan_entity == "" }}'
+    then:
+    - stop: No fan entity found for this climate device
+      error: true
+  - if:
+    - condition: template
+      value_template: '{{ states(climate_entity) != "off" }}'
+    then:
+    - action: climate.turn_off
+      target:
+        entity_id: '{{ climate_entity }}'
+  - if:
+    - condition: template
+      value_template: '{{ states(fan_entity) != "off" }}'
+    then:
+    - action: fan.turn_off
+      target:
+        entity_id: '{{ fan_entity }}'
+  - delay: 00:00:03
+  - wait_template: "{{\n   is_state(climate_entity, 'off') and\n   is_state(fan_entity,
+      'off')\n}}"
+    timeout: 00:01:00
+    continue_on_timeout: false
+  - if:
+    - condition: template
+      value_template: '{{ night_entity != "" and operation != "off" }}'
+    then:
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: '{{ night_mode | default(false) | bool }}'
+        - condition: template
+          value_template: '{{ not is_state(night_entity, "on") }}'
+        sequence:
+        - action: switch.turn_on
+          target:
+            entity_id: '{{ night_entity }}'
+      default:
+      - if:
+        - condition: template
+          value_template: '{{ is_state(night_entity, "on") }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: '{{ night_entity }}'
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ operation == "heat" }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ states(climate_entity) == "off" }}'
+        then:
+        - action: climate.turn_on
+          target:
+            entity_id: '{{ climate_entity }}'
+      - if:
+        - condition: template
+          value_template: "{{ state_attr(climate_entity, \"temperature\") | float(0)
+            !=\n   target_temperature | default(21, true) | float }}"
+        then:
+        - action: climate.set_temperature
+          target:
+            entity_id: '{{ climate_entity }}'
+          data:
+            temperature: '{{ target_temperature | default(21, true) | float }}'
+            hvac_mode: heat
+      - if:
+        - condition: template
+          value_template: '{{ states(climate_entity) != "heat" }}'
+        then:
+        - action: climate.set_hvac_mode
+          target:
+            entity_id: '{{ climate_entity }}'
+          data:
+            hvac_mode: heat
+      - if:
+        - condition: template
+          value_template: '{{ states(fan_entity) == "off" }}'
+        then:
+        - action: fan.turn_on
+          target:
+            entity_id: '{{ fan_entity }}'
+      - if:
+        - condition: template
+          value_template: '{{ state_attr(fan_entity, "preset_mode") != "Auto" }}'
+        then:
+        - action: fan.set_preset_mode
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            preset_mode: Auto
+      - if:
+        - condition: template
+          value_template: '{{ not state_attr(fan_entity, "oscillating") | bool }}'
+        then:
+        - action: fan.oscillate
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            oscillating: true
+    - conditions:
+      - condition: template
+        value_template: '{{ operation == "cool" }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ states(climate_entity) == "off" }}'
+        then:
+        - action: climate.turn_on
+          target:
+            entity_id: '{{ climate_entity }}'
+      - if:
+        - condition: template
+          value_template: "{{ state_attr(climate_entity, \"temperature\") | float(0)
+            !=\n   target_temperature | default(21, true) | float }}"
+        then:
+        - action: climate.set_temperature
+          target:
+            entity_id: '{{ climate_entity }}'
+          data:
+            temperature: '{{ target_temperature | default(21, true) | float }}'
+            hvac_mode: cool
+      - if:
+        - condition: template
+          value_template: '{{ states(climate_entity) != "cool" }}'
+        then:
+        - action: climate.set_hvac_mode
+          target:
+            entity_id: '{{ climate_entity }}'
+          data:
+            hvac_mode: cool
+      - if:
+        - condition: template
+          value_template: '{{ states(fan_entity) == "off" }}'
+        then:
+        - action: fan.turn_on
+          target:
+            entity_id: '{{ fan_entity }}'
+      - if:
+        - condition: template
+          value_template: '{{ state_attr(fan_entity, "preset_mode") != "Auto" }}'
+        then:
+        - action: fan.set_preset_mode
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            preset_mode: Auto
+      - if:
+        - condition: template
+          value_template: '{{ not state_attr(fan_entity, "oscillating") | bool }}'
+        then:
+        - action: fan.oscillate
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            oscillating: true
+    - conditions:
+      - condition: template
+        value_template: '{{ operation == "fan" }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ states(climate_entity) == "off" }}'
+        then:
+        - action: climate.turn_on
+          target:
+            entity_id: '{{ climate_entity }}'
+      - if:
+        - condition: template
+          value_template: "{{ state_attr(climate_entity, \"temperature\") | float(0)
+            !=\n   target_temperature | default(21, true) | float }}"
+        then:
+        - action: climate.set_temperature
+          target:
+            entity_id: '{{ climate_entity }}'
+          data:
+            temperature: '{{ target_temperature | default(21, true) | float }}'
+            hvac_mode: cool
+      - if:
+        - condition: template
+          value_template: '{{ states(climate_entity) != "cool" }}'
+        then:
+        - action: climate.set_hvac_mode
+          target:
+            entity_id: '{{ climate_entity }}'
+          data:
+            hvac_mode: cool
+      - if:
+        - condition: template
+          value_template: '{{ states(fan_entity) == "off" }}'
+        then:
+        - action: fan.turn_on
+          target:
+            entity_id: '{{ fan_entity }}'
+      - if:
+        - condition: template
+          value_template: '{{ state_attr(fan_entity, "percentage") | int(0) != 100
+            }}'
+        then:
+        - action: fan.set_percentage
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            percentage: 100
+      - if:
+        - condition: template
+          value_template: '{{ state_attr(fan_entity, "preset_mode") != "Normal" }}'
+        then:
+        - action: fan.set_preset_mode
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            preset_mode: Normal
+      - if:
+        - condition: template
+          value_template: '{{ not state_attr(fan_entity, "oscillating") | bool }}'
+        then:
+        - action: fan.oscillate
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            oscillating: true
+    - conditions:
+      - condition: template
+        value_template: '{{ operation == "filter" }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ states(climate_entity) == "off" }}'
+        then:
+        - action: climate.turn_on
+          target:
+            entity_id: '{{ climate_entity }}'
+      - if:
+        - condition: template
+          value_template: "{{ state_attr(climate_entity, \"temperature\") | float(0)
+            !=\n   target_temperature | default(21, true) | float }}"
+        then:
+        - action: climate.set_temperature
+          target:
+            entity_id: '{{ climate_entity }}'
+          data:
+            temperature: '{{ target_temperature | default(21, true) | float }}'
+            hvac_mode: cool
+      - if:
+        - condition: template
+          value_template: '{{ states(climate_entity) != "cool" }}'
+        then:
+        - action: climate.set_hvac_mode
+          target:
+            entity_id: '{{ climate_entity }}'
+          data:
+            hvac_mode: cool
+      - if:
+        - condition: template
+          value_template: '{{ states(fan_entity) == "off" }}'
+        then:
+        - action: fan.turn_on
+          target:
+            entity_id: '{{ fan_entity }}'
+      - if:
+        - condition: template
+          value_template: '{{ state_attr(fan_entity, "preset_mode") != "Auto" }}'
+        then:
+        - action: fan.set_preset_mode
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            preset_mode: Auto
+      - if:
+        - condition: template
+          value_template: '{{ not state_attr(fan_entity, "oscillating") | bool }}'
+        then:
+        - action: fan.oscillate
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            oscillating: true
+  - if:
+    - condition: template
+      value_template: "{{\n   operation != 'off' and\n   (state_attr(fan_entity, 'supported_features')
+        | int(0)) | bitwise_and(4) > 0 and\n   state_attr(fan_entity, 'direction')
+        !=\n     ('reverse' if operation == 'filter' else 'forward')\n}}"
+    then:
+    - action: fan.set_direction
+      target:
+        entity_id: '{{ fan_entity }}'
+      data:
+        direction: '{{ "reverse" if operation == "filter" else "forward" }}'
+  - if:
+    - condition: template
+      value_template: '{{ operation != "off" and focus_entity != "" }}'
+    then:
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: '{{ operation in ["cool", "fan"] and not is_state(focus_entity,
+            "on") }}'
+        sequence:
+        - action: switch.turn_on
+          target:
+            entity_id: '{{ focus_entity }}'
+      default:
+      - if:
+        - condition: template
+          value_template: '{{ operation not in ["cool", "fan"] and is_state(focus_entity,
+            "on") }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: '{{ focus_entity }}'
+  - if:
+    - condition: template
+      value_template: "{{\n  (angle_low is defined or angle_high is defined) and\n
+        \ (\n    state_attr(fan_entity, 'angle_low') != angle_low | default(155) or\n
+        \   state_attr(fan_entity, 'angle_high') != angle_high | default(225)\n  )\n}}"
+    then:
+    - action: dyson_local.set_angle
+      data:
+        entity_id: '{{ fan_entity }}'
+        angle_low: '{{ angle_low | default(155) }}'
+        angle_high: '{{ angle_high | default(225) }}'
+    - if:
+      - condition: template
+        value_template: "{{\n  state_attr(fan_entity, 'angle_low') != angle_low |
+          float and\n  state_attr(fan_entity, 'angle_high') != angle_high | float\n}}"
+      then:
+      - delay: 00:00:05
+  - if:
+    - condition: template
+      value_template: '{{ operation == "off" }}'
+    then:
+    - if:
+      - condition: template
+        value_template: '{{ states(climate_entity) != "off" }}'
+      then:
+      - action: climate.turn_off
+        target:
+          entity_id: '{{ climate_entity }}'
+    - if:
+      - condition: template
+        value_template: '{{ states(fan_entity) != "off" }}'
+      then:
+      - action: fan.turn_off
+        target:
+          entity_id: '{{ fan_entity }}'
+lock_unlock:
+  alias: lock_unlock
+  description: 'Robust oplåsning af Yale Doorman og håndtag låse via Bluetooth og
+    Cloud.
+
+    '
+  mode: parallel
+  max: 10
+  fields:
+    lock:
+      name: Lock
+      description: Main lock entity.
+      required: true
+      selector:
+        entity:
+          domain: lock
+    cloud_lock:
+      name: Cloud lock
+      description: Lock entity from the Yale Cloud integration.
+      required: true
+      selector:
+        entity:
+          domain: lock
+    bluetooth_lock:
+      name: Bluetooth lock
+      description: Lock entity from the Yale Bluetooth integration.
+      required: true
+      selector:
+        entity:
+          domain: lock
+    wake_button:
+      name: Wake button
+      description: Wake and update lock data.
+      required: true
+      selector:
+        entity:
+          domain: button
+    person:
+      name: Person
+      description: Find the access code based on the person.
+      required: false
+      selector:
+        text:
+    code:
+      name: Code
+      description: Access code.
+      required: false
+      selector:
+        text:
+  variables:
+    access_code: "{% if code is defined and code | string | trim != '' %}\n  {{ code
+      }}\n{% elif person is defined and person | string | trim != '' %}\n  {{ state_attr('sensor.yale_code',
+      person | lower) | default('', true) }}\n{% else %}\n  none \n{% endif %}"
+  sequence:
+  - action: button.press
+    continue_on_error: true
+    target:
+      entity_id: '{{ wake_button }}'
+  - if:
+    - condition: template
+      value_template: '{{ not is_state(lock, ''unlocked'') }}'
+    then:
+    - if:
+      - condition: template
+        value_template: '{{ not is_state(bluetooth_lock, ''unlocked'') }}'
+      then:
+      - action: lock.unlock
+        continue_on_error: true
+        target:
+          entity_id: '{{ bluetooth_lock }}'
+        data:
+          code: '{{ access_code }}'
+      - action: homeassistant.update_entity
+        continue_on_error: true
+        target:
+          entity_id: '{{ [cloud_lock, bluetooth_lock] }}'
+      - wait_template: '{{ is_state(lock, ''unlocked'') }}'
+        timeout: 00:00:10
+        continue_on_timeout: true
+    - if:
+      - condition: template
+        value_template: "{{\n  not is_state(lock, 'unlocked') and\n  not is_state(cloud_lock,
+          'unlocked')\n}}"
+      then:
+      - action: lock.unlock
+        continue_on_error: true
+        target:
+          entity_id: '{{ cloud_lock }}'
+        data:
+          code: '{{ access_code }}'
+      - action: homeassistant.update_entity
+        continue_on_error: true
+        target:
+          entity_id: '{{ [cloud_lock, bluetooth_lock] }}'
+    - wait_template: '{{ is_state(lock, ''unlocked'') }}'
+      timeout: 00:01:00
+      continue_on_timeout: true
+lock_secure:
+  alias: lock_secure
   description: 'Robust låsning af Yale Doorman og Håndtag låse via Bluetooth og Cloud.
 
     '
@@ -1687,105 +2211,8 @@ home_lock_door:
           id: '{{ lock }}_auto_warning'
           recipient: home
           persistent: false
-home_unlock_door:
-  alias: Hjem lås op dør
-  description: 'Robust oplåsning af Yale Doorman og håndtag låse via Bluetooth og
-    Cloud.
-
-    '
-  mode: parallel
-  max: 10
-  fields:
-    lock:
-      name: Lock
-      description: Main lock entity.
-      required: true
-      selector:
-        entity:
-          domain: lock
-    cloud_lock:
-      name: Cloud lock
-      description: Lock entity from the Yale Cloud integration.
-      required: true
-      selector:
-        entity:
-          domain: lock
-    bluetooth_lock:
-      name: Bluetooth lock
-      description: Lock entity from the Yale Bluetooth integration.
-      required: true
-      selector:
-        entity:
-          domain: lock
-    wake_button:
-      name: Wake button
-      description: Wake and update lock data.
-      required: true
-      selector:
-        entity:
-          domain: button
-    person:
-      name: Person
-      description: Find the access code based on the person.
-      required: false
-      selector:
-        text:
-    code:
-      name: Code
-      description: Access code.
-      required: false
-      selector:
-        text:
-  variables:
-    access_code: "{% if code is defined and code | string | trim != '' %}\n  {{ code
-      }}\n{% elif person is defined and person | string | trim != '' %}\n  {{ state_attr('sensor.yale_code',
-      person | lower) | default('', true) }}\n{% else %}\n  none \n{% endif %}"
-  sequence:
-  - action: button.press
-    continue_on_error: true
-    target:
-      entity_id: '{{ wake_button }}'
-  - if:
-    - condition: template
-      value_template: '{{ not is_state(lock, ''unlocked'') }}'
-    then:
-    - if:
-      - condition: template
-        value_template: '{{ not is_state(bluetooth_lock, ''unlocked'') }}'
-      then:
-      - action: lock.unlock
-        continue_on_error: true
-        target:
-          entity_id: '{{ bluetooth_lock }}'
-        data:
-          code: '{{ access_code }}'
-      - action: homeassistant.update_entity
-        continue_on_error: true
-        target:
-          entity_id: '{{ [cloud_lock, bluetooth_lock] }}'
-      - wait_template: '{{ is_state(lock, ''unlocked'') }}'
-        timeout: 00:00:10
-        continue_on_timeout: true
-    - if:
-      - condition: template
-        value_template: "{{\n  not is_state(lock, 'unlocked') and\n  not is_state(cloud_lock,
-          'unlocked')\n}}"
-      then:
-      - action: lock.unlock
-        continue_on_error: true
-        target:
-          entity_id: '{{ cloud_lock }}'
-        data:
-          code: '{{ access_code }}'
-      - action: homeassistant.update_entity
-        continue_on_error: true
-        target:
-          entity_id: '{{ [cloud_lock, bluetooth_lock] }}'
-    - wait_template: '{{ is_state(lock, ''unlocked'') }}'
-      timeout: 00:01:00
-      continue_on_timeout: true
-operate_air_purifier:
-  alias: Betjen blæser
+air_purifier_operate:
+  alias: air_purifier_operate
   description: Styrer Dyson luftrenserens/blæserens driftstilstand, herunder varme,
     køling, blæser og filtrering.
   mode: parallel
@@ -1855,233 +2282,358 @@ operate_air_purifier:
       device: '{{ device_id(climate_entity) }}'
   - variables:
       device_entity_list: '{{ device_entities(device) if device else [] }}'
-      fan_entity: "{{\n   device_entity_list | \n   select('match', '^fan\\\\.') |
-        \n   list | first | default('') \n}}"
-      focus_entity: "{{ \n   device_entity_list | select('match', '^switch\\\\.')
-        |\n   select('search', 'focus') |\n   list | first | default('') \n}}"
-      night_entity: "{{ \n   device_entity_list | select('match', '^switch\\\\.')
-        |\n   select('search', '_night_mode') |\n   list | first | default('') \n}}"
+      fan_entity: "{{\n   device_entity_list |\n   select('match', '^fan\\.') |\n
+        \  list | first | default('')\n}}"
+      focus_entity: "{{\n   device_entity_list | select('match', '^switch\\.') |\n
+        \  select('search', 'focus') |\n   list | first | default('')\n}}"
+      night_entity: "{{\n   device_entity_list | select('match', '^switch\\.') |\n
+        \  select('search', '_night_mode') |\n   list | first | default('')\n}}"
   - if:
     - condition: template
-      value_template: '{{ fan_entity == '''' }}'
+      value_template: '{{ fan_entity == "" }}'
     then:
     - stop: No fan entity found for this climate device
       error: true
   - if:
     - condition: template
-      value_template: '{{ states(climate_entity) != ''off'' }}'
+      value_template: '{{ states(climate_entity) != "off" }}'
     then:
     - action: climate.turn_off
       target:
         entity_id: '{{ climate_entity }}'
   - if:
     - condition: template
-      value_template: '{{ states(fan_entity) != ''off'' }}'
+      value_template: '{{ states(fan_entity) != "off" }}'
     then:
     - action: fan.turn_off
       target:
         entity_id: '{{ fan_entity }}'
   - delay: 00:00:03
-  - wait_template: "{{ \n   is_state(climate_entity, 'off') and\n   is_state(fan_entity,
-      'off') \n}}"
+  - wait_template: "{{\n   is_state(climate_entity, 'off') and\n   is_state(fan_entity,
+      'off')\n}}"
     timeout: 00:01:00
     continue_on_timeout: false
   - if:
     - condition: template
-      value_template: '{{ night_entity != '''' and operation != ''off'' }}'
+      value_template: '{{ night_entity != "" and operation != "off" }}'
     then:
     - choose:
       - conditions:
         - condition: template
           value_template: '{{ night_mode | default(false) | bool }}'
+        - condition: template
+          value_template: '{{ not is_state(night_entity, "on") }}'
         sequence:
         - action: switch.turn_on
           target:
             entity_id: '{{ night_entity }}'
       default:
-      - action: switch.turn_off
-        target:
-          entity_id: '{{ night_entity }}'
+      - if:
+        - condition: template
+          value_template: '{{ is_state(night_entity, "on") }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: '{{ night_entity }}'
   - choose:
     - conditions:
       - condition: template
-        value_template: '{{ operation == ''heat'' }}'
+        value_template: '{{ operation == "heat" }}'
       sequence:
-      - action: climate.turn_on
-        target:
-          entity_id: '{{ climate_entity }}'
-      - action: climate.set_temperature
-        target:
-          entity_id: '{{ climate_entity }}'
-        data:
-          temperature: '{{ target_temperature | default(21, true) | float }}'
-          hvac_mode: heat
-      - action: climate.set_hvac_mode
-        target:
-          entity_id: '{{ climate_entity }}'
-        data:
-          hvac_mode: heat
-      - action: fan.turn_on
-        target:
-          entity_id: '{{ fan_entity }}'
-      - action: fan.set_preset_mode
-        target:
-          entity_id: '{{ fan_entity }}'
-        data:
-          preset_mode: Auto
-      - action: fan.oscillate
-        target:
-          entity_id: '{{ fan_entity }}'
-        data:
-          oscillating: true
+      - if:
+        - condition: template
+          value_template: '{{ states(climate_entity) == "off" }}'
+        then:
+        - action: climate.turn_on
+          target:
+            entity_id: '{{ climate_entity }}'
+      - if:
+        - condition: template
+          value_template: "{{ state_attr(climate_entity, \"temperature\") | float(0)
+            !=\n   target_temperature | default(21, true) | float }}"
+        then:
+        - action: climate.set_temperature
+          target:
+            entity_id: '{{ climate_entity }}'
+          data:
+            temperature: '{{ target_temperature | default(21, true) | float }}'
+            hvac_mode: heat
+      - if:
+        - condition: template
+          value_template: '{{ states(climate_entity) != "heat" }}'
+        then:
+        - action: climate.set_hvac_mode
+          target:
+            entity_id: '{{ climate_entity }}'
+          data:
+            hvac_mode: heat
+      - if:
+        - condition: template
+          value_template: '{{ states(fan_entity) == "off" }}'
+        then:
+        - action: fan.turn_on
+          target:
+            entity_id: '{{ fan_entity }}'
+      - if:
+        - condition: template
+          value_template: '{{ state_attr(fan_entity, "preset_mode") != "Auto" }}'
+        then:
+        - action: fan.set_preset_mode
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            preset_mode: Auto
+      - if:
+        - condition: template
+          value_template: '{{ not state_attr(fan_entity, "oscillating") | bool }}'
+        then:
+        - action: fan.oscillate
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            oscillating: true
     - conditions:
       - condition: template
-        value_template: '{{ operation == ''cool'' }}'
+        value_template: '{{ operation == "cool" }}'
       sequence:
-      - action: climate.turn_on
-        target:
-          entity_id: '{{ climate_entity }}'
-      - action: climate.set_temperature
-        target:
-          entity_id: '{{ climate_entity }}'
-        data:
-          temperature: '{{ target_temperature | default(21, true) | float }}'
-          hvac_mode: cool
-      - action: climate.set_hvac_mode
-        target:
-          entity_id: '{{ climate_entity }}'
-        data:
-          hvac_mode: cool
-      - action: fan.turn_on
-        target:
-          entity_id: '{{ fan_entity }}'
-      - action: fan.set_preset_mode
-        target:
-          entity_id: '{{ fan_entity }}'
-        data:
-          preset_mode: Auto
-      - action: fan.oscillate
-        target:
-          entity_id: '{{ fan_entity }}'
-        data:
-          oscillating: true
+      - if:
+        - condition: template
+          value_template: '{{ states(climate_entity) == "off" }}'
+        then:
+        - action: climate.turn_on
+          target:
+            entity_id: '{{ climate_entity }}'
+      - if:
+        - condition: template
+          value_template: "{{ state_attr(climate_entity, \"temperature\") | float(0)
+            !=\n   target_temperature | default(21, true) | float }}"
+        then:
+        - action: climate.set_temperature
+          target:
+            entity_id: '{{ climate_entity }}'
+          data:
+            temperature: '{{ target_temperature | default(21, true) | float }}'
+            hvac_mode: cool
+      - if:
+        - condition: template
+          value_template: '{{ states(climate_entity) != "cool" }}'
+        then:
+        - action: climate.set_hvac_mode
+          target:
+            entity_id: '{{ climate_entity }}'
+          data:
+            hvac_mode: cool
+      - if:
+        - condition: template
+          value_template: '{{ states(fan_entity) == "off" }}'
+        then:
+        - action: fan.turn_on
+          target:
+            entity_id: '{{ fan_entity }}'
+      - if:
+        - condition: template
+          value_template: '{{ state_attr(fan_entity, "preset_mode") != "Auto" }}'
+        then:
+        - action: fan.set_preset_mode
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            preset_mode: Auto
+      - if:
+        - condition: template
+          value_template: '{{ not state_attr(fan_entity, "oscillating") | bool }}'
+        then:
+        - action: fan.oscillate
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            oscillating: true
     - conditions:
       - condition: template
-        value_template: '{{ operation == ''fan'' }}'
+        value_template: '{{ operation == "fan" }}'
       sequence:
-      - action: climate.turn_on
-        target:
-          entity_id: '{{ climate_entity }}'
-      - action: climate.set_temperature
-        target:
-          entity_id: '{{ climate_entity }}'
-        data:
-          temperature: '{{ target_temperature | default(21, true) | float }}'
-          hvac_mode: cool
-      - action: climate.set_hvac_mode
-        target:
-          entity_id: '{{ climate_entity }}'
-        data:
-          hvac_mode: cool
-      - action: fan.turn_on
-        target:
-          entity_id: '{{ fan_entity }}'
-      - action: fan.set_percentage
-        target:
-          entity_id: '{{ fan_entity }}'
-        data:
-          percentage: 100
-      - action: fan.set_preset_mode
-        target:
-          entity_id: '{{ fan_entity }}'
-        data:
-          preset_mode: Normal
-      - action: fan.oscillate
-        target:
-          entity_id: '{{ fan_entity }}'
-        data:
-          oscillating: true
+      - if:
+        - condition: template
+          value_template: '{{ states(climate_entity) == "off" }}'
+        then:
+        - action: climate.turn_on
+          target:
+            entity_id: '{{ climate_entity }}'
+      - if:
+        - condition: template
+          value_template: "{{ state_attr(climate_entity, \"temperature\") | float(0)
+            !=\n   target_temperature | default(21, true) | float }}"
+        then:
+        - action: climate.set_temperature
+          target:
+            entity_id: '{{ climate_entity }}'
+          data:
+            temperature: '{{ target_temperature | default(21, true) | float }}'
+            hvac_mode: cool
+      - if:
+        - condition: template
+          value_template: '{{ states(climate_entity) != "cool" }}'
+        then:
+        - action: climate.set_hvac_mode
+          target:
+            entity_id: '{{ climate_entity }}'
+          data:
+            hvac_mode: cool
+      - if:
+        - condition: template
+          value_template: '{{ states(fan_entity) == "off" }}'
+        then:
+        - action: fan.turn_on
+          target:
+            entity_id: '{{ fan_entity }}'
+      - if:
+        - condition: template
+          value_template: '{{ state_attr(fan_entity, "percentage") | int(0) != 100
+            }}'
+        then:
+        - action: fan.set_percentage
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            percentage: 100
+      - if:
+        - condition: template
+          value_template: '{{ state_attr(fan_entity, "preset_mode") != "Normal" }}'
+        then:
+        - action: fan.set_preset_mode
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            preset_mode: Normal
+      - if:
+        - condition: template
+          value_template: '{{ not state_attr(fan_entity, "oscillating") | bool }}'
+        then:
+        - action: fan.oscillate
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            oscillating: true
     - conditions:
       - condition: template
-        value_template: '{{ operation == ''filter'' }}'
+        value_template: '{{ operation == "filter" }}'
       sequence:
-      - action: climate.turn_on
-        target:
-          entity_id: '{{ climate_entity }}'
-      - action: climate.set_temperature
-        target:
-          entity_id: '{{ climate_entity }}'
-        data:
-          temperature: '{{ target_temperature | default(21, true) | float }}'
-          hvac_mode: cool
-      - action: climate.set_hvac_mode
-        target:
-          entity_id: '{{ climate_entity }}'
-        data:
-          hvac_mode: cool
-      - action: fan.turn_on
-        target:
-          entity_id: '{{ fan_entity }}'
-      - action: fan.set_preset_mode
-        target:
-          entity_id: '{{ fan_entity }}'
-        data:
-          preset_mode: Auto
-      - action: fan.oscillate
-        target:
-          entity_id: '{{ fan_entity }}'
-        data:
-          oscillating: true
+      - if:
+        - condition: template
+          value_template: '{{ states(climate_entity) == "off" }}'
+        then:
+        - action: climate.turn_on
+          target:
+            entity_id: '{{ climate_entity }}'
+      - if:
+        - condition: template
+          value_template: "{{ state_attr(climate_entity, \"temperature\") | float(0)
+            !=\n   target_temperature | default(21, true) | float }}"
+        then:
+        - action: climate.set_temperature
+          target:
+            entity_id: '{{ climate_entity }}'
+          data:
+            temperature: '{{ target_temperature | default(21, true) | float }}'
+            hvac_mode: cool
+      - if:
+        - condition: template
+          value_template: '{{ states(climate_entity) != "cool" }}'
+        then:
+        - action: climate.set_hvac_mode
+          target:
+            entity_id: '{{ climate_entity }}'
+          data:
+            hvac_mode: cool
+      - if:
+        - condition: template
+          value_template: '{{ states(fan_entity) == "off" }}'
+        then:
+        - action: fan.turn_on
+          target:
+            entity_id: '{{ fan_entity }}'
+      - if:
+        - condition: template
+          value_template: '{{ state_attr(fan_entity, "preset_mode") != "Auto" }}'
+        then:
+        - action: fan.set_preset_mode
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            preset_mode: Auto
+      - if:
+        - condition: template
+          value_template: '{{ not state_attr(fan_entity, "oscillating") | bool }}'
+        then:
+        - action: fan.oscillate
+          target:
+            entity_id: '{{ fan_entity }}'
+          data:
+            oscillating: true
   - if:
     - condition: template
-      value_template: "{{ \n   operation != 'off' and\n   (state_attr(fan_entity,
-        'supported_features') | int(0)) | bitwise_and(4) > 0 \n}}"
+      value_template: "{{\n   operation != 'off' and\n   (state_attr(fan_entity, 'supported_features')
+        | int(0)) | bitwise_and(4) > 0 and\n   state_attr(fan_entity, 'direction')
+        !=\n     ('reverse' if operation == 'filter' else 'forward')\n}}"
     then:
     - action: fan.set_direction
       target:
         entity_id: '{{ fan_entity }}'
       data:
-        direction: '{{ ''reverse'' if operation == ''filter'' else ''forward'' }}'
+        direction: '{{ "reverse" if operation == "filter" else "forward" }}'
   - if:
     - condition: template
-      value_template: '{{ operation != ''off'' and focus_entity != '''' }}'
+      value_template: '{{ operation != "off" and focus_entity != "" }}'
     then:
     - choose:
       - conditions:
         - condition: template
-          value_template: '{{ operation in [''cool'', ''fan''] }}'
+          value_template: '{{ operation in ["cool", "fan"] and not is_state(focus_entity,
+            "on") }}'
         sequence:
         - action: switch.turn_on
           target:
             entity_id: '{{ focus_entity }}'
       default:
-      - action: switch.turn_off
-        target:
-          entity_id: '{{ focus_entity }}'
+      - if:
+        - condition: template
+          value_template: '{{ operation not in ["cool", "fan"] and is_state(focus_entity,
+            "on") }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: '{{ focus_entity }}'
   - if:
     - condition: template
-      value_template: '{{ angle_low is defined or angle_high is defined }}'
+      value_template: "{{\n  (angle_low is defined or angle_high is defined) and\n
+        \ (\n    state_attr(fan_entity, 'angle_low') != angle_low | default(155) or\n
+        \   state_attr(fan_entity, 'angle_high') != angle_high | default(225)\n  )\n}}"
     then:
     - action: dyson_local.set_angle
       data:
         entity_id: '{{ fan_entity }}'
         angle_low: '{{ angle_low | default(155) }}'
         angle_high: '{{ angle_high | default(225) }}'
-  - if:
-    - condition: template
-      value_template: '{{ operation == ''off'' }}'
-    then:
-    - delay: 00:00:01
     - if:
       - condition: template
-        value_template: '{{ states(climate_entity) != ''off'' }}'
+        value_template: "{{\n  state_attr(fan_entity, 'angle_low') != angle_low |
+          float and\n  state_attr(fan_entity, 'angle_high') != angle_high | float\n}}"
+      then:
+      - delay: 00:00:05
+  - if:
+    - condition: template
+      value_template: '{{ operation == "off" }}'
+    then:
+    - if:
+      - condition: template
+        value_template: '{{ states(climate_entity) != "off" }}'
       then:
       - action: climate.turn_off
         target:
           entity_id: '{{ climate_entity }}'
     - if:
       - condition: template
-        value_template: '{{ states(fan_entity) != ''off'' }}'
+        value_template: '{{ states(fan_entity) != "off" }}'
       then:
       - action: fan.turn_off
         target:

@@ -55,7 +55,7 @@
           states('lock.entrance_lock_bluetooth') in ['locked', 'unlocked']
         }}
       lock:
-        action: script.home_lock_door
+        action: script.lock_secure
         data:
           lock: lock.entrance_lock
           cloud_lock: lock.entrance_lock_cloud
@@ -63,7 +63,7 @@
           lock_ready: binary_sensor.entrance_lock_ready
           wake_button: button.entrance_lock_cloud_wake
       unlock:
-        action: script.home_unlock_door
+        action: script.lock_unlock
         data:
           lock: lock.entrance_lock
           cloud_lock: lock.entrance_lock_cloud
@@ -126,7 +126,7 @@
           states('lock.garage_lock_bluetooth') in ['locked', 'unlocked']
         }}
       lock:
-        action: script.home_lock_door
+        action: script.lock_secure
         data:
           lock: lock.garage_lock
           cloud_lock: lock.garage_lock_cloud
@@ -134,7 +134,7 @@
           lock_ready: binary_sensor.garage_lock_ready
           wake_button: button.garage_lock_cloud_wake
       unlock:
-        action: script.home_unlock_door
+        action: script.lock_unlock
         data:
           lock: lock.garage_lock
           cloud_lock: lock.garage_lock_cloud
@@ -197,7 +197,7 @@
           states('lock.patio_lock_bluetooth') in ['locked', 'unlocked']
         }}
       lock:
-        action: script.home_lock_door
+        action: script.lock_secure
         data:
           lock: lock.patio_lock
           cloud_lock: lock.patio_lock_cloud
@@ -205,7 +205,7 @@
           lock_ready: binary_sensor.patio_lock_ready
           wake_button: button.patio_lock_cloud_wake
       unlock:
-        action: script.home_unlock_door
+        action: script.lock_unlock
         data:
           lock: lock.patio_lock
           cloud_lock: lock.patio_lock_cloud
@@ -268,7 +268,7 @@
           states('lock.utility_room_lock_bluetooth') in ['locked', 'unlocked']
         }}
       lock:
-        action: script.home_lock_door
+        action: script.lock_secure
         data:
           lock: lock.utility_room_lock
           cloud_lock: lock.utility_room_lock_cloud
@@ -276,7 +276,7 @@
           lock_ready: binary_sensor.utility_room_lock_ready
           wake_button: button.utility_room_lock_cloud_wake
       unlock:
-        action: script.home_unlock_door
+        action: script.lock_unlock
         data:
           lock: lock.utility_room_lock
           cloud_lock: lock.utility_room_lock_cloud

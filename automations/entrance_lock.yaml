@@ -3,18 +3,16 @@
   description: |
     Låser hoveddøren op eller i afhængigt af, hvem der er hjemme.
   use_blueprint:
-    path: custom/home_lock.yaml
+    path: custom/lock_control.yaml
     input:
       lock: lock.entrance_lock
       cloud_lock: lock.entrance_lock_cloud
       bluetooth_lock: lock.entrance_lock_bluetooth
       lock_ready: binary_sensor.entrance_lock_ready
       wake_button: button.entrance_lock_cloud_wake
-      person_home_entities:
+      person_home:
         - binary_sensor.anders_home
         - binary_sensor.monique_home
         - binary_sensor.emil_home
         - binary_sensor.charlie_home
-      enable_unlocked_trigger: true
-      enable_ready_trigger: true
       trace_count: 100

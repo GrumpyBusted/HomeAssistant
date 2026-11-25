@@ -3,19 +3,17 @@
   description: |
     Låser garagedøren op eller i afhængigt af, hvem der er hjemme.
   use_blueprint:
-    path: custom/home_lock.yaml
+    path: custom/lock_control.yaml
     input:
       lock: lock.garage_lock
       cloud_lock: lock.garage_lock_cloud
       bluetooth_lock: lock.garage_lock_bluetooth
       lock_ready: binary_sensor.garage_lock_ready
       wake_button: button.garage_lock_cloud_wake
-      room_presence_entities:
+      person_room:
         - sensor.anders_room
         - sensor.monique_room
         - sensor.emil_room
         - sensor.charlie_room
-      room_name: Garage
-      enable_unlocked_trigger: true
-      enable_ready_trigger: true
+      room: Garage
       trace_count: 100

@@ -3,13 +3,11 @@
   description: |
     Låser bryggersdøren op eller i afhængigt af, hvem der er hjemme.
   use_blueprint:
-    path: custom/home_lock.yaml
+    path: custom/lock_control.yaml
     input:
       lock: lock.utility_room_lock
       cloud_lock: lock.utility_room_lock_cloud
       bluetooth_lock: lock.utility_room_lock_bluetooth
       lock_ready: binary_sensor.utility_room_lock_ready
       wake_button: button.utility_room_lock_cloud_wake
-      enable_unlocked_trigger: true
-      enable_ready_trigger: true
       trace_count: 100
